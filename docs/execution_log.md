@@ -104,6 +104,8 @@
 - Tela `/app/integracoes` passou a mostrar acoes de testar e sincronizar para BigShop.
 - Criados testes `BigShopIntegrationTest` com `Http::fake`.
 - Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build` e smoke de erro controlado `422` sem conexao BigShop.
+- Run `26331844564` do GitHub Actions finalizou com sucesso para o commit `2254a07`.
+- Validado em producao: `/app/integracoes` e `POST /public/api/v1/integrations/bigshop/probe` retornando `422` controlado sem credencial real.
 
 ## Pendencias abertas
 

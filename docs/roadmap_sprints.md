@@ -121,7 +121,7 @@ Entregas:
 - mapeamento tabela de medidas quando disponivel;
 - relatorio de lacunas por loja.
 
-Status: implementado localmente; publicar e validar em producao.
+Status: concluido e publicado em producao no run `26331844564`.
 
 ## Sprint 8 - BigShop Um Clique
 
