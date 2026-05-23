@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\MerchantCompany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -50,6 +51,38 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.allowed_domains.1', 'localhost')
             ->assertJsonPath('data.theme.primary', '#101820')
             ->assertJsonPath('data.is_active', false);
+    }
+
+    public function test_bigshop_contract_keeps_widget_platform_locked(): void
+    {
+        $this->seed();
+
+        MerchantCompany::query()
+            ->where('external_store_id', 'pv-demo-store')
+            ->update(['platform' => 'bigshop']);
+
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/widget-install')
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'bigshop')
+            ->assertJsonPath('data.company.platform', 'bigshop');
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'platform' => 'shopify',
+            ])
+            ->assertForbidden()
+            ->assertJsonPath('message', 'Sua empresa contratou o plano BigShop. O widget pode ser instalado apenas na BigShop.');
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'platform' => 'bigshop',
+                'allowed_domains' => ['provadorvirtual.online'],
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'bigshop');
     }
 
     private function loginToken(): string

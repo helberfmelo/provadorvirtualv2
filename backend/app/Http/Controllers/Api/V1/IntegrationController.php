@@ -6,8 +6,11 @@ use App\Http\Controllers\Api\V1\Concerns\ResolvesMerchant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePlatformConnectionRequest;
 use App\Http\Resources\PlatformConnectionResource;
+use App\Models\Merchant;
+use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Services\Audit\AuditLogger;
+use App\Support\ActiveTenant;
 use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -20,12 +23,13 @@ class IntegrationController extends Controller
     public function index(Request $request)
     {
         $merchant = $this->currentMerchant($request);
+        $company = $this->activeCompany($request, $merchant);
         $connections = PlatformConnection::query()
             ->where('merchant_id', $merchant->id)
             ->get()
             ->keyBy('platform');
 
-        $data = collect(PlatformCatalog::all())->map(function (array $platform) use ($connections): array {
+        $data = collect($this->catalogForCompany($company))->map(function (array $platform) use ($connections): array {
             $connection = $connections->get($platform['key']);
 
             return array_merge($platform, [
@@ -45,8 +49,13 @@ class IntegrationController extends Controller
         }
 
         $merchant = $this->currentMerchant($request);
+        $activeCompany = $this->activeCompany($request, $merchant);
+        $this->guardPlatformAllowed($activeCompany, $platform);
+
         $data = $request->validated();
-        $company = $this->merchantCompany($merchant, $data['merchant_company_id'] ?? null);
+        $company = array_key_exists('merchant_company_id', $data)
+            ? $this->merchantCompany($merchant, $data['merchant_company_id'])
+            : $activeCompany;
 
         $connection = PlatformConnection::query()->firstOrNew([
             'merchant_id' => $merchant->id,
@@ -94,5 +103,28 @@ class IntegrationController extends Controller
         }
 
         return $fallback ?: 'draft';
+    }
+
+    private function activeCompany(Request $request, Merchant $merchant): ?MerchantCompany
+    {
+        return app(ActiveTenant::class)->company($request, $merchant);
+    }
+
+    private function catalogForCompany(?MerchantCompany $company): array
+    {
+        if ($company?->platform === 'bigshop') {
+            return ['bigshop' => PlatformCatalog::find('bigshop')];
+        }
+
+        return PlatformCatalog::all();
+    }
+
+    private function guardPlatformAllowed(?MerchantCompany $company, string $platform): void
+    {
+        abort_if(
+            $company?->platform === 'bigshop' && $platform !== 'bigshop',
+            403,
+            'Sua empresa contratou o plano BigShop. A integracao disponivel para este contrato e apenas BigShop.'
+        );
     }
 }

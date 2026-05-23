@@ -161,6 +161,8 @@ Rotas protegidas:
 
 Plataformas catalogadas: `bigshop`, `shopify`, `woocommerce`, `nuvemshop`, `vtex`, `tray` e `custom`.
 
+Regra comercial Sprint 32: empresas que contrataram como BigShop recebem o desconto BigShop e, no painel, podem visualizar/configurar apenas instalacao BigShop. O backend tambem bloqueia tentativas de salvar Shopify, WooCommerce, Nuvemshop, VTEX, Tray ou custom para esse contrato.
+
 Plataformas a adicionar no roadmap inteligente: `loja_integrada`, `magento`, `opencart` e guias de Tag Manager quando fizer sentido.
 
 Credenciais de plataforma devem ser salvas apenas por endpoints protegidos e persistidas criptografadas. A API retorna somente flags como `has_access_token` e `has_webhook_secret`.

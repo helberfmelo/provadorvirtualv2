@@ -1,10 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 
 const route = useRoute()
 const auth = useAuthStore()
+const navOpen = ref(false)
 
 const isAppRoute = computed(() => route.path.startsWith('/app'))
 const canSeeSaas = computed(() => ['admin', 'support'].includes(auth.user?.role || ''))
@@ -13,8 +14,13 @@ onMounted(() => {
   auth.loadMe().catch(() => undefined)
 })
 
+watch(() => route.fullPath, () => {
+  navOpen.value = false
+})
+
 async function logout() {
   await auth.logout()
+  navOpen.value = false
 }
 </script>
 
@@ -26,7 +32,20 @@ async function logout() {
         <span>Provador Virtual</span>
       </RouterLink>
 
-      <nav class="nav" aria-label="Principal">
+      <button
+        class="menu-toggle"
+        type="button"
+        :aria-expanded="navOpen"
+        aria-controls="main-navigation"
+        :aria-label="navOpen ? 'Fechar menu' : 'Abrir menu'"
+        @click="navOpen = !navOpen"
+      >
+        <i class="fa-solid" :class="navOpen ? 'fa-xmark' : 'fa-bars'" aria-hidden="true"></i>
+      </button>
+
+      <div v-if="navOpen" class="nav-scrim" @click="navOpen = false"></div>
+
+      <nav id="main-navigation" class="nav" :class="{ open: navOpen }" aria-label="Principal">
         <RouterLink to="/produto-teste">Produto teste</RouterLink>
         <RouterLink v-if="!auth.isAuthenticated" to="/checkout">Contratar</RouterLink>
         <RouterLink v-if="auth.isAuthenticated && auth.canView('products')" to="/app/produtos">Produtos</RouterLink>

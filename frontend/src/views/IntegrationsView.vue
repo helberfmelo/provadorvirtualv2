@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
+import { useAuthStore } from '../stores/auth'
 
 type PlatformConnection = {
   id: number
@@ -24,6 +25,7 @@ type Platform = {
   connection: PlatformConnection | null
 }
 
+const auth = useAuthStore()
 const platforms = ref<Platform[]>([])
 const selectedKey = ref('bigshop')
 const loading = ref(false)
@@ -42,6 +44,10 @@ const form = reactive({
 })
 
 const selected = computed(() => platforms.value.find((platform) => platform.key === selectedKey.value) || platforms.value[0] || null)
+const isBigShopContract = computed(() => {
+  return auth.activeCompany?.platform === 'bigshop'
+    || (platforms.value.length === 1 && platforms.value[0]?.key === 'bigshop')
+})
 
 onMounted(() => {
   loadPlatforms()
@@ -164,6 +170,9 @@ function statusLabel(status: string) {
 
     <p v-if="notice" class="success-message">{{ notice }}</p>
     <p v-if="error" class="form-error">{{ error }}</p>
+    <p v-if="isBigShopContract" class="info-message">
+      Plano BigShop ativo: este painel exibe somente a integracao BigShop.
+    </p>
 
     <div v-if="loading" class="empty-state">Carregando integracoes...</div>
 

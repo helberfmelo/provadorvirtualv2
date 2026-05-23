@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
+import { useAuthStore } from '../stores/auth'
 
 type WidgetInstall = {
   id: number
@@ -30,8 +31,16 @@ type WidgetInstall = {
     sku: string | null
     external_product_id: string | null
   } | null
+  company?: {
+    id: number
+    name: string
+    domain: string | null
+    platform: string
+    external_store_id: string | null
+  } | null
 }
 
+const auth = useAuthStore()
 const install = ref<WidgetInstall | null>(null)
 const loading = ref(false)
 const saving = ref(false)
@@ -59,6 +68,27 @@ const domains = computed(() => form.allowed_domains
   .split('\n')
   .map((domain) => domain.trim())
   .filter(Boolean))
+
+const platformOptions = computed(() => {
+  if (isBigShopContract.value) {
+    return [{ value: 'bigshop', label: 'BigShop' }]
+  }
+
+  return [
+    { value: 'bigshop', label: 'BigShop' },
+    { value: 'shopify', label: 'Shopify' },
+    { value: 'woocommerce', label: 'WooCommerce' },
+    { value: 'nuvemshop', label: 'Nuvemshop' },
+    { value: 'vtex', label: 'VTEX' },
+    { value: 'tray', label: 'Tray' },
+    { value: 'custom', label: 'Personalizada' },
+  ]
+})
+
+const isBigShopContract = computed(() => {
+  return auth.activeCompany?.platform === 'bigshop'
+    || install.value?.company?.platform === 'bigshop'
+})
 
 const previewStyle = computed(() => ({
   '--pv-preview-primary': form.theme.primary,
@@ -88,7 +118,7 @@ async function loadInstall() {
 }
 
 function fillForm(data: WidgetInstall) {
-  form.platform = data.platform || 'custom'
+  form.platform = isBigShopContract.value ? 'bigshop' : data.platform || 'custom'
   form.allowed_domains = (data.allowed_domains || []).join('\n')
   form.is_active = data.is_active
   form.theme.primary = data.theme?.primary || '#0f172a'
@@ -157,15 +187,12 @@ async function copySnippet() {
         <div class="form-grid">
           <label>
             Plataforma
-            <select v-model="form.platform">
-              <option value="bigshop">BigShop</option>
-              <option value="shopify">Shopify</option>
-              <option value="woocommerce">WooCommerce</option>
-              <option value="nuvemshop">Nuvemshop</option>
-              <option value="vtex">VTEX</option>
-              <option value="tray">Tray</option>
-              <option value="custom">Personalizada</option>
+            <select v-model="form.platform" :disabled="isBigShopContract">
+              <option v-for="platform in platformOptions" :key="platform.value" :value="platform.value">
+                {{ platform.label }}
+              </option>
             </select>
+            <small v-if="isBigShopContract">Plano BigShop permite instalacao somente na BigShop.</small>
           </label>
           <label>
             Chave publica

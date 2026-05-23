@@ -134,7 +134,7 @@ class DatabaseSeeder extends Seeder
             'category' => 'Vestidos',
             'gender' => 'female',
             'fit_profile' => 'regular',
-            'image_url' => '/images/demo-product.jpg',
+            'image_url' => 'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=900&q=80',
             'color' => 'Verde oliva',
             'price' => 189.90,
         ], ['PP', 'P', 'M', 'G', 'GG']);
@@ -148,7 +148,7 @@ class DatabaseSeeder extends Seeder
             'category' => 'Blusas',
             'gender' => 'female',
             'fit_profile' => 'slim',
-            'image_url' => '/images/demo-product.jpg',
+            'image_url' => 'https://images.unsplash.com/photo-1554568218-0f1715e72254?auto=format&fit=crop&w=900&q=80',
             'color' => 'Off white',
             'price' => 99.90,
         ], ['PP', 'P', 'M', 'G', 'GG']);
@@ -162,7 +162,7 @@ class DatabaseSeeder extends Seeder
             'category' => 'Camisetas',
             'gender' => 'male',
             'fit_profile' => 'regular',
-            'image_url' => '/images/demo-product.jpg',
+            'image_url' => 'https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=900&q=80',
             'color' => 'Azul marinho',
             'price' => 79.90,
         ], ['P', 'M', 'G', 'GG', 'XGG']);
@@ -176,7 +176,7 @@ class DatabaseSeeder extends Seeder
             'category' => 'Calcas',
             'gender' => 'male',
             'fit_profile' => 'regular',
-            'image_url' => '/images/demo-product.jpg',
+            'image_url' => 'https://images.unsplash.com/photo-1542272604-787c3835535d?auto=format&fit=crop&w=900&q=80',
             'color' => 'Jeans escuro',
             'price' => 219.90,
         ], ['38', '40', '42', '44', '46']);

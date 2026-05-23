@@ -6,8 +6,10 @@ use App\Http\Controllers\Api\V1\Concerns\ResolvesMerchant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateWidgetInstallRequest;
 use App\Http\Resources\WidgetInstallResource;
+use App\Models\MerchantCompany;
 use App\Models\WidgetInstall;
 use App\Services\Audit\AuditLogger;
+use App\Support\ActiveTenant;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -19,7 +21,8 @@ class WidgetInstallController extends Controller
     public function show(Request $request)
     {
         $merchant = $this->currentMerchant($request);
-        $install = $this->resolveInstall($merchant);
+        $company = app(ActiveTenant::class)->company($request, $merchant);
+        $install = $this->resolveInstall($merchant, $company);
 
         return new WidgetInstallResource($install->load('company'));
     }
@@ -27,8 +30,22 @@ class WidgetInstallController extends Controller
     public function update(UpdateWidgetInstallRequest $request)
     {
         $merchant = $this->currentMerchant($request);
-        $install = $this->resolveInstall($merchant);
+        $activeCompany = app(ActiveTenant::class)->company($request, $merchant);
+        $install = $this->resolveInstall($merchant, $activeCompany);
         $data = $request->validated();
+
+        abort_if(
+            $activeCompany?->platform === 'bigshop'
+            && array_key_exists('platform', $data)
+            && $data['platform'] !== 'bigshop',
+            403,
+            'Sua empresa contratou o plano BigShop. O widget pode ser instalado apenas na BigShop.'
+        );
+
+        if ($activeCompany?->platform === 'bigshop') {
+            $data['platform'] = 'bigshop';
+            $data['merchant_company_id'] = $activeCompany->id;
+        }
 
         if (array_key_exists('merchant_company_id', $data)) {
             $data['merchant_company_id'] = $this->merchantCompany($merchant, $data['merchant_company_id'])?->id;
@@ -64,11 +81,11 @@ class WidgetInstallController extends Controller
         return new WidgetInstallResource($install->refresh()->load('company'));
     }
 
-    private function resolveInstall($merchant): WidgetInstall
+    private function resolveInstall($merchant, ?MerchantCompany $company = null): WidgetInstall
     {
-        $company = $merchant->companies()->orderBy('id')->first();
+        $company ??= $merchant->companies()->orderBy('id')->first();
 
-        return WidgetInstall::query()->firstOrCreate(
+        $install = WidgetInstall::query()->firstOrCreate(
             ['merchant_id' => $merchant->id],
             [
                 'merchant_company_id' => $company?->id,
@@ -93,5 +110,14 @@ class WidgetInstallController extends Controller
                 'is_active' => true,
             ]
         );
+
+        if ($company?->platform === 'bigshop' && $install->platform !== 'bigshop') {
+            $install->forceFill([
+                'merchant_company_id' => $company->id,
+                'platform' => 'bigshop',
+            ])->save();
+        }
+
+        return $install;
     }
 }

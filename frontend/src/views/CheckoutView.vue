@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { api } from '../services/api'
 import { tokenizePagarMeCard, type PublicCheckoutConfig } from '../services/pagarme'
 
@@ -22,6 +22,7 @@ type PricingVariant = {
 }
 
 const router = useRouter()
+const route = useRoute()
 const loading = ref(true)
 const submitting = ref(false)
 const cepLoading = ref(false)
@@ -29,6 +30,7 @@ const error = ref('')
 const checkoutConfig = ref<PublicCheckoutConfig | null>(null)
 const plans = ref<Plan[]>([])
 const pricing = ref<Record<string, PricingVariant>>({})
+const allowedPlatforms = ['bigshop', 'shopify', 'woocommerce', 'nuvemshop', 'vtex', 'tray', 'custom']
 
 const form = reactive({
   plan_code: 'annual',
@@ -92,6 +94,10 @@ async function loadConfig() {
     plans.value = data.plans
     pricing.value = data.pricing || {}
     form.plan_code = data.plans?.[0]?.code || 'annual'
+    const queryPlatform = String(route.query.platform || '')
+    if (allowedPlatforms.includes(queryPlatform)) {
+      form.platform = queryPlatform
+    }
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Nao foi possivel iniciar o checkout.'
   } finally {

@@ -355,7 +355,7 @@ Entregas:
 
 Status: implementado, publicado e validado em producao no run `26337792120`.
 
-## Sprints 31 a 36 - Refinamento operacional e escala
+## Sprints 31 a 37 - Refinamento operacional e escala
 
 ### Sprint 31 - Automacoes de e-mail e ciclo financeiro
 
@@ -371,7 +371,26 @@ Entregas:
 
 Status: implementado, publicado e validado em producao no run `26338061259`.
 
-### Sprint 32 - Login multiempresa e permissoes refinadas
+### Sprint 32 - Oferta BigShop travada, site publico e mobile
+
+Objetivo: impedir uso indevido do desconto BigShop e refinar a experiencia comercial publica.
+
+Entregas:
+
+- bloquear painel de integracoes para mostrar apenas BigShop quando a empresa contratou BigShop;
+- bloquear atualizacao do widget para plataformas diferentes da BigShop nesses contratos;
+- separar planos/precos publicos em duas colunas com CTA proprio;
+- abrir `Falar com especialista` no WhatsApp oficial;
+- trocar favicon para icone PV laranja/branco;
+- configurar tags OG/Twitter para compartilhamento no WhatsApp;
+- trocar imagens da loja teste por fotos mais fieis aos produtos;
+- revisar responsividade com menu mobile em drawer;
+- melhorar footer publico com copyright e credito OTS;
+- incluir CTA para quem ainda nao tem loja online criar loja na BigShop.
+
+Status: implementado e validado localmente. Publicacao em producao pendente do push da sprint.
+
+### Sprint 33 - Login multiempresa e permissoes refinadas
 
 Objetivo: completar a experiencia de usuarios que participam de mais de uma empresa.
 
@@ -382,7 +401,7 @@ Entregas previstas:
 - enforcement completo das permissoes de visualizar/editar;
 - auditoria por usuario/empresa/modulo.
 
-### Sprint 33 - Guias de integracao por plataforma
+### Sprint 34 - Guias de integracao por plataforma
 
 Objetivo: deixar a implantacao default para o maximo de plataformas.
 
@@ -393,7 +412,7 @@ Entregas previstas:
 - validacao de dominio/snippet instalado;
 - matriz de dados suportados por plataforma.
 
-### Sprint 34 - BigShop um clique em producao
+### Sprint 35 - BigShop um clique em producao
 
 Objetivo: preparar o ajuste final do lado BigShop e ativar o fluxo nativo.
 
@@ -404,7 +423,7 @@ Entregas previstas:
 - ajustes no codigo da BigShop para instalar widget e mapear produto/tabela;
 - monitoramento de ativacoes BigShop.
 
-### Sprint 35 - Inteligencia de perfis e aprendizado
+### Sprint 36 - Inteligencia de perfis e aprendizado
 
 Objetivo: evoluir a recomendacao sem comprometer LGPD e qualidade estatistica.
 
@@ -416,7 +435,7 @@ Entregas previstas:
 - deteccao de outliers antes de alimentar modelos;
 - dashboards de qualidade da recomendacao.
 
-### Sprint 36 - Piloto comercial e qualidade final
+### Sprint 37 - Piloto comercial e qualidade final
 
 Objetivo: preparar venda assistida e piloto com clientes reais.
 

@@ -1,6 +1,10 @@
 <script setup lang="ts">
 const widgetPreviewUrl = `${import.meta.env.BASE_URL}images/widget-preview.jpg`
 const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
+const whatsappUrl = 'https://wa.me/5531993157573'
+const checkoutDefault = { path: '/checkout', query: { platform: 'custom' } }
+const checkoutBigShop = { path: '/checkout', query: { platform: 'bigshop' } }
+const currentYear = new Date().getFullYear()
 </script>
 
 <template>
@@ -23,7 +27,7 @@ const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
           <i class="fa-solid fa-play" aria-hidden="true"></i>
           Testar agora
         </RouterLink>
-        <RouterLink to="/checkout" class="btn btn-secondary">
+        <RouterLink :to="checkoutDefault" class="btn btn-secondary">
           <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
           Contratar
         </RouterLink>
@@ -51,7 +55,7 @@ const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
           <li><i class="fa-solid fa-check" aria-hidden="true"></i><strong>Mais conversao:</strong> tire a duvida antes do carrinho.</li>
           <li><i class="fa-solid fa-check" aria-hidden="true"></i><strong>Mais dados:</strong> aprenda com recomendacoes, feedbacks e outliers.</li>
         </ul>
-        <RouterLink to="/checkout" class="btn btn-primary">
+        <RouterLink :to="checkoutDefault" class="btn btn-primary">
           <i class="fa-solid fa-bolt" aria-hidden="true"></i>
           Ativar na minha loja
         </RouterLink>
@@ -106,12 +110,22 @@ const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
       <article>
         <span>Demais plataformas</span>
         <strong>R$ 189,90/mes</strong>
+        <p>Para lojas em Shopify, WooCommerce, Nuvemshop, VTEX, Tray ou instalacao personalizada.</p>
         <small>Total anual em ate 12x no cartao. Pix a vista com 5% de desconto.</small>
+        <RouterLink :to="checkoutDefault" class="btn btn-secondary">
+          <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
+          Contratar este plano
+        </RouterLink>
       </article>
       <article class="highlight">
         <span>BigShop</span>
         <strong>R$ 129,90/mes</strong>
-        <small>Preco especial para lojas BigShop, com a integracao mais simples do ecossistema.</small>
+        <p>Preco especial exclusivo para lojas BigShop, com instalacao guiada apenas para BigShop.</p>
+        <small>Integracao mais simples do ecossistema, sem liberar outras plataformas no painel.</small>
+        <RouterLink :to="checkoutBigShop" class="btn btn-primary">
+          <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+          Contratar BigShop
+        </RouterLink>
       </article>
     </div>
   </section>
@@ -156,6 +170,18 @@ const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
     </div>
   </section>
 
+  <section class="landing-section bigshop-store-band">
+    <div class="landing-heading">
+      <span class="eyebrow">BigShop</span>
+      <h2>Ainda nao tem uma loja online?</h2>
+      <p>Crie agora sua loja na BigShop e ja comece com o caminho mais simples para usar o Provador Virtual.</p>
+      <a href="https://bigshop.com.br" target="_blank" rel="noopener" class="btn btn-primary">
+        <i class="fa-solid fa-store" aria-hidden="true"></i>
+        Crie agora sua loja na BigShop
+      </a>
+    </div>
+  </section>
+
   <section class="landing-cta">
     <div>
       <span class="eyebrow">Provador Virtual</span>
@@ -166,11 +192,11 @@ const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
           <i class="fa-solid fa-shirt" aria-hidden="true"></i>
           Ver demo
         </RouterLink>
-        <RouterLink to="/checkout" class="btn btn-primary">
+        <RouterLink :to="checkoutDefault" class="btn btn-primary">
           <i class="fa-solid fa-lock" aria-hidden="true"></i>
           Contratar agora
         </RouterLink>
-        <a href="mailto:helber@bigshop.com.br?subject=Provador%20Virtual" class="btn btn-secondary">
+        <a :href="whatsappUrl" target="_blank" rel="noopener" class="btn btn-secondary">
           <i class="fa-solid fa-headset" aria-hidden="true"></i>
           Falar com especialista
         </a>
@@ -178,15 +204,36 @@ const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
     </div>
   </section>
 
-  <section class="public-band landing-footer">
-    <RouterLink to="/privacidade">
-      <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-      Privacidade
-    </RouterLink>
-    <RouterLink to="/termos">
-      <i class="fa-solid fa-file-contract" aria-hidden="true"></i>
-      Termos
-    </RouterLink>
-    <span>Desenvolvido por provadorvirtual.online</span>
+  <section class="landing-footer">
+    <div class="public-band footer-grid">
+      <div class="footer-brand">
+        <span class="brand-mark">PV</span>
+        <div>
+          <strong>Provador Virtual</strong>
+          <small>Recomendacao de tamanho simples para lojas de moda.</small>
+        </div>
+      </div>
+
+      <nav aria-label="Rodape">
+        <RouterLink to="/produto-teste">Loja teste</RouterLink>
+        <RouterLink :to="checkoutDefault">Contratar</RouterLink>
+        <RouterLink to="/privacidade">Privacidade</RouterLink>
+        <RouterLink to="/termos">Termos</RouterLink>
+      </nav>
+
+      <div class="footer-contact">
+        <a :href="whatsappUrl" target="_blank" rel="noopener">
+          <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
+          Falar com especialista
+        </a>
+        <a href="https://bigshop.com.br" target="_blank" rel="noopener">
+          <i class="fa-solid fa-store" aria-hidden="true"></i>
+          BigShop
+        </a>
+      </div>
+    </div>
+    <div class="public-band footer-bottom">
+      <span><b>{{ currentYear }} ©</b> | desenvolvido por <a href="https://opents.com.br" target="_blank" rel="noopener">OTS - Open Tecnologia e Serviços</a></span>
+    </div>
   </section>
 </template>

@@ -237,6 +237,13 @@ Conector deve mapear:
 - imagem de tabela -> backlog de OCR/assistencia;
 - estoque/status -> campos informativos, sem promessa no widget se nao for necessario.
 
+Regra comercial da Sprint 32:
+
+- quando a empresa ativa/contratada tiver `platform=bigshop`, `GET /integrations` retorna somente BigShop;
+- `PATCH /integrations/{platform}` bloqueia plataformas diferentes de `bigshop`;
+- `GET|PATCH /widget-install` mantem `platform=bigshop` para esse contrato;
+- o front do painel tambem mostra apenas a opcao BigShop nesses casos.
+
 ## Ambientes
 
 Local:

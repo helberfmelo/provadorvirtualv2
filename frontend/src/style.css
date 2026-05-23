@@ -79,6 +79,22 @@ a {
   font-size: 0.92rem;
 }
 
+.menu-toggle {
+  display: none;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #0f172a;
+  background: #fff;
+  cursor: pointer;
+}
+
+.nav-scrim {
+  display: none;
+}
+
 .nav a {
   padding: 8px 10px;
   border-radius: 8px;
@@ -340,7 +356,8 @@ a {
 }
 
 .pricing-strip article {
-  min-height: 178px;
+  align-content: start;
+  min-height: 264px;
 }
 
 .pricing-strip article > span {
@@ -353,6 +370,17 @@ a {
 .pricing-strip strong {
   font-size: clamp(2rem, 4vw, 3.1rem);
   line-height: 1;
+}
+
+.pricing-strip p {
+  margin: 0;
+  color: #374151;
+  line-height: 1.55;
+}
+
+.pricing-strip .btn {
+  width: fit-content;
+  margin-top: auto;
 }
 
 .pricing-strip .highlight {
@@ -379,22 +407,82 @@ a {
   color: #fb7185;
 }
 
-.landing-footer {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 12px;
-  padding-top: 22px;
-  padding-bottom: 32px;
+.bigshop-store-band {
+  border-top: 1px solid #fed7aa;
+  border-bottom: 1px solid #fed7aa;
+  background: #fff7ed;
 }
 
-.landing-footer a,
-.landing-footer span {
+.bigshop-store-band .landing-heading {
+  margin-bottom: 0;
+}
+
+.landing-footer {
+  background: #0f172a;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(220px, 0.65fr) minmax(220px, 0.65fr);
+  gap: 28px;
+  padding-top: 42px;
+  padding-bottom: 26px;
+  color: #e5e7eb;
+}
+
+.footer-brand {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.footer-brand strong,
+.footer-brand small {
+  display: block;
+}
+
+.footer-brand strong {
+  color: #fff;
+  font-size: 1.1rem;
+}
+
+.footer-brand small {
+  max-width: 340px;
+  margin-top: 6px;
+  color: #cbd5e1;
+  line-height: 1.55;
+}
+
+.footer-grid nav,
+.footer-contact {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+.footer-grid a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 38px;
-  color: #374151;
+  width: fit-content;
+  color: #e5e7eb;
+  font-weight: 800;
+}
+
+.footer-grid a:hover,
+.footer-bottom a:hover {
+  color: #fed7aa;
+}
+
+.footer-bottom {
+  padding-top: 18px;
+  padding-bottom: 28px;
+  border-top: 1px solid rgba(203, 213, 225, 0.18);
+  color: #cbd5e1;
+}
+
+.footer-bottom a {
+  color: #fff;
   font-weight: 800;
 }
 
@@ -633,6 +721,17 @@ a {
   border-radius: 8px;
   color: #065f46;
   background: #d1fae5;
+  font-weight: 800;
+}
+
+.info-message {
+  width: fit-content;
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  color: #9a3412;
+  background: #fff7ed;
   font-weight: 800;
 }
 
@@ -1705,11 +1804,66 @@ td small {
 }
 
 @media (max-width: 860px) {
+  .topbar {
+    padding: 12px 18px;
+  }
+
+  .brand {
+    max-width: calc(100% - 58px);
+  }
+
+  .menu-toggle {
+    position: relative;
+    z-index: 42;
+    display: grid;
+  }
+
+  .nav-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: block;
+    background: rgba(15, 23, 42, 0.42);
+  }
+
+  .nav {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 40;
+    display: grid;
+    align-content: start;
+    width: min(340px, calc(100vw - 38px));
+    height: 100vh;
+    padding: 78px 18px 24px;
+    overflow-y: auto;
+    border-left: 1px solid #e5e7eb;
+    background: #fff;
+    box-shadow: -18px 0 46px rgba(15, 23, 42, 0.16);
+    transform: translateX(106%);
+    transition: transform 180ms ease;
+  }
+
+  .nav.open {
+    transform: translateX(0);
+  }
+
+  .nav a,
+  .nav-button {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .nav-button {
+    display: inline-flex;
+  }
+
   .hero-section,
   .landing-split,
   .landing-split.reverse,
   .landing-steps,
   .pricing-strip,
+  .footer-grid,
   .public-flow,
   .product-page,
   .product-card-grid,
@@ -1763,18 +1917,13 @@ td small {
   .permission-row {
     grid-template-columns: 1fr;
   }
+
+  .pricing-strip .btn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 560px) {
-  .topbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .nav {
-    justify-content: flex-start;
-  }
-
   .size-picker {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }

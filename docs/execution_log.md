@@ -262,3 +262,16 @@
 - Validacoes locais completas: `php artisan test`, `npm run build`, build raiz com `VITE_APP_BASE_PATH=/`, `git diff --check` e `vendor/bin/pint --dirty`.
 - Run `26338061259` do GitHub Actions finalizou com sucesso para o commit `62e0830`.
 - Validado em producao: `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 32 Oferta BigShop travada, site publico e mobile
+
+- Criada sprint adicional para impedir que desconto BigShop seja usado com integracao de plataforma mais cara.
+- Backend passou a filtrar catalogo de integracoes para BigShop quando a empresa ativa e BigShop.
+- Backend passou a bloquear `PATCH /integrations/{platform}` e `PATCH /widget-install` para plataformas diferentes de BigShop nesses contratos.
+- Painel do lojista passou a mostrar aviso de contrato BigShop e apenas a opcao BigShop no widget.
+- Checkout publico passou a aceitar query `platform` para CTA direto do plano padrao ou BigShop.
+- Landing ganhou duas colunas de preco com CTAs exclusivos, WhatsApp oficial, secao BigShop, footer refinado, favicon PV e metatags OG/Twitter.
+- Loja teste passou a usar fotos externas que representam vestido, blusa, camiseta e calca jeans.
+- Menu mobile do Vue passou a abrir em drawer com botao de barras.
+- Validacoes locais focadas: `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=WidgetInstallApiTest` e `npm run build`.
+- Validacoes locais completas: `php artisan test`, `npm run build`, build raiz com `VITE_APP_BASE_PATH=/`, `git diff --check` e `vendor/bin/pint --dirty`.

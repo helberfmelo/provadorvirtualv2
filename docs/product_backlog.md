@@ -40,6 +40,7 @@ Atualizado em: 2026-05-23
 ## Integracoes
 
 - `DONE` Cadastro manual de conexao por plataforma.
+- `DONE` Contrato BigShop com desconto exibe e permite apenas integracao BigShop no painel.
 - `DONE` BigShop probe.
 - `DONE` BigShop sync produtos/grades.
 - `DONE` BigShop sync tabela de medidas quando houver payload estruturado.
@@ -97,6 +98,9 @@ Atualizado em: 2026-05-23
 - `DONE` Webhook Pagar.me e ativacao de empresa paga.
 - `DONE` Landing publica v2 inspirada no v1 e preparada para rodar na raiz.
 - `DONE` Checkout anual unico sem boleto, com desconto BigShop e Pix.
+- `DONE` Site publico com CTA separado para plano padrao e plano BigShop, WhatsApp oficial, favicon PV e tags OG.
+- `DONE` Menu mobile em drawer no site/app Vue.
+- `DONE` Footer publico com credito OTS e CTA para criar loja na BigShop.
 - `TODO` Configurar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` em producao junto com as chaves reais.
 - `DONE` Monitorar pagamento pendente por cron alem do webhook.
 - `DONE` CRUD de credenciais SMTP e e-mails transacionais.
