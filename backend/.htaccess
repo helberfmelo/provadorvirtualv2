@@ -1,7 +1,9 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    RewriteRule ^(.*/)?(api|up|sanctum)(/.*)?$ public/index.php/$2$3 [L,QSA]
+    RewriteRule ^(.*/)?api/(.*)$ public/api/$2 [R=307,L,QSA]
+    RewriteRule ^(.*/)?sanctum/(.*)$ public/sanctum/$2 [R=307,L,QSA]
+    RewriteRule ^(.*/)?up$ public/up [R=307,L,QSA]
 
     RewriteRule ^public/ - [L]
     RewriteRule ^public$ public/ [L]

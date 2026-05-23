@@ -29,7 +29,7 @@
 - Segundo Actions da Sprint 1 passou por validacao/build/deploy remoto, mas falhou no smoke publico com HTTP 404 porque publicou em `/home1/opents62/public_html/provadorvirtual_v2`.
 - Confirmado via SSH que `provadorvirtual_v1` esta em `/home1/opents62/provadorvirtual.online/provadorvirtual_v1`; workflow ajustado para publicar v2 em `/home1/opents62/provadorvirtual.online/provadorvirtual_v2`.
 - Deploy no docroot correto passou no Actions, mas teste manual mostrou que `/api/v1/health` estava retornando o `index.html` do Vue. Ajustado `.htaccess` para enviar `api`, `up` e `sanctum` ao front controller Laravel preservando o path, e smoke publico passou a validar conteudo JSON da API.
-- A regra de API precisou ser tolerante a prefixos no Apache do HostGator, porque a regra genérica ainda entregava a requisicao ao fallback SPA.
+- Como o rewrite interno com `PATH_INFO` continuou caindo no fallback SPA no HostGator, a compatibilidade inicial passou a usar redirect 307 para endpoints Laravel limpos (`api`, `sanctum`, `up`) apontarem para a entrada publica funcional.
 
 ## Pendencias abertas
 
