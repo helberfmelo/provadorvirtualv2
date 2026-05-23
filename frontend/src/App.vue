@@ -3,13 +3,53 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 
+type NavLink = {
+  to: string
+  label: string
+  icon: string
+  show: boolean
+}
+
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const navOpen = ref(false)
 
-const isAppRoute = computed(() => route.path.startsWith('/app'))
 const canSeeSaas = computed(() => ['admin', 'support'].includes(auth.user?.role || ''))
+const isCompanyRoute = computed(() => route.path === '/app' || route.path.startsWith('/app/'))
+const isSaasRoute = computed(() => (route.path === '/saas' || route.path.startsWith('/saas/')) && route.path !== '/saas/login')
+const isWorkRoute = computed(() => isCompanyRoute.value || isSaasRoute.value)
+const contextLabel = computed(() => isSaasRoute.value ? 'SaaS admin' : 'Portal da empresa')
+const workNavTitle = computed(() => isSaasRoute.value ? 'Operacao SaaS' : 'Operacao da loja')
+const activeCompanyName = computed(() => auth.activeCompany?.name || 'Sem empresa ativa')
+
+const publicLinks = computed<NavLink[]>(() => [
+  { to: '/produto-teste', label: 'Produto teste', icon: 'fa-bag-shopping', show: true },
+  { to: '/checkout', label: 'Contratar', icon: 'fa-credit-card', show: !auth.isAuthenticated },
+  { to: '/login', label: 'Entrar', icon: 'fa-right-to-bracket', show: !auth.isAuthenticated },
+])
+
+const companyLinks = computed<NavLink[]>(() => [
+  { to: '/app', label: 'Painel', icon: 'fa-gauge-high', show: true },
+  { to: '/app/produtos', label: 'Produtos', icon: 'fa-shirt', show: auth.canView('products') },
+  { to: '/app/tabelas-de-medidas', label: 'Tabelas', icon: 'fa-ruler-combined', show: auth.canView('measurement_tables') },
+  { to: '/app/assistente', label: 'Assistente IA', icon: 'fa-wand-magic-sparkles', show: auth.canView('ai_assistant') },
+  { to: '/app/importacoes', label: 'Importacoes', icon: 'fa-file-arrow-up', show: auth.canView('imports') },
+  { to: '/app/widget', label: 'Widget', icon: 'fa-code', show: auth.canView('widget') },
+  { to: '/app/integracoes', label: 'Integracoes', icon: 'fa-plug', show: auth.canView('integrations') },
+  { to: '/app/analytics', label: 'Analytics', icon: 'fa-chart-line', show: auth.canView('analytics') },
+  { to: '/app/go-live', label: 'Go-live', icon: 'fa-rocket', show: auth.canView('go_live') },
+  { to: '/app/usuarios', label: 'Usuarios', icon: 'fa-users-gear', show: auth.canView('users') },
+])
+
+const saasLinks = computed<NavLink[]>(() => [
+  { to: '/saas', label: 'Visao geral', icon: 'fa-gauge-high', show: auth.canSaasView('saas_dashboard') },
+  { to: '/saas/usuarios', label: 'Usuarios SaaS', icon: 'fa-user-shield', show: auth.canSaasView('saas_users') },
+])
+
+const visibleWorkLinks = computed(() => (
+  isSaasRoute.value ? saasLinks.value : companyLinks.value
+).filter((link) => link.show))
 
 onMounted(() => {
   auth.loadMe().catch(() => undefined)
@@ -42,11 +82,14 @@ async function switchCompany(event: Event) {
 </script>
 
 <template>
-  <div class="shell" :class="{ 'shell-app': isAppRoute }">
-    <header class="topbar">
+  <div class="shell" :class="{ 'shell-work': isWorkRoute, 'shell-company': isCompanyRoute, 'shell-saas': isSaasRoute }">
+    <header class="topbar" :class="{ 'topbar-work': isWorkRoute }">
       <RouterLink to="/" class="brand" aria-label="Provador Virtual">
         <span class="brand-mark">PV</span>
-        <span>Provador Virtual</span>
+        <span>
+          Provador Virtual
+          <small v-if="isWorkRoute">{{ contextLabel }}</small>
+        </span>
       </RouterLink>
 
       <button
@@ -62,8 +105,51 @@ async function switchCompany(event: Event) {
 
       <div v-if="navOpen" class="nav-scrim" @click="navOpen = false"></div>
 
-      <nav id="main-navigation" class="nav" :class="{ open: navOpen }" aria-label="Principal">
-        <label v-if="auth.isAuthenticated && auth.companyOptions.length > 1" class="company-switcher">
+      <nav v-if="!isWorkRoute" id="main-navigation" class="nav public-nav" :class="{ open: navOpen }" aria-label="Principal">
+        <RouterLink
+          v-for="link in publicLinks.filter((item) => item.show)"
+          :key="link.to"
+          :to="link.to"
+          @click="navOpen = false"
+        >
+          {{ link.label }}
+        </RouterLink>
+        <button v-if="auth.isAuthenticated" class="nav-button" type="button" title="Sair" @click="logout">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+        </button>
+      </nav>
+
+      <div v-else class="work-top-actions">
+        <RouterLink
+          v-if="isCompanyRoute && canSeeSaas && auth.canSaasView('saas_dashboard')"
+          to="/saas"
+          class="context-link"
+        >
+          <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+          SaaS
+        </RouterLink>
+        <RouterLink v-if="isSaasRoute && auth.activeCompany" to="/app" class="context-link">
+          <i class="fa-solid fa-store" aria-hidden="true"></i>
+          Portal da empresa
+        </RouterLink>
+        <span class="user-chip">
+          <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+          {{ auth.user?.name || 'Usuario' }}
+        </span>
+        <button class="nav-button" type="button" title="Sair" @click="logout">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+        </button>
+      </div>
+    </header>
+
+    <div v-if="isWorkRoute" class="work-layout">
+      <aside id="main-navigation" class="work-sidebar" :class="{ open: navOpen }" aria-label="Menu operacional">
+        <div class="work-sidebar-header">
+          <span>{{ workNavTitle }}</span>
+          <strong>{{ isSaasRoute ? 'Provador Virtual' : activeCompanyName }}</strong>
+        </div>
+
+        <label v-if="isCompanyRoute && auth.isAuthenticated && auth.companyOptions.length > 1" class="company-switcher">
           <span>Empresa</span>
           <select :value="auth.activeCompany?.id || ''" @change="switchCompany">
             <option v-for="company in auth.companyOptions" :key="company.id" :value="company.id">
@@ -71,28 +157,26 @@ async function switchCompany(event: Event) {
             </option>
           </select>
         </label>
-        <RouterLink to="/produto-teste">Produto teste</RouterLink>
-        <RouterLink v-if="!auth.isAuthenticated" to="/checkout">Contratar</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('products')" to="/app/produtos">Produtos</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('measurement_tables')" to="/app/tabelas-de-medidas">Tabelas</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('ai_assistant')" to="/app/assistente">Assistente</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('analytics')" to="/app/analytics">Analytics</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('go_live')" to="/app/go-live">Go-live</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('imports')" to="/app/importacoes">Importacoes</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('widget')" to="/app/widget">Widget</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('integrations')" to="/app/integracoes">Integracoes</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && auth.canView('users')" to="/app/usuarios">Usuarios</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && canSeeSaas && auth.canSaasView('saas_dashboard')" to="/saas">SaaS</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && canSeeSaas && auth.canSaasView('saas_users')" to="/saas/usuarios">Usuarios SaaS</RouterLink>
-        <RouterLink v-if="!auth.isAuthenticated" to="/login">Entrar</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app">Painel</RouterLink>
-        <button v-if="auth.isAuthenticated" class="nav-button" type="button" title="Sair" @click="logout">
-          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
-        </button>
-      </nav>
-    </header>
 
-    <main>
+        <nav class="work-nav" aria-label="Navegacao do portal">
+          <RouterLink
+            v-for="link in visibleWorkLinks"
+            :key="link.to"
+            :to="link.to"
+            @click="navOpen = false"
+          >
+            <i class="fa-solid" :class="link.icon" aria-hidden="true"></i>
+            <span>{{ link.label }}</span>
+          </RouterLink>
+        </nav>
+      </aside>
+
+      <main class="work-main">
+        <RouterView />
+      </main>
+    </div>
+
+    <main v-else>
       <RouterView />
     </main>
   </div>

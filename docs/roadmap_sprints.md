@@ -458,3 +458,51 @@ Entregas previstas:
 - pacote comercial e checklist de onboarding.
 
 Status: implementado, publicado e validado em producao no run `26340033238`. A Sprint 37 ampliou go-live/readiness com Pagar.me, transacao real, cron, performance do widget, acessibilidade/mobile e pacote de piloto; tambem criou `docs/commercial_pilot_package.md` e ampliou `scripts/validate-production.ps1`. Testes reais Pagar.me/BigShop seguem pendentes das credenciais oficiais.
+
+### Sprint 38 - UX corretiva: navegacao por contexto
+
+Objetivo: corrigir a mistura entre portal SaaS e portal da empresa, criando uma base visual mais clara antes de refatorar os CRUDs.
+
+Entregas previstas:
+
+- separar shell/menu do SaaS e do portal da empresa;
+- remover menus de lojista da navegacao do SaaS;
+- usar menu lateral em areas autenticadas, com drawer no mobile;
+- manter menu publico separado de operacao interna;
+- atualizar documentacao de rotas e URLs.
+
+### Sprint 39 - SaaS list-first e subpaginas
+
+Objetivo: transformar o portal SaaS em telas operacionais de listagem, com formularios em paginas proprias.
+
+Entregas previstas:
+
+- `/saas` apenas como visao geral;
+- `/saas/empresas` como listagem de empresas ocupando a tela;
+- `/saas/empresas/nova` e `/saas/empresas/:id/editar` como formularios separados;
+- `/saas/emails` como area de e-mail transacional separada;
+- formularios de credenciais SMTP e templates fora da mesma tela da visao geral;
+- manter acoes de criar, editar e ativar/desativar nas listagens.
+
+### Sprint 40 - Portal da empresa list-first e subpaginas
+
+Objetivo: revisar as telas do lojista para evitar paginas emboladas e padronizar CRUDs.
+
+Entregas previstas:
+
+- listagens de produtos, tabelas, usuarios e importacoes ocupando a tela;
+- paginas separadas para novo/editar quando o CRUD exigir muitos campos;
+- revisao de widget, integracoes, assistente, analytics e go-live para reduzir secoes misturadas;
+- submenus claros por operacao: catalogo, configuracao, inteligencia, publicacao e acessos.
+
+### Sprint 41 - Revisao visual, responsiva e QA de telas
+
+Objetivo: validar tela por tela a experiencia final em desktop e mobile.
+
+Entregas previstas:
+
+- reduzir desalinhamentos, overflow e tabelas espremidas;
+- revisar hierarquia visual de cards, formularios, botoes e tabelas;
+- garantir drawer mobile para SaaS e portal da empresa;
+- ampliar checklist de validacao visual/rotas;
+- publicar e validar producao apos cada ajuste.

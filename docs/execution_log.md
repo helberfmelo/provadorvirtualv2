@@ -299,3 +299,11 @@
 - `scripts/validate-production.ps1` passou a validar `/checkout`, widget JS/CSS, perfil consentido, esquecimento de perfil, sinal de aprendizado e pacote de piloto.
 - Validacoes locais: `vendor/bin/pint --dirty`, `php artisan test`, `npm run build` e `php artisan test --filter=GoLiveReadinessApiTest`.
 - Run `26340033238` finalizou com sucesso e o validador ampliado retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 38 UX corretiva: navegacao por contexto
+
+- Registradas as sprints 38 a 41 para corrigir arquitetura de informacao, CRUDs list-first e revisao visual/responsiva.
+- Shell autenticado passou a separar portal SaaS e portal da empresa.
+- SaaS deixou de exibir menus de lojista; portal da empresa deixou de misturar atalhos de SaaS no menu principal.
+- Areas autenticadas passaram a usar menu lateral no desktop e drawer no mobile.
+- Validacoes locais: `npm run build` e `git diff --check`.
