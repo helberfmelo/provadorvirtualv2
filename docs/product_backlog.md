@@ -38,7 +38,8 @@ Atualizado em: 2026-05-23
 - `DONE` BigShop probe.
 - `DONE` BigShop sync produtos/grades.
 - `DONE` BigShop sync tabela de medidas quando houver payload estruturado.
-- `TODO` BigShop um clique.
+- `DONE` BigShop um clique por endpoint assinado.
+- `TODO` Cadastrar `BIGSHOP_ACTIVATION_SECRET` para teste real.
 - `DONE` Base do guia/snippet custom no painel.
 - `DONE` Tabelas `import_jobs` e `integration_events`.
 - `TODO` Guias Shopify.

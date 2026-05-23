@@ -52,6 +52,7 @@ APIs protegidas ja implementadas:
 - `GET|POST|PATCH|DELETE /api/v1/measurement-tables`
 - `GET /api/v1/measurement-templates`
 - `GET|PATCH /api/v1/widget-install`
+- `POST /api/v1/public/bigshop/activate`
 - `GET /api/v1/integrations`
 - `PATCH /api/v1/integrations/{platform}`
 - `POST /api/v1/integrations/bigshop/probe`

@@ -82,6 +82,7 @@ IA:
 BigShop:
 
 - credenciais reais devem ficar no banco criptografado por loja. Para testes automatizados, podemos precisar de `BIGSHOP_TEST_STORE_ID` e `BIGSHOP_TEST_API_TOKEN`.
+- `BIGSHOP_ACTIVATION_SECRET` deve ser cadastrado em `PRODUCTION_ENV` antes de liberar o um clique real.
 
 Pagamentos:
 

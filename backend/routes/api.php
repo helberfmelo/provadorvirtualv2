@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BigShopActivationController;
 use App\Http\Controllers\Api\V1\BigShopIntegrationController;
 use App\Http\Controllers\Api\V1\DemoProductController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -25,6 +26,7 @@ Route::prefix('v1')->group(function (): void {
     Route::post('/public/recommendations/config-check', [RecommendationController::class, 'configCheck']);
     Route::post('/public/recommendations', [RecommendationController::class, 'store']);
     Route::post('/public/recommendations/{recommendationLog}/feedback', [RecommendationController::class, 'feedback']);
+    Route::post('/public/bigshop/activate', BigShopActivationController::class);
 
     Route::post('/auth/login', [AuthController::class, 'login']);
 

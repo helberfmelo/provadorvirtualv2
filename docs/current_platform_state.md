@@ -14,6 +14,7 @@ Atualizado em: 2026-05-23
 - Sprint 5 criou configuracao operacional do widget no painel, catalogo de integracoes e persistencia de conexoes por plataforma.
 - Sprint 6 criou importacao com preview/commit para CSV de produtos, CSV de tabelas e Google XML inicial.
 - Sprint 7 criou conector BigShop base com probe, sync de produtos/grades/tabelas e eventos de integracao.
+- Sprint 8 criou ativacao BigShop um clique por endpoint publico assinado com HMAC.
 
 ## Referencias confirmadas
 
@@ -81,6 +82,7 @@ Atualizado em: 2026-05-23
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
 - Falta chave de IA se as primeiras sprints incluirem OCR/geracao assistida.
 - Falta credencial BigShop real para loja de teste.
+- Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativacao um clique real.
 - Falta decidir provider de pagamento quando billing sair do modo preparado.
 
 ## Superficie atual
@@ -89,9 +91,10 @@ Atualizado em: 2026-05-23
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
+- BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
 - APIs publicas: health, produto demo e recomendacoes do widget.
 - Widget publico: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 8: BigShop Um Clique.
+Publicar a Sprint 8 e iniciar a Sprint 9: IA para OCR e Tabelas.

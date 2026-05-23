@@ -158,3 +158,51 @@ Comportamento:
 - relatorio retorna produtos, variacoes, tabelas sincronizadas e lacunas.
 
 Sem credencial real, validacao automatizada usa `Http::fake`. Para teste real ainda falta loja controlada, `store_id` e token `x-api`.
+
+## Sprint 8 implementada - ativacao um clique
+
+Rota publica assinada:
+
+- `POST /api/v1/public/bigshop/activate`
+
+Headers obrigatorios:
+
+- `X-BigShop-Timestamp`: Unix timestamp, com tolerancia de 10 minutos;
+- `X-BigShop-Signature`: assinatura no formato `sha256=<hmac>`.
+
+Assinatura:
+
+```txt
+hmac_sha256(BIGSHOP_ACTIVATION_SECRET, timestamp + "." + raw_body)
+```
+
+Payload esperado:
+
+```json
+{
+  "store_id": "123",
+  "store_name": "Loja Exemplo",
+  "store_url": "https://loja.exemplo.com.br",
+  "store_domain": "loja.exemplo.com.br",
+  "api_base_url": "https://api.bigshop.com.br",
+  "access_token": "token-write-only",
+  "webhook_secret": "secret-write-only",
+  "merchant": {
+    "name": "Nome do lojista",
+    "email": "lojista@example.com"
+  }
+}
+```
+
+Comportamento:
+
+- cria ou atualiza usuario, lojista, empresa, conexao BigShop e instalacao do widget;
+- aceita `store_domain` ou `store_url`, derivando o dominio quando vier URL completa;
+- salva token e webhook secret criptografados, sem retornar esses valores em claro;
+- cria `widget_public_key` para uso no snippet;
+- registra evento `one_click_activation` em `integration_events`;
+- retorna `dashboard_url`, `widget_url`, `widget_public_key` e status da ativacao.
+
+Quando `BIGSHOP_ACTIVATION_SECRET` nao estiver configurado, a rota retorna `503` e nao processa o payload.
+
+Para teste real ainda falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` e receber da BigShop o payload/secret oficial do app interno.

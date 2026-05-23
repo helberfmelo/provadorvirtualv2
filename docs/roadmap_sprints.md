@@ -135,6 +135,8 @@ Entregas:
 - teste em loja controlada;
 - documentacao para time BigShop.
 
+Status: implementado localmente; publicar e validar em producao.
+
 ## Sprint 9 - IA para OCR e Tabelas
 
 Objetivo: acelerar criacao de tabelas sem comprometer confianca.

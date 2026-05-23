@@ -35,4 +35,8 @@ return [
         ],
     ],
 
+    'bigshop' => [
+        'activation_secret' => env('BIGSHOP_ACTIVATION_SECRET'),
+    ],
+
 ];

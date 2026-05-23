@@ -107,6 +107,17 @@
 - Run `26331844564` do GitHub Actions finalizou com sucesso para o commit `2254a07`.
 - Validado em producao: `/app/integracoes` e `POST /public/api/v1/integrations/bigshop/probe` retornando `422` controlado sem credencial real.
 
+## 2026-05-23 - Sprint 8 BigShop Um Clique
+
+- Criada configuracao `BIGSHOP_ACTIVATION_SECRET` para controlar a ativacao nativa por HMAC.
+- Criado endpoint publico assinado `POST /api/v1/public/bigshop/activate`.
+- Endpoint valida timestamp, assinatura `sha256=<hmac>` e payload minimo da loja BigShop.
+- Ativacao cria/atualiza usuario, lojista, empresa, conexao BigShop e instalacao do widget.
+- Tokens recebidos sao salvos criptografados e nunca retornam em claro.
+- Resposta retorna `dashboard_url`, `widget_url`, `widget_public_key` e status operacional.
+- Criados testes `BigShopActivationTest`.
+- Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build`, `git diff --check` e smoke local retornando `503` quando o secret nao esta configurado.
+
 ## Pendencias abertas
 
 - Repositorio esta publico para manter a cota do GitHub Actions disponivel.

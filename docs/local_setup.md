@@ -80,6 +80,7 @@ npm run dev
 - `/api/v1/public/recommendations/config-check`
 - `/api/v1/public/recommendations`
 - `/api/v1/public/recommendations/{id}/feedback`
+- `/api/v1/public/bigshop/activate`
 - `/widget/v1/provador-virtual.js`
 - `/widget/v1/provador-virtual.css`
 
@@ -145,3 +146,5 @@ Em producao, o painel usa `VITE_API_BASE_URL=/provadorvirtual_v2/public/api/v1`.
 Status Sprint 6: painel demo permite analisar e importar CSV de produtos, CSV de tabelas e feed Google XML inicial.
 
 Status Sprint 7: backend possui conector BigShop com probe/sync testados via `Http::fake`; tela de integracoes mostra acoes BigShop.
+
+Status Sprint 8: ativacao BigShop um clique disponivel por endpoint assinado; sem `BIGSHOP_ACTIVATION_SECRET`, retorna `503`.
