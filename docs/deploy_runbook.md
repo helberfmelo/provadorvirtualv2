@@ -60,11 +60,13 @@ Opcional:
 
 - `SSH_PASSPHRASE`, se a chave tiver senha.
 
-## Bloqueios externos antes do primeiro Actions
+## Historico de bloqueio do Actions
 
 Em 2026-05-23, o workflow foi disparado no GitHub, mas o job nao iniciou porque a conta/repositorio estava bloqueado por billing/spending limit do GitHub Actions.
 
-Antes de validar deploy real, confirmar em GitHub:
+No mesmo dia, o repositorio foi alterado para publico e a reexecucao do workflow terminou com sucesso.
+
+Se o repositorio voltar a ser privado, confirmar em GitHub:
 
 - Billing & plans sem pendencia de pagamento;
 - spending limit do GitHub Actions suficiente;
@@ -94,6 +96,7 @@ Arquivo:
 Comportamento:
 
 - se `backend/` e `frontend/` ainda nao existirem, o workflow encerra em sucesso informando que o app ainda nao foi scaffoldado;
+- publica Laravel em subpasta HostGator usando `.htaccess` raiz para encaminhar requisicoes para `public/`;
 - instala dependencias backend/frontend;
 - valida backend em SQLite no CI;
 - builda frontend com base path de producao;

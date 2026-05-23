@@ -14,6 +14,17 @@
 - Cadastrados no GitHub Actions: `SSH_PRIVATE_KEY`, `SSH_PRIVATE_KEY_B64` e `PRODUCTION_ENV`.
 - Validado acesso SSH local ao HostGator/opents62 com a chave cadastrada; `/home1/opents62/public_html` existe e `/home1/opents62/public_html/provadorvirtual_v2` ainda nao existe.
 - Reexecutado manualmente o workflow apos cadastrar os secrets; o job continuou bloqueado por billing/spending limit antes de iniciar qualquer etapa.
+- Repositorio alterado para publico pelo usuario; workflow reexecutado e finalizado com sucesso.
+
+## 2026-05-23 - Sprint 1 Fundacao Laravel/Vue
+
+- Criado `backend/` com Laravel 12, Sanctum, rotas API versionadas e fallback SPA.
+- Criado `frontend/` com Vue 3, TypeScript, Vite, Pinia, Vue Router, Axios e Font Awesome.
+- Criadas migrations iniciais para users, merchants, companies, products, variants, measurement tables, widget installs, recommendation logs e feedbacks.
+- Criado seed demo com lojista, loja, produto ficticio, cinco variacoes, tabela de medidas e instalacao de widget.
+- Criada pagina `/produto-teste` com produto ficticio, seletor de tamanho, tabela de medidas e recomendacao inicial client-side.
+- Criados endpoints `/api/v1/health`, `/api/v1/auth/login`, `/api/v1/me` e `/api/v1/demo/product-test`.
+- Validacoes locais: `php artisan migrate:fresh --seed`, `php artisan test`, `php artisan route:list --path=api/v1`, `npm run build` e smoke integrado em `php artisan serve`.
 
 ## Pendencias abertas
 

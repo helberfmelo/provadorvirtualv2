@@ -1,0 +1,77 @@
+<?php
+
+namespace App\Http\Controllers\Api\V1;
+
+use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\WidgetInstall;
+
+class DemoProductController extends Controller
+{
+    public function show()
+    {
+        $product = Product::query()
+            ->with(['company', 'measurementTable.rows', 'variants' => fn ($query) => $query->orderBy('id')])
+            ->where('slug', 'vestido-luna-midi')
+            ->firstOrFail();
+
+        $widget = WidgetInstall::query()
+            ->where('merchant_id', $product->merchant_id)
+            ->where('merchant_company_id', $product->merchant_company_id)
+            ->where('is_active', true)
+            ->first();
+
+        return response()->json([
+            'product' => [
+                'id' => $product->id,
+                'merchant_id' => $product->merchant_id,
+                'store_id' => $product->merchant_company_id,
+                'external_product_id' => $product->external_product_id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'description' => $product->description,
+                'category' => $product->category,
+                'gender' => $product->gender,
+                'fit_profile' => $product->fit_profile,
+                'image_url' => asset(ltrim($product->image_url ?? 'images/demo-product.jpg', '/')),
+                'company' => [
+                    'id' => $product->company?->id,
+                    'name' => $product->company?->name,
+                    'platform' => $product->company?->platform,
+                    'domain' => $product->company?->domain,
+                ],
+            ],
+            'variants' => $product->variants->map(fn ($variant) => [
+                'id' => $variant->id,
+                'external_variant_id' => $variant->external_variant_id,
+                'sku' => $variant->sku,
+                'size_label' => $variant->size_label,
+                'color' => $variant->color,
+                'price' => $variant->price,
+                'stock_quantity' => $variant->stock_quantity,
+                'is_active' => $variant->is_active,
+            ])->values(),
+            'measurement_table' => [
+                'id' => $product->measurementTable?->id,
+                'name' => $product->measurementTable?->name,
+                'unit' => $product->measurementTable?->unit,
+                'rows' => $product->measurementTable?->rows->map(fn ($row) => [
+                    'size_label' => $row->size_label,
+                    'bust' => [$row->bust_min, $row->bust_max],
+                    'waist' => [$row->waist_min, $row->waist_max],
+                    'hip' => [$row->hip_min, $row->hip_max],
+                    'height' => [$row->height_min, $row->height_max],
+                    'weight' => [$row->weight_min, $row->weight_max],
+                ])->values() ?? [],
+            ],
+            'widget' => [
+                'public_key' => $widget?->public_key,
+                'platform' => $widget?->platform ?? 'custom',
+                'theme' => $widget?->theme ?? [
+                    'primary' => '#0f172a',
+                    'accent' => '#ff4d5e',
+                ],
+            ],
+        ]);
+    }
+}

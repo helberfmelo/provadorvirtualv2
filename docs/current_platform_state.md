@@ -7,7 +7,7 @@ Atualizado em: 2026-05-23
 - `D:\Projetos\provadorvirtual_v2` estava vazio no inicio desta documentacao.
 - Git local foi inicializado em `main` e conectado ao remoto `git@github.com:helberfmelo/provadorvirtualv2.git`.
 - Foram criados documentos iniciais, `.gitignore` e workflow de deploy.
-- O codigo Laravel/Vue ainda precisa ser scaffoldado em `backend/` e `frontend/`.
+- Sprint 1 scaffoldou `backend/` Laravel 12 e `frontend/` Vue 3/Vite.
 
 ## Referencias confirmadas
 
@@ -60,7 +60,7 @@ Atualizado em: 2026-05-23
 
 ## Bloqueios e informacoes faltantes
 
-- GitHub Actions esta bloqueado por billing/spending limit da conta GitHub.
+- GitHub Actions voltou a executar apos o repositorio ser alterado para publico.
 - Falta confirmar se o path remoto de v2 sera `/home1/opents62/public_html/provadorvirtual_v2`.
 - Acesso SSH local ao HostGator/opents62 foi validado; `/home1/opents62/public_html` existe e a pasta `provadorvirtual_v2` ainda nao foi criada.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
@@ -70,4 +70,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Executar a Sprint 1 do roadmap: scaffold Laravel/Vue, `.env.example`, health, layout base, pagina `/produto-teste` com dados seedados e smoke local.
+Concluir a publicacao da Sprint 1 pelo GitHub Actions e, se estiver verde, iniciar a Sprint 2: produtos, variacoes e tabelas de medidas.

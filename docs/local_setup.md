@@ -50,6 +50,20 @@ npm run dev
 - Frontend: `http://127.0.0.1:5173`
 - API: `http://127.0.0.1:8000/api/v1`
 
+## Acesso demo
+
+- E-mail: `demo@provadorvirtual.online`
+- Senha: `provador123`
+
+## Rotas iniciais
+
+- `/`
+- `/login`
+- `/produto-teste`
+- `/app`
+- `/api/v1/health`
+- `/api/v1/demo/product-test`
+
 ## Variaveis frontend
 
 ```env
@@ -96,3 +110,5 @@ Seeder inicial deve criar:
 - tabela de medidas completa;
 - instalacao de widget demo;
 - pagina `/produto-teste` funcional.
+
+Status Sprint 1: dados demo criados por `DatabaseSeeder` e publicados em producao por `ProductionSeeder`.
