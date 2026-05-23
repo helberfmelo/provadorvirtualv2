@@ -370,3 +370,4 @@
 - Erros ficam abertos ate o usuario fechar e mostram motivo amigavel, inclusive `422` de validacao.
 - Mantidas exclusoes para login/logout, checkout publico, previews e acoes que nao representam salvamento.
 - Validacoes locais: `npm run build`, `php artisan test --filter=UserAccessApiTest` e `git diff --check`.
+- Run `26344601240` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

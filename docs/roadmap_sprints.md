@@ -570,4 +570,4 @@ Entregas:
 - interceptador global para `POST`, `PATCH`, `PUT` e `DELETE` autenticados dos portais;
 - exclusoes para login/logout, checkout publico, preview/importacao assistida e acoes que nao sao salvamento.
 
-Status: implementado localmente, aguardando publicacao e validacao de producao.
+Status: implementado, publicado e validado em producao no run `26344601240`.

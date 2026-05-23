@@ -121,6 +121,7 @@ Atualizado em: 2026-05-23
 - Sprint 42 publicada em producao pelo GitHub Actions no run `26343135605`.
 - Sprint 43 publicada em producao pelo GitHub Actions no run `26343538804`.
 - Sprint 44 publicada em producao pelo GitHub Actions no run `26343868801`.
+- Sprint 45 publicada em producao pelo GitHub Actions no run `26344601240`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em producao usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que nao preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site publico comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
