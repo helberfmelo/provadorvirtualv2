@@ -37,7 +37,7 @@ class PublicCheckoutController extends Controller
         $plan = $this->plans()[$data['plan_code']] ?? null;
         $pricing = $this->pricingFor($data);
 
-        abort_if(! $plan, 422, 'Plano selecionado indisponivel.');
+        abort_if(! $plan, 422, 'Plano selecionado indisponível.');
 
         try {
             $session = DB::transaction(function () use ($data, $plan, $pricing): CheckoutSession {
@@ -232,7 +232,7 @@ class PublicCheckoutController extends Controller
                 'name' => 'Provador Virtual Anual',
                 'price_cents' => 18990,
                 'currency' => 'BRL',
-                'description' => 'Plano anual unico com widget, tabela de medidas, recomendacao inteligente, integracoes padrao e suporte de ativacao.',
+                'description' => 'Plano anual único com widget, tabela de medidas, recomendação inteligente, integrações padrão e suporte de ativação.',
             ],
         ];
     }
@@ -281,7 +281,7 @@ class PublicCheckoutController extends Controller
         $cpfUser = User::query()->where('cpf', $data['admin_cpf'])->first();
 
         if ($emailUser && $cpfUser && (int) $emailUser->id !== (int) $cpfUser->id) {
-            throw new RuntimeException('E-mail e CPF ja pertencem a usuarios diferentes. Use os dados do mesmo usuario ou fale com o suporte.');
+            throw new RuntimeException('E-mail e CPF já pertencem a usuários diferentes. Use os dados do mesmo usuário ou fale com o suporte.');
         }
 
         $user = $emailUser ?: $cpfUser ?: new User;
@@ -327,12 +327,12 @@ class PublicCheckoutController extends Controller
     {
         return match ($status) {
             CheckoutSession::STATUS_PAID => 'Pagamento aprovado',
-            CheckoutSession::STATUS_FAILED => 'Pagamento nao aprovado',
+            CheckoutSession::STATUS_FAILED => 'Pagamento não aprovado',
             CheckoutSession::STATUS_CANCELLED => 'Pagamento cancelado',
             CheckoutSession::STATUS_EXPIRED => 'Pagamento expirado',
             CheckoutSession::STATUS_REFUNDED => 'Pagamento estornado',
             CheckoutSession::STATUS_CHECKOUT_CREATED => 'Pagamento iniciado',
-            default => 'Aguardando confirmacao',
+            default => 'Aguardando confirmação',
         };
     }
 }

@@ -23,7 +23,7 @@ async function loadSettings() {
     const { data } = await api.get('/saas/email-settings')
     Object.assign(emailSettings, normalizeEmailSettings(data.data))
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar as credenciais de e-mail.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar as credenciais de e-mail.'
   } finally {
     loading.value = false
   }
@@ -52,7 +52,7 @@ async function saveSettings() {
     await api.patch('/saas/email-settings', payload)
     await router.push('/saas/emails')
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar as credenciais de e-mail.'
+    error.value = requestError.response?.data?.message || 'Não foi possível salvar as credenciais de e-mail.'
   } finally {
     saving.value = false
   }
@@ -65,7 +65,7 @@ async function saveSettings() {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>Credenciais SMTP</h1>
-        <p>Configuracao central de envio transacional.</p>
+        <p>Configuração central de envio transacional.</p>
       </div>
       <RouterLink class="btn btn-secondary" to="/saas/emails">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -95,13 +95,13 @@ async function saveSettings() {
 
       <div class="form-grid">
         <label>
-          Usuario
+          Usuário
           <input v-model="emailSettings.username" autocomplete="username" />
         </label>
         <label>
           Senha SMTP
           <input v-model="smtpPassword" type="password" autocomplete="new-password" placeholder="Manter senha atual" />
-          <small>{{ emailSettings.has_smtp_password ? 'Senha ja salva no cofre criptografado.' : 'Nenhuma senha salva ainda.' }}</small>
+          <small>{{ emailSettings.has_smtp_password ? 'Senha já salva no cofre criptografado.' : 'Nenhuma senha salva ainda.' }}</small>
         </label>
         <label>
           Criptografia

@@ -35,11 +35,11 @@ trait ResolvesMerchant
     protected function scopedProduct(Merchant $merchant, Product $product, ?MerchantCompany $company = null): Product
     {
         if ((int) $product->merchant_id !== (int) $merchant->id) {
-            throw new NotFoundHttpException('Produto nao encontrado.');
+            throw new NotFoundHttpException('Produto não encontrado.');
         }
 
         if ($company && $product->merchant_company_id && (int) $product->merchant_company_id !== (int) $company->id) {
-            throw new NotFoundHttpException('Produto nao encontrado.');
+            throw new NotFoundHttpException('Produto não encontrado.');
         }
 
         return $product;
@@ -48,7 +48,7 @@ trait ResolvesMerchant
     protected function scopedVariant(Product $product, ProductVariant $variant): ProductVariant
     {
         if ((int) $variant->product_id !== (int) $product->id) {
-            throw new NotFoundHttpException('Variacao nao encontrada.');
+            throw new NotFoundHttpException('Variação não encontrada.');
         }
 
         return $variant;
@@ -57,11 +57,11 @@ trait ResolvesMerchant
     protected function scopedMeasurementTable(Merchant $merchant, MeasurementTable $measurementTable, ?MerchantCompany $company = null): MeasurementTable
     {
         if ((int) $measurementTable->merchant_id !== (int) $merchant->id) {
-            throw new NotFoundHttpException('Tabela de medidas nao encontrada.');
+            throw new NotFoundHttpException('Tabela de medidas não encontrada.');
         }
 
         if ($company && $measurementTable->merchant_company_id && (int) $measurementTable->merchant_company_id !== (int) $company->id) {
-            throw new NotFoundHttpException('Tabela de medidas nao encontrada.');
+            throw new NotFoundHttpException('Tabela de medidas não encontrada.');
         }
 
         return $measurementTable;

@@ -11,15 +11,15 @@ class PermissionCatalog
     {
         return [
             ['key' => 'dashboard', 'label' => 'Dashboard', 'description' => 'Resumo da empresa e indicadores principais.'],
-            ['key' => 'products', 'label' => 'Produtos', 'description' => 'Produtos, variacoes e vinculo com tabelas.'],
-            ['key' => 'measurement_tables', 'label' => 'Tabelas de medidas', 'description' => 'Cadastro e revisao das tabelas usadas no widget.'],
+            ['key' => 'products', 'label' => 'Produtos', 'description' => 'Produtos, variações e vínculo com tabelas.'],
+            ['key' => 'measurement_tables', 'label' => 'Tabelas de medidas', 'description' => 'Cadastro e revisão das tabelas usadas no widget.'],
             ['key' => 'imports', 'label' => 'Importacoes', 'description' => 'CSV, XML e cargas assistidas.'],
             ['key' => 'ai_assistant', 'label' => 'Assistente IA', 'description' => 'Sugestoes de tabela por texto, CSV ou OCR.'],
-            ['key' => 'analytics', 'label' => 'Analytics', 'description' => 'Metricas de recomendacao e feedback.'],
-            ['key' => 'widget', 'label' => 'Widget', 'description' => 'Snippet, dominios e personalizacao visual.'],
-            ['key' => 'integrations', 'label' => 'Integracoes', 'description' => 'Conexoes com plataformas de e-commerce.'],
-            ['key' => 'go_live', 'label' => 'Go-live', 'description' => 'Checklist de publicacao assistida.'],
-            ['key' => 'users', 'label' => 'Usuarios', 'description' => 'Usuarios, acessos e permissoes da empresa.'],
+            ['key' => 'analytics', 'label' => 'Analytics', 'description' => 'Métricas de recomendação e feedback.'],
+            ['key' => 'widget', 'label' => 'Widget', 'description' => 'Snippet, domínios e personalização visual.'],
+            ['key' => 'integrations', 'label' => 'Integrações', 'description' => 'Conexões com plataformas de e-commerce.'],
+            ['key' => 'go_live', 'label' => 'Go-live', 'description' => 'Checklist de publicação assistida.'],
+            ['key' => 'users', 'label' => 'Usuários', 'description' => 'Usuários, acessos e permissões da empresa.'],
         ];
     }
 
@@ -28,8 +28,8 @@ class PermissionCatalog
         return [
             ['key' => 'saas_dashboard', 'label' => 'Painel SaaS', 'description' => 'Resumo operacional do Provador Virtual.'],
             ['key' => 'saas_companies', 'label' => 'Empresas', 'description' => 'Cadastro e manutencao de empresas clientes.'],
-            ['key' => 'saas_users', 'label' => 'Usuarios SaaS', 'description' => 'Usuarios internos e equipe de suporte do SaaS.'],
-            ['key' => 'saas_company_users', 'label' => 'Usuarios das empresas', 'description' => 'Usuarios vinculados a empresas clientes e permissoes do portal da empresa.'],
+            ['key' => 'saas_users', 'label' => 'Usuários SaaS', 'description' => 'Usuários internos e equipe de suporte do SaaS.'],
+            ['key' => 'saas_company_users', 'label' => 'Usuários das empresas', 'description' => 'Usuários vinculados a empresas clientes e permissões do portal da empresa.'],
             ['key' => 'saas_emails', 'label' => 'E-mails', 'description' => 'Credenciais SMTP e e-mails transacionais.'],
             ['key' => 'saas_audit', 'label' => 'Auditoria', 'description' => 'Logs, diagnosticos e rastreabilidade.'],
         ];

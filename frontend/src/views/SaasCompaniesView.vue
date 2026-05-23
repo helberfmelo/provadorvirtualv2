@@ -21,7 +21,7 @@ async function loadCompanies() {
     const { data } = await api.get('/saas/companies')
     companies.value = data.data
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar as empresas.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar as empresas.'
   } finally {
     loading.value = false
   }
@@ -56,7 +56,7 @@ async function toggleCompany(company: CompanyRow) {
     notice.value = nextStatus === 'active' ? 'Empresa ativada.' : 'Empresa desativada.'
     await loadCompanies()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel alterar o status da empresa.'
+    error.value = requestError.response?.data?.message || 'Não foi possível alterar o status da empresa.'
   }
 }
 </script>
@@ -67,7 +67,7 @@ async function toggleCompany(company: CompanyRow) {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>Empresas</h1>
-        <p>Listagem operacional de empresas clientes. Cadastros e edicoes abrem em tela propria.</p>
+        <p>Listagem operacional de empresas clientes. Cadastros e edicoes abrem em tela própria.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadCompanies">
@@ -93,13 +93,13 @@ async function toggleCompany(company: CompanyRow) {
         <table>
           <thead>
             <tr>
-              <th>Codigo</th>
+              <th>Código</th>
               <th>Empresa</th>
               <th>Lojista</th>
               <th>Plataforma</th>
-              <th>Endereco</th>
+              <th>Endereço</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>

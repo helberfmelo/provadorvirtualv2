@@ -4,20 +4,20 @@ Atualizado em: 2026-05-23
 
 ## Objetivo
 
-Preparar o Provador Virtual para uso publico com controles basicos de seguranca,
+Preparar o Provador Virtual para uso público com controles basicos de segurança,
 privacidade e diagnostico operacional.
 
 ## Status Sprint 11
 
 Implementado:
 
-- paginas publicas `/privacidade` e `/termos`;
-- rota publica `GET /api/v1/ops/status`;
-- rate limit nas rotas publicas de login, widget e ativacao BigShop;
-- CORS dinamico por dominio autorizado em `widget_installs.allowed_domains`;
-- mascaramento recursivo de campos sensiveis em `audit_logs.metadata`;
+- páginas públicas `/privacidade` e `/termos`;
+- rota pública `GET /api/v1/ops/status`;
+- rate limit nas rotas públicas de login, widget e ativação BigShop;
+- CORS dinamico por domínio autorizado em `widget_installs.allowed_domains`;
+- mascaramento recursivo de campos sensíveis em `audit_logs.metadata`;
 - auditoria de login e logout;
-- comandos de anonimizacao e limpeza de logs;
+- comandos de anonimização e limpeza de logs;
 - smoke de deploy incluindo status operacional.
 
 ## CORS do widget
@@ -31,21 +31,21 @@ Rotas protegidas por origem:
 Regras:
 
 - requisicao sem `Origin` e permitida para smokes e chamadas server-to-server;
-- requisicao com `Origin` precisa corresponder a dominio ativo do lojista;
-- subdominios sao aceitos quando o dominio raiz estiver liberado;
+- requisicao com `Origin` precisa corresponder a domínio ativo do lojista;
+- subdominios são aceitos quando o domínio raiz estiver liberado;
 - `OPTIONS` responde preflight para o widget, mas o `POST` real continua validando a origem por lojista.
 
 ## Rate limits
 
 Limites iniciais:
 
-- `POST /api/v1/auth/login`: 10 requisicoes por minuto;
-- rotas publicas de recomendacao: 60 requisicoes por minuto;
-- feedback do widget: 120 requisicoes por minuto;
-- ativacao BigShop: 20 requisicoes por minuto;
-- status operacional: 60 requisicoes por minuto.
+- `POST /api/v1/auth/login`: 10 requisições por minuto;
+- rotas públicas de recomendação: 60 requisições por minuto;
+- feedback do widget: 120 requisições por minuto;
+- ativação BigShop: 20 requisições por minuto;
+- status operacional: 60 requisições por minuto.
 
-## Retencao e anonimizacao
+## Retenção e anonimização
 
 Comando para anonimizar dados antigos do widget:
 
@@ -68,9 +68,9 @@ php artisan pv:privacy-prune --days=180 --dry-run
 ```
 
 O comando remove `audit_logs` e `ai_usage_logs` antigos e aplica soft delete em
-`integration_events` antigos. Analytics de recomendacao permanece preservado.
+`integration_events` antigos. Analytics de recomendação permanece preservado.
 
-## Variaveis
+## Variáveis
 
 ```env
 PRIVACY_WIDGET_DATA_RETENTION_DAYS=30
@@ -79,8 +79,8 @@ CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
 LOG_DAILY_DAYS=14
 ```
 
-`CORS_ALLOWED_ORIGINS` atende o painel em desenvolvimento local. O widget publico
-usa a validacao dinamica por dominio liberado na loja.
+`CORS_ALLOWED_ORIGINS` atende o painel em desenvolvimento local. O widget público
+usa a validação dinâmica por domínio liberado na loja.
 
 ## Status operacional
 
@@ -93,10 +93,10 @@ usa a validacao dinamica por dominio liberado na loja.
 - ambiente;
 - timestamp.
 
-A rota nao expoe credenciais, paths internos ou detalhes de erro.
+A rota não expoe credenciais, paths internos ou detalhes de erro.
 
-## Pendencias
+## Pendências
 
 - Criar rotina agendada no servidor para executar comandos de privacidade.
-- Definir politica comercial final de retencao nos contratos.
-- Cadastrar usuario `admin` real para operacao SaaS.
+- Definir política comercial final de retenção nos contratos.
+- Cadastrar usuário `admin` real para operação SaaS.

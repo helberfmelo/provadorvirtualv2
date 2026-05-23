@@ -7,8 +7,8 @@ Atualizado em: 2026-05-23
 P1:
 
 - site/app fora;
-- widget fora em producao;
-- recomendacao retornando tamanho incorreto de forma sistemica;
+- widget fora em produção;
+- recomendação retornando tamanho incorreto de forma sistemica;
 - vazamento ou suspeita de credencial.
 
 P2:
@@ -16,7 +16,7 @@ P2:
 - deploy falhou;
 - BigShop sync falhou;
 - SMTP falhou;
-- pagina de produto teste fora;
+- página de produto teste fora;
 - lentidao relevante.
 
 P3:
@@ -35,7 +35,7 @@ P3:
 6. Confirmar se houve deploy recente.
 7. Registrar em `docs/execution_log.md`.
 
-## Widget nao aparece
+## Widget não aparece
 
 Verificar:
 
@@ -46,12 +46,12 @@ Verificar:
 - console do navegador;
 - produto tem tabela vinculada.
 
-## Recomendacao falhou
+## Recomendação falhou
 
 Verificar:
 
-- tabela de medidas valida;
-- variacao correta;
+- tabela de medidas válida;
+- variação correta;
 - medidas recebidas;
 - logs de scoring;
 - status do lojista;
@@ -63,7 +63,7 @@ Verificar:
 2. Validar contagens retornadas.
 3. Rodar `php artisan pv:privacy-anonymize`.
 4. Para logs operacionais antigos, rodar `php artisan pv:privacy-prune --dry-run` e depois sem `--dry-run`.
-5. Registrar a acao em `docs/execution_log.md`.
+5. Registrar a ação em `docs/execution_log.md`.
 
 ## Deploy falhou
 
@@ -73,15 +73,15 @@ Verificar:
 - `SSH_HOST`, `SSH_PORT`, `SSH_USERNAME`;
 - path remoto;
 - `.env` remoto ou `PRODUCTION_ENV`;
-- permissao de `storage` e `bootstrap/cache`;
+- permissão de `storage` e `bootstrap/cache`;
 - compatibilidade PHP.
 
 ## Banco falhou
 
 Verificar:
 
-- host `localhost` em producao;
-- banco/usuario/senha;
+- host `localhost` em produção;
+- banco/usuário/senha;
 - `DB_COLLATION=utf8mb4_unicode_ci`;
 - migration destrutiva;
 - backup recente.

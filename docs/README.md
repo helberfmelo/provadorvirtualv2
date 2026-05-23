@@ -1,11 +1,11 @@
-# Documentacao do Projeto Provador Virtual
+# Documentação do Projeto Provador Virtual
 
 Atualizado em: 2026-05-23  
 Status: fonte inicial de verdade para iniciar desenvolvimento do `provadorvirtual_v2`.
 
-## Documentos obrigatorios antes de qualquer sprint
+## Documentos obrigatórios antes de qualquer sprint
 
-Antes de desenvolver qualquer sprint, ajuste, correcao ou deploy, reler nesta ordem:
+Antes de desenvolver qualquer sprint, ajuste, correção ou deploy, reler nesta ordem:
 
 1. `docs/project_overview.md`
 2. `docs/master_spec.md`
@@ -35,7 +35,7 @@ Antes de desenvolver qualquer sprint, ajuste, correcao ou deploy, reler nesta or
 26. `docs/intelligent_sizing_roadmap.md`
 27. `docs/product_backlog.md`
 28. `docs/security_compliance.md`
-29. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
+29. `docs/credentials.local.md`, somente quando a sprint envolver produção, banco, SMTP, deploy, IA ou integrações.
 
 Nenhuma sprint deve comecar sem essa releitura.
 
@@ -47,21 +47,21 @@ Nenhuma sprint deve comecar sem essa releitura.
 - `D:\Projetos\provadorvirtual_v1`
 - `D:\Projetos\bigbangshop2.0`
 - `D:\Projetos\bigshop\172.16.151.5`
-- Documentacao publica: `https://documenter.getpostman.com/view/4253101/2s93sdYrsi`
-- Documentacao publica Sizebay: `https://docs.sizebay.com/`
-- Captura tecnica publica Zak/Sizebay em `https://www.zak.com.br/`
+- Documentação pública: `https://documenter.getpostman.com/view/4253101/2s93sdYrsi`
+- Documentação pública Sizebay: `https://docs.sizebay.com/`
+- Captura tecnica pública Zak/Sizebay em `https://www.zak.com.br/`
 
-## Decisoes iniciais
+## Decisões iniciais
 
 - Backend: Laravel 11 ou superior, PHP 8.2+, Sanctum, API REST versionada em `/api/v1`.
 - Frontend: Vue 3, TypeScript, Vite, Pinia, Vue Router.
 - Banco: MySQL/MariaDB com `utf8mb4` e `utf8mb4_unicode_ci`.
 - Deploy: GitHub Actions via SSH para HostGator/opentshost.
-- Publicacao inicial: `https://provadorvirtual.online/provadorvirtual_v2/`, preservando o v1.
+- Publicação inicial: `https://provadorvirtual.online/provadorvirtual_v2/`, preservando o v1.
 - Nome comercial: Provador Virtual, sem expor v1/v2 ao cliente final.
 - Widget: SDK JavaScript universal e isolado, com snippet simples por plataforma.
-- BigShop: integracao nativa de um clique como objetivo prioritario, usando a API V3 e/ou encaixe direto no front da BigShop.
+- BigShop: integração nativa de um clique como objetivo prioritario, usando a API V3 e/ou encaixe direto no front da BigShop.
 
-## Observacao sobre segredos
+## Observação sobre segredos
 
-`docs/credentials.local.md` existe apenas para referencia local e esta no `.gitignore`. Nao commitar esse arquivo.
+`docs/credentials.local.md` existe apenas para referência local e esta no `.gitignore`. Não commitar esse arquivo.

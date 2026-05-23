@@ -30,7 +30,7 @@ const loginTitle = computed(() => isSaasLogin.value ? 'Entrar no SaaS' : 'Entrar
 const companyAccessHelp = computed(() => (
   companyOptions.value.length > 0
     ? 'Selecione a empresa para continuar no portal.'
-    : 'Obrigatorio para o portal da empresa. Use codigo da loja ou CNPJ.'
+    : 'Obrigatório para o portal da empresa. Use código da loja ou CNPJ.'
 ))
 
 async function submit() {
@@ -44,7 +44,7 @@ async function submit() {
 
     if (isSaasLogin.value && !isAdmin) {
       await auth.logout()
-      error.value = 'Este acesso e exclusivo para administradores do SaaS.'
+      error.value = 'Este acesso é exclusivo para administradores do SaaS.'
 
       return
     }
@@ -63,7 +63,7 @@ async function submit() {
     error.value = requestError.response?.data?.message
       || requestError.response?.data?.errors?.company_access?.[0]
       || requestError.response?.data?.errors?.login?.[0]
-      || 'Nao foi possivel entrar com esses dados.'
+      || 'Não foi possível entrar com esses dados.'
   } finally {
     loading.value = false
   }
@@ -81,7 +81,7 @@ async function submit() {
           <input v-model="identifier" autocomplete="username" required />
         </label>
         <label v-if="!isSaasLogin || companyOptions.length > 0">
-          Codigo da loja ou CNPJ
+          Código da loja ou CNPJ
           <input
             v-if="companyOptions.length === 0"
             v-model="companyAccess"

@@ -173,11 +173,11 @@ async function copySnippet() {
     <div class="page-heading">
       <div>
         <span class="eyebrow">Widget</span>
-        <h1>Instalacao</h1>
+        <h1>Instalação</h1>
       </div>
       <button class="btn btn-secondary" type="button" :disabled="!install" @click="copySnippet">
         <i class="fa-solid fa-copy" aria-hidden="true"></i>
-        {{ copied ? 'Copiado' : 'Copiar codigo' }}
+        {{ copied ? 'Copiado' : 'Copiar código' }}
       </button>
     </div>
 
@@ -195,10 +195,10 @@ async function copySnippet() {
                 {{ platform.label }}
               </option>
             </select>
-            <small v-if="isBigShopContract">Plano BigShop permite instalacao somente na BigShop.</small>
+            <small v-if="isBigShopContract">Plano BigShop permite instalação somente na BigShop.</small>
           </label>
           <label>
-            Chave publica
+            Chave pública
             <input :value="install?.public_key" readonly />
           </label>
           <label class="toggle-line">
@@ -208,7 +208,7 @@ async function copySnippet() {
         </div>
 
         <label>
-          Dominios liberados
+          Domínios liberados
           <textarea v-model="form.allowed_domains" rows="5"></textarea>
         </label>
 
@@ -274,7 +274,7 @@ async function copySnippet() {
             </select>
           </label>
           <label>
-            Raio dos botoes
+            Raio dos botões
             <input v-model="form.theme.button_radius" type="number" min="0" max="24" />
           </label>
         </div>
@@ -310,7 +310,7 @@ async function copySnippet() {
         </div>
 
         <div class="subsection-heading">
-          <h2>Codigo</h2>
+          <h2>Código</h2>
           <span>{{ install?.sample_product?.sku || 'produto' }}</span>
         </div>
         <pre><code>{{ install?.snippet }}</code></pre>
@@ -318,7 +318,7 @@ async function copySnippet() {
         <div class="check-list">
           <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Produto ativo</span>
           <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Tabela vinculada</span>
-          <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Widget publico</span>
+          <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Widget público</span>
         </div>
       </aside>
     </div>

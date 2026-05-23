@@ -73,7 +73,7 @@ async function runPreview() {
     preview.value = data.data
   } catch (requestError: any) {
     preview.value = null
-    error.value = requestError.response?.data?.message || 'Nao foi possivel analisar o arquivo.'
+    error.value = requestError.response?.data?.message || 'Não foi possível analisar o arquivo.'
   } finally {
     loading.value = false
   }
@@ -90,7 +90,7 @@ async function commitImport() {
     preview.value = null
     await loadJobs()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel importar.'
+    error.value = requestError.response?.data?.message || 'Não foi possível importar.'
   } finally {
     saving.value = false
   }
@@ -162,8 +162,8 @@ function statusLabel(status: string) {
   return {
     pending: 'Pendente',
     running: 'Processando',
-    completed: 'Concluida',
-    completed_with_warnings: 'Concluida com avisos',
+    completed: 'Concluída',
+    completed_with_warnings: 'Concluída com avisos',
     failed: 'Falhou',
   }[status] || status
 }
@@ -219,7 +219,7 @@ function statusLabel(status: string) {
         </div>
 
         <label>
-          Conteudo
+          Conteúdo
           <textarea v-model="form.content" rows="14"></textarea>
         </label>
 
@@ -276,11 +276,11 @@ function statusLabel(status: string) {
 
         <div class="subsection">
           <div class="subsection-heading">
-            <h2>Historico</h2>
+            <h2>Histórico</h2>
             <span>{{ jobs.length }} recentes</span>
           </div>
           <div class="job-list">
-            <div v-if="!jobs.length" class="empty-state">Nenhuma importacao registrada.</div>
+            <div v-if="!jobs.length" class="empty-state">Nenhuma importação registrada.</div>
             <article v-for="job in jobs" :key="job.id" class="job-row">
               <i class="fa-solid fa-file-import" aria-hidden="true"></i>
               <span>

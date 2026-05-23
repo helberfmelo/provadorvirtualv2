@@ -23,7 +23,7 @@ class BigShopActivationService
         $email = (string) (data_get($payload, 'merchant.email') ?: data_get($payload, 'merchant_email'));
 
         if ($storeId === '' || $email === '') {
-            throw new RuntimeException('Payload de ativacao BigShop incompleto.');
+            throw new RuntimeException('Payload de ativação BigShop incompleto.');
         }
 
         $user = User::query()->firstOrCreate(

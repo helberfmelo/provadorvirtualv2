@@ -82,7 +82,7 @@ class ImportService
     {
         if ($format === 'google_xml') {
             if ($type !== 'products') {
-                throw new RuntimeException('Google XML esta disponivel apenas para produtos.');
+                throw new RuntimeException('Google XML está disponível apenas para produtos.');
             }
 
             return $this->parseGoogleXml($content);
@@ -130,7 +130,7 @@ class ImportService
         $xml = simplexml_load_string(trim($content));
 
         if (! $xml instanceof SimpleXMLElement) {
-            throw new RuntimeException('XML invalido.');
+            throw new RuntimeException('XML inválido.');
         }
 
         $namespaces = $xml->getNamespaces(true);

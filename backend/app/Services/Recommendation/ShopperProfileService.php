@@ -46,7 +46,7 @@ class ShopperProfileService
                 'response' => [
                     'consent' => false,
                     'known_profile' => false,
-                    'message' => 'Medidas usadas somente para esta recomendacao.',
+                    'message' => 'Medidas usadas somente para esta recomendação.',
                 ],
             ];
         }
@@ -115,8 +115,8 @@ class ShopperProfileService
                 'measurements' => $profile->measurements ?? [],
                 'preferences' => $profile->preferences ?? [],
                 'message' => $knownProfile
-                    ? 'Recomendacao baseada em medidas fornecidas anteriormente.'
-                    : 'Perfil salvo para deixar as proximas recomendacoes mais rapidas.',
+                    ? 'Recomendação baseada em medidas fornecidas anteriormente.'
+                    : 'Perfil salvo para deixar as próximas recomendações mais rápidas.',
             ],
         ];
     }

@@ -11,34 +11,34 @@ Dar visibilidade operacional sem transformar a primeira versao em BI complexo.
 Implementado:
 
 - tela protegida `/app/analytics`;
-- tela protegida `/saas` para usuarios `admin` ou `support`;
+- tela protegida `/saas` para usuários `admin` ou `support`;
 - rota protegida `GET /api/v1/analytics/recommendations`;
 - rota protegida `GET /api/v1/audit-logs`;
 - rotas protegidas `GET /api/v1/saas/overview` e `GET /api/v1/saas/merchants`;
 - tabela `audit_logs`;
-- logs de auditoria para tabelas de medidas, widget e integracoes.
+- logs de auditoria para tabelas de medidas, widget e integrações.
 
 ## Analytics do lojista
 
 Resumo entregue por `/analytics/recommendations`:
 
-- recomendacoes totais;
-- recomendacoes hoje;
-- recomendacoes em 7 dias;
-- confianca media;
+- recomendações totais;
+- recomendações hoje;
+- recomendações em 7 dias;
+- confiança média;
 - total de feedbacks;
 - taxa de feedback positivo;
 - produtos sem tabela de medidas;
-- alertas do widget e integracoes.
+- alertas do widget e integrações.
 - perfis de comprador ativos/reconhecidos;
-- qualidade media de perfil;
+- qualidade média de perfil;
 - eventos de aprendizado por status;
 - outliers bloqueados;
 - sinais comerciais de carrinho, compra, devolucao e troca.
 
-Tambem retorna series diarias, distribuicao por tamanho, produtos com recomendacao, produtos sem tabela, status de aprendizado, sinais comerciais e outliers recentes para revisao.
+Também retorna series diarias, distribuicao por tamanho, produtos com recomendação, produtos sem tabela, status de aprendizado, sinais comerciais e outliers recentes para revisão.
 
-Status Sprint 36: `/app/analytics` mostra os novos cards de perfis, aprendizado e outliers. Sinais `blocked_outlier` sao armazenados para investigacao e nao entram direto em refinamento automatico.
+Status Sprint 36: `/app/analytics` mostra os novos cards de perfis, aprendizado e outliers. Sinais `blocked_outlier` são armazenados para investigacao e não entram direto em refinamento automático.
 
 ## SaaS Admin
 
@@ -55,10 +55,10 @@ Resumo entregue:
 - lojas/empresas;
 - produtos;
 - widgets ativos;
-- integracoes configuradas;
-- recomendacoes em 7 dias;
+- integrações configuradas;
+- recomendações em 7 dias;
 - usos de IA em 7 dias;
-- falhas recentes de importacao/integracao.
+- falhas recentes de importacao/integração.
 
 ## Auditoria
 
@@ -83,7 +83,7 @@ Eventos iniciais:
 - `auth.login`;
 - `auth.logout`.
 
-## Pendencias
+## Pendências
 
-- Criar usuario admin real em producao quando for operar suporte.
+- Criar usuário admin real em produção quando for operar suporte.
 - Adicionar filtros por periodo quando houver maior volume.

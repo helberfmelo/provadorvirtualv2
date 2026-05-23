@@ -47,7 +47,7 @@ async function loadForm() {
     if (editing.value) {
       const user = (data.data as PortalUser[]).find((item) => item.id === userId.value)
       if (!user) {
-        error.value = 'Usuario nao encontrado.'
+        error.value = 'Usuário não encontrado.'
         return
       }
       editUser(user)
@@ -56,7 +56,7 @@ async function loadForm() {
 
     permissionDraft.value = emptyPermissions(modules.value)
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o usuario.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar o usuário.'
   } finally {
     loading.value = false
   }
@@ -111,7 +111,7 @@ async function saveUser() {
       : await api.post('/merchant/users', payload)
     await router.push('/app/usuarios')
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar o usuario.'
+    error.value = requestError.response?.data?.message || 'Não foi possível salvar o usuário.'
   } finally {
     saving.value = false
   }
@@ -122,9 +122,9 @@ async function saveUser() {
   <section class="dashboard app-workspace">
     <div class="page-heading">
       <div>
-        <span class="eyebrow">Usuarios</span>
-        <h1>{{ editing ? 'Editar usuario' : 'Novo usuario' }}</h1>
-        <p>Defina perfil, status e permissoes por modulo.</p>
+        <span class="eyebrow">Usuários</span>
+        <h1>{{ editing ? 'Editar usuário' : 'Novo usuário' }}</h1>
+        <p>Defina perfil, status e permissões por módulo.</p>
       </div>
       <RouterLink class="btn btn-secondary" to="/app/usuarios">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -207,7 +207,7 @@ async function saveUser() {
       <div class="action-row compact">
         <button class="btn btn-primary" type="submit" :disabled="saving || loading">
           <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-          {{ saving ? 'Salvando...' : 'Salvar usuario' }}
+          {{ saving ? 'Salvando...' : 'Salvar usuário' }}
         </button>
       </div>
     </form>

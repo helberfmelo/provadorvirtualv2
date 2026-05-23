@@ -121,7 +121,7 @@ class BigShopIntegrationController extends Controller
 
         if (! $connection) {
             throw ValidationException::withMessages([
-                'bigshop' => 'Configure a conexao BigShop antes de continuar.',
+                'bigshop' => 'Configure a conexão BigShop antes de continuar.',
             ]);
         }
 

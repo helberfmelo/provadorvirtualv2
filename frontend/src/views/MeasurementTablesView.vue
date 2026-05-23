@@ -21,7 +21,7 @@ async function loadTables() {
     const { data } = await api.get('/measurement-tables')
     tables.value = data.data
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar as tabelas.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar as tabelas.'
   } finally {
     loading.value = false
   }
@@ -40,7 +40,7 @@ async function removeTable(table: MeasurementTable) {
       <div>
         <span class="eyebrow">Tabelas</span>
         <h1>Tabelas de medidas</h1>
-        <p>Listagem das tabelas da empresa. Cadastro e edicao abrem em tela propria.</p>
+        <p>Listagem das tabelas da empresa. Cadastro e edição abrem em tela própria.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadTables">
@@ -72,7 +72,7 @@ async function removeTable(table: MeasurementTable) {
               <th>Linhas</th>
               <th>Produtos</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>

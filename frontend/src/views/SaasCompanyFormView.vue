@@ -57,7 +57,7 @@ async function loadForm() {
     if (editing.value) {
       const company = (companiesResponse.data.data as CompanyRow[]).find((item) => item.id === companyId.value)
       if (!company) {
-        error.value = 'Empresa nao encontrada.'
+        error.value = 'Empresa não encontrada.'
         return
       }
 
@@ -86,7 +86,7 @@ async function loadForm() {
       })
     }
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o cadastro da empresa.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar o cadastro da empresa.'
   } finally {
     loading.value = false
   }
@@ -142,7 +142,7 @@ async function saveCompany() {
       : await api.post('/saas/companies', payload(true))
     await router.push('/saas/empresas')
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar a empresa.'
+    error.value = requestError.response?.data?.message || 'Não foi possível salvar a empresa.'
   } finally {
     saving.value = false
   }
@@ -155,7 +155,7 @@ async function saveCompany() {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>{{ editing ? 'Editar empresa' : 'Nova empresa' }}</h1>
-        <p>Cadastro em tela propria para manter a listagem limpa e operacional.</p>
+        <p>Cadastro em tela própria para manter a listagem limpa e operacional.</p>
       </div>
       <RouterLink class="btn btn-secondary" to="/saas/empresas">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -211,14 +211,14 @@ async function saveCompany() {
         <label>
           CEP
           <input v-model="form.zip_code" inputmode="numeric" @blur="lookupCep" />
-          <small>{{ cepLoading ? 'Buscando endereco...' : 'Preenche endereco automaticamente ao sair do campo.' }}</small>
+          <small>{{ cepLoading ? 'Buscando endereço...' : 'Preenche endereço automaticamente ao sair do campo.' }}</small>
         </label>
         <label>
           Rua
           <input v-model="form.street" />
         </label>
         <label>
-          Numero
+          Número
           <input v-model="form.number" />
         </label>
       </div>
@@ -244,7 +244,7 @@ async function saveCompany() {
           <input v-model="form.state" maxlength="2" />
         </label>
         <label>
-          Dominio
+          Domínio
           <input v-model="form.domain" placeholder="loja.com.br" />
         </label>
         <label>

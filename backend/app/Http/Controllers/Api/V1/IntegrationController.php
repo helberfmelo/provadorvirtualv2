@@ -54,7 +54,7 @@ class IntegrationController extends Controller
     public function update(UpdatePlatformConnectionRequest $request, string $platform)
     {
         if (! PlatformCatalog::find($platform)) {
-            throw new NotFoundHttpException('Integracao nao encontrada.');
+            throw new NotFoundHttpException('Integração não encontrada.');
         }
 
         $merchant = $this->currentMerchant($request);
@@ -114,7 +114,7 @@ class IntegrationController extends Controller
     public function syncXml(Request $request, string $platform, ImportService $imports)
     {
         if (! PlatformCatalog::find($platform)) {
-            throw new NotFoundHttpException('Integracao nao encontrada.');
+            throw new NotFoundHttpException('Integração não encontrada.');
         }
 
         $merchant = $this->currentMerchant($request);
@@ -130,11 +130,11 @@ class IntegrationController extends Controller
 
         if (! $connection) {
             throw ValidationException::withMessages([
-                'feed_url' => ['Salve a integracao com uma URL de XML/feed antes de sincronizar.'],
+                'feed_url' => ['Salve a integração com uma URL de XML/feed antes de sincronizar.'],
             ]);
         }
 
-        $feedUrl = $this->publicUrl($connection->feed_url, 'feed_url', 'Informe a URL publica do XML/feed antes de sincronizar.');
+        $feedUrl = $this->publicUrl($connection->feed_url, 'feed_url', 'Informe a URL pública do XML/feed antes de sincronizar.');
         $host = (string) parse_url($feedUrl, PHP_URL_HOST);
         $httpStatus = null;
         $job = null;
@@ -227,7 +227,7 @@ class IntegrationController extends Controller
     public function validateInstall(Request $request, string $platform)
     {
         if (! PlatformCatalog::find($platform)) {
-            throw new NotFoundHttpException('Integracao nao encontrada.');
+            throw new NotFoundHttpException('Integração não encontrada.');
         }
 
         $merchant = $this->currentMerchant($request);
@@ -342,7 +342,7 @@ class IntegrationController extends Controller
         abort_if(
             $company?->platform === 'bigshop' && $platform !== 'bigshop',
             403,
-            'Sua empresa contratou o plano BigShop. A integracao disponivel para este contrato e apenas BigShop.'
+            'Sua empresa contratou o plano BigShop. A integração disponível para este contrato é apenas BigShop.'
         );
     }
 
@@ -352,11 +352,11 @@ class IntegrationController extends Controller
 
         if ($value === '') {
             throw ValidationException::withMessages([
-                'url' => ['Informe a URL publica da pagina de produto para validar.'],
+                'url' => ['Informe a URL pública da página de produto para validar.'],
             ]);
         }
 
-        return $this->publicUrl($value, 'url', 'Informe uma URL publica valida.');
+        return $this->publicUrl($value, 'url', 'Informe uma URL pública válida.');
     }
 
     private function publicUrl(?string $url, string $field, string $message): string
@@ -377,7 +377,7 @@ class IntegrationController extends Controller
 
         if (! filter_var($value, FILTER_VALIDATE_URL) || ! is_string($host) || $host === '') {
             throw ValidationException::withMessages([
-                $field => ['Informe uma URL publica valida.'],
+                $field => ['Informe uma URL pública válida.'],
             ]);
         }
 
@@ -388,7 +388,7 @@ class IntegrationController extends Controller
 
         if (in_array($host, $blockedHosts, true) || str_ends_with($host, '.local') || ! $isPublicIp) {
             throw ValidationException::withMessages([
-                $field => ['Use uma URL publica da loja.'],
+                $field => ['Use uma URL pública da loja.'],
             ]);
         }
 
@@ -403,13 +403,13 @@ class IntegrationController extends Controller
         return [
             $this->check(
                 'domain_configured',
-                'Dominio cadastrado no widget',
+                'Domínio cadastrado no widget',
                 $this->domainMatches($host, $allowedDomains),
                 'Cadastre '.$host.' em /app/widget antes de publicar.'
             ),
             $this->check(
                 'page_reachable',
-                'Pagina de produto publicada',
+                'Página de produto publicada',
                 $reachable,
                 'A URL precisa responder HTTP 2xx/3xx para o validador.'
             ),
@@ -424,7 +424,7 @@ class IntegrationController extends Controller
                 'script_found',
                 'Script do widget carregado',
                 str_contains($content, 'provadorvirtualscript') || str_contains($content, 'provador-virtual.js'),
-                'Inclua o script oficial do widget na pagina de produto.'
+                'Inclua o script oficial do widget na página de produto.'
             ),
             $this->check(
                 'platform_hint',
@@ -435,7 +435,7 @@ class IntegrationController extends Controller
             ),
             $this->check(
                 'product_identifiers',
-                'Produto, variacao ou SKU informados',
+                'Produto, variação ou SKU informados',
                 str_contains($content, 'data-product-id') || str_contains($content, 'data-sku'),
                 'Informe data-product-id e data-sku para identificar o produto.',
                 warning: true

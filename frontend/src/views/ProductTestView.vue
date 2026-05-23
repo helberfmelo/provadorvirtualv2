@@ -90,7 +90,7 @@ async function loadStorefront() {
     storefront.value = data
     await loadProductForRoute()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar a loja teste.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar a loja teste.'
   } finally {
     loading.value = false
   }
@@ -113,7 +113,7 @@ async function loadProductForRoute() {
     await nextTick()
     loadWidget()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Produto nao encontrado.'
+    error.value = requestError.response?.data?.message || 'Produto não encontrado.'
   } finally {
     productLoading.value = false
   }
@@ -186,7 +186,7 @@ function price(value: string | number | null | undefined) {
       <div>
         <span class="eyebrow">{{ storefront.store.name }}</span>
         <h1>Loja teste do Provador Virtual</h1>
-        <p>Escolha um produto e teste a recomendacao de tamanho e a tabela de medidas como em uma loja real.</p>
+        <p>Escolha um produto e teste a recomendação de tamanho e a tabela de medidas como em uma loja real.</p>
       </div>
     </div>
 

@@ -35,7 +35,7 @@ class AuthController extends Controller
 
         if (($user->status ?? 'active') !== 'active') {
             throw ValidationException::withMessages([
-                'login' => ['Este usuario esta inativo. Fale com o administrador.'],
+                'login' => ['Este usuário está inativo. Fale com o administrador.'],
             ]);
         }
 
@@ -76,7 +76,7 @@ class AuthController extends Controller
         $request->user()?->currentAccessToken()?->delete();
 
         return response()->json([
-            'message' => 'Sessao encerrada com sucesso.',
+            'message' => 'Sessão encerrada com sucesso.',
         ]);
     }
 
@@ -118,7 +118,7 @@ class AuthController extends Controller
 
         if (! $this->canAccessCompany($user, $company)) {
             throw ValidationException::withMessages([
-                'company_access' => ['Este usuario nao pertence a empresa informada.'],
+                'company_access' => ['Este usuário não pertence a empresa informada.'],
             ]);
         }
 
@@ -163,7 +163,7 @@ class AuthController extends Controller
 
             if (! $this->canAccessCompany($user, $company)) {
                 throw ValidationException::withMessages([
-                    'company_access' => ['Este usuario nao pertence a empresa informada.'],
+                    'company_access' => ['Este usuário não pertence a empresa informada.'],
                 ]);
             }
 
@@ -186,7 +186,7 @@ class AuthController extends Controller
 
         if ($companyCount > 1) {
             throw ValidationException::withMessages([
-                'company_access' => ['Informe o codigo da loja ou CNPJ para entrar no portal da empresa.'],
+                'company_access' => ['Informe o código da loja ou CNPJ para entrar no portal da empresa.'],
             ]);
         }
 
@@ -199,7 +199,7 @@ class AuthController extends Controller
             ->first();
         if (! $merchant) {
             throw ValidationException::withMessages([
-                'company_access' => ['Usuario sem empresa vinculada.'],
+                'company_access' => ['Usuário sem empresa vinculada.'],
             ]);
         }
 
@@ -221,7 +221,7 @@ class AuthController extends Controller
 
         if (! $company) {
             throw ValidationException::withMessages([
-                'company_access' => ['Empresa nao encontrada para o codigo ou CNPJ informado.'],
+                'company_access' => ['Empresa não encontrada para o código ou CNPJ informado.'],
             ]);
         }
 

@@ -29,7 +29,7 @@ onMounted(() => {
       <h1>Fundacao pronta para configurar lojas</h1>
       <p>
         Acompanhe os cadastros principais, publique o widget e mantenha as
-        conexoes da loja em um unico lugar.
+        conexões da loja em um único lugar.
       </p>
     </div>
 
@@ -47,11 +47,11 @@ onMounted(() => {
       <article class="metric-card">
         <i class="fa-solid fa-plug" aria-hidden="true"></i>
         <strong>{{ summary.widget_active ? 'Widget ativo' : 'Widget pendente' }}</strong>
-        <span>{{ summary.recommendations_today }} recomendacoes registradas hoje.</span>
+        <span>{{ summary.recommendations_today }} recomendações registradas hoje.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-link" aria-hidden="true"></i>
-        <strong>{{ summary.integrations_configured }} integracao{{ summary.integrations_configured === 1 ? '' : 'es' }}</strong>
+        <strong>{{ summary.integrations_configured }} integração{{ summary.integrations_configured === 1 ? '' : 'es' }}</strong>
         <span>BigShop, lojas externas e instalacoes manuais.</span>
       </article>
     </div>
@@ -68,7 +68,7 @@ onMounted(() => {
         <i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>
         <span>
           <strong>Tabelas</strong>
-          <small>{{ summary.measurement_tables }} disponiveis</small>
+          <small>{{ summary.measurement_tables }} disponíveis</small>
         </span>
       </RouterLink>
       <RouterLink class="onboarding-step" to="/app/assistente">
@@ -109,7 +109,7 @@ onMounted(() => {
       <RouterLink class="onboarding-step" to="/app/integracoes">
         <i class="fa-solid fa-bolt" aria-hidden="true"></i>
         <span>
-          <strong>Integracoes</strong>
+          <strong>Integrações</strong>
           <small>{{ summary.integrations_configured }} configuradas</small>
         </span>
       </RouterLink>

@@ -10,35 +10,35 @@ Dar ao suporte/comercial um roteiro objetivo para demonstrar, contratar, configu
 
 Implementado em `/app/go-live` via `GET /api/v1/go-live/readiness`:
 
-- checklist tecnico de prontidao;
+- checklist técnico de prontidão;
 - links comerciais principais;
 - passos de onboarding;
-- comandos de automacao para cPanel;
-- pendencias reais que ainda dependem de credenciais ou loja piloto;
+- comandos de automação para cPanel;
+- pendências reais que ainda dependem de credenciais ou loja piloto;
 - checks de Pagar.me, cron, performance do widget, acessibilidade/mobile e BigShop.
 
-Publicado e validado em producao no run `26340033238`.
+Publicado e validado em produção no run `26340033238`.
 
 ## Materiais comerciais
 
-- Site publico: `https://provadorvirtual.online/`
+- Site público: `https://provadorvirtual.online/`
 - Produto teste: `https://provadorvirtual.online/produto-teste`
 - Checkout: `https://provadorvirtual.online/checkout`
 - WhatsApp especialista: `https://wa.me/5531993157573`
-- Politica de privacidade: `https://provadorvirtual.online/privacidade`
+- Política de privacidade: `https://provadorvirtual.online/privacidade`
 - Termos: `https://provadorvirtual.online/termos`
 
 ## Onboarding do cliente
 
 1. Cadastrar empresa no SaaS ou contratar pelo checkout.
-2. Conferir plataforma contratada e codigo/CNPJ de acesso.
-3. Cadastrar ou importar produtos, variacoes e tabelas de medidas.
-4. Configurar dominio permitido do widget.
-5. Instalar snippet ou usar integracao BigShop.
-6. Executar recomendacao real e feedback no produto piloto.
-7. Acompanhar analytics, outliers e prontidao de go-live.
+2. Conferir plataforma contratada e código/CNPJ de acesso.
+3. Cadastrar ou importar produtos, variações e tabelas de medidas.
+4. Configurar domínio permitido do widget.
+5. Instalar snippet ou usar integração BigShop.
+6. Executar recomendação real e feedback no produto piloto.
+7. Acompanhar analytics, outliers e prontidão de go-live.
 
-## Comandos de operacao
+## Comandos de operação
 
 Cron principal recomendado no cPanel:
 
@@ -54,31 +54,31 @@ php artisan pv:emails-dispatch --limit=50
 php artisan pv:privacy-anonymize
 ```
 
-Validacao local/operacional:
+Validação local/operacional:
 
 ```powershell
 .\scripts\validate-production.ps1
 ```
 
-## Pendencias para piloto real
+## Pendências para piloto real
 
-- Transacao Pagar.me Pix/cartao de baixo valor com webhook e cron.
-- Ativacao BigShop um clique com payload assinado real.
+- Transação Pagar.me Pix/cartão de baixo valor com webhook e cron.
+- Ativação BigShop um clique com payload assinado real.
 - Probe e sync em loja BigShop piloto com produto, grade e tabela.
-- Teste de widget em pagina real de cliente com cache frio e mobile.
+- Teste de widget em página real de cliente com cache frio e mobile.
 
 ## Criterio de liberacao comercial
 
 Demo assistida pode seguir quando:
 
-- site publico, produto teste, widget e API estiverem verdes;
+- site público, produto teste, widget e API estiverem verdes;
 - privacidade/termos estiverem publicados;
 - analytics e go-live estiverem acessiveis;
-- pendencias de Pagar.me/BigShop estiverem explicitamente registradas.
+- pendências de Pagar.me/BigShop estiverem explicitamente registradas.
 
-Campanha publica deve aguardar:
+Campanha pública deve aguardar:
 
-- chaves reais Pagar.me em producao;
+- chaves reais Pagar.me em produção;
 - cron cPanel gerando log recente;
-- transacao real aprovada;
+- transação real aprovada;
 - piloto BigShop real, quando a venda envolver BigShop um clique.

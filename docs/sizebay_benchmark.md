@@ -4,14 +4,14 @@ Atualizado em: 2026-05-23
 
 Objetivo: registrar o que podemos aprender com a Sizebay e com a loja Zak para deixar o Provador Virtual v2 simples de integrar, inteligente e comparavel comercialmente.
 
-## Fontes publicas consultadas
+## Fontes públicas consultadas
 
-- Documentacao inicial Sizebay: https://docs.sizebay.com/
+- Documentação inicial Sizebay: https://docs.sizebay.com/
 - Implementacao por script: https://docs.sizebay.com/size-and-fit-implementation/service-implementation-script
 - Implementacao por API: https://docs.sizebay.com/size-and-fit-implementation/service-implementation-api
-- Integracao de produto por API: https://docs.sizebay.com/integration-products/api-product-integration
-- Integracao de produto por XML: https://docs.sizebay.com/integration-products/feed-xml
-- Integracao OnPage: https://docs.sizebay.com/integration-products/integracao-na-pagina
+- Integração de produto por API: https://docs.sizebay.com/integration-products/api-product-integration
+- Integração de produto por XML: https://docs.sizebay.com/integration-products/feed-xml
+- Integração OnPage: https://docs.sizebay.com/integration-products/integração-na-página
 - Categorias aceitas: https://docs.sizebay.com/integration-products/categories-accepted-by-the-integration
 - Order Tracking API: https://docs.sizebay.com/size-and-fit-order-tracking/order-tracking-api
 - Return Data Integration: https://docs.sizebay.com/size-and-fit-data-integration/return-data-integration-csv
@@ -21,27 +21,27 @@ Objetivo: registrar o que podemos aprender com a Sizebay e com a loja Zak para d
 - Loja Zak: https://www.zak.com.br/
 - Produto Zak camisa: https://www.zak.com.br/704986-camisa-masculina-bambu-drop-areia-04
 - Produto Zak calca: https://www.zak.com.br/calca-masculina-alfaiataria-genova-chumbo-63
-- Exemplo publico adicional encontrado usando Sizebay: https://www.shop2gether.com.br/calca-feminina-crepe-cintura-baixa-alfaiataria-off-white-191348
+- Exemplo público adicional encontrado usando Sizebay: https://www.shop2gether.com.br/calca-feminina-crepe-cintura-baixa-alfaiataria-off-white-191348
 
 ## O que a Sizebay faz bem
 
-- Carregamento assincrono para nao travar a pagina de produto.
+- Carregamento assincrono para não travar a página de produto.
 - Snippet simples com prescript por tenant.
-- Botao de provador e botao de tabela de medidas no ponto de decisao de tamanho.
+- Botão de provador e botão de tabela de medidas no ponto de decisao de tamanho.
 - Identificacao anonima por cookie `SIZEBAY_SESSION_ID_V4`.
-- Consulta de produto por permalink ou SKU antes de exibir botoes.
+- Consulta de produto por permalink ou SKU antes de exibir botões.
 - VFR e tabela em iframe/modal independente da plataforma.
-- Recomendacao passiva na PDP quando ja existe perfil.
+- Recomendação passiva na PDP quando já existe perfil.
 - Tracking de carrinho e pedido para medir funil.
-- Integracao de devolucoes para refinar recomendacoes.
-- Integracao de produtos por API, XML Google Shopping ou OnPage.
+- Integração de devolucoes para refinar recomendações.
+- Integração de produtos por API, XML Google Shopping ou OnPage.
 - Suporte a plataformas de mercado e plataformas proprietarias.
 
-## Contrato tecnico observado na documentacao
+## Contrato técnico observado na documentação
 
 ### Script
 
-Padrao de script:
+Padrão de script:
 
 ```html
 <div id="sizebay-container"></div>
@@ -55,24 +55,24 @@ Para o v2, o equivalente deve continuar sendo:
 <script defer id="provadorVirtualScript" src="https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js"></script>
 ```
 
-O v2 deve manter configuracao por `data-*`, mas evoluir para autodetectar produto em plataformas conhecidas.
+O v2 deve manter configuração por `data-*`, mas evoluir para autodetectar produto em plataformas conhecidas.
 
 ### Produto
 
-Campos importantes vistos na integracao de produto:
+Campos importantes vistos na integração de produto:
 
 - nome;
-- genero: `M`, `F`, `U`;
+- gênero: `M`, `F`, `U`;
 - permalink;
 - imagem;
 - `feedProductId`;
 - marca;
 - categoria;
-- tamanhos disponiveis;
+- tamanhos disponíveis;
 - faixa etaria;
 - tipo de tamanho.
 
-Categorias de referencia para normalizacao:
+Categorias de referência para normalizacao:
 
 - Top;
 - Bottom;
@@ -81,18 +81,18 @@ Categorias de referencia para normalizacao:
 - Bottom Underwear;
 - Shoe.
 
-### Usuario e recomendacao
+### Usuário e recomendação
 
-Fluxo publico:
+Fluxo público:
 
 1. checar/criar SID;
 2. identificar produto;
-3. exibir botoes se o produto existir;
+3. exibir botões se o produto existir;
 4. abrir VFR ou tabela;
-5. buscar recomendacao por produto e perfil;
+5. buscar recomendação por produto e perfil;
 6. registrar abertura/eventos.
 
-O v2 deve ter fluxo equivalente, mas com endpoint proprio:
+O v2 deve ter fluxo equivalente, mas com endpoint próprio:
 
 - `config-check`;
 - `profile/resolve`;
@@ -112,9 +112,9 @@ O v2 deve implementar isso como recurso nativo, com privacidade e consentimento.
 
 ## Captura tecnica na Zak
 
-Captura feita em 2026-05-23 por navegador headless em paginas publicas da Zak.
+Captura feita em 2026-05-23 por navegador headless em páginas públicas da Zak.
 
-### Integracao detectada
+### Integração detectada
 
 - Plataforma da loja: BigShop.
 - Tenant Sizebay: `1235`.
@@ -122,22 +122,22 @@ Captura feita em 2026-05-23 por navegador headless em paginas publicas da Zak.
 - CSS: `https://static.sizebay.technology/1235/styles/styles_v4.css`.
 - Implantacao: `https://vfr-v3-production.sizebay.technology/V4/implantation/index.js`.
 - Container: `#szb-container`.
-- Botao VFR: `#szb-vfr-button`, texto `DESCUBRA SEU TAMANHO`.
-- Botao tabela: `#szb-measurements-button`, texto `TABELA DE MEDIDAS`.
+- Botão VFR: `#szb-vfr-button`, texto `DESCUBRA SEU TAMANHO`.
+- Botão tabela: `#szb-measurements-button`, texto `TABELA DE MEDIDAS`.
 - Cookies usados: `SIZEBAY_SESSION_ID_V4` e `szb-current-product-id`.
 - O front da BigShop chama `Sizebay.changePermalink(window.location.href)` ao montar produto.
 
 O fluxo interno do VFR observado:
 
-1. genero;
+1. gênero;
 2. altura, peso e idade;
 3. ajuste de formato corporal aproximado;
 4. medidas corporais calculadas;
 5. tamanho indicado;
-6. opcoes vizinhas para provar;
+6. opções vizinhas para provar;
 7. editar medidas e fechar.
 
-### Configuracao Sizebay da Zak
+### Configuração Sizebay da Zak
 
 `config_v4.json` retornou:
 
@@ -161,7 +161,7 @@ O fluxo interno do VFR observado:
 }
 ```
 
-Observacao: apesar de `isMetric=false`, a experiencia da Zak mostra cm/kg na interface em portugues.
+Observação: apesar de `isMetric=false`, a experiencia da Zak mostra cm/kg na interface em portugues.
 
 ### Produto Zak: camisa
 
@@ -190,7 +190,7 @@ Tabela observada:
 | 7 | 130 | 124 |
 | 8 | 136 | 132 |
 
-Recomendacoes capturadas:
+Recomendações capturadas:
 
 | Perfil | Entrada | Medidas inferidas | Tamanho |
 | --- | --- | --- | --- |
@@ -229,7 +229,7 @@ Tabela observada:
 | 54 | 130-134 | 150-154 |
 | 56 | 138-142 | 158-162 |
 
-Recomendacoes capturadas:
+Recomendações capturadas:
 
 | Perfil | Entrada | Medidas inferidas | Tamanho |
 | --- | --- | --- | --- |
@@ -237,9 +237,9 @@ Recomendacoes capturadas:
 | masc_178_78_35 | 178 cm, 78 kg, 35 anos | cintura 89, quadril 100 | 42 |
 | masc_188_95_45 | 188 cm, 95 kg, 45 anos | cintura 102, quadril 111 | 46 |
 
-## Exemplo publico adicional
+## Exemplo público adicional
 
-Shop2gether expunha em HTML publico o script:
+Shop2gether expunha em HTML público o script:
 
 ```html
 <script defer id="sizebay-vfr-v4" src="https://static.sizebay.technology/6463/prescript.js"></script>
@@ -249,29 +249,29 @@ Produto observado:
 
 - https://www.shop2gether.com.br/calca-feminina-crepe-cintura-baixa-alfaiataria-off-white-191348
 
-Uso recomendado: manter uma lista de lojas publicas com Sizebay para benchmarking visual e de integracao, sem copiar dados proprietarios nem sobrecarregar sites terceiros.
+Uso recomendado: manter uma lista de lojas públicas com Sizebay para benchmarking visual e de integração, sem copiar dados proprietarios nem sobrecarregar sites terceiros.
 
 ## Aprendizados para o Provador Virtual v2
 
-- O botao precisa aparecer exatamente perto da decisao de tamanho.
-- O widget nao pode bloquear a renderizacao da PDP.
-- O config-check deve esconder o botao quando produto/tabela nao estiverem prontos.
-- O usuario anonimo deve ser reconhecido por cookie proprio.
+- O botão precisa aparecer exatamente perto da decisao de tamanho.
+- O widget não pode bloquear a renderizacao da PDP.
+- O config-check deve esconder o botão quando produto/tabela não estiverem prontos.
+- O usuário anônimo deve ser reconhecido por cookie próprio.
 - A experiencia deve funcionar mesmo sem login.
 - A tela deve avisar quando usa medidas anteriores.
-- O usuario precisa editar medidas rapidamente.
-- Deve haver recomendacao por perfil conhecido sem repetir o fluxo inteiro.
-- O lojista deve ter integracao por script e por plataforma.
+- O usuário precisa editar medidas rapidamente.
+- Deve haver recomendação por perfil conhecido sem repetir o fluxo inteiro.
+- O lojista deve ter integração por script e por plataforma.
 - Produto deve ser identificado por permalink, ID externo, SKU e variante.
 - Carrinho, pedido e devolucao precisam alimentar analytics.
 - A base inteligente deve aceitar retorno "ficou pequeno"/"ficou grande".
 - Para BigShop, precisamos de um caminho nativo que injete o container e o script automaticamente.
 
-## Pendencias para continuar o benchmark
+## Pendências para continuar o benchmark
 
-- Receber autorizacao comercial para capturas em massa de lojas terceiras, mesmo que publicas.
+- Receber autorização comercial para capturas em massa de lojas terceiras, mesmo que públicas.
 - Definir lista de marcas/categorias prioritarias para montar base inteligente inicial.
 - Capturar lojas femininas, infantis, calcados e plus size.
-- Criar script interno de benchmark que salve apenas dados agregados e anonimos.
-- Confirmar com juridico/comercial quais dados publicos de concorrentes podem entrar em base de treinamento.
+- Criar script interno de benchmark que salve apenas dados agregados e anônimos.
+- Confirmar com juridico/comercial quais dados públicos de concorrentes podem entrar em base de treinamento.
 - Receber loja piloto BigShop com acesso admin para validar o "um clique" do nosso lado e do lado da BigShop.

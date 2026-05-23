@@ -21,7 +21,7 @@ const isCompanyRoute = computed(() => route.path === '/app' || route.path.starts
 const isSaasRoute = computed(() => (route.path === '/saas' || route.path.startsWith('/saas/')) && route.path !== '/saas/login')
 const isWorkRoute = computed(() => isCompanyRoute.value || isSaasRoute.value)
 const contextLabel = computed(() => isSaasRoute.value ? 'SaaS admin' : 'Portal da empresa')
-const workNavTitle = computed(() => isSaasRoute.value ? 'Operacao SaaS' : 'Operacao da loja')
+const workNavTitle = computed(() => isSaasRoute.value ? 'Operação SaaS' : 'Operação da loja')
 const activeCompanyName = computed(() => auth.activeCompany?.name || 'Sem empresa ativa')
 const workViewKey = computed(() => {
   if (!isCompanyRoute.value) {
@@ -44,17 +44,17 @@ const companyLinks = computed<NavLink[]>(() => [
   { to: '/app/assistente', label: 'Assistente IA', icon: 'fa-wand-magic-sparkles', show: auth.canView('ai_assistant') },
   { to: '/app/importacoes', label: 'Importacoes', icon: 'fa-file-arrow-up', show: auth.canView('imports') },
   { to: '/app/widget', label: 'Widget', icon: 'fa-code', show: auth.canView('widget') },
-  { to: '/app/integracoes', label: 'Integracoes', icon: 'fa-plug', show: auth.canView('integrations') },
+  { to: '/app/integracoes', label: 'Integrações', icon: 'fa-plug', show: auth.canView('integrations') },
   { to: '/app/analytics', label: 'Analytics', icon: 'fa-chart-line', show: auth.canView('analytics') },
   { to: '/app/go-live', label: 'Go-live', icon: 'fa-rocket', show: auth.canView('go_live') },
-  { to: '/app/usuarios', label: 'Usuarios', icon: 'fa-users-gear', show: auth.canView('users') },
+  { to: '/app/usuarios', label: 'Usuários', icon: 'fa-users-gear', show: auth.canView('users') },
 ])
 
 const saasLinks = computed<NavLink[]>(() => [
-  { to: '/saas', label: 'Visao geral', icon: 'fa-gauge-high', show: auth.canSaasView('saas_dashboard') },
+  { to: '/saas', label: 'Visão geral', icon: 'fa-gauge-high', show: auth.canSaasView('saas_dashboard') },
   { to: '/saas/empresas', label: 'Empresas', icon: 'fa-building', show: auth.canSaasView('saas_companies') },
-  { to: '/saas/usuarios', label: 'Usuarios SaaS', icon: 'fa-user-shield', show: auth.canSaasView('saas_users') },
-  { to: '/saas/usuarios-empresas', label: 'Usuarios das empresas', icon: 'fa-users-gear', show: auth.canSaasView('saas_company_users') },
+  { to: '/saas/usuarios', label: 'Usuários SaaS', icon: 'fa-user-shield', show: auth.canSaasView('saas_users') },
+  { to: '/saas/usuarios-empresas', label: 'Usuários das empresas', icon: 'fa-users-gear', show: auth.canSaasView('saas_company_users') },
   { to: '/saas/emails', label: 'E-mails', icon: 'fa-envelope-open-text', show: auth.canSaasView('saas_emails') },
 ])
 
@@ -145,7 +145,7 @@ async function switchCompany(event: Event) {
         </RouterLink>
         <span class="user-chip">
           <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
-          {{ auth.user?.name || 'Usuario' }}
+          {{ auth.user?.name || 'Usuário' }}
         </span>
         <button class="nav-button" type="button" title="Sair" @click="logout">
           <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>

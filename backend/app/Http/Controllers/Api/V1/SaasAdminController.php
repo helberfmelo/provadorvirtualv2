@@ -207,7 +207,7 @@ class SaasAdminController extends Controller
             })
             ->first();
 
-        abort_if(! $company, 404, 'Empresa nao encontrada para o codigo ou documento informado.');
+        abort_if(! $company, 404, 'Empresa não encontrada para o código ou documento informado.');
 
         return response()->json([
             'data' => [
@@ -293,7 +293,7 @@ class SaasAdminController extends Controller
             : null;
 
         if ($emailUser && $cpfUser && (int) $emailUser->id !== (int) $cpfUser->id) {
-            throw new HttpException(422, 'E-mail e CPF ja pertencem a usuarios diferentes.');
+            throw new HttpException(422, 'E-mail e CPF já pertencem a usuários diferentes.');
         }
 
         $owner = $emailUser ?: $cpfUser ?: new User;

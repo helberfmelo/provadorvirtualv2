@@ -104,7 +104,7 @@ async function suggestTable() {
     suggestion.value = data.data.suggestion
     warnings.value = data.data.warnings || []
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel sugerir a tabela.'
+    error.value = requestError.response?.data?.message || 'Não foi possível sugerir a tabela.'
   } finally {
     loading.value = false
   }
@@ -138,7 +138,7 @@ async function saveSuggestion() {
     await api.post('/measurement-tables', payload)
     notice.value = 'Tabela criada como rascunho.'
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel criar a tabela.'
+    error.value = requestError.response?.data?.message || 'Não foi possível criar a tabela.'
   } finally {
     saving.value = false
   }
@@ -207,7 +207,7 @@ function readAsDataUrl(file: File): Promise<string> {
         <span class="eyebrow">Assistente</span>
         <h1>Tabelas por imagem ou texto</h1>
         <p>
-          A IA acelera a leitura de tabelas e o lojista compara a sugestao com a base inteligente de medidas do mercado brasileiro.
+          A IA acelera a leitura de tabelas e o lojista compara a sugestão com a base inteligente de medidas do mercado brasileiro.
         </p>
       </div>
       <button class="btn btn-secondary" type="button" @click="applySample">
@@ -234,7 +234,7 @@ function readAsDataUrl(file: File): Promise<string> {
       </span>
       <span class="status-pill ok">
         <i class="fa-solid fa-user-check" aria-hidden="true"></i>
-        Revisao obrigatoria
+        Revisão obrigatória
       </span>
     </div>
 
@@ -288,7 +288,7 @@ function readAsDataUrl(file: File): Promise<string> {
         </div>
 
         <label>
-          Conteudo
+          Conteúdo
           <textarea v-model="form.content" rows="14"></textarea>
         </label>
 
@@ -302,7 +302,7 @@ function readAsDataUrl(file: File): Promise<string> {
 
       <aside class="panel-main import-preview-panel">
         <div class="subsection-heading">
-          <h2>Sugestao</h2>
+          <h2>Sugestão</h2>
           <span v-if="suggestion">{{ suggestion.rows.length }} linhas</span>
         </div>
 
@@ -313,7 +313,7 @@ function readAsDataUrl(file: File): Promise<string> {
           </span>
         </div>
 
-        <div v-if="!suggestion" class="empty-state">Nenhuma sugestao carregada.</div>
+        <div v-if="!suggestion" class="empty-state">Nenhuma sugestão carregada.</div>
         <template v-else>
           <div class="form-grid">
             <label>

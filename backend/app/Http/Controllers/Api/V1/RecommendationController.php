@@ -165,7 +165,7 @@ class RecommendationController extends Controller
 
         if (! $event) {
             return response()->json([
-                'message' => 'Nao foi possivel registrar este sinal para aprendizado.',
+                'message' => 'Não foi possível registrar este sinal para aprendizado.',
             ], 422);
         }
 
@@ -183,7 +183,7 @@ class RecommendationController extends Controller
 
         return response()->json([
             'forgotten' => $forgotten,
-            'message' => $forgotten ? 'Perfil removido deste provador.' : 'Perfil nao encontrado.',
+            'message' => $forgotten ? 'Perfil removido deste provador.' : 'Perfil não encontrado.',
         ], $forgotten ? 200 : 404);
     }
 

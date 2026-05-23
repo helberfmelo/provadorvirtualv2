@@ -27,7 +27,7 @@ export async function tokenizePagarMeCard(
   payload: PagarMeCardTokenPayload,
 ): Promise<PagarMeCardTokenResult> {
   if (!config.public_key) {
-    throw new Error('A tokenizacao do cartao nao esta disponivel para este ambiente agora.')
+    throw new Error('A tokenização do cartão não está disponível para este ambiente agora.')
   }
 
   const tokenUrl = new URL(config.token_url)
@@ -55,7 +55,7 @@ export async function tokenizePagarMeCard(
 
   if (!response.ok) {
     throw new Error(resolvePagarMeErrorMessage(data)
-      || 'Nao foi possivel tokenizar o cartao agora. Confirme os dados e o dominio autorizado na Pagar.me.')
+      || 'Não foi possível tokenizar o cartão agora. Confirme os dados e o domínio autorizado na Pagar.me.')
   }
 
   const token = typeof data?.id === 'string'
@@ -63,7 +63,7 @@ export async function tokenizePagarMeCard(
     : (typeof data?.token === 'string' ? data.token : '')
 
   if (!token) {
-    throw new Error('A Pagar.me nao retornou o token do cartao.')
+    throw new Error('A Pagar.me não retornou o token do cartão.')
   }
 
   return {

@@ -35,7 +35,7 @@ async function loadUsers() {
     const { data } = await api.get('/saas/company-users')
     users.value = data.data
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar os usuarios das empresas.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar os usuários das empresas.'
   } finally {
     loading.value = false
   }
@@ -54,7 +54,7 @@ async function toggleAccess(row: CompanyUserRow) {
     notice.value = nextStatus === 'active' ? 'Acesso ativado.' : 'Acesso desativado.'
     await loadUsers()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel alterar o acesso.'
+    error.value = requestError.response?.data?.message || 'Não foi possível alterar o acesso.'
   }
 }
 
@@ -78,8 +78,8 @@ function companyDocument(row: CompanyUserRow) {
     <div class="page-heading">
       <div>
         <span class="eyebrow">SaaS</span>
-        <h1>Usuarios das empresas</h1>
-        <p>Listagem de usuarios dos clientes. Cadastro e edicao ficam em telas proprias.</p>
+        <h1>Usuários das empresas</h1>
+        <p>Listagem de usuários dos clientes. Cadastro e edição ficam em telas próprias.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadUsers">
@@ -88,7 +88,7 @@ function companyDocument(row: CompanyUserRow) {
         </button>
         <RouterLink class="btn btn-primary" to="/saas/usuarios-empresas/novo">
           <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
-          Novo usuario
+          Novo usuário
         </RouterLink>
       </div>
     </div>
@@ -106,18 +106,18 @@ function companyDocument(row: CompanyUserRow) {
         <table>
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>Empresa</th>
               <th>Lojista</th>
               <th>Perfil</th>
-              <th>Status usuario</th>
+              <th>Status usuário</th>
               <th>Status acesso</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="!rows.length">
-              <td colspan="7">Nenhum usuario de empresa cadastrado.</td>
+              <td colspan="7">Nenhum usuário de empresa cadastrado.</td>
             </tr>
             <tr v-for="row in rows" :key="row.key">
               <td>
@@ -145,7 +145,7 @@ function companyDocument(row: CompanyUserRow) {
                   class="icon-link"
                   :to="{ path: `/saas/usuarios-empresas/${row.user.id}/editar`, query: { company: row.merchant.access.merchant_company_id || '' } }"
                   title="Editar"
-                  aria-label="Editar usuario da empresa"
+                  aria-label="Editar usuário da empresa"
                 >
                   <i class="fa-solid fa-pen" aria-hidden="true"></i>
                 </RouterLink>

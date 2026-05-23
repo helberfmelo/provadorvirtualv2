@@ -2,11 +2,11 @@
 
 Atualizado em: 2026-05-23
 
-Status: publicado e validado em producao no GitHub Actions run `26339426665`. A ativacao real ainda depende de `BIGSHOP_ACTIVATION_SECRET` oficial, loja piloto BigShop, `store_id` e token `x-api`.
+Status: publicado e validado em produção no GitHub Actions run `26339426665`. A ativação real ainda depende de `BIGSHOP_ACTIVATION_SECRET` oficial, loja piloto BigShop, `store_id` e token `x-api`.
 
 ## Objetivo
 
-Definir o contrato final do lado Provador Virtual para a ativacao nativa de lojas BigShop, deixando pronto o que depende do nosso SaaS e separando o que ainda depende de credenciais/ajuste no codigo BigShop.
+Definir o contrato final do lado Provador Virtual para a ativação nativa de lojas BigShop, deixando pronto o que depende do nosso SaaS e separando o que ainda depende de credenciais/ajuste no código BigShop.
 
 ## Endpoint
 
@@ -14,7 +14,7 @@ Definir o contrato final do lado Provador Virtual para a ativacao nativa de loja
 POST /api/v1/public/bigshop/activate
 ```
 
-Headers obrigatorios:
+Headers obrigatórios:
 
 - `X-BigShop-Timestamp`: Unix timestamp;
 - `X-BigShop-Signature`: `sha256=<hmac>`.
@@ -29,7 +29,7 @@ Tolerancia: 600 segundos.
 
 ## Payload
 
-Campos obrigatorios:
+Campos obrigatórios:
 
 ```json
 {
@@ -89,14 +89,14 @@ A resposta retorna:
 
 ## Mapeamento no front BigShop
 
-Arquivo de referencia:
+Arquivo de referência:
 
 - `D:\Projetos\bigshop\172.16.151.5\front\stores\pro_store\produto.vue`
 
 Ponto de encaixe recomendado:
 
 - perto do seletor de tamanho/grade;
-- antes do botao comprar quando a grade ja estiver selecionavel;
+- antes do botão comprar quando a grade já estiver selecionavel;
 - atualizar `data-variant-id` e `data-sku` sempre que `productSizes`/grade ativa mudar.
 
 Campos:
@@ -115,18 +115,18 @@ Rota protegida:
 GET /api/v1/integrations/bigshop/activations
 ```
 
-Retorna as 20 ativacoes recentes da empresa ativa, com:
+Retorna as 20 ativações recentes da empresa ativa, com:
 
 - status;
 - store_id;
-- dominio;
+- domínio;
 - versao do contrato;
-- chave publica do widget;
+- chave pública do widget;
 - empresa vinculada.
 
 O painel `/app/integracoes` mostra essa lista quando a plataforma ativa e BigShop.
 
-## Pendencias externas
+## Pendências externas
 
 - Receber `BIGSHOP_ACTIVATION_SECRET` oficial e cadastrar em `PRODUCTION_ENV`.
 - Receber loja piloto BigShop real com `store_id` e token `x-api`.

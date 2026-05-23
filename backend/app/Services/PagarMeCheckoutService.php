@@ -46,15 +46,15 @@ class PagarMeCheckoutService
                 ->throw()
                 ->json();
         } catch (ConnectionException $exception) {
-            throw new RuntimeException('Nao foi possivel conectar a Pagar.me agora. Tente novamente em instantes.', 0, $exception);
+            throw new RuntimeException('Não foi possível conectar a Pagar.me agora. Tente novamente em instantes.', 0, $exception);
         } catch (RequestException $exception) {
-            Log::warning('A Pagar.me recusou a criacao do checkout transparente.', [
+            Log::warning('A Pagar.me recusou a criação do checkout transparente.', [
                 'status' => $exception->response?->status(),
                 'response' => $exception->response?->json(),
             ]);
 
             throw new RuntimeException(
-                $this->providerErrorMessage($exception, 'Nao foi possivel iniciar o checkout na Pagar.me com os dados enviados.'),
+                $this->providerErrorMessage($exception, 'Não foi possível iniciar o checkout na Pagar.me com os dados enviados.'),
                 0,
                 $exception,
             );
@@ -168,10 +168,10 @@ class PagarMeCheckoutService
                 ->throw()
                 ->json();
         } catch (ConnectionException $exception) {
-            throw new RuntimeException('Nao foi possivel conectar a Pagar.me para sincronizar o checkout.', 0, $exception);
+            throw new RuntimeException('Não foi possível conectar a Pagar.me para sincronizar o checkout.', 0, $exception);
         } catch (RequestException $exception) {
             throw new RuntimeException(
-                $this->providerErrorMessage($exception, 'Nao foi possivel consultar o pedido na Pagar.me.'),
+                $this->providerErrorMessage($exception, 'Não foi possível consultar o pedido na Pagar.me.'),
                 0,
                 $exception,
             );
@@ -531,7 +531,7 @@ class PagarMeCheckoutService
         $secretKey = trim((string) config('services.pagarme.secret_key'));
 
         if ($secretKey === '') {
-            throw new RuntimeException('As credenciais da Pagar.me nao estao configuradas.');
+            throw new RuntimeException('As credenciais da Pagar.me não estão configuradas.');
         }
 
         return $secretKey;

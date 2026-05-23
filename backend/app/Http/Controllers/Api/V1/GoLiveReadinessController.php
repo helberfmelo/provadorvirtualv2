@@ -123,8 +123,8 @@ class GoLiveReadinessController extends Controller
             key: 'product_test',
             label: 'Produto teste funcional',
             status: $count > 0 ? 'passed' : 'blocked',
-            detail: $count.' produto(s) com tabela e variacao ativa.',
-            action: $count > 0 ? 'Validar recomendacao em /produto-teste apos cada deploy.' : 'Vincular tabela e variacoes ao produto teste.'
+            detail: $count.' produto(s) com tabela e variação ativa.',
+            action: $count > 0 ? 'Validar recomendação em /produto-teste após cada deploy.' : 'Vincular tabela e variações ao produto teste.'
         );
     }
 
@@ -139,10 +139,10 @@ class GoLiveReadinessController extends Controller
 
         return $this->check(
             key: 'widget_domains',
-            label: 'Widget e dominios',
+            label: 'Widget e domínios',
             status: $install && $domains->isNotEmpty() ? 'passed' : 'blocked',
-            detail: $install ? $domains->count().' dominio(s) liberado(s).' : 'Widget inativo.',
-            action: $install && $domains->isNotEmpty() ? 'Testar snippet no dominio final antes do cutover.' : 'Ativar widget e cadastrar dominios liberados.'
+            detail: $install ? $domains->count().' domínio(s) liberado(s).' : 'Widget inativo.',
+            action: $install && $domains->isNotEmpty() ? 'Testar snippet no domínio final antes do cutover.' : 'Ativar widget e cadastrar domínios liberados.'
         );
     }
 
@@ -155,10 +155,10 @@ class GoLiveReadinessController extends Controller
 
         return $this->check(
             key: 'recommendation_smoke',
-            label: 'Smoke de recomendacao',
+            label: 'Smoke de recomendação',
             status: $count > 0 ? 'passed' : 'warning',
-            detail: $count.' recomendacao(oes) registrada(s).',
-            action: $count > 0 ? 'Repetir smoke no deploy final.' : 'Rodar uma recomendacao real no produto teste.'
+            detail: $count.' recomendação(oes) registrada(s).',
+            action: $count > 0 ? 'Repetir smoke no deploy final.' : 'Rodar uma recomendação real no produto teste.'
         );
     }
 
@@ -170,7 +170,7 @@ class GoLiveReadinessController extends Controller
             key: 'bigshop_pilot',
             label: 'Loja BigShop piloto',
             status: $configured ? 'passed' : 'warning',
-            detail: $configured ? 'Conexao BigShop configurada.' : 'Aguardando loja, store_id e token x-api reais.',
+            detail: $configured ? 'Conexão BigShop configurada.' : 'Aguardando loja, store_id e token x-api reais.',
             action: $configured ? 'Executar probe e sync antes do piloto.' : 'Cadastrar credenciais reais da loja piloto.'
         );
     }
@@ -183,7 +183,7 @@ class GoLiveReadinessController extends Controller
             key: 'pagarme_provider',
             label: 'Checkout Pagar.me',
             status: $configured ? 'passed' : 'warning',
-            detail: $configured ? 'Chaves Pagar.me e URLs de retorno configuradas.' : 'Chaves reais Pagar.me ainda nao estao completas em producao.',
+            detail: $configured ? 'Chaves Pagar.me e URLs de retorno configuradas.' : 'Chaves reais Pagar.me ainda não estão completas em produção.',
             action: $configured ? 'Executar compra real de baixo valor antes da campanha.' : 'Cadastrar PAGARME_SECRET_KEY, PAGARME_PUBLIC_KEY, PAGARME_WEBHOOK_SECRET e URLs na raiz.'
         );
     }
@@ -194,10 +194,10 @@ class GoLiveReadinessController extends Controller
 
         return $this->check(
             key: 'pagarme_real_transaction',
-            label: 'Transacao real de pagamento',
+            label: 'Transação real de pagamento',
             status: $paid ? 'passed' : 'warning',
-            detail: $paid ? 'Existe checkout aprovado registrado.' : 'Nenhuma transacao real aprovada registrada ainda.',
-            action: $paid ? 'Manter webhook e cron monitorados.' : 'Depois das chaves Pagar.me, executar uma compra Pix/cartao de baixo valor.'
+            detail: $paid ? 'Existe checkout aprovado registrado.' : 'Nenhuma transação real aprovada registrada ainda.',
+            action: $paid ? 'Manter webhook e cron monitorados.' : 'Depois das chaves Pagar.me, executar uma compra Pix/cartão de baixo valor.'
         );
     }
 
@@ -207,9 +207,9 @@ class GoLiveReadinessController extends Controller
 
         return $this->check(
             key: 'scheduler_cron',
-            label: 'Cron e automacoes',
+            label: 'Cron e automações',
             status: $recent ? 'passed' : 'warning',
-            detail: $recent ? 'Log do scheduler atualizado recentemente.' : 'Nao ha log recente do scheduler do Laravel.',
+            detail: $recent ? 'Log do scheduler atualizado recentemente.' : 'Não ha log recente do scheduler do Laravel.',
             action: $recent ? 'Continuar acompanhando pagamentos e e-mails.' : 'Cadastrar no cPanel: php artisan schedule:run a cada minuto com log em storage/logs/cron-schedule.log.'
         );
     }
@@ -235,8 +235,8 @@ class GoLiveReadinessController extends Controller
             key: 'ai_ocr',
             label: 'OCR externo de IA',
             status: $externalKey ? 'passed' : 'warning',
-            detail: $externalKey ? 'Provider externo configuravel.' : 'Parser local ativo; OCR de imagem real pendente.',
-            action: $externalKey ? 'Validar custo e prompt antes de liberar OCR.' : 'Cadastrar OPENAI_API_KEY ou GEMINI_API_KEY quando OCR for necessario.'
+            detail: $externalKey ? 'Provider externo configurável.' : 'Parser local ativo; OCR de imagem real pendente.',
+            action: $externalKey ? 'Validar custo e prompt antes de liberar OCR.' : 'Cadastrar OPENAI_API_KEY ou GEMINI_API_KEY quando OCR for necessário.'
         );
     }
 
@@ -246,8 +246,8 @@ class GoLiveReadinessController extends Controller
             key: 'legal_pages',
             label: 'Privacidade e termos',
             status: 'passed',
-            detail: 'Paginas publicas /privacidade e /termos disponiveis.',
-            action: 'Revisar texto juridico antes de campanhas pagas.'
+            detail: 'Páginas públicas /privacidade e /termos disponíveis.',
+            action: 'Revisar texto jurídico antes de campanhas pagas.'
         );
     }
 
@@ -255,9 +255,9 @@ class GoLiveReadinessController extends Controller
     {
         return $this->check(
             key: 'root_cutover',
-            label: 'Plano da raiz do dominio',
+            label: 'Plano da raiz do domínio',
             status: 'passed',
-            detail: 'Site publico v2 publicado na raiz; backend permanece em /provadorvirtual_v2 para rollback.',
+            detail: 'Site público v2 publicado na raiz; backend permanece em /provadorvirtual_v2 para rollback.',
             action: 'Validar raiz e subpasta em cada deploy.'
         );
     }
@@ -343,19 +343,19 @@ class GoLiveReadinessController extends Controller
         return [
             'status' => $this->hasPagarMeKeys() && $this->hasPaidCheckout() ? 'commercial_ready' : 'assisted_demo_ready',
             'sales_assets' => [
-                ['label' => 'Site publico', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/'],
+                ['label' => 'Site público', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/'],
                 ['label' => 'Produto teste', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/produto-teste'],
                 ['label' => 'Checkout', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/checkout'],
                 ['label' => 'WhatsApp especialista', 'url' => 'https://wa.me/5531993157573'],
             ],
             'onboarding_steps' => [
                 'Cadastrar empresa no SaaS ou pelo checkout.',
-                'Conferir plataforma contratada e codigo/CNPJ de acesso.',
-                'Cadastrar ou importar produtos, variacoes e tabelas de medidas.',
-                'Configurar dominio permitido do widget.',
-                'Instalar snippet ou usar integracao BigShop.',
-                'Executar recomendacao real e feedback no produto piloto.',
-                'Acompanhar analytics, outliers e prontidao de go-live.',
+                'Conferir plataforma contratada e código/CNPJ de acesso.',
+                'Cadastrar ou importar produtos, variações e tabelas de medidas.',
+                'Configurar domínio permitido do widget.',
+                'Instalar snippet ou usar integração BigShop.',
+                'Executar recomendação real e feedback no produto piloto.',
+                'Acompanhar analytics, outliers e prontidão de go-live.',
             ],
             'automation_commands' => [
                 'cron' => 'cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan schedule:run >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-schedule.log 2>&1',
@@ -365,10 +365,10 @@ class GoLiveReadinessController extends Controller
                 'validation' => '.\\scripts\\validate-production.ps1',
             ],
             'pending_real_world_tests' => [
-                'Transacao Pagar.me Pix/cartao de baixo valor com webhook e cron.',
-                'Ativacao BigShop um clique com payload assinado real.',
+                'Transação Pagar.me Pix/cartão de baixo valor com webhook e cron.',
+                'Ativação BigShop um clique com payload assinado real.',
                 'Probe e sync em loja BigShop piloto com produto, grade e tabela.',
-                'Teste de widget em pagina real de cliente com cache frio e mobile.',
+                'Teste de widget em página real de cliente com cache frio e mobile.',
             ],
         ];
     }

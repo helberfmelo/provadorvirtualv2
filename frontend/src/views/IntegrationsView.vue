@@ -89,7 +89,7 @@ const form = reactive({
 
 const selected = computed(() => platforms.value.find((platform) => platform.key === selectedKey.value) || platforms.value[0] || null)
 const feedPlaceholder = computed(() => selected.value?.key === 'bigshop'
-  ? 'https://dominio-da-loja.com.br/feed.xml'
+  ? 'https://domínio-da-loja.com.br/feed.xml'
   : 'https://loja.com.br/feed.xml')
 const isBigShopContract = computed(() => {
   return auth.activeCompany?.platform === 'bigshop'
@@ -98,12 +98,12 @@ const isBigShopContract = computed(() => {
 const fieldHelp = {
   external_store_id: 'Informe o identificador da loja na plataforma. Na BigShop, use o store_id da loja.',
   api_base_url: 'Informe a URL base da API quando a plataforma tiver API autenticada. Na BigShop, use a API V3.',
-  feed_url: 'Informe a URL publica do catalogo XML/Google Merchant. Na BigShop, normalmente e o dominio da loja seguido de /feed.xml.',
-  status: 'Controle o estado operacional desta integracao no Provador Virtual.',
-  access_token: 'Cole o token ou chave de API da plataforma. O valor fica criptografado e nao volta a aparecer no formulario.',
+  feed_url: 'Informe a URL pública do catálogo XML/Google Merchant. Na BigShop, normalmente é o domínio da loja seguido de /feed.xml.',
+  status: 'Controle o estado operacional desta integração no Provador Virtual.',
+  access_token: 'Cole o token ou chave de API da plataforma. O valor fica criptografado e não volta a aparecer no formulário.',
   webhook_secret: 'Informe o segredo usado para validar webhooks assinados, quando a plataforma enviar eventos ao Provador Virtual.',
-  validation_url: 'Informe uma pagina publica de produto para confirmar se o container, script e identificadores do widget foram instalados.',
-  validation_action: 'Rode a validacao da pagina informada e veja o checklist tecnico de instalacao.',
+  validation_url: 'Informe uma página pública de produto para confirmar se o container, script e identificadores do widget foram instalados.',
+  validation_action: 'Rode a validação da página informada e veja o checklist técnico de instalação.',
 }
 
 onMounted(() => {
@@ -167,10 +167,10 @@ async function savePlatform() {
       webhook_secret: form.webhook_secret || undefined,
     })
 
-    notice.value = 'Integracao atualizada.'
+    notice.value = 'Integração atualizada.'
     await loadPlatforms()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar.'
+    error.value = requestError.response?.data?.message || 'Não foi possível salvar.'
   } finally {
     saving.value = false
   }
@@ -185,10 +185,10 @@ async function probeBigShop() {
   try {
     const { data } = await api.post('/integrations/bigshop/probe')
     integrationReport.value = data.data
-    notice.value = 'Conexao BigShop validada.'
+    notice.value = 'Conexão BigShop validada.'
     await loadPlatforms()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel validar a BigShop.'
+    error.value = requestError.response?.data?.message || 'Não foi possível validar a BigShop.'
   } finally {
     running.value = false
   }
@@ -206,7 +206,7 @@ async function syncBigShop() {
     notice.value = 'Produtos BigShop sincronizados.'
     await loadPlatforms()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel sincronizar a BigShop.'
+    error.value = requestError.response?.data?.message || 'Não foi possível sincronizar a BigShop.'
   } finally {
     running.value = false
   }
@@ -240,7 +240,7 @@ async function syncXmlFeed() {
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message
       || requestError.response?.data?.errors?.feed_url?.[0]
-      || 'Nao foi possivel sincronizar o XML.'
+      || 'Não foi possível sincronizar o XML.'
   } finally {
     running.value = false
   }
@@ -272,12 +272,12 @@ async function validateInstall() {
     })
     validation.value = data.data
     notice.value = validation.value?.status === 'passed'
-      ? 'Instalacao validada.'
-      : 'Validacao concluida com pendencias.'
+      ? 'Instalação validada.'
+      : 'Validação concluída com pendências.'
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message
       || requestError.response?.data?.errors?.url?.[0]
-      || 'Nao foi possivel validar a instalacao.'
+      || 'Não foi possível validar a instalação.'
   } finally {
     validating.value = false
   }
@@ -303,7 +303,7 @@ function statusLabel(status: string) {
     disabled: 'Pausada',
     error: 'Erro',
     passed: 'Validado',
-    warning: 'Atencao',
+    warning: 'Atenção',
     failed: 'Falhou',
   }[status] || status
 }
@@ -331,7 +331,7 @@ function checkIcon(key: string) {
   <section class="dashboard app-workspace">
     <div class="page-heading">
       <div>
-        <span class="eyebrow">Integracoes</span>
+        <span class="eyebrow">Integrações</span>
         <h1>Plataformas</h1>
       </div>
     </div>
@@ -339,10 +339,10 @@ function checkIcon(key: string) {
     <p v-if="notice" class="success-message">{{ notice }}</p>
     <p v-if="error" class="form-error">{{ error }}</p>
     <p v-if="isBigShopContract" class="info-message">
-      Plano BigShop ativo: este painel exibe somente a integracao BigShop.
+      Plano BigShop ativo: este painel exibe somente a integração BigShop.
     </p>
 
-    <div v-if="loading" class="empty-state">Carregando integracoes...</div>
+    <div v-if="loading" class="empty-state">Carregando integrações...</div>
 
     <div v-else class="integrations-grid">
       <aside class="platform-list">
@@ -433,7 +433,7 @@ function checkIcon(key: string) {
           </span>
           <span :class="{ on: selected?.status === 'connected' }">
             <i class="fa-solid fa-link" aria-hidden="true"></i>
-            Conexao
+            Conexão
           </span>
         </div>
 
@@ -473,11 +473,11 @@ function checkIcon(key: string) {
           <label class="inline-action-label">
             <span class="field-label">
               <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_action" :title="fieldHelp.validation_action" :data-tooltip="fieldHelp.validation_action">i</span>
-              Validacao
+              Validação
             </span>
             <button class="btn btn-secondary" type="button" :disabled="validating" @click="validateInstall">
               <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-              {{ validating ? 'Validando...' : 'Validar instalacao' }}
+              {{ validating ? 'Validando...' : 'Validar instalação' }}
             </button>
           </label>
         </div>
@@ -518,7 +518,7 @@ function checkIcon(key: string) {
         <div class="action-row compact">
           <button class="btn btn-primary" type="submit" :disabled="saving">
             <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-            Salvar integracao
+            Salvar integração
           </button>
           <button
             class="btn btn-secondary"
@@ -560,16 +560,16 @@ function checkIcon(key: string) {
 
         <div v-if="selected?.key === 'bigshop'" class="guide-panel">
           <div class="subsection-heading">
-            <h2>Ativacoes um clique</h2>
+            <h2>Ativações um clique</h2>
             <span>{{ bigShopActivations.length }} recentes</span>
           </div>
-          <div v-if="!bigShopActivations.length" class="empty-inline">Nenhuma ativacao BigShop registrada para esta empresa.</div>
+          <div v-if="!bigShopActivations.length" class="empty-inline">Nenhuma ativação BigShop registrada para esta empresa.</div>
           <div v-else class="activation-list">
             <article v-for="activation in bigShopActivations" :key="activation.id">
               <i class="fa-solid fa-bolt" aria-hidden="true"></i>
               <span>
                 <strong>{{ activation.company?.name || activation.store_id || 'Loja BigShop' }}</strong>
-                <small>{{ activation.store_domain || activation.company?.domain || 'dominio pendente' }}</small>
+                <small>{{ activation.store_domain || activation.company?.domain || 'domínio pendente' }}</small>
               </span>
               <em :class="{ ok: activation.status === 'success' }">{{ activation.status }}</em>
               <small>{{ activation.contract_version || 'contrato atual' }}</small>

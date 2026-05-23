@@ -60,7 +60,7 @@ class ProductVariantController extends Controller
         $variant->delete();
 
         return response()->json([
-            'message' => 'Variacao removida com sucesso.',
+            'message' => 'Variação removida com sucesso.',
         ]);
     }
 }

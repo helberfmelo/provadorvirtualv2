@@ -58,7 +58,7 @@ const statusLabel = computed(() => {
   }
 
   if (readiness.summary.status === 'ready_with_warnings') {
-    return 'Pronto com pendencias'
+    return 'Pronto com pendências'
   }
 
   return 'Bloqueado'
@@ -78,7 +78,7 @@ async function loadReadiness() {
     readiness.missing_credentials = data.missing_credentials
     readiness.pilot_package = data.pilot_package
   } catch {
-    error.value = 'Nao foi possivel carregar o checklist de go-live.'
+    error.value = 'Não foi possível carregar o checklist de go-live.'
   } finally {
     loading.value = false
   }
@@ -102,9 +102,9 @@ function packageStatusLabel(status: ReadinessPayload['pilot_package']['status'])
     <div class="page-heading">
       <div>
         <span class="eyebrow">Go-live assistido</span>
-        <h1>Prontidao de producao</h1>
+        <h1>Prontidão de produção</h1>
         <p>
-          Use este painel para conferir se produto teste, widget, seguranca e integracoes estao
+          Use este painel para conferir se produto teste, widget, segurança e integrações estão
           prontos antes de mover trafego real.
         </p>
       </div>
@@ -126,13 +126,13 @@ function packageStatusLabel(status: ReadinessPayload['pilot_package']['status'])
         </article>
         <article class="metric-card">
           <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
-          <strong>{{ readiness.summary.warnings }} pendencia{{ readiness.summary.warnings === 1 ? '' : 's' }}</strong>
-          <span>Itens que nao impedem operacao assistida, mas precisam de dono.</span>
+          <strong>{{ readiness.summary.warnings }} pendência{{ readiness.summary.warnings === 1 ? '' : 's' }}</strong>
+          <span>Itens que não impedem operação assistida, mas precisam de dono.</span>
         </article>
         <article class="metric-card">
           <i class="fa-solid fa-ban" aria-hidden="true"></i>
           <strong>{{ readiness.summary.blockers }} bloqueio{{ readiness.summary.blockers === 1 ? '' : 's' }}</strong>
-          <span>Devem estar zerados antes de campanha publica.</span>
+          <span>Devem estar zerados antes de campanha pública.</span>
         </article>
         <article class="metric-card">
           <i class="fa-solid fa-link" aria-hidden="true"></i>
@@ -155,7 +155,7 @@ function packageStatusLabel(status: ReadinessPayload['pilot_package']['status'])
                   :class="check.status === 'passed' ? 'fa-solid fa-check' : check.status === 'warning' ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-xmark'"
                   aria-hidden="true"
                 ></i>
-                {{ check.status === 'passed' ? 'Ok' : check.status === 'warning' ? 'Atencao' : 'Bloqueio' }}
+                {{ check.status === 'passed' ? 'Ok' : check.status === 'warning' ? 'Atenção' : 'Bloqueio' }}
               </span>
               <div>
                 <strong>{{ check.label }}</strong>
@@ -168,7 +168,7 @@ function packageStatusLabel(status: ReadinessPayload['pilot_package']['status'])
 
         <section class="panel-main">
           <div class="subsection-heading">
-            <h2>URLs de producao</h2>
+            <h2>URLs de produção</h2>
             <span>smoke</span>
           </div>
 
@@ -247,7 +247,7 @@ function packageStatusLabel(status: ReadinessPayload['pilot_package']['status'])
       <div class="analytics-grid">
         <section class="panel-main">
           <div class="subsection-heading">
-            <h2>Automacoes</h2>
+            <h2>Automações</h2>
             <span>cPanel</span>
           </div>
           <div class="command-list">
@@ -260,7 +260,7 @@ function packageStatusLabel(status: ReadinessPayload['pilot_package']['status'])
 
         <section class="panel-main">
           <div class="subsection-heading">
-            <h2>Pendencias reais</h2>
+            <h2>Pendências reais</h2>
             <span>{{ readiness.pilot_package.pending_real_world_tests.length }} testes</span>
           </div>
           <div class="check-list stacked">

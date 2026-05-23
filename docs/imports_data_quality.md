@@ -4,7 +4,7 @@ Atualizado em: 2026-05-23
 
 ## Objetivo
 
-Reduzir cadastro manual sem deixar dados ruins entrarem direto no motor de recomendacao.
+Reduzir cadastro manual sem deixar dados ruins entrarem direto no motor de recomendação.
 
 ## APIs
 
@@ -14,7 +14,7 @@ Rotas protegidas por Sanctum:
 - `GET /api/v1/imports/{importJob}`
 - `POST /api/v1/imports/preview`
 - `POST /api/v1/imports`
-- `POST /api/v1/integrations/{platform}/sync-xml`, busca `feed_url` salvo na integracao e cria um import job de produtos
+- `POST /api/v1/integrations/{platform}/sync-xml`, busca `feed_url` salvo na integração e cria um import job de produtos
 
 Payload base:
 
@@ -48,8 +48,8 @@ sku,name,category,gender,fit_profile,size_label,variant_sku,price,stock_quantity
 Regras:
 
 - `sku` ou `external_product_id` identifica produto.
-- `name` e obrigatorio.
-- `size_label` cria ou atualiza variacao.
+- `name` e obrigatório.
+- `size_label` cria ou atualiza variação.
 - `measurement_table` tenta vincular tabela existente pelo nome.
 - importacao atualiza produto por `sku` ou `external_product_id`.
 
@@ -63,9 +63,9 @@ table_name,product_type,gender,fit_profile,size_label,bust_min,bust_max,waist_mi
 
 Regras:
 
-- `table_name` e `size_label` sao obrigatorios.
+- `table_name` e `size_label` são obrigatórios.
 - Linhas com o mesmo `table_name` compoem a mesma tabela.
-- Ao importar uma tabela existente com o mesmo nome, as linhas sao substituidas pelo conteudo importado.
+- Ao importar uma tabela existente com o mesmo nome, as linhas são substituidas pelo conteúdo importado.
 - Fonte da tabela fica como `import`.
 
 ## Google Shopping XML
@@ -92,13 +92,13 @@ Parser de produtos le campos comuns:
 Mapeamento:
 
 - `g:item_group_id` vira o produto pai quando existir.
-- `g:id` vira a variacao.
+- `g:id` vira a variação.
 - `g:size` cria ou atualiza `product_variants.size_label`.
 - `g:color` cria ou atualiza `product_variants.color`.
 - `g:availability` controla `product_variants.is_active` quando vier como `in stock` ou `out of stock`.
 - `link`, `g:brand` e `g:age_group` ficam em metadata.
 
-Nao cria grade completa quando o feed nao informa tamanho. Nesse caso, o catalogo entra como produto e a grade/tabela deve ser completada no painel ou por API.
+Não cria grade completa quando o feed não informa tamanho. Nesse caso, o catálogo entra como produto e a grade/tabela deve ser completada no painel ou por API.
 
 ## Jobs e logs
 
@@ -111,4 +111,4 @@ Cada commit cria `import_jobs` com:
 - resumo;
 - erros por linha.
 
-`integration_events` foi criado como trilha para sync/webhook das proximas sprints.
+`integration_events` foi criado como trilha para sync/webhook das próximas sprints.

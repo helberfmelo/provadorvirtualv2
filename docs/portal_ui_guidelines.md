@@ -2,60 +2,62 @@
 
 Atualizado em: 2026-05-23
 
-Este documento registra a correcao solicitada para evitar telas emboladas no portal SaaS e no portal da empresa.
+Este documento registra a correção solicitada para evitar telas emboladas no portal SaaS e no portal da empresa.
 
 ## Regra principal de CRUD
 
-Todo CRUD novo ou existente deve seguir o padrao list-first:
+Todo CRUD novo ou existente deve seguir o padrão list-first:
 
 - a rota base do CRUD mostra somente a listagem ocupando a tela;
-- a listagem tem botao `Novo`, botao de editar e acao de ativar/desativar quando aplicavel;
-- cadastro abre em rota propria `/novo`;
-- edicao abre em rota propria `/:id/editar`;
-- formularios longos nao devem ficar ao lado da tabela principal;
-- cards de resumo podem existir apenas em visoes gerais, nao dentro da listagem operacional do CRUD.
+- a listagem tem botão `Novo`, botão de editar e ação de ativar/desativar quando aplicável;
+- cadastro abre em rota própria `/novo`;
+- edição abre em rota própria `/:id/editar`;
+- formulários longos não devem ficar ao lado da tabela principal;
+- cards de resumo podem existir apenas em visões gerais, não dentro da listagem operacional do CRUD.
 
-## Separacao de portais
+## Separação de portais
 
-O portal SaaS e o portal da empresa nao devem misturar menus:
+O portal SaaS e o portal da empresa não devem misturar menus:
 
-- SaaS: visao geral, empresas, usuarios SaaS, usuarios das empresas e e-mails transacionais;
-- Empresa: painel, catalogo, configuracao do widget, integracoes, importacoes, assistente, analytics, go-live e usuarios da empresa;
-- links entre contextos devem ser explicitos e secundarios;
+- SaaS: visão geral, empresas, usuários SaaS, usuários das empresas e e-mails transacionais;
+- Empresa: painel, catálogo, configuração do widget, integrações, importações, assistente, analytics, go-live e usuários da empresa;
+- links entre contextos devem ser explícitos e secundários;
 - no mobile, o menu autenticado deve abrir em drawer.
 
 ## Rotas SaaS revisadas
 
-- `/saas`: visao geral operacional;
+- `/saas`: visão geral operacional;
 - `/saas/empresas`: listagem de empresas;
 - `/saas/empresas/nova`: cadastro de empresa;
-- `/saas/empresas/:id/editar`: edicao de empresa;
-- `/saas/usuarios`: listagem de usuarios SaaS;
-- `/saas/usuarios/novo`: cadastro de usuario SaaS;
-- `/saas/usuarios/:id/editar`: edicao de usuario SaaS;
-- `/saas/usuarios-empresas`: listagem de usuarios das empresas clientes;
-- `/saas/usuarios-empresas/novo`: cadastro de usuario de empresa cliente;
-- `/saas/usuarios-empresas/:id/editar`: edicao de usuario de empresa cliente;
-- `/saas/emails`: listagem de e-mails transacionais e historico;
+- `/saas/empresas/:id/editar`: edição de empresa;
+- `/saas/usuarios`: listagem de usuários SaaS;
+- `/saas/usuarios/novo`: cadastro de usuário SaaS;
+- `/saas/usuarios/:id/editar`: edição de usuário SaaS;
+- `/saas/usuarios-empresas`: listagem de usuários das empresas clientes;
+- `/saas/usuarios-empresas/novo`: cadastro de usuário de empresa cliente;
+- `/saas/usuarios-empresas/:id/editar`: edição de usuário de empresa cliente;
+- `/saas/emails`: listagem de e-mails transacionais e histórico;
 - `/saas/emails/configuracoes`: credenciais SMTP;
 - `/saas/emails/novo`: cadastro de template;
-- `/saas/emails/:id/editar`: edicao de template.
+- `/saas/emails/:id/editar`: edição de template.
 
 ## Rotas da empresa revisadas
 
 - `/app/produtos`: listagem de produtos;
 - `/app/produtos/novo`: cadastro de produto;
-- `/app/produtos/:id/editar`: edicao de produto;
+- `/app/produtos/:id/editar`: edição de produto;
 - `/app/tabelas-de-medidas`: listagem de tabelas;
 - `/app/tabelas-de-medidas/nova`: cadastro de tabela;
-- `/app/tabelas-de-medidas/:id/editar`: edicao de tabela;
-- `/app/usuarios`: listagem de usuarios da empresa;
-- `/app/usuarios/novo`: cadastro de usuario da empresa;
-- `/app/usuarios/:id/editar`: edicao de usuario da empresa.
+- `/app/tabelas-de-medidas/:id/editar`: edição de tabela;
+- `/app/usuarios`: listagem de usuários da empresa;
+- `/app/usuarios/novo`: cadastro de usuário da empresa;
+- `/app/usuarios/:id/editar`: edição de usuário da empresa.
 
 ## Checklist antes de finalizar sprint
 
 - `npm run build`;
 - `git diff --check`;
-- validar rotas publicas e autenticadas pelo `scripts/validate-production.ps1` apos deploy;
-- confirmar que nenhuma rota de listagem principal voltou a exibir formulario longo na mesma tela.
+- validar rotas públicas e autenticadas pelo `scripts/validate-production.ps1` após deploy;
+- confirmar que nenhuma rota de listagem principal voltou a exibir formulário longo na mesma tela;
+- revisar textos visíveis em PT-BR com acentos, til e cedilha corretos antes de commitar;
+- conferir se inputs, selects, textareas e botões usam as classes globais (`admin-form`, `form`, `inline-form`, `btn`, `icon-link` ou equivalentes) para evitar controles sem CSS.

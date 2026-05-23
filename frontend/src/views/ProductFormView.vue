@@ -54,7 +54,7 @@ async function loadForm() {
 
     form.measurement_table_id = null
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o produto.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar o produto.'
   } finally {
     loading.value = false
   }
@@ -97,7 +97,7 @@ async function saveProduct() {
     selected.value = data.data
     fillForm(data.data)
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar o produto.'
+    error.value = requestError.response?.data?.message || 'Não foi possível salvar o produto.'
   } finally {
     saving.value = false
   }
@@ -157,7 +157,7 @@ async function removeVariant(variant: ProductVariant) {
       <div>
         <span class="eyebrow">Produtos</span>
         <h1>{{ editing ? 'Editar produto' : 'Novo produto' }}</h1>
-        <p>Dados principais do produto e grade de variacoes.</p>
+        <p>Dados principais do produto e grade de variações.</p>
       </div>
       <RouterLink class="btn btn-secondary" to="/app/produtos">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -227,7 +227,7 @@ async function removeVariant(variant: ProductVariant) {
 
     <section v-if="selected" class="panel-main subsection form-page">
       <div class="subsection-heading">
-        <h2>Variacoes</h2>
+        <h2>Variações</h2>
         <span>{{ selected.variants?.length ?? 0 }} itens</span>
       </div>
 
@@ -238,7 +238,7 @@ async function removeVariant(variant: ProductVariant) {
               <th>Tamanho</th>
               <th>SKU</th>
               <th>Cor</th>
-              <th>Preco</th>
+              <th>Preço</th>
               <th>Estoque</th>
               <th>Ativa</th>
               <th></th>
@@ -253,10 +253,10 @@ async function removeVariant(variant: ProductVariant) {
               <td><input v-model.number="variant.stock_quantity" class="table-input short" type="number" min="0" /></td>
               <td><input v-model="variant.is_active" type="checkbox" /></td>
               <td class="row-actions">
-                <button type="button" title="Salvar variacao" @click="updateVariant(variant)">
+                <button type="button" title="Salvar variação" @click="updateVariant(variant)">
                   <i class="fa-solid fa-check" aria-hidden="true"></i>
                 </button>
-                <button type="button" title="Remover variacao" @click="removeVariant(variant)">
+                <button type="button" title="Remover variação" @click="removeVariant(variant)">
                   <i class="fa-solid fa-trash" aria-hidden="true"></i>
                 </button>
               </td>
@@ -269,11 +269,11 @@ async function removeVariant(variant: ProductVariant) {
         <input v-model="variantForm.size_label" required placeholder="Tamanho" />
         <input v-model="variantForm.sku" placeholder="SKU" />
         <input v-model="variantForm.color" placeholder="Cor" />
-        <input v-model.number="variantForm.price" type="number" min="0" step="0.01" placeholder="Preco" />
+        <input v-model.number="variantForm.price" type="number" min="0" step="0.01" placeholder="Preço" />
         <input v-model.number="variantForm.stock_quantity" type="number" min="0" placeholder="Estoque" />
         <button class="btn btn-secondary" type="submit">
           <i class="fa-solid fa-plus" aria-hidden="true"></i>
-          Variacao
+          Variação
         </button>
       </form>
     </section>

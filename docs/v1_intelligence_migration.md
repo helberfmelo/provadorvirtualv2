@@ -19,9 +19,9 @@ Este documento registra o que foi encontrado no `D:\Projetos\provadorvirtual_v1`
 
 Foi encontrada somente `GEMINI_API_KEY` no `.env` do v1.
 
-A chave foi copiada para `docs/credentials.local.md`, que esta no `.gitignore`. O valor nao deve aparecer em nenhum arquivo versionado, log de deploy, issue, PR ou resposta publica.
+A chave foi copiada para `docs/credentials.local.md`, que esta no `.gitignore`. O valor não deve aparecer em nenhum arquivo versionado, log de deploy, issue, PR ou resposta pública.
 
-Configuracao local recomendada para ativar o provider externo no v2:
+Configuração local recomendada para ativar o provider externo no v2:
 
 ```env
 AI_PROVIDER=gemini
@@ -29,13 +29,13 @@ AI_MODEL=gemini-2.0-flash
 GEMINI_API_KEY=valor_apenas_no_arquivo_local_ou_secret
 ```
 
-Quando for ativar em producao, cadastrar `GEMINI_API_KEY` no GitHub Actions/ambiente remoto e ajustar `PRODUCTION_ENV`, sem commitar o valor.
+Quando for ativar em produção, cadastrar `GEMINI_API_KEY` no GitHub Actions/ambiente remoto e ajustar `PRODUCTION_ENV`, sem commitar o valor.
 
 ## Conceitos uteis do v1
 
-### Catalogo padrao de medidas
+### Catálogo padrão de medidas
 
-`default_measurement_tables_data.json` tem modelos por genero e tipo de produto:
+`default_measurement_tables_data.json` tem modelos por gênero e tipo de produto:
 
 - Masculino: Camiseta, Calca Jeans, Camisa Social, Bermuda, Jaqueta.
 - Feminino: Camiseta/Blusa, Calca Jeans, Vestido, Saia, Sutia.
@@ -45,16 +45,16 @@ Quando for ativar em producao, cadastrar `GEMINI_API_KEY` no GitHub Actions/ambi
 
 Cada modelo inclui campos de medida, tamanhos, altura/peso/idade recomendados e compatibilidade com formato corporal. O v2 deve importar esse conceito para uma base canonica, com normalizacao de nomes e unidades.
 
-Status no v2: o arquivo foi versionado em `backend/database/data/default_measurement_tables_data.json` e normalizado por `App\Services\Measurement\StandardMeasurementCatalog`. A API `/api/v1/measurement-templates` agora entrega os modelos do v1 como templates inteligentes para a tela de criacao/edicao de tabelas.
+Status no v2: o arquivo foi versionado em `backend/database/data/default_measurement_tables_data.json` e normalizado por `App\Services\Measurement\StandardMeasurementCatalog`. A API `/api/v1/measurement-templates` agora entrega os modelos do v1 como templates inteligentes para a tela de criação/edição de tabelas.
 
-### Modelo padrao com fallback de IA
+### Modelo padrão com fallback de IA
 
-`ajax_get_default_table.php` primeiro tenta buscar `standard_models` por genero/tipo de peca. Se nao encontra, chama Gemini para gerar um modelo. O v2 deve manter essa ordem:
+`ajax_get_default_table.php` primeiro tenta buscar `standard_models` por gênero/tipo de peça. Se não encontra, chama Gemini para gerar um modelo. O v2 deve manter essa ordem:
 
-1. catalogo interno validado;
-2. historico da marca/lojista quando existir;
-3. sugestao por IA;
-4. revisao obrigatoria pelo lojista antes de ativar.
+1. catálogo interno validado;
+2. histórico da marca/lojista quando existir;
+3. sugestão por IA;
+4. revisão obrigatória pelo lojista antes de ativar.
 
 ### OCR de tabela
 
@@ -62,20 +62,20 @@ Status no v2: o arquivo foi versionado em `backend/database/data/default_measure
 
 - aceitar imagem, PDF leve, CSV e texto colado;
 - retornar rascunho;
-- destacar confianca por campo;
-- exigir revisao antes de salvar;
+- destacar confiança por campo;
+- exigir revisão antes de salvar;
 - registrar custo/uso em `ai_usage_logs`;
 - nunca ativar tabela automaticamente.
 
 ### Cadastro de tabela pelo lojista
 
-`table_new.php` tinha fluxo de escolha por genero/tipo, modelo padrao, IA/OCR e edicao manual. O v2 deve transformar isso em um wizard simples:
+`table_new.php` tinha fluxo de escolha por gênero/tipo, modelo padrão, IA/OCR e edição manual. O v2 deve transformar isso em um wizard simples:
 
-1. escolher publico e categoria;
-2. escolher origem: modelo pronto, IA por descricao, OCR/imagem, CSV/XML ou manual;
+1. escolher público e categoria;
+2. escolher origem: modelo pronto, IA por descrição, OCR/imagem, CSV/XML ou manual;
 3. revisar tabela em grade editavel;
 4. validar lacunas e medidas fora da curva;
-5. vincular a produtos/variacoes;
+5. vincular a produtos/variações;
 6. publicar.
 
 ### Widget gamificado
@@ -83,47 +83,47 @@ Status no v2: o arquivo foi versionado em `backend/database/data/default_measure
 `widget/widget.js` tinha etapas progressivas:
 
 - altura, peso e idade;
-- genero e formato corporal;
+- gênero e formato corporal;
 - medidas detalhadas por tipo de produto;
 - barra de precisao;
 - mensagens de incentivo;
 - confete em 100%;
-- feedback da recomendacao;
-- configuracao dinamica por produto.
+- feedback da recomendação;
+- configuração dinâmica por produto.
 
-O v2 ja tem widget universal, mas as proximas sprints devem recuperar esse fluxo com mais fluidez, acessibilidade e persistencia.
+O v2 já tem widget universal, mas as próximas sprints devem recuperar esse fluxo com mais fluidez, acessibilidade e persistência.
 
 ## Melhorias obrigatorias para o v2
 
 ### Experiencia do consumidor
 
-- Reconhecer consumidor anonimo por cookie/localStorage com identificador proprio do v2.
+- Reconhecer consumidor anônimo por cookie/localStorage com identificador próprio do v2.
 - Reutilizar medidas preenchidas anteriormente quando houver consentimento.
-- Mostrar mensagem clara quando a recomendacao usa dados anteriores.
+- Mostrar mensagem clara quando a recomendação usa dados anteriores.
 - Permitir editar medidas em modal, sem reiniciar a compra.
-- Permitir multiplos perfis quando o usuario for conhecido/logado.
-- Manter recomendacao inicial rapida com altura/peso/idade e refinar quando o usuario fornecer mais dados.
-- Separar perfil anonimo, perfil cadastrado e perfil importado da loja.
+- Permitir multiplos perfis quando o usuário for conhecido/logado.
+- Manter recomendação inicial rapida com altura/peso/idade e refinar quando o usuário fornecer mais dados.
+- Separar perfil anônimo, perfil cadastrado e perfil importado da loja.
 
 ### Experiencia do lojista
 
-- Comecar por modelos prontos e sugestoes assistidas, nao por tabela vazia.
-- Permitir IA gerar tabela por tipo de produto, publico, marca, modelagem e imagem.
+- Comecar por modelos prontos e sugestoes assistidas, não por tabela vazia.
+- Permitir IA gerar tabela por tipo de produto, público, marca, modelagem e imagem.
 - Permitir OCR de tabelas de medidas de fornecedores.
 - Validar outliers antes de salvar.
-- Oferecer base de dados universal como sugestao, sempre editavel.
+- Oferecer base de dados universal como sugestão, sempre editavel.
 - Mostrar lacunas de produtos sem tabela e produtos com tabela fraca.
 
 ### Dados e aprendizado
 
-- Salvar snapshots anonimizados de recomendacao, medidas, tamanho indicado, tamanho escolhido, feedback e eventos de compra/devolucao quando existirem.
-- Marcar anomalias: medidas improvaveis, escolha muito distante da recomendacao, retorno contraditorio, tabela de lojista muito fora do padrao.
-- Usar dados anomalos para analise, mas nao para atualizar diretamente a base inteligente.
+- Salvar snapshots anonimizados de recomendação, medidas, tamanho indicado, tamanho escolhido, feedback e eventos de compra/devolucao quando existirem.
+- Marcar anomalias: medidas improvaveis, escolha muito distante da recomendação, retorno contraditorio, tabela de lojista muito fora do padrão.
+- Usar dados anomalos para análise, mas não para atualizar diretamente a base inteligente.
 - Promover dados para aprendizado apenas quando houver volume e consistencia por coorte.
 
-## Impacto tecnico esperado
+## Impacto técnico esperado
 
-Campos canonicos que o v2 deve suportar nas proximas sprints:
+Campos canonicos que o v2 deve suportar nas próximas sprints:
 
 - `height`, `weight`, `age`
 - `chest`, `bust`, `under_bust`
@@ -135,12 +135,12 @@ Campos canonicos que o v2 deve suportar nas proximas sprints:
 - `body_shape_chest`, `body_shape_waist`, `body_shape_hip`
 - `fit_preference`
 
-As tabelas atuais do v2 ja aceitam `metadata`, mas o schema e as telas ainda precisam evoluir para tratar esses campos como parte do contrato principal.
+As tabelas atuais do v2 já aceitam `metadata`, mas o schema e as telas ainda precisam evoluir para tratar esses campos como parte do contrato principal.
 
-## Pendencias
+## Pendências
 
-- Ativar provider Gemini no backend do v2 usando a chave ja copiada localmente.
-- Evoluir o catalogo importado para salvar campos extras como idade, formato corporal, manga, entrepernas e pe em `metadata`.
+- Ativar provider Gemini no backend do v2 usando a chave já copiada localmente.
+- Evoluir o catálogo importado para salvar campos extras como idade, formato corporal, manga, entrepernas e pe em `metadata`.
 - Definir imagens/ilustracoes proprias para formatos corporais do widget.
-- Decidir se o v2 tambem tera OpenAI como provider alternativo para OCR e geracao.
-- Cadastrar `GEMINI_API_KEY` em producao quando for liberar OCR real.
+- Decidir se o v2 também tera OpenAI como provider alternativo para OCR e geracao.
+- Cadastrar `GEMINI_API_KEY` em produção quando for liberar OCR real.

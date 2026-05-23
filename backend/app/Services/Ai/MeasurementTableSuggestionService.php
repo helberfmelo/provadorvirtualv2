@@ -46,12 +46,12 @@ class MeasurementTableSuggestionService
 
         if ($sourceType === 'image' && ! $this->status()['image_ocr']) {
             $status = $rows ? 'completed_with_warnings' : 'needs_provider';
-            $warnings[] = 'OCR de imagem ainda nao esta ativo. Use texto colado por enquanto ou cadastre uma chave de IA para a proxima etapa.';
+            $warnings[] = 'OCR de imagem ainda não está ativo. Use texto colado por enquanto ou cadastre uma chave de IA para a próxima etapa.';
         }
 
         if (! $rows && $sourceType !== 'image') {
             $status = 'failed';
-            $warnings[] = 'Nao encontrei linhas de medida suficientes. Cole uma tabela com cabecalho e tamanhos.';
+            $warnings[] = 'Não encontrei linhas de medida suficientes. Cole uma tabela com cabeçalho e tamanhos.';
         }
 
         $suggestion = $this->buildSuggestion($input, $rows, $warnings);
@@ -97,7 +97,7 @@ class MeasurementTableSuggestionService
             ->all();
 
         if (count($lines) < 2) {
-            return [[], ['A tabela precisa ter cabecalho e pelo menos uma linha de tamanho.']];
+            return [[], ['A tabela precisa ter cabeçalho e pelo menos uma linha de tamanho.']];
         }
 
         $delimiter = $this->delimiter($lines[0]);
@@ -133,7 +133,7 @@ class MeasurementTableSuggestionService
         }
 
         if (! $rows) {
-            $warnings[] = 'Nenhuma linha valida foi detectada.';
+            $warnings[] = 'Nenhuma linha válida foi detectada.';
         }
 
         return [$rows, $warnings];

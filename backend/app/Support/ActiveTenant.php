@@ -27,7 +27,7 @@ class ActiveTenant
             : $query?->orderBy('merchants.id')->first();
 
         if (! $merchant) {
-            throw new NotFoundHttpException('Lojista nao encontrado para o usuario autenticado.');
+            throw new NotFoundHttpException('Lojista não encontrado para o usuário autenticado.');
         }
 
         return $merchant;
@@ -47,7 +47,7 @@ class ActiveTenant
         }
 
         if (($company->status ?? 'active') === 'inactive') {
-            throw new NotFoundHttpException('Empresa inativa ou indisponivel.');
+            throw new NotFoundHttpException('Empresa inativa ou indisponível.');
         }
 
         $user = $request->user();
@@ -62,7 +62,7 @@ class ActiveTenant
             $pivotCompanyId = $activeMerchant?->pivot?->merchant_company_id;
 
             if ($pivotCompanyId && (int) $pivotCompanyId !== (int) $company->id) {
-                throw new NotFoundHttpException('Empresa nao encontrada para o usuario autenticado.');
+                throw new NotFoundHttpException('Empresa não encontrada para o usuário autenticado.');
             }
         }
 

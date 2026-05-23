@@ -89,11 +89,11 @@ class RecommendationEngine
         $warnings = [];
 
         if ($needsMoreData) {
-            $warnings[] = 'Recomendacao com poucas medidas. Para melhorar a confianca, informe busto, cintura e quadril.';
+            $warnings[] = 'Recomendação com poucas medidas. Para melhorar a confiança, informe busto, cintura e quadril.';
         }
 
         if ($tie) {
-            $warnings[] = 'Suas medidas ficaram proximas de dois tamanhos. Considere a preferencia de caimento.';
+            $warnings[] = 'Suas medidas ficaram próximas de dois tamanhos. Considere a preferência de caimento.';
         }
 
         return new RecommendationResult(

@@ -27,7 +27,7 @@ class EnsureWidgetOriginAllowed
 
         if (! $originHost || ! $merchantId || ! $this->isAllowed($merchantId, $originHost, $this->companyId($request))) {
             return response()->json([
-                'message' => 'Origem nao autorizada para este widget.',
+                'message' => 'Origem não autorizada para este widget.',
             ], 403);
         }
 

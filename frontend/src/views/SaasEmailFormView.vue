@@ -38,7 +38,7 @@ async function loadTemplate() {
     const { data } = await api.get('/saas/transactional-emails')
     const template = (data.data as TransactionalEmail[]).find((item) => item.id === templateId.value)
     if (!template) {
-      error.value = 'Template nao encontrado.'
+      error.value = 'Template não encontrado.'
       return
     }
 
@@ -52,7 +52,7 @@ async function loadTemplate() {
       is_active: template.is_active,
     })
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o template.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar o template.'
   } finally {
     loading.value = false
   }
@@ -81,7 +81,7 @@ async function saveTemplate() {
       : await api.post('/saas/transactional-emails', payload)
     await router.push('/saas/emails')
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar o e-mail transacional.'
+    error.value = requestError.response?.data?.message || 'Não foi possível salvar o e-mail transacional.'
   } finally {
     saving.value = false
   }
@@ -94,7 +94,7 @@ async function saveTemplate() {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>{{ editing ? 'Editar e-mail' : 'Novo e-mail' }}</h1>
-        <p>Template transacional em tela propria para edicao sem poluir a listagem.</p>
+        <p>Template transacional em tela própria para edição sem poluir a listagem.</p>
       </div>
       <RouterLink class="btn btn-secondary" to="/saas/emails">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -107,7 +107,7 @@ async function saveTemplate() {
     <form class="panel-main admin-form form-page" @submit.prevent="saveTemplate">
       <div class="form-grid">
         <label>
-          Codigo
+          Código
           <input v-model="form.code" placeholder="cadastro_realizado" required />
         </label>
         <label>
@@ -128,11 +128,11 @@ async function saveTemplate() {
         <input v-model="form.subject" required />
       </label>
       <label>
-        Descricao interna
+        Descrição interna
         <input v-model="form.description" />
       </label>
       <label>
-        Variaveis
+        Variáveis
         <input v-model="form.variables" placeholder="nome, empresa, link_checkout" />
       </label>
       <label>

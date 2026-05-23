@@ -185,11 +185,11 @@ class TransactionalEmailService
         ]);
 
         if (! $template || ! $template->is_active) {
-            return $this->markSkipped($send, 'Template transacional inativo ou nao encontrado.');
+            return $this->markSkipped($send, 'Template transacional inativo ou não encontrado.');
         }
 
         if (! $settings->is_active) {
-            return $this->markSkipped($send, 'Envio transacional inativo nas configuracoes SMTP.');
+            return $this->markSkipped($send, 'Envio transacional inativo nas configurações SMTP.');
         }
 
         if (! filter_var($recipientEmail, FILTER_VALIDATE_EMAIL)) {

@@ -2,9 +2,9 @@
 
 Atualizado em: 2026-05-23
 
-Este roadmap busca um produto enxuto, robusto e comercialmente usavel. Nao e MVP minimo; e uma primeira versao consistente.
+Este roadmap busca um produto enxuto, robusto e comercialmente usavel. Não e MVP mínimo; e uma primeira versao consistente.
 
-## Sprint 0 - Documentacao e Preparacao
+## Sprint 0 - Documentação e Preparacao
 
 Objetivo: criar fonte de verdade, deploy inicial e regras de trabalho.
 
@@ -16,7 +16,7 @@ Entregas:
 - lista de secrets faltantes;
 - backlog inicial.
 
-## Sprint 1 - Fundacao Laravel/Vue
+## Sprint 1 - Fundação Laravel/Vue
 
 Objetivo: app rodando local e deployavel.
 
@@ -30,42 +30,42 @@ Entregas:
 - auth base;
 - migrations iniciais;
 - seed demo;
-- pagina `/produto-teste` inicial.
+- página `/produto-teste` inicial.
 
-## Sprint 2 - Produtos, Variacoes e Tabelas
+## Sprint 2 - Produtos, Variações e Tabelas
 
 Objetivo: lojista conseguir cadastrar produto e tabela de medidas.
 
 Entregas:
 
 - CRUD produtos;
-- CRUD variacoes;
+- CRUD variações;
 - CRUD tabelas;
 - templates de medidas;
 - vinculo produto/tabela;
-- validacoes e testes.
+- validações e testes.
 
-Status: concluido e publicado em producao no run `26326950616`.
+Status: concluído e publicado em produção no run `26326950616`.
 
-## Sprint 3 - Motor de Recomendacao
+## Sprint 3 - Motor de Recomendação
 
-Objetivo: recomendacao real sem depender de IA externa.
+Objetivo: recomendação real sem depender de IA externa.
 
 Entregas:
 
-- service de recomendacao;
+- service de recomendação;
 - normalizacao de medidas;
 - scoring por tamanho;
-- confianca e explicacao;
+- confiança e explicacao;
 - logs;
-- endpoints publicos;
+- endpoints públicos;
 - testes de casos comuns e extremos.
 
-Status: concluido e publicado em producao no run `26327119754`.
+Status: concluído e publicado em produção no run `26327119754`.
 
 ## Sprint 4 - Widget Universal v1
 
-Objetivo: snippet funcionar em qualquer pagina.
+Objetivo: snippet funcionar em qualquer página.
 
 Entregas:
 
@@ -73,11 +73,11 @@ Entregas:
 - config-check;
 - modal/drawer responsivo;
 - fluxo de medidas;
-- recomendacao e feedback;
-- pagina `/produto-teste` usando widget real;
+- recomendação e feedback;
+- página `/produto-teste` usando widget real;
 - guia custom/Shopify/WooCommerce/Nuvemshop.
 
-Status: concluido e publicado em producao no run `26331199145`.
+Status: concluído e publicado em produção no run `26331199145`.
 
 ## Sprint 5 - Painel do Lojista
 
@@ -86,13 +86,13 @@ Objetivo: experiencia operacional completa para configurar a loja.
 Entregas:
 
 - dashboard;
-- produtos/tabelas/integracoes;
-- tela de instalacao;
+- produtos/tabelas/integrações;
+- tela de instalação;
 - onboarding guiado;
 - estados vazios uteis;
 - ajustes mobile.
 
-Status: concluido e publicado em producao no run `26331485173`.
+Status: concluído e publicado em produção no run `26331485173`.
 
 ## Sprint 6 - Importacao e Templates Assistidos
 
@@ -101,27 +101,27 @@ Objetivo: reduzir trabalho manual do lojista.
 Entregas:
 
 - importacao CSV/XML;
-- parser de feed Google Shopping quando possivel;
+- parser de feed Google Shopping quando possível;
 - assistente para criar tabela a partir de modelo;
-- preview e validacao antes de importar;
+- preview e validação antes de importar;
 - jobs e logs.
 
-Status: concluido e publicado em producao no run `26331691701`.
+Status: concluído e publicado em produção no run `26331691701`.
 
-## Sprint 7 - Integracao BigShop Base
+## Sprint 7 - Integração BigShop Base
 
 Objetivo: conectar BigShop por API e sincronizar dados reais.
 
 Entregas:
 
-- cadastro de conexao;
+- cadastro de conexão;
 - token criptografado;
 - probe remoto;
 - sync produtos/grades;
-- mapeamento tabela de medidas quando disponivel;
-- relatorio de lacunas por loja.
+- mapeamento tabela de medidas quando disponível;
+- relatório de lacunas por loja.
 
-Status: concluido e publicado em producao no run `26331844564`.
+Status: concluído e publicado em produção no run `26331844564`.
 
 ## Sprint 8 - BigShop Um Clique
 
@@ -130,73 +130,73 @@ Objetivo: definir e implementar primeiro caminho nativo.
 Entregas:
 
 - especificacao de handshake com BigShop;
-- endpoint de ativacao;
-- snippet/tema automatico ou instrucao interna;
+- endpoint de ativação;
+- snippet/tema automático ou instrucao interna;
 - teste em loja controlada;
-- documentacao para time BigShop.
+- documentação para time BigShop.
 
-Status: concluido e publicado em producao no run `26332055677`.
+Status: concluído e publicado em produção no run `26332055677`.
 
 ## Sprint 9 - IA para OCR e Tabelas
 
-Objetivo: acelerar criacao de tabelas sem comprometer confianca.
+Objetivo: acelerar criação de tabelas sem comprometer confiança.
 
 Entregas:
 
 - provider IA configuravel;
 - OCR de imagem/texto;
-- sugestao de tabela;
-- revisao obrigatoria pelo lojista;
+- sugestão de tabela;
+- revisão obrigatória pelo lojista;
 - logs de custo/uso;
 - guardrails.
 
-Status: concluido e publicado em producao no run `26332326042`. OCR de imagem real depende de `OPENAI_API_KEY` ou `GEMINI_API_KEY` e ativacao do provider externo.
+Status: concluído e publicado em produção no run `26332326042`. OCR de imagem real depende de `OPENAI_API_KEY` ou `GEMINI_API_KEY` e ativação do provider externo.
 
 ## Sprint 10 - Analytics e SaaS Admin
 
-Objetivo: dar visibilidade de uso, qualidade e operacao.
+Objetivo: dar visibilidade de uso, qualidade e operação.
 
 Entregas:
 
-- dashboard de recomendacoes;
+- dashboard de recomendações;
 - taxa de feedback positivo;
 - produtos sem tabela;
 - erros de widget;
 - painel SaaS para lojistas;
 - audit logs.
 
-Status: concluido e publicado em producao no run `26332544138`.
+Status: concluído e publicado em produção no run `26332544138`.
 
 ## Sprint 11 - Hardening, LGPD e Observabilidade
 
-Objetivo: preparar release publico com seguranca.
+Objetivo: preparar release público com segurança.
 
 Entregas:
 
 - politicas de privacidade/termos;
-- CORS por dominio;
+- CORS por domínio;
 - rate limit;
 - mascaramento de logs;
-- retencao;
+- retenção;
 - incident runbook;
 - smoke e rollback testados.
 
-Status: concluido e publicado em producao no run `26332960822`.
+Status: concluído e publicado em produção no run `26332960822`.
 
 ## Sprint 12 - Go-live Assistido
 
-Objetivo: publicar v2 com seguranca e decidir cutover.
+Objetivo: publicar v2 com segurança e decidir cutover.
 
 Entregas:
 
 - deploy production verde;
-- produto teste em producao;
+- produto teste em produção;
 - loja BigShop piloto;
-- validacao de widget externo;
+- validação de widget externo;
 - checklist de cutover;
 - plano para raiz `provadorvirtual.online`.
 
-Status: concluido e publicado em producao no run `26333226813`. Go-live assistido permanece na subpasta `/provadorvirtual_v2/`; cutover para a raiz depende de aceite comercial e piloto BigShop.
+Status: concluído e publicado em produção no run `26333226813`. Go-live assistido permanece na subpasta `/provadorvirtual_v2/`; cutover para a raiz depende de aceite comercial e piloto BigShop.
 
 ## Roadmap de Evolucao - Sprints 13 a 22
 
@@ -204,15 +204,15 @@ Documento detalhado: `docs/intelligent_sizing_roadmap.md`.
 
 Resumo:
 
-- Sprint 13: catalogo inteligente de medidas, importando e normalizando a base do v1.
-- Sprint 14: wizard de tabelas para lojista com modelo pronto, IA, OCR e validacao.
+- Sprint 13: catálogo inteligente de medidas, importando e normalizando a base do v1.
+- Sprint 14: wizard de tabelas para lojista com modelo pronto, IA, OCR e validação.
 - Sprint 15: widget inteligente e gamificado com precisao progressiva.
-- Sprint 16: perfis anonimos/conhecidos de consumidor e consentimento.
-- Sprint 17: benchmark e base por marca, com Zak como primeira referencia controlada.
-- Sprint 18: pacotes de integracao por plataforma, priorizando BigShop um clique.
-- Sprint 19: IA externa em producao com Gemini/OpenAI, custo e guardrails.
+- Sprint 16: perfis anônimos/conhecidos de consumidor e consentimento.
+- Sprint 17: benchmark e base por marca, com Zak como primeira referência controlada.
+- Sprint 18: pacotes de integração por plataforma, priorizando BigShop um clique.
+- Sprint 19: IA externa em produção com Gemini/OpenAI, custo e guardrails.
 - Sprint 20: pipeline de aprendizado e outliers.
-- Sprint 21: recomendacao contextual e comercial.
+- Sprint 21: recomendação contextual e comercial.
 - Sprint 22: preparacao comercial Sizebay-like e piloto.
 
 Status: Sprint 13 a 22 continuam como trilha evolutiva inteligente.
@@ -221,32 +221,32 @@ Status: Sprint 13 a 22 continuam como trilha evolutiva inteligente.
 
 ### Sprint 23 - SaaS admin, empresas e identidade
 
-Objetivo: permitir operacao interna de empresas sem checkout publico e preparar acesso por codigo.
+Objetivo: permitir operação interna de empresas sem checkout público e preparar acesso por código.
 
 Entregas:
 
-- `cpf` no usuario;
-- endereco completo em `merchant_companies`;
+- `cpf` no usuário;
+- endereço completo em `merchant_companies`;
 - `access_code` no formato `aaaa + id com 4 digitos`;
 - comando `php artisan pv:create-master-admin`;
 - endpoints SaaS para listar/criar/editar empresas;
-- endpoint publico para resolver empresa por codigo ou CNPJ;
-- CEP primeiro no formulario SaaS com ViaCEP no frontend.
+- endpoint público para resolver empresa por código ou CNPJ;
+- CEP primeiro no formulário SaaS com ViaCEP no frontend.
 
 Status: implementado e testado.
 
 ### Sprint 24 - Loja teste realista e widget Sizebay-like
 
-Objetivo: simular uma loja real com produtos e botoes do Provador Virtual dentro da pagina de produto.
+Objetivo: simular uma loja real com produtos e botões do Provador Virtual dentro da página de produto.
 
 Entregas:
 
 - loja demo `Provador Virtual Loja Teste`;
 - 4 produtos demo: 2 femininos e 2 masculinos;
 - 4 tabelas de medidas por tipo de produto;
-- storefront publica em `/produto-teste`;
-- pagina de produto por slug;
-- widget com botoes `Descubra seu tamanho` e `Tabela de Medidas`;
+- storefront pública em `/produto-teste`;
+- página de produto por slug;
+- widget com botões `Descubra seu tamanho` e `Tabela de Medidas`;
 - modal de tabela de medidas;
 - assinatura `desenvolvido por provadorvirtual.online`;
 - reuso local de medidas anteriores pelo navegador.
@@ -260,7 +260,7 @@ Objetivo: lojista ajustar o visual do widget/tabela e ver o resultado antes de p
 Entregas:
 
 - tema ampliado: cores, fundo, texto, fonte, tamanho, peso e raio;
-- validacao backend dos novos campos;
+- validação backend dos novos campos;
 - visualizador em tempo real em `/app/widget`;
 - snippet continua independente por plataforma.
 
@@ -268,144 +268,144 @@ Status: implementado e testado.
 
 ### Sprint 26 - Landing e checkout Pagar.me transparente
 
-Objetivo: abrir contratacao publica com checkout transparente e provisionamento inicial.
+Objetivo: abrir contratacao pública com checkout transparente e provisionamento inicial.
 
 Entregas:
 
-- landing publica clean com CTAs;
+- landing pública clean com CTAs;
 - rota `/checkout`;
 - checkout com CEP primeiro e ViaCEP;
-- tokenizacao de cartao no navegador via chave publica Pagar.me;
+- tokenizacao de cartão no navegador via chave pública Pagar.me;
 - pedido direto na Pagar.me pelo backend;
-- Pix, boleto e cartao;
+- Pix, boleto e cartão;
 - tabelas `checkout_sessions` e `payment_events`;
 - webhook `POST /api/v1/webhooks/pagarme`;
 - liberacao da empresa quando pagamento aprovado;
 - tela `/checkout/sucesso`.
 
-Status: implementado e testado. Producao depende de `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY` e `PAGARME_WEBHOOK_SECRET` em `PRODUCTION_ENV`.
+Status: implementado e testado. Produção depende de `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY` e `PAGARME_WEBHOOK_SECRET` em `PRODUCTION_ENV`.
 
 ## Sprints 27 a 30 - Nova trilha comercial e operacional
 
-### Sprint 27 - Site publico raiz e checkout anual unico
+### Sprint 27 - Site público raiz e checkout anual único
 
-Objetivo: substituir a landing v1 na raiz pelo site publico v2 e fechar a regra comercial atual.
+Objetivo: substituir a landing v1 na raiz pelo site público v2 e fechar a regra comercial atual.
 
 Entregas:
 
 - landing v2 com estrutura inspirada no v1, sem promessa de gratuidade;
 - cores v2 no lugar do lilas legado;
-- publicacao da build publica em `https://provadorvirtual.online/`;
+- publicação da build pública em `https://provadorvirtual.online/`;
 - preservacao da aplicacao em `/provadorvirtual_v2/` para backend, widget e rollback;
-- checkout com um plano anual unico;
-- select de plataforma com BigShop como primeira opcao;
-- preco padrao `R$ 189,90/mes` no anual;
-- preco BigShop `R$ 129,90/mes` no anual;
-- cartao em ate 12x e Pix a vista com 5% de desconto;
+- checkout com um plano anual único;
+- select de plataforma com BigShop como primeira opção;
+- preço padrão `R$ 189,90/mes` no anual;
+- preço BigShop `R$ 129,90/mes` no anual;
+- cartão em até 12x e Pix a vista com 5% de desconto;
 - boleto removido;
 - plataforma salva na empresa e no widget;
-- testes de preco por plataforma e bloqueio de boleto.
+- testes de preço por plataforma e bloqueio de boleto.
 
-Status: implementado, publicado e validado em producao no run `26336554760`.
+Status: implementado, publicado e validado em produção no run `26336554760`.
 
 ### Sprint 28 - Monitor de pagamentos e e-mails transacionais
 
-Objetivo: reduzir dependencia exclusiva do webhook e criar operacao de comunicacao transacional.
+Objetivo: reduzir dependencia exclusiva do webhook e criar operação de comunicacao transacional.
 
 Entregas:
 
 - comando Artisan para sincronizar pagamentos pendentes com a Pagar.me;
 - agendamento Laravel do monitor de pagamentos a cada 5 minutos;
-- documentacao de cron cPanel com log;
-- configuracao SaaS de credenciais SMTP, com senha criptografada e sem retorno em claro na API;
+- documentação de cron cPanel com log;
+- configuração SaaS de credenciais SMTP, com senha criptografada e sem retorno em claro na API;
 - CRUD SaaS de e-mails transacionais com listagem, novo, editar e ativar/desativar;
 - templates iniciais: cadastro realizado, pagamento confirmado, aguardando pagamento com Pix, erro no pagamento, recuperacao de senha e renovacao de plano;
-- testes para API de e-mails e comando de sincronizacao de pagamentos.
+- testes para API de e-mails e comando de sincronização de pagamentos.
 
-Status: implementado, publicado e validado em producao no run `26336899986`.
+Status: implementado, publicado e validado em produção no run `26336899986`.
 
 ### Sprint 29 - Login contextual e acesso de empresa
 
-Objetivo: permitir acesso por e-mail ou CPF e selecionar empresa por codigo/CNPJ quando for portal do lojista.
+Objetivo: permitir acesso por e-mail ou CPF e selecionar empresa por código/CNPJ quando for portal do lojista.
 
 Entregas:
 
 - login por e-mail ou CPF no SaaS;
-- login do portal da empresa exigindo codigo da loja ou CNPJ;
-- reuso seguro de usuario com mesmo e-mail/CPF em mais de uma empresa;
-- ajuste de checkout/cadastro para vincular usuario existente quando aplicavel;
-- mensagens claras quando o usuario nao pertence a empresa informada.
+- login do portal da empresa exigindo código da loja ou CNPJ;
+- reuso seguro de usuário com mesmo e-mail/CPF em mais de uma empresa;
+- ajuste de checkout/cadastro para vincular usuário existente quando aplicável;
+- mensagens claras quando o usuário não pertence a empresa informada.
 - contexto de lojista/empresa gravado no token de acesso;
-- painel passa a enviar e exibir o campo `Codigo da loja ou CNPJ`.
+- painel passa a enviar e exibir o campo `Código da loja ou CNPJ`.
 
-Status: implementado, publicado e validado em producao no run `26337254520`.
+Status: implementado, publicado e validado em produção no run `26337254520`.
 
-### Sprint 30 - Usuarios e permissoes por modulo
+### Sprint 30 - Usuários e permissões por módulo
 
-Objetivo: permitir que SaaS e lojista gerenciem usuarios com permissoes granulares.
+Objetivo: permitir que SaaS e lojista gerenciem usuários com permissões granulares.
 
 Entregas:
 
-- CRUD de usuarios no portal SaaS;
-- CRUD de usuarios no portal da empresa;
+- CRUD de usuários no portal SaaS;
+- CRUD de usuários no portal da empresa;
 - listagem, novo, editar e ativar/desativar em todos os CRUDs;
-- permissoes por modulo/menu com visualizar e editar;
+- permissões por módulo/menu com visualizar e editar;
 - ao marcar editar, visualizar fica automaticamente ativo;
-- enforcement inicial no backend para modulos criticos.
+- enforcement inicial no backend para módulos criticos.
 
-Status: implementado, publicado e validado em producao no run `26337792120`.
+Status: implementado, publicado e validado em produção no run `26337792120`.
 
 ## Sprints 31 a 37 - Refinamento operacional e escala
 
-### Sprint 31 - Automacoes de e-mail e ciclo financeiro
+### Sprint 31 - Automações de e-mail e ciclo financeiro
 
 Objetivo: transformar os templates em disparos transacionais reais.
 
 Entregas:
 
 - service de envio usando as credenciais SMTP salvas;
-- disparo de cadastro realizado, pagamento confirmado e erro/pendencia de pagamento;
-- reenvio de Pix pendente com controle de frequencia;
+- disparo de cadastro realizado, pagamento confirmado e erro/pendência de pagamento;
+- reenvio de Pix pendente com controle de frequência;
 - links de checkout de renovacao;
-- historico de envios por empresa e template.
+- histórico de envios por empresa e template.
 
-Status: implementado, publicado e validado em producao no run `26338061259`.
+Status: implementado, publicado e validado em produção no run `26338061259`.
 
-### Sprint 32 - Oferta BigShop travada, site publico e mobile
+### Sprint 32 - Oferta BigShop travada, site público e mobile
 
-Objetivo: impedir uso indevido do desconto BigShop e refinar a experiencia comercial publica.
+Objetivo: impedir uso indevido do desconto BigShop e refinar a experiencia comercial pública.
 
 Entregas:
 
-- bloquear painel de integracoes para mostrar apenas BigShop quando a empresa contratou BigShop;
-- bloquear atualizacao do widget para plataformas diferentes da BigShop nesses contratos;
-- separar planos/precos publicos em duas colunas com CTA proprio;
+- bloquear painel de integrações para mostrar apenas BigShop quando a empresa contratou BigShop;
+- bloquear atualização do widget para plataformas diferentes da BigShop nesses contratos;
+- separar planos/precos públicos em duas colunas com CTA próprio;
 - abrir `Falar com especialista` no WhatsApp oficial;
 - trocar favicon para icone PV laranja/branco;
 - configurar tags OG/Twitter para compartilhamento no WhatsApp;
 - trocar imagens da loja teste por fotos mais fieis aos produtos;
 - revisar responsividade com menu mobile em drawer;
-- melhorar footer publico com copyright e credito OTS;
-- incluir CTA para quem ainda nao tem loja online criar loja na BigShop.
+- melhorar footer público com copyright e crédito OTS;
+- incluir CTA para quem ainda não tem loja online criar loja na BigShop.
 
-Status: implementado, publicado e validado em producao no run `26338411089`.
+Status: implementado, publicado e validado em produção no run `26338411089`.
 
-### Sprint 33 - Login multiempresa e permissoes refinadas
+### Sprint 33 - Login multiempresa e permissões refinadas
 
-Objetivo: completar a experiencia de usuarios que participam de mais de uma empresa.
+Objetivo: completar a experiencia de usuários que participam de mais de uma empresa.
 
 Entregas:
 
-- seletor de empresa apos login quando houver multiplas empresas;
+- seletor de empresa após login quando houver multiplas empresas;
 - escopo por empresa em todas as telas do portal;
-- enforcement completo das permissoes de visualizar/editar;
-- auditoria por usuario/empresa/modulo.
+- enforcement completo das permissões de visualizar/editar;
+- auditoria por usuário/empresa/módulo.
 - alternancia de empresa no topo do painel sem logout;
 - testes cobrindo login multiempresa, troca de contexto, escopo de dados e negacao auditada.
 
-Status: implementado, publicado e validado em producao no run `26338888072`.
+Status: implementado, publicado e validado em produção no run `26338888072`.
 
-### Sprint 34 - Guias de integracao por plataforma
+### Sprint 34 - Guias de integração por plataforma
 
 Objetivo: deixar a implantacao default para o maximo de plataformas.
 
@@ -413,12 +413,12 @@ Entregas:
 
 - guias e snippets para Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom;
 - checklist visual por plataforma no portal;
-- validacao de dominio/snippet instalado;
+- validação de domínio/snippet instalado;
 - matriz de dados suportados por plataforma.
 
-Status: implementado, publicado e validado em producao no run `26339199751`.
+Status: implementado, publicado e validado em produção no run `26339199751`.
 
-### Sprint 35 - BigShop um clique em producao
+### Sprint 35 - BigShop um clique em produção
 
 Objetivo: preparar o ajuste final do lado BigShop e ativar o fluxo nativo.
 
@@ -426,24 +426,24 @@ Entregas:
 
 - contrato final de payload BigShop;
 - teste com loja piloto real;
-- ajustes no codigo da BigShop para instalar widget e mapear produto/tabela;
-- monitoramento de ativacoes BigShop.
+- ajustes no código da BigShop para instalar widget e mapear produto/tabela;
+- monitoramento de ativações BigShop.
 
-Status: implementado, publicado e validado em producao no run `26339426665`. O contrato, o snippet de instalacao e o monitoramento estao prontos no SaaS; teste com loja piloto real segue pendente de `BIGSHOP_ACTIVATION_SECRET`, `store_id` e token `x-api` oficiais.
+Status: implementado, publicado e validado em produção no run `26339426665`. O contrato, o snippet de instalação e o monitoramento estão prontos no SaaS; teste com loja piloto real segue pendente de `BIGSHOP_ACTIVATION_SECRET`, `store_id` e token `x-api` oficiais.
 
 ### Sprint 36 - Inteligencia de perfis e aprendizado
 
-Objetivo: evoluir a recomendacao sem comprometer LGPD e qualidade estatistica.
+Objetivo: evoluir a recomendação sem comprometer LGPD e qualidade estatistica.
 
 Entregas previstas:
 
-- perfis anonimos e conhecidos com consentimento;
-- edicao fluida de medidas salvas no widget;
+- perfis anônimos e conhecidos com consentimento;
+- edição fluida de medidas salvas no widget;
 - sinais de compra/devolucao/feedback;
 - deteccao de outliers antes de alimentar modelos;
-- dashboards de qualidade da recomendacao.
+- dashboards de qualidade da recomendação.
 
-Status: implementado, publicado e validado em producao no run `26339824157`. A Sprint 36 criou perfis anonimos com token local, consentimento e esquecimento; eventos de aprendizado para recomendacao, feedback e sinais comerciais; `outlier_score`/`learning_status`; e paineis de qualidade no analytics. O run anterior `26339739429` falhou por nome automatico de foreign key acima do limite do MySQL e foi corrigido com migration idempotente e identificadores curtos.
+Status: implementado, publicado e validado em produção no run `26339824157`. A Sprint 36 criou perfis anônimos com token local, consentimento e esquecimento; eventos de aprendizado para recomendação, feedback e sinais comerciais; `outlier_score`/`learning_status`; e paineis de qualidade no analytics. O run anterior `26339739429` falhou por nome automático de foreign key acima do limite do MySQL e foi corrigido com migration idempotente e identificadores curtos.
 
 ### Sprint 37 - Piloto comercial e qualidade final
 
@@ -451,126 +451,126 @@ Objetivo: preparar venda assistida e piloto com clientes reais.
 
 Entregas previstas:
 
-- teste real de checkout/Pagar.me em producao;
+- teste real de checkout/Pagar.me em produção;
 - teste ponta a ponta em loja BigShop;
-- performance do widget em paginas de produto reais;
-- revisao responsiva/acessibilidade;
+- performance do widget em páginas de produto reais;
+- revisão responsiva/acessibilidade;
 - pacote comercial e checklist de onboarding.
 
-Status: implementado, publicado e validado em producao no run `26340033238`. A Sprint 37 ampliou go-live/readiness com Pagar.me, transacao real, cron, performance do widget, acessibilidade/mobile e pacote de piloto; tambem criou `docs/commercial_pilot_package.md` e ampliou `scripts/validate-production.ps1`. Testes reais Pagar.me/BigShop seguem pendentes das credenciais oficiais.
+Status: implementado, publicado e validado em produção no run `26340033238`. A Sprint 37 ampliou go-live/readiness com Pagar.me, transação real, cron, performance do widget, acessibilidade/mobile e pacote de piloto; também criou `docs/commercial_pilot_package.md` e ampliou `scripts/validate-production.ps1`. Testes reais Pagar.me/BigShop seguem pendentes das credenciais oficiais.
 
-### Sprint 38 - UX corretiva: navegacao por contexto
+### Sprint 38 - UX corretiva: navegação por contexto
 
 Objetivo: corrigir a mistura entre portal SaaS e portal da empresa, criando uma base visual mais clara antes de refatorar os CRUDs.
 
 Entregas previstas:
 
 - separar shell/menu do SaaS e do portal da empresa;
-- remover menus de lojista da navegacao do SaaS;
+- remover menus de lojista da navegação do SaaS;
 - usar menu lateral em areas autenticadas, com drawer no mobile;
-- manter menu publico separado de operacao interna;
-- atualizar documentacao de rotas e URLs.
+- manter menu público separado de operação interna;
+- atualizar documentação de rotas e URLs.
 
-Status: implementado, publicado e validado em producao no run `26342322716`.
+Status: implementado, publicado e validado em produção no run `26342322716`.
 
 ### Sprint 39 - SaaS list-first e subpaginas
 
-Objetivo: transformar o portal SaaS em telas operacionais de listagem, com formularios em paginas proprias.
+Objetivo: transformar o portal SaaS em telas operacionais de listagem, com formulários em páginas proprias.
 
 Entregas previstas:
 
-- `/saas` apenas como visao geral;
+- `/saas` apenas como visão geral;
 - `/saas/empresas` como listagem de empresas ocupando a tela;
-- `/saas/empresas/nova` e `/saas/empresas/:id/editar` como formularios separados;
+- `/saas/empresas/nova` e `/saas/empresas/:id/editar` como formulários separados;
 - `/saas/emails` como area de e-mail transacional separada;
-- formularios de credenciais SMTP e templates fora da mesma tela da visao geral;
-- manter acoes de criar, editar e ativar/desativar nas listagens.
+- formulários de credenciais SMTP e templates fora da mesma tela da visão geral;
+- manter ações de criar, editar e ativar/desativar nas listagens.
 
-Status: implementado, publicado e validado em producao no run `26342542196`.
+Status: implementado, publicado e validado em produção no run `26342542196`.
 
 ### Sprint 40 - Portal da empresa list-first e subpaginas
 
-Objetivo: revisar as telas do lojista para evitar paginas emboladas e padronizar CRUDs.
+Objetivo: revisar as telas do lojista para evitar páginas emboladas e padronizar CRUDs.
 
 Entregas previstas:
 
-- listagens de produtos, tabelas, usuarios e importacoes ocupando a tela;
-- paginas separadas para novo/editar quando o CRUD exigir muitos campos;
-- revisao de widget, integracoes, assistente, analytics e go-live para reduzir secoes misturadas;
-- submenus claros por operacao: catalogo, configuracao, inteligencia, publicacao e acessos.
+- listagens de produtos, tabelas, usuários e importacoes ocupando a tela;
+- páginas separadas para novo/editar quando o CRUD exigir muitos campos;
+- revisão de widget, integrações, assistente, analytics e go-live para reduzir secoes misturadas;
+- submenus claros por operação: catálogo, configuração, inteligencia, publicação e acessos.
 
-Status: implementado, publicado e validado em producao no run `26342724625`. Produtos, tabelas de medidas e usuarios foram separados em listagens e formularios proprios.
+Status: implementado, publicado e validado em produção no run `26342724625`. Produtos, tabelas de medidas e usuários foram separados em listagens e formulários próprios.
 
-### Sprint 41 - Revisao visual, responsiva e QA de telas
+### Sprint 41 - Revisão visual, responsiva e QA de telas
 
 Objetivo: validar tela por tela a experiencia final em desktop e mobile.
 
 Entregas previstas:
 
 - reduzir desalinhamentos, overflow e tabelas espremidas;
-- revisar hierarquia visual de cards, formularios, botoes e tabelas;
+- revisar hierarquia visual de cards, formulários, botões e tabelas;
 - garantir drawer mobile para SaaS e portal da empresa;
-- ampliar checklist de validacao visual/rotas;
-- publicar e validar producao apos cada ajuste.
+- ampliar checklist de validação visual/rotas;
+- publicar e validar produção após cada ajuste.
 
-Status: implementado. A Sprint 41 consolidou as diretrizes em `docs/portal_ui_guidelines.md`, ajustou alinhamento de tabelas/acoes/cabecalhos, ampliou o validador de producao para as novas rotas SaaS e empresa e reforcou o smoke do GitHub Actions.
+Status: implementado. A Sprint 41 consolidou as diretrizes em `docs/portal_ui_guidelines.md`, ajustou alinhamento de tabelas/ações/cabecalhos, ampliou o validador de produção para as novas rotas SaaS e empresa e reforçou o smoke do GitHub Actions.
 
-### Sprint 42 - Ajustes pos-inspecao visual
+### Sprint 42 - Ajustes pos-inspeção visual
 
-Objetivo: corrigir defaults de formularios que ainda davam sensacao de prototipo ou podiam induzir erro no cadastro.
+Objetivo: corrigir defaults de formulários que ainda davam sensacao de prototipo ou podiam induzir erro no cadastro.
 
 Entregas:
 
-- formulario `Nova empresa` sem nome pre-preenchido como loja teste;
-- plataforma padrao de cadastro interno ajustada para BigShop;
-- formulario `Novo produto` sem categoria/tabela incompatibilizadas por padrao;
-- nova validacao visual dos formularios em producao.
+- formulário `Nova empresa` sem nome pre-preenchido como loja teste;
+- plataforma padrão de cadastro interno ajustada para BigShop;
+- formulário `Novo produto` sem categoria/tabela incompatibilizadas por padrão;
+- nova validação visual dos formulários em produção.
 
-Status: implementado, publicado e validado em producao no run `26343135605`.
+Status: implementado, publicado e validado em produção no run `26343135605`.
 
 ### Sprint 43 - Cerebro inteligente do v1 no v2
 
-Objetivo: transformar a base padrao do v1 no catalogo inteligente inicial do Provador Virtual v2.
+Objetivo: transformar a base padrão do v1 no catálogo inteligente inicial do Provador Virtual v2.
 
 Entregas previstas:
 
 - importar `default_measurement_tables_data.json` do v1 para `backend/database/data`;
-- normalizar genero, tipo de produto, altura, peso, idade e campos de medidas para templates do v2;
+- normalizar gênero, tipo de produto, altura, peso, idade e campos de medidas para templates do v2;
 - trocar os templates fixos por modelos inteligentes consultados pela API `/measurement-templates`;
-- melhorar a tela de nova tabela com seletor de modelo inteligente filtrado por produto/genero;
-- reforcar no site publico e no portal da empresa que a IA acelera tabelas, usa base brasileira e exige revisao humana;
-- limpar a documentacao local de URLs para manter somente login master SaaS e login do portal da empresa.
+- melhorar a tela de nova tabela com seletor de modelo inteligente filtrado por produto/gênero;
+- reforcar no site público e no portal da empresa que a IA acelera tabelas, usa base brasileira e exige revisão humana;
+- limpar a documentação local de URLs para manter somente login master SaaS e login do portal da empresa.
 
-Status: implementado, publicado e validado em producao no run `26343538804`.
+Status: implementado, publicado e validado em produção no run `26343538804`.
 
-### Sprint 44 - CRUD SaaS de usuarios das empresas
+### Sprint 44 - CRUD SaaS de usuários das empresas
 
-Objetivo: separar usuarios internos do SaaS dos usuarios das empresas clientes.
+Objetivo: separar usuários internos do SaaS dos usuários das empresas clientes.
 
 Entregas previstas:
 
-- criar APIs SaaS especificas para listar, criar, editar e ativar/desativar usuarios de empresas clientes;
-- incluir selecao de empresa por codigo/nome/CNPJ e vinculo correto com lojista;
-- criar listagem em tela cheia e formularios dedicados em `/saas/usuarios-empresas`;
-- manter permissoes por modulo do portal da empresa com regra editar seleciona visualizar;
-- atualizar menu, permissao e documentacao para nao misturar usuarios SaaS com usuarios de clientes.
+- criar APIs SaaS especificas para listar, criar, editar e ativar/desativar usuários de empresas clientes;
+- incluir selecao de empresa por código/nome/CNPJ e vinculo correto com lojista;
+- criar listagem em tela cheia e formulários dedicados em `/saas/usuarios-empresas`;
+- manter permissões por módulo do portal da empresa com regra editar seleciona visualizar;
+- atualizar menu, permissão e documentação para não misturar usuários SaaS com usuários de clientes.
 
-Status: implementado, publicado e validado em producao no run `26343868801`.
+Status: implementado, publicado e validado em produção no run `26343868801`.
 
 ### Sprint 45 - Feedback global de salvamento
 
-Objetivo: garantir que qualquer salvamento nos portais SaaS e empresa tenha retorno claro para o usuario.
+Objetivo: garantir que qualquer salvamento nos portais SaaS e empresa tenha retorno claro para o usuário.
 
 Entregas:
 
 - modal pequeno central para estado `Salvando`;
-- modal de sucesso com fechamento automatico em 4 segundos;
-- modal de erro persistente com botao `Fechar`;
-- tratamento amigavel para erros `422`, permissao, registro ausente e falha de conexao;
+- modal de sucesso com fechamento automático em 4 segundos;
+- modal de erro persistente com botão `Fechar`;
+- tratamento amigável para erros `422`, permissão, registro ausente e falha de conexão;
 - interceptador global para `POST`, `PATCH`, `PUT` e `DELETE` autenticados dos portais;
-- exclusoes para login/logout, checkout publico, preview/importacao assistida e acoes que nao sao salvamento.
+- exclusoes para login/logout, checkout público, preview/importacao assistida e ações que não são salvamento.
 
-Status: implementado, publicado e validado em producao no run `26344601240`.
+Status: implementado, publicado e validado em produção no run `26344601240`.
 
 ### Sprint 46 - Recarregamento ao trocar empresa
 
@@ -580,7 +580,36 @@ Entregas:
 
 - `RouterView` operacional passa a usar chave baseada em rota e `activeCompany.id`;
 - telas do portal da empresa desmontam e montam novamente ao trocar empresa;
-- chamadas `onMounted()` de painel, produtos, tabelas, widget, integracoes, analytics, usuarios e go-live passam a buscar os dados do novo contexto;
+- chamadas `onMounted()` de painel, produtos, tabelas, widget, integrações, analytics, usuários e go-live passam a buscar os dados do novo contexto;
 - fluxo vindo do SaaS para o portal da empresa preserva a separacao de menus.
 
-Status: implementado, publicado e validado em producao no run `26344923662`.
+Status: implementado, publicado e validado em produção no run `26344923662`.
+
+### Sprint 47 - Integrações BigShop e XML
+
+Objetivo: aprofundar a estratégia Sizebay-like de integrações por plataforma e permitir sincronização por XML/feed no painel.
+
+Entregas:
+
+- adicionar `feed_url` e `feed_format` nas conexões de plataforma;
+- criar sincronização XML por URL em `POST /api/v1/integrations/{platform}/sync-xml`;
+- mapear XML Google Merchant com produto pai por `g:item_group_id`, variação por `g:id`, tamanho, cor, gênero, disponibilidade, imagem e link;
+- adicionar tooltips nos campos da tela de integrações e botão de sincronização XML;
+- validar feed e API da Luna Moda Festa sem registrar segredos na documentação;
+- documentar matriz por plataforma, pesquisa Sizebay, BigShop e roadmap de conectores.
+
+Status: implementado, testado localmente e enviado ao GitHub no commit `6fd8f46`.
+
+### Sprint 48 - Revisão de textos e idioma dos portais
+
+Objetivo: corrigir textos sem acentos, til e cedilha nos portais SaaS/empresa e registrar a regra como obrigatória nas próximas sprints.
+
+Entregas:
+
+- revisar strings visíveis do frontend autenticado e público;
+- revisar mensagens de API exibidas nos portais;
+- preservar aliases técnicos de APIs/importações sem acento quando fazem parte do contrato de dados;
+- atualizar diretrizes obrigatórias de desenvolvimento e UX para exigir PT-BR correto;
+- reforçar que controles de formulário devem usar estilo global do portal.
+
+Status: implementado e testado localmente com `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=UserAccessApiTest` e `git diff --check`.

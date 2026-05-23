@@ -166,14 +166,14 @@ class LearningSignalService
 
         if ($confidence < 45) {
             $score += 10;
-            $reasons[] = 'confianca baixa';
+            $reasons[] = 'confiança baixa';
         }
 
         $negativeCommerceSignal = in_array($commerceSignal, ['return', 'exchange'], true);
 
         if ($negativeCommerceSignal) {
             $score += 25;
-            $reasons[] = 'sinal comercial exige revisao';
+            $reasons[] = 'sinal comercial exige revisão';
         }
 
         $score = round(min(100, $score), 2);

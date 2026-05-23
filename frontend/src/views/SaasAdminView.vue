@@ -32,7 +32,7 @@ async function loadOverview() {
     companies.value = companiesResponse.data.data
     emailSends.value = emailSendsResponse.data.data
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o painel SaaS.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar o painel SaaS.'
   } finally {
     loading.value = false
   }
@@ -44,8 +44,8 @@ async function loadOverview() {
     <div class="page-heading">
       <div>
         <span class="eyebrow">SaaS</span>
-        <h1>Visao geral</h1>
-        <p>Resumo operacional do Provador Virtual e atalhos para as areas administrativas.</p>
+        <h1>Visão geral</h1>
+        <p>Resumo operacional do Provador Virtual e atalhos para as áreas administrativas.</p>
       </div>
       <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadOverview">
         <i class="fa-solid fa-rotate" aria-hidden="true"></i>
@@ -69,7 +69,7 @@ async function loadOverview() {
       <article class="metric-card">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <strong>{{ summary.recommendations_7d || 0 }}</strong>
-        <span>Recomendacoes em 7 dias</span>
+        <span>Recomendações em 7 dias</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
@@ -82,17 +82,17 @@ async function loadOverview() {
       <RouterLink to="/saas/empresas" class="quick-card">
         <i class="fa-solid fa-building" aria-hidden="true"></i>
         <strong>Empresas</strong>
-        <span>Listagem, novo cadastro, edicao e ativacao.</span>
+        <span>Listagem, novo cadastro, edição e ativação.</span>
       </RouterLink>
       <RouterLink to="/saas/usuarios" class="quick-card">
         <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
-        <strong>Usuarios SaaS</strong>
-        <span>Usuarios internos, suporte e acessos vinculados.</span>
+        <strong>Usuários SaaS</strong>
+        <span>Usuários internos, suporte e acessos vinculados.</span>
       </RouterLink>
       <RouterLink to="/saas/emails" class="quick-card">
         <i class="fa-solid fa-envelope-open-text" aria-hidden="true"></i>
         <strong>E-mails</strong>
-        <span>Credenciais SMTP, templates e historico de envios.</span>
+        <span>Credenciais SMTP, templates e histórico de envios.</span>
       </RouterLink>
     </div>
 
@@ -108,7 +108,7 @@ async function loadOverview() {
         <table>
           <thead>
             <tr>
-              <th>Codigo</th>
+              <th>Código</th>
               <th>Empresa</th>
               <th>Lojista</th>
               <th>Plataforma</th>
@@ -151,7 +151,7 @@ async function loadOverview() {
               <th>Status</th>
               <th>Produtos</th>
               <th>Tabelas</th>
-              <th>Integracoes</th>
+              <th>Integrações</th>
               <th>7 dias</th>
             </tr>
           </thead>

@@ -16,7 +16,7 @@ class EnsurePortalPermission
         $user = $request->user();
 
         if (! $user || ($user->status ?? 'active') !== 'active') {
-            throw new HttpException(403, 'Usuario sem permissao para acessar este recurso.');
+            throw new HttpException(403, 'Usuário sem permissão para acessar este recurso.');
         }
 
         if ($scope === 'saas') {
@@ -29,7 +29,7 @@ class EnsurePortalPermission
                     'action' => $action,
                 ]);
 
-                throw new HttpException(403, 'Sem permissao para acessar este modulo SaaS.');
+                throw new HttpException(403, 'Sem permissão para acessar este módulo SaaS.');
             }
 
             return $next($request);
@@ -47,7 +47,7 @@ class EnsurePortalPermission
                 'action' => $action,
             ]);
 
-            throw new HttpException(403, 'Sem permissao para acessar este modulo.');
+            throw new HttpException(403, 'Sem permissão para acessar este módulo.');
         }
 
         return $next($request);

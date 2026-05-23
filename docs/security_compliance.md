@@ -1,27 +1,27 @@
-# Seguranca, Privacidade e Compliance
+# Segurança, Privacidade e Compliance
 
 Atualizado em: 2026-05-23
 
 ## Principios
 
-- Coletar o minimo necessario.
+- Coletar o mínimo necessário.
 - Explicar ao consumidor por que a medida e pedida.
-- Nao vender nem expor dados corporais.
-- Nao armazenar dados sensiveis sem necessidade.
-- Criptografar credenciais de integracao.
-- Registrar auditoria de acoes sensiveis.
+- Não vender nem expor dados corporais.
+- Não armazenar dados sensíveis sem necessidade.
+- Criptografar credenciais de integração.
+- Registrar auditoria de ações sensíveis.
 
 ## LGPD
 
 Dados do widget podem ser pessoais. Regras:
 
-- evitar nome, email e telefone no fluxo padrao de recomendacao;
+- evitar nome, email e telefone no fluxo padrão de recomendação;
 - usar session anonima;
-- permitir retencao curta configuravel;
+- permitir retenção curta configuravel;
 - permitir exclusao/anomizacao;
-- termos e politica devem explicar finalidade.
+- termos e política devem explicar finalidade.
 
-Status Sprint 36: `shopper_profiles` salva medidas somente com consentimento operacional no widget. O navegador guarda `profile_id` e token local; o banco guarda apenas hash do token. O comprador pode limpar o perfil pelo widget, e `pv:privacy-anonymize` tambem remove medidas/preferencias antigas.
+Status Sprint 36: `shopper_profiles` salva medidas somente com consentimento operacional no widget. O navegador guarda `profile_id` e token local; o banco guarda apenas hash do token. O comprador pode limpar o perfil pelo widget, e `pv:privacy-anonymize` também remove medidas/preferencias antigas.
 
 ## Segredos
 
@@ -40,38 +40,38 @@ Nunca commitar:
 ## CORS e widget
 
 - Durante desenvolvimento, CORS pode ser permissivo.
-- Em producao, liberar dominios configurados por loja.
-- Requisicoes publicas devem ter rate limit.
-- `config-check` deve revelar apenas estado funcional, nao detalhes internos.
+- Em produção, liberar domínios configurados por loja.
+- Requisições públicas devem ter rate limit.
+- `config-check` deve revelar apenas estado funcional, não detalhes internos.
 
-## Integracoes
+## Integrações
 
 - Tokens externos criptografados.
 - Campo de senha/token write-only.
-- Nao logar headers sensiveis.
-- Webhooks com HMAC quando possivel.
-- Payload bruto salvo com mascaramento quando contiver dados sensiveis.
+- Não logar headers sensíveis.
+- Webhooks com HMAC quando possível.
+- Payload bruto salvo com mascaramento quando contiver dados sensíveis.
 
 ## IA
 
-- Nao enviar credenciais para prompts.
+- Não enviar credenciais para prompts.
 - Evitar enviar dados pessoais identificaveis.
 - Guardar versao do prompt/provider/modelo quando usado.
-- Toda tabela sugerida por IA requer revisao humana.
-- Logs de IA guardam hash/resumo operacional, nao conteudo bruto enviado pelo lojista.
+- Toda tabela sugerida por IA requer revisão humana.
+- Logs de IA guardam hash/resumo operacional, não conteúdo bruto enviado pelo lojista.
 
 ## Auditoria
 
 Auditar:
 
 - login e logout;
-- criacao/alteracao de conexoes;
+- criação/alteracao de conexões;
 - alteracao de tabela de medidas;
 - importacoes;
 - mudanca de plano/status;
 - uso de IA;
 - falhas de webhook.
 
-Status Sprint 10: `audit_logs` registra acoes em tabelas de medidas, widget e integracoes com hash de IP/user-agent e metadata sem secrets.
+Status Sprint 10: `audit_logs` registra ações em tabelas de medidas, widget e integrações com hash de IP/user-agent e metadata sem secrets.
 
-Status Sprint 11: `audit_logs` tambem registra login/logout; metadata sensivel e mascarada recursivamente. Widget publico valida `Origin` por dominio configurado, rotas publicas tem rate limit e existem comandos de anonimizacao/limpeza para retencao LGPD.
+Status Sprint 11: `audit_logs` também registra login/logout; metadata sensível é mascarada recursivamente. Widget público valida `Origin` por domínio configurado, rotas públicas têm rate limit e existem comandos de anonimização/limpeza para retenção LGPD.

@@ -21,7 +21,7 @@ async function loadUsers() {
     const { data } = await api.get('/merchant/users')
     users.value = data.data
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar os usuarios.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar os usuários.'
   } finally {
     loading.value = false
   }
@@ -36,10 +36,10 @@ async function toggleUser(user: PortalUser) {
     await api.patch(`/merchant/users/${user.id}`, {
       merchant_user_status: nextStatus,
     })
-    notice.value = nextStatus === 'active' ? 'Usuario ativado.' : 'Usuario desativado.'
+    notice.value = nextStatus === 'active' ? 'Usuário ativado.' : 'Usuário desativado.'
     await loadUsers()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel alterar o status.'
+    error.value = requestError.response?.data?.message || 'Não foi possível alterar o status.'
   }
 }
 </script>
@@ -48,9 +48,9 @@ async function toggleUser(user: PortalUser) {
   <section class="dashboard app-workspace">
     <div class="page-heading">
       <div>
-        <span class="eyebrow">Usuarios</span>
+        <span class="eyebrow">Usuários</span>
         <h1>Acessos da empresa</h1>
-        <p>Listagem de acessos. Cadastro e edicao abrem em tela propria.</p>
+        <p>Listagem de acessos. Cadastro e edição abrem em tela própria.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadUsers">
@@ -59,7 +59,7 @@ async function toggleUser(user: PortalUser) {
         </button>
         <RouterLink class="btn btn-primary" to="/app/usuarios/novo">
           <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
-          Novo usuario
+          Novo usuário
         </RouterLink>
       </div>
     </div>
@@ -69,23 +69,23 @@ async function toggleUser(user: PortalUser) {
 
     <section class="panel-main subsection">
       <div class="subsection-heading">
-        <h2>Usuarios cadastrados</h2>
-        <span>{{ loading ? 'carregando' : `${users.length} usuarios` }}</span>
+        <h2>Usuários cadastrados</h2>
+        <span>{{ loading ? 'carregando' : `${users.length} usuários` }}</span>
       </div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Usuario</th>
+              <th>Usuário</th>
               <th>Perfil</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="!users.length">
-              <td colspan="4">Nenhum usuario cadastrado.</td>
+              <td colspan="4">Nenhum usuário cadastrado.</td>
             </tr>
             <tr v-for="user in users" :key="user.id">
               <td>
@@ -99,7 +99,7 @@ async function toggleUser(user: PortalUser) {
                 </span>
               </td>
               <td class="row-actions">
-                <RouterLink class="icon-link" :to="`/app/usuarios/${user.id}/editar`" title="Editar" aria-label="Editar usuario">
+                <RouterLink class="icon-link" :to="`/app/usuarios/${user.id}/editar`" title="Editar" aria-label="Editar usuário">
                   <i class="fa-solid fa-pen" aria-hidden="true"></i>
                 </RouterLink>
                 <button type="button" :title="user.access?.status === 'active' ? 'Desativar' : 'Ativar'" @click="toggleUser(user)">

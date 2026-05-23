@@ -6,7 +6,7 @@ use Illuminate\Support\Str;
 
 class StandardMeasurementCatalog
 {
-    public const MARKET_BASIS = 'Base inteligente herdada do v1, com medidas padrao do mercado brasileiro por genero, produto, altura, peso, idade e formato corporal.';
+    public const MARKET_BASIS = 'Base inteligente herdada do v1, com medidas padrão do mercado brasileiro por gênero, produto, altura, peso, idade e formato corporal.';
 
     public function templates(): array
     {
@@ -55,7 +55,7 @@ class StandardMeasurementCatalog
     {
         $genderLabel = (string) ($product['genero'] ?? 'Outro');
         $productTypeLabel = (string) ($product['tipo_produto'] ?? 'Produto');
-        $name = (string) ($product['nome_referencia'] ?? "{$productTypeLabel} padrao");
+        $name = (string) ($product['nome_referencia'] ?? "{$productTypeLabel} padrão");
 
         return [
             'key' => Str::slug("v1-{$index}-{$genderLabel}-{$productTypeLabel}-{$name}"),

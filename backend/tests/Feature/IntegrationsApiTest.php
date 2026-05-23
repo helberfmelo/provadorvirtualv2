@@ -185,14 +185,14 @@ XML, 200),
                 'external_store_id' => 'loja-travada',
             ])
             ->assertForbidden()
-            ->assertJsonPath('message', 'Sua empresa contratou o plano BigShop. A integracao disponivel para este contrato e apenas BigShop.');
+            ->assertJsonPath('message', 'Sua empresa contratou o plano BigShop. A integração disponível para este contrato é apenas BigShop.');
 
         $this->withHeaders($headers)
             ->postJson('/api/v1/integrations/shopify/validate-install', [
                 'url' => 'https://provadorvirtual.online/produto-validacao',
             ])
             ->assertForbidden()
-            ->assertJsonPath('message', 'Sua empresa contratou o plano BigShop. A integracao disponivel para este contrato e apenas BigShop.');
+            ->assertJsonPath('message', 'Sua empresa contratou o plano BigShop. A integração disponível para este contrato é apenas BigShop.');
 
         $this->withHeaders($headers)
             ->patchJson('/api/v1/integrations/bigshop', [

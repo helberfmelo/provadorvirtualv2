@@ -19,7 +19,7 @@ class BigShopActivationController extends Controller
 
         if (! $secret) {
             return response()->json([
-                'message' => 'Ativacao BigShop ainda nao configurada.',
+                'message' => 'Ativação BigShop ainda não configurada.',
             ], Response::HTTP_SERVICE_UNAVAILABLE);
         }
 

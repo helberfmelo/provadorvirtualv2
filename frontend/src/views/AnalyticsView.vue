@@ -78,7 +78,7 @@ async function loadAnalytics() {
     analytics.value = analyticsResponse.data.data
     auditLogs.value = auditResponse.data.data
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar analytics.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar analytics.'
   } finally {
     loading.value = false
   }
@@ -95,7 +95,7 @@ function eventLabel(event: string) {
 function statusLabel(status: string) {
   const labels: Record<string, string> = {
     accepted: 'Aproveitado',
-    review: 'Revisao',
+    review: 'Revisão',
     blocked_outlier: 'Bloqueado',
   }
 
@@ -108,7 +108,7 @@ function statusLabel(status: string) {
     <div class="page-heading">
       <div>
         <span class="eyebrow">Analytics</span>
-        <h1>Recomendacoes e qualidade</h1>
+        <h1>Recomendações e qualidade</h1>
       </div>
       <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadAnalytics">
         <i class="fa-solid fa-rotate" aria-hidden="true"></i>
@@ -148,7 +148,7 @@ function statusLabel(status: string) {
         <article class="metric-card">
           <i class="fa-solid fa-brain" aria-hidden="true"></i>
           <strong>{{ analytics.summary.average_profile_quality }}</strong>
-          <span>qualidade media do perfil</span>
+          <span>qualidade média do perfil</span>
         </article>
         <article class="metric-card">
           <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
@@ -166,7 +166,7 @@ function statusLabel(status: string) {
         <section class="panel-main">
           <div class="subsection-heading">
             <h2>Volume diario</h2>
-            <span>{{ analytics.summary.average_confidence }} confianca media</span>
+            <span>{{ analytics.summary.average_confidence }} confiança média</span>
           </div>
           <div class="bar-list">
             <div v-for="day in analytics.daily" :key="day.date" class="bar-row">
@@ -182,7 +182,7 @@ function statusLabel(status: string) {
             <h2>Tamanhos</h2>
             <span>{{ analytics.sizes.length }} com uso</span>
           </div>
-          <div v-if="!analytics.sizes.length" class="empty-state">Sem recomendacoes suficientes.</div>
+          <div v-if="!analytics.sizes.length" class="empty-state">Sem recomendações suficientes.</div>
           <div v-else class="summary-strip">
             <span v-for="size in analytics.sizes" :key="size.size">
               <strong>{{ size.count }}</strong>
@@ -196,15 +196,15 @@ function statusLabel(status: string) {
         <section class="panel-main">
           <div class="subsection-heading">
             <h2>Produtos</h2>
-            <span>{{ analytics.products.length }} com recomendacao</span>
+            <span>{{ analytics.products.length }} com recomendação</span>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Produto</th>
-                  <th>Recomendacoes</th>
-                  <th>Confianca</th>
+                  <th>Recomendações</th>
+                  <th>Confiança</th>
                   <th>Outlier</th>
                 </tr>
               </thead>
@@ -313,7 +313,7 @@ function statusLabel(status: string) {
             <thead>
               <tr>
                 <th>Evento</th>
-                <th>Usuario</th>
+                <th>Usuário</th>
                 <th>Categoria</th>
                 <th>Data</th>
               </tr>

@@ -64,7 +64,7 @@ class UserAccessController extends Controller
         $data = $this->validateUserPayload($request, updating: true, allowSaasRole: true);
 
         if ((int) $request->user()->id === (int) $user->id && ($data['status'] ?? null) === 'inactive') {
-            throw new HttpException(422, 'Nao desative seu proprio usuario SaaS.');
+            throw new HttpException(422, 'Não desative seu próprio usuário SaaS.');
         }
 
         $user = $this->saveUser($data, $user, allowRole: true);
@@ -110,7 +110,7 @@ class UserAccessController extends Controller
         $data = $this->validateUserPayload($request, allowSaasRole: true);
 
         if (! filled($data['merchant_company_id'] ?? null)) {
-            throw new HttpException(422, 'Selecione a empresa cliente para vincular o usuario.');
+            throw new HttpException(422, 'Selecione a empresa cliente para vincular o usuário.');
         }
 
         $company = MerchantCompany::query()
@@ -136,7 +136,7 @@ class UserAccessController extends Controller
         $data = $this->validateUserPayload($request, updating: true, allowSaasRole: true);
 
         if ((int) $request->user()->id === (int) $user->id && ($data['status'] ?? null) === 'inactive') {
-            throw new HttpException(422, 'Nao desative seu proprio usuario SaaS.');
+            throw new HttpException(422, 'Não desative seu próprio usuário SaaS.');
         }
 
         $company = $this->companyForCompanyUser($user, $data['merchant_company_id'] ?? null);
@@ -196,13 +196,13 @@ class UserAccessController extends Controller
         $this->ensureMerchantPermission($request, $merchant, 'edit');
 
         if (! $user->merchants()->whereKey($merchant->id)->exists()) {
-            throw new HttpException(404, 'Usuario nao encontrado nesta empresa.');
+            throw new HttpException(404, 'Usuário não encontrado nesta empresa.');
         }
 
         $data = $this->validateUserPayload($request, updating: true);
 
         if ((int) $request->user()->id === (int) $user->id && ($data['merchant_user_status'] ?? null) === 'inactive') {
-            throw new HttpException(422, 'Nao desative seu proprio acesso a empresa.');
+            throw new HttpException(422, 'Não desative seu próprio acesso à empresa.');
         }
 
         $data['role'] = $user->role;
@@ -293,7 +293,7 @@ class UserAccessController extends Controller
             : null;
 
         if ($emailUser && $cpfUser && (int) $emailUser->id !== (int) $cpfUser->id) {
-            throw new HttpException(422, 'E-mail e CPF ja pertencem a usuarios diferentes.');
+            throw new HttpException(422, 'E-mail e CPF já pertencem a usuários diferentes.');
         }
 
         return $emailUser ?: $cpfUser ?: new User;
@@ -308,7 +308,7 @@ class UserAccessController extends Controller
                 ->exists();
 
             if ($exists) {
-                throw new HttpException(422, 'Este e-mail ja esta em uso.');
+                throw new HttpException(422, 'Este e-mail já está em uso.');
             }
         }
 
@@ -319,7 +319,7 @@ class UserAccessController extends Controller
                 ->exists();
 
             if ($exists) {
-                throw new HttpException(422, 'Este CPF ja esta em uso.');
+                throw new HttpException(422, 'Este CPF já está em uso.');
             }
         }
     }
@@ -382,7 +382,7 @@ class UserAccessController extends Controller
         $accessMerchant = $user->merchants()->first();
 
         if (! $accessMerchant) {
-            throw new HttpException(404, 'Usuario nao encontrado nas empresas clientes.');
+            throw new HttpException(404, 'Usuário não encontrado nas empresas clientes.');
         }
 
         if ($accessMerchant->pivot?->merchant_company_id) {
@@ -410,7 +410,7 @@ class UserAccessController extends Controller
     private function ensureMerchantPermission(Request $request, Merchant $merchant, string $action): void
     {
         if (! PermissionCatalog::canMerchant($request->user(), $merchant, 'users', $action)) {
-            throw new HttpException(403, 'Sem permissao para gerenciar usuarios.');
+            throw new HttpException(403, 'Sem permissão para gerenciar usuários.');
         }
     }
 

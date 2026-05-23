@@ -111,7 +111,7 @@ async function loadConfig() {
       form.platform = queryPlatform
     }
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel iniciar o checkout.'
+    error.value = requestError.response?.data?.message || 'Não foi possível iniciar o checkout.'
   } finally {
     loading.value = false
   }
@@ -170,7 +170,7 @@ async function submitCheckout() {
     const { data } = await api.post('/public/checkout', payload)
     await router.push(`/checkout/sucesso?ref=${encodeURIComponent(data.reference)}`)
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || requestError.message || 'Nao foi possivel concluir o checkout.'
+    error.value = requestError.response?.data?.message || requestError.message || 'Não foi possível concluir o checkout.'
   } finally {
     submitting.value = false
   }
@@ -188,7 +188,7 @@ function price(cents: number) {
         <span class="eyebrow">Checkout</span>
         <h1>Contratar Provador Virtual</h1>
       </div>
-      <strong class="checkout-total">{{ price(monthlyCents) }}/mes</strong>
+      <strong class="checkout-total">{{ price(monthlyCents) }}/mês</strong>
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
@@ -198,16 +198,16 @@ function price(cents: number) {
       <section class="panel-main admin-form">
         <div class="subsection-heading">
           <h2>{{ selectedPlan?.name }}</h2>
-          <span>Plano anual unico</span>
+          <span>Plano anual único</span>
         </div>
 
         <div class="annual-plan-summary">
           <div>
-            <strong>{{ price(monthlyCents) }}/mes</strong>
+            <strong>{{ price(monthlyCents) }}/mês</strong>
             <span>{{ activePricing?.label }}</span>
           </div>
           <p>{{ selectedPlan?.description }}</p>
-          <small>Cartao em ate 12x ou Pix a vista com {{ activePricing?.pix_discount_percent || 5 }}% de desconto.</small>
+          <small>Cartão em até 12x ou Pix à vista com {{ activePricing?.pix_discount_percent || 5 }}% de desconto.</small>
         </div>
 
         <div class="form-grid">
@@ -218,7 +218,7 @@ function price(cents: number) {
                 {{ platform.label }}
               </option>
             </select>
-            <small v-if="form.platform === 'bigshop'">Cliente BigShop tem preco especial.</small>
+            <small v-if="form.platform === 'bigshop'">Cliente BigShop tem preço especial.</small>
           </label>
           <label>
             Empresa
@@ -236,13 +236,13 @@ function price(cents: number) {
             <input v-model="form.company_document" inputmode="numeric" required />
           </label>
           <label>
-            Dominio
+            Domínio
             <input v-model="form.company_domain" placeholder="loja.com.br" />
           </label>
           <label>
             CEP
             <input v-model="form.company_zip_code" inputmode="numeric" required @blur="lookupCep" />
-            <small>{{ cepLoading ? 'Buscando endereco...' : ' ' }}</small>
+            <small>{{ cepLoading ? 'Buscando endereço...' : ' ' }}</small>
           </label>
         </div>
 
@@ -252,7 +252,7 @@ function price(cents: number) {
             <input v-model="form.company_address_street" required />
           </label>
           <label>
-            Numero
+            Número
             <input v-model="form.company_address_number" required />
           </label>
           <label>
@@ -280,7 +280,7 @@ function price(cents: number) {
       <section class="panel-main admin-form">
         <div class="subsection-heading">
           <h2>Acesso e pagamento</h2>
-          <span>{{ form.payment_method === 'credit_card' ? 'Cartao' : 'Pix' }}</span>
+          <span>{{ form.payment_method === 'credit_card' ? 'Cartão' : 'Pix' }}</span>
         </div>
 
         <div class="form-grid">
@@ -323,17 +323,17 @@ function price(cents: number) {
             :class="{ active: form.payment_method === 'credit_card' }"
             @click="form.payment_method = 'credit_card'"
           >
-            Cartao
+            Cartão
           </button>
         </div>
 
         <div v-if="form.payment_method === 'credit_card'" class="form-grid">
           <label>
-            Nome no cartao
+            Nome no cartão
             <input v-model="card.holder_name" :required="form.payment_method === 'credit_card'" />
           </label>
           <label>
-            Numero
+            Número
             <input v-model="card.number" inputmode="numeric" :required="form.payment_method === 'credit_card'" />
           </label>
           <label>
@@ -359,7 +359,7 @@ function price(cents: number) {
         </div>
 
         <div class="checkout-summary">
-          <span>{{ form.payment_method === 'pix' ? 'Total no Pix' : `${form.installments}x no cartao` }}</span>
+          <span>{{ form.payment_method === 'pix' ? 'Total no Pix' : `${form.installments}x no cartão` }}</span>
           <strong>{{ form.payment_method === 'pix' ? price(payableCents) : price(cardInstallmentCents) }}</strong>
         </div>
         <div class="checkout-summary muted">
@@ -369,7 +369,7 @@ function price(cents: number) {
 
         <button class="btn btn-primary" type="submit" :disabled="submitting">
           <i class="fa-solid fa-lock" aria-hidden="true"></i>
-          {{ submitting ? 'Processando...' : 'Finalizar contratacao' }}
+          {{ submitting ? 'Processando...' : 'Finalizar contratação' }}
         </button>
       </section>
     </form>

@@ -4,7 +4,7 @@ Atualizado em: 2026-05-23
 
 ## Decisao atual
 
-Depois da Sprint 27, o site publico comercial do v2 deve rodar na raiz:
+Depois da Sprint 27, o site público comercial do v2 deve rodar na raiz:
 
 - `https://provadorvirtual.online/`
 
@@ -23,27 +23,27 @@ Implementado:
 - tela protegida `/app/go-live`;
 - script `scripts/validate-production.ps1`;
 - arquivo `tools/widget-external-smoke.html` para validar o widget fora do app;
-- checklist de cutover e pendencias externas.
+- checklist de cutover e pendências externas.
 
-Publicado em producao no run `26333226813`. Validacao final com
+Publicado em produção no run `26333226813`. Validação final com
 `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
 
 ## Checklist de go-live
 
-Obrigatorio antes de campanha publica:
+Obrigatório antes de campanha pública:
 
 - GitHub Actions verde no ultimo commit;
 - `GET /api/v1/health` retornando `ok`;
 - `GET /api/v1/ops/status` retornando `ok`;
-- `/produto-teste` funcionando em producao;
+- `/produto-teste` funcionando em produção;
 - widget carregando por snippet real;
-- CORS bloqueando origem nao cadastrada e liberando dominio configurado;
+- CORS bloqueando origem não cadastrada e liberando domínio configurado;
 - produto piloto com tabela de medidas revisada;
 - backup criado no deploy;
-- politica de privacidade e termos publicados;
+- política de privacidade e termos publicados;
 - plano de rollback revisado.
 
-## Validacao automatizada
+## Validação automatizada
 
 Rodar:
 
@@ -53,15 +53,15 @@ Rodar:
 
 O script valida:
 
-- paginas publicas principais;
+- páginas públicas principais;
 - health e ops status;
 - produto teste;
-- recomendacao publica;
+- recomendação pública;
 - bloqueio/liberacao de CORS;
 - login demo;
-- endpoint de prontidao.
+- endpoint de prontidão.
 
-## Validacao externa do widget
+## Validação externa do widget
 
 Servir o arquivo de smoke por HTTP local:
 
@@ -75,20 +75,20 @@ Depois abrir:
 http://localhost:8090/widget-external-smoke.html
 ```
 
-`localhost` esta cadastrado nos dominios demo. Para loja real, cadastrar o dominio
+`localhost` esta cadastrado nos domínios demo. Para loja real, cadastrar o domínio
 final em `/app/widget` antes de instalar o snippet.
 
 ## Cutover para raiz
 
 Estrategia executada:
 
-- build estatica Vue com `VITE_APP_BASE_PATH=/` publicada no docroot;
+- build estática Vue com `VITE_APP_BASE_PATH=/` publicada no docroot;
 - API e widget continuam servidos por `/provadorvirtual_v2/`;
 - `.htaccess` da raiz preserva `/provadorvirtual_v1/` e `/provadorvirtual_v2/`;
-- `/api/*`, `/widget/*` e `/up` na raiz encaminham para o v2 quando necessario;
+- `/api/*`, `/widget/*` e `/up` na raiz encaminham para o v2 quando necessário;
 - backup da raiz fica em `/home1/opents62/deploy_backups/provadorvirtual_root`.
 
-Validar apos cada deploy:
+Validar após cada deploy:
 
 - `/`;
 - `/checkout`;
@@ -107,7 +107,7 @@ Ainda falta receber:
 - `BIGSHOP_ACTIVATION_SECRET`;
 - webhook secret, se existir.
 
-Sem esses dados, o produto esta pronto para demo e instalacao universal, mas o
+Sem esses dados, o produto esta pronto para demo e instalação universal, mas o
 piloto BigShop real permanece pendente.
 
 ## IA/OCR
@@ -123,12 +123,12 @@ Sem chave externa, o assistente continua operando com parser local para texto/CS
 
 `/app/go-live`, `GET /api/v1/go-live/readiness` e `scripts/validate-production.ps1` passaram a incluir:
 
-- checks de Pagar.me e transacao real;
+- checks de Pagar.me e transação real;
 - check de cron/scheduler recente;
 - check de peso do widget;
-- check basico de acessibilidade/mobile do widget;
-- pacote de piloto com links comerciais, onboarding, comandos e pendencias reais.
+- check básico de acessibilidade/mobile do widget;
+- pacote de piloto com links comerciais, onboarding, comandos e pendências reais.
 
 Roteiro completo em `docs/commercial_pilot_package.md`.
 
-Publicado em producao no run `26340033238`; `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+Publicado em produção no run `26340033238`; `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

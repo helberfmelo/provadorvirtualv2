@@ -12,7 +12,7 @@ const payment = ref<any>(null)
 onMounted(async () => {
   const reference = String(route.query.ref || '')
   if (!reference) {
-    error.value = 'Referencia de checkout nao informada.'
+    error.value = 'Referência de checkout não informada.'
     loading.value = false
     return
   }
@@ -22,7 +22,7 @@ onMounted(async () => {
     session.value = data.session
     payment.value = data.payment
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o checkout.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar o checkout.'
   } finally {
     loading.value = false
   }
@@ -40,7 +40,7 @@ onMounted(async () => {
         <div class="summary-strip">
           <span>
             <strong>{{ session.company?.access_code }}</strong>
-            <small>Codigo da empresa</small>
+            <small>Código da empresa</small>
           </span>
           <span>
             <strong>{{ session.company?.status }}</strong>
@@ -55,7 +55,7 @@ onMounted(async () => {
         <div v-if="payment?.pix?.qr_code" class="payment-box">
           <strong>Pix copia e cola</strong>
           <textarea :value="payment.pix.qr_code" rows="4" readonly></textarea>
-          <small>O acesso da empresa sera liberado automaticamente quando a Pagar.me confirmar o pagamento.</small>
+          <small>O acesso da empresa será liberado automaticamente quando a Pagar.me confirmar o pagamento.</small>
         </div>
 
         <div class="action-row">

@@ -56,7 +56,7 @@ async function loadForm() {
     if (editing.value) {
       const user = users.value.find((item) => item.id === userId.value)
       if (!user) {
-        error.value = 'Usuario nao encontrado.'
+        error.value = 'Usuário não encontrado.'
         return
       }
       editUser(user)
@@ -65,7 +65,7 @@ async function loadForm() {
 
     permissionDraft.value = emptyPermissions(merchantModules.value)
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o usuario da empresa.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar o usuário da empresa.'
   } finally {
     loading.value = false
   }
@@ -132,7 +132,7 @@ async function saveUser() {
       : await api.post('/saas/company-users', payload)
     await router.push('/saas/usuarios-empresas')
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar o usuario da empresa.'
+    error.value = requestError.response?.data?.message || 'Não foi possível salvar o usuário da empresa.'
   } finally {
     saving.value = false
   }
@@ -144,8 +144,8 @@ async function saveUser() {
     <div class="page-heading">
       <div>
         <span class="eyebrow">SaaS</span>
-        <h1>{{ editing ? 'Editar usuario da empresa' : 'Novo usuario da empresa' }}</h1>
-        <p>Vincule o usuario a uma empresa cliente e defina os modulos do portal da empresa.</p>
+        <h1>{{ editing ? 'Editar usuário da empresa' : 'Novo usuário da empresa' }}</h1>
+        <p>Vincule o usuário a uma empresa cliente e defina os módulos do portal da empresa.</p>
       </div>
       <RouterLink class="btn btn-secondary" to="/saas/usuarios-empresas">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
@@ -184,7 +184,7 @@ async function saveUser() {
       </div>
 
       <div v-if="selectedCompany" class="detail-strip">
-        <span><strong>Codigo</strong>{{ selectedCompany.access_code || selectedCompany.id }}</span>
+        <span><strong>Código</strong>{{ selectedCompany.access_code || selectedCompany.id }}</span>
         <span><strong>Plataforma</strong>{{ selectedCompany.platform }}</span>
         <span><strong>Lojista</strong>{{ selectedCompany.merchant.name }}</span>
       </div>
@@ -253,7 +253,7 @@ async function saveUser() {
       <div class="action-row compact">
         <button class="btn btn-primary" type="submit" :disabled="saving || loading">
           <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-          {{ saving ? 'Salvando...' : 'Salvar usuario' }}
+          {{ saving ? 'Salvando...' : 'Salvar usuário' }}
         </button>
       </div>
     </form>

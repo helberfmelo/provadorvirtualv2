@@ -21,7 +21,7 @@ async function loadProducts() {
     const { data } = await api.get('/products')
     products.value = data.data
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar os produtos.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar os produtos.'
   } finally {
     loading.value = false
   }
@@ -40,7 +40,7 @@ async function removeProduct(product: Product) {
       <div>
         <span class="eyebrow">Produtos</span>
         <h1>Produtos</h1>
-        <p>Listagem de produtos da empresa. Cadastro, edicao e variacoes ficam em tela propria.</p>
+        <p>Listagem de produtos da empresa. Cadastro, edição e variações ficam em tela própria.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadProducts">
@@ -69,9 +69,9 @@ async function removeProduct(product: Product) {
               <th>Produto</th>
               <th>Categoria</th>
               <th>Tabela</th>
-              <th>Variacoes</th>
+              <th>Variações</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>

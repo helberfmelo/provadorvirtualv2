@@ -17,10 +17,10 @@ const currentYear = new Date().getFullYear()
         <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
         Para e-commerces de moda
       </span>
-      <h1>Transforme a experiencia de compra na sua loja de moda</h1>
+      <h1>Transforme a experiência de compra na sua loja de moda</h1>
       <p>
         Com o Provador Virtual, seus clientes descobrem o tamanho ideal em poucos passos. A IA usa tabelas da loja,
-        base brasileira de medidas, perfil corporal e historico autorizado para reduzir duvida, troca e abandono.
+        base brasileira de medidas, perfil corporal e histórico autorizado para reduzir dúvida, troca e abandono.
       </p>
       <div class="hero-actions">
         <RouterLink to="/produto-teste" class="btn btn-primary">
@@ -38,22 +38,22 @@ const currentYear = new Date().getFullYear()
   <section class="landing-section">
     <div class="landing-split">
       <div class="landing-media">
-        <img :src="productImageUrl" alt="Produto de moda em pagina de loja online" />
+        <img :src="productImageUrl" alt="Produto de moda em página de loja online" />
       </div>
       <div class="landing-copy">
         <span class="eyebrow">
           <i class="fa-solid fa-box-open" aria-hidden="true"></i>
-          Menos devolucoes
+          Menos devoluções
         </span>
-        <h2>Sua loja ainda perde vendas por duvida de tamanho?</h2>
+        <h2>Sua loja ainda perde vendas por dúvida de tamanho?</h2>
         <p>
-          O comprador nao quer decorar tabela, medir tudo de novo ou trocar peca depois. Ele quer uma resposta clara:
+          O comprador não quer decorar tabela, medir tudo de novo ou trocar peça depois. Ele quer uma resposta clara:
           qual tamanho tem mais chance de servir bem naquele produto.
         </p>
         <ul class="landing-checks">
           <li><i class="fa-solid fa-check" aria-hidden="true"></i><strong>Menos custo:</strong> reduza trocas por tamanho errado.</li>
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i><strong>Mais conversao:</strong> tire a duvida antes do carrinho.</li>
-          <li><i class="fa-solid fa-check" aria-hidden="true"></i><strong>Mais dados:</strong> aprenda com recomendacoes, feedbacks e outliers.</li>
+          <li><i class="fa-solid fa-check" aria-hidden="true"></i><strong>Mais conversão:</strong> tire a dúvida antes do carrinho.</li>
+          <li><i class="fa-solid fa-check" aria-hidden="true"></i><strong>Mais dados:</strong> aprenda com recomendações, feedbacks e outliers.</li>
         </ul>
         <RouterLink :to="checkoutDefault" class="btn btn-primary">
           <i class="fa-solid fa-bolt" aria-hidden="true"></i>
@@ -66,23 +66,23 @@ const currentYear = new Date().getFullYear()
   <section class="landing-section muted-band">
     <div class="landing-split reverse">
       <div class="landing-media">
-        <img :src="widgetPreviewUrl" alt="Widget do Provador Virtual em uma experiencia de compra" />
+        <img :src="widgetPreviewUrl" alt="Widget do Provador Virtual em uma experiência de compra" />
       </div>
       <div class="landing-copy">
         <span class="eyebrow">
           <i class="fa-solid fa-brain" aria-hidden="true"></i>
-          Inteligencia simples de usar
+          Inteligência simples de usar
         </span>
         <h2>IA e regras de medidas trabalhando sem complicar a compra</h2>
         <p>
           O lojista parte de modelos prontos do mercado brasileiro, pode extrair tabela por texto, CSV ou imagem e
-          revisa tudo antes de publicar. Na loja, o motor combina esses dados com sinais reais de uso para evoluir com seguranca.
+          revisa tudo antes de publicar. Na loja, o motor combina esses dados com sinais reais de uso para evoluir com segurança.
         </p>
         <div class="landing-steps">
           <article>
             <span>1</span>
-            <strong>Medidas e preferencias</strong>
-            <small>O cliente informa o basico, refina se quiser e pode reaproveitar dados salvos com consentimento.</small>
+            <strong>Medidas e preferências</strong>
+            <small>O cliente informa o básico, refina se quiser e pode reaproveitar dados salvos com consentimento.</small>
           </article>
           <article>
             <span>2</span>
@@ -92,7 +92,7 @@ const currentYear = new Date().getFullYear()
           <article>
             <span>3</span>
             <strong>Tamanho recomendado</strong>
-            <small>A loja mostra a indicacao, a tabela de medidas do produto e aprende com feedbacks confiaveis.</small>
+            <small>A loja mostra a indicação, a tabela de medidas do produto e aprende com feedbacks confiáveis.</small>
           </article>
         </div>
       </div>
@@ -101,17 +101,17 @@ const currentYear = new Date().getFullYear()
 
   <section id="planos" class="landing-section">
     <div class="landing-heading">
-      <span class="eyebrow">Plano unico</span>
-      <h2>Preco direto, com desconto para clientes BigShop</h2>
-      <p>Assinatura anual com pagamento em ate 12x no cartao ou Pix a vista com 5% de desconto.</p>
+      <span class="eyebrow">Plano único</span>
+      <h2>Preço direto, com desconto para clientes BigShop</h2>
+      <p>Assinatura anual com pagamento em até 12x no cartão ou Pix à vista com 5% de desconto.</p>
     </div>
 
     <div class="pricing-strip">
       <article>
         <span>Demais plataformas</span>
-        <strong>R$ 189,90/mes</strong>
-        <p>Para lojas em Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou instalacao personalizada.</p>
-        <small>Total anual em ate 12x no cartao. Pix a vista com 5% de desconto.</small>
+        <strong>R$ 189,90/mês</strong>
+        <p>Para lojas em Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou instalação personalizada.</p>
+        <small>Total anual em até 12x no cartão. Pix à vista com 5% de desconto.</small>
         <RouterLink :to="checkoutDefault" class="btn btn-secondary">
           <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
           Contratar este plano
@@ -119,9 +119,9 @@ const currentYear = new Date().getFullYear()
       </article>
       <article class="highlight">
         <span>BigShop</span>
-        <strong>R$ 129,90/mes</strong>
-        <p>Preco especial exclusivo para lojas BigShop, com instalacao guiada apenas para BigShop.</p>
-        <small>Integracao mais simples do ecossistema, sem liberar outras plataformas no painel.</small>
+        <strong>R$ 129,90/mês</strong>
+        <p>Preço especial exclusivo para lojas BigShop, com instalação guiada apenas para BigShop.</p>
+        <small>Integração mais simples do ecossistema, sem liberar outras plataformas no painel.</small>
         <RouterLink :to="checkoutBigShop" class="btn btn-primary">
           <i class="fa-solid fa-bolt" aria-hidden="true"></i>
           Contratar BigShop
@@ -133,39 +133,39 @@ const currentYear = new Date().getFullYear()
   <section class="landing-section muted-band">
     <div class="landing-heading">
       <span class="eyebrow">Vantagens</span>
-      <h2>O que o lojista e o comprador sentem na pratica</h2>
+      <h2>O que o lojista e o comprador sentem na prática</h2>
     </div>
 
     <div class="metric-grid landing-benefits">
       <article class="metric-card">
         <i class="fa-solid fa-bullseye" aria-hidden="true"></i>
-        <strong>Recomendacao precisa</strong>
-        <span>Tamanho ideal por produto, categoria, tabela, medidas e preferencia de caimento.</span>
+        <strong>Recomendação precisa</strong>
+        <span>Tamanho ideal por produto, categoria, tabela, medidas e preferência de caimento.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-table-list" aria-hidden="true"></i>
         <strong>Tabelas com IA</strong>
-        <span>Modelos prontos por categoria, sugestao por texto/CSV/imagem e revisao humana antes de publicar.</span>
+        <span>Modelos prontos por categoria, sugestão por texto/CSV/imagem e revisão humana antes de publicar.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-plug" aria-hidden="true"></i>
-        <strong>Integracao padrao</strong>
+        <strong>Integração padrão</strong>
         <span>BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e script universal.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-palette" aria-hidden="true"></i>
-        <strong>Visual configuravel</strong>
-        <span>O lojista ajusta cores, fonte e botoes do widget com preview antes de publicar.</span>
+        <strong>Visual configurável</strong>
+        <span>O lojista ajusta cores, fonte e botões do widget com preview antes de publicar.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         <strong>Aprendizado seguro</strong>
-        <span>Dados de uso, recomendacoes, produtos sem tabela e descarte de sinais fora da media.</span>
+        <span>Dados de uso, recomendações, produtos sem tabela e descarte de sinais fora da média.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
         <strong>LGPD desde a base</strong>
-        <span>Historico de medidas com cuidado, consentimento e descarte de sinais fora da media.</span>
+        <span>Histórico de medidas com cuidado, consentimento e descarte de sinais fora da média.</span>
       </article>
     </div>
   </section>
@@ -173,8 +173,8 @@ const currentYear = new Date().getFullYear()
   <section class="landing-section bigshop-store-band">
     <div class="landing-heading">
       <span class="eyebrow">BigShop</span>
-      <h2>Ainda nao tem uma loja online?</h2>
-      <p>Crie agora sua loja na BigShop e ja comece com o caminho mais simples para usar o Provador Virtual.</p>
+      <h2>Ainda não tem uma loja online?</h2>
+      <p>Crie agora sua loja na BigShop e já comece com o caminho mais simples para usar o Provador Virtual.</p>
       <a href="https://bigshop.com.br" target="_blank" rel="noopener" class="btn btn-primary">
         <i class="fa-solid fa-store" aria-hidden="true"></i>
         Crie agora sua loja na BigShop
@@ -185,8 +185,8 @@ const currentYear = new Date().getFullYear()
   <section class="landing-cta">
     <div>
       <span class="eyebrow">Provador Virtual</span>
-      <h2>Pronto para vender moda com menos duvida de tamanho?</h2>
-      <p>Teste a experiencia em uma loja ficticia realista ou contrate o plano anual para ativar sua empresa.</p>
+      <h2>Pronto para vender moda com menos dúvida de tamanho?</h2>
+      <p>Teste a experiência em uma loja fictícia realista ou contrate o plano anual para ativar sua empresa.</p>
       <div class="hero-actions">
         <RouterLink to="/produto-teste" class="btn btn-secondary">
           <i class="fa-solid fa-shirt" aria-hidden="true"></i>
@@ -210,11 +210,11 @@ const currentYear = new Date().getFullYear()
         <span class="brand-mark">PV</span>
         <div>
           <strong>Provador Virtual</strong>
-          <small>Recomendacao de tamanho simples para lojas de moda.</small>
+          <small>Recomendação de tamanho simples para lojas de moda.</small>
         </div>
       </div>
 
-      <nav aria-label="Rodape">
+      <nav aria-label="Rodapé">
         <RouterLink to="/produto-teste">Loja teste</RouterLink>
         <RouterLink :to="checkoutDefault">Contratar</RouterLink>
         <RouterLink to="/privacidade">Privacidade</RouterLink>

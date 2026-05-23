@@ -82,7 +82,7 @@ async function loadForm() {
 
     newRows()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar a tabela.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar a tabela.'
   } finally {
     loading.value = false
   }
@@ -176,7 +176,7 @@ async function saveTable() {
       : await api.post('/measurement-tables', payload)
     await router.push('/app/tabelas-de-medidas')
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar a tabela.'
+    error.value = requestError.response?.data?.message || 'Não foi possível salvar a tabela.'
   } finally {
     saving.value = false
   }
@@ -207,8 +207,8 @@ async function saveTable() {
         </span>
         <h2>Comece por uma tabela pronta do mercado brasileiro</h2>
         <p>
-          A base herdada do v1 cruza genero, categoria, altura, peso, idade e formato corporal. A IA ajuda a acelerar
-          a criacao, mas a tabela sempre fica sob revisao do lojista antes de ir para a loja.
+          A base herdada do v1 cruza gênero, categoria, altura, peso, idade e formato corporal. A IA ajuda a acelerar
+          a criação, mas a tabela sempre fica sob revisão do lojista antes de ir para a loja.
         </p>
       </div>
       <div class="smart-catalog-actions">
@@ -227,7 +227,7 @@ async function saveTable() {
         </button>
       </div>
       <div class="smart-catalog-meta">
-        <span><strong>{{ templates.length }}</strong> modelos padrao</span>
+        <span><strong>{{ templates.length }}</strong> modelos padrão</span>
         <span><strong>{{ visibleTemplates.length }}</strong> compativeis com os filtros atuais</span>
         <span v-if="selectedTemplate">Campos: {{ fieldSummary(selectedTemplate) }}</span>
       </div>

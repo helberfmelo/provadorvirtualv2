@@ -100,7 +100,7 @@ export function failSaveFeedback(error: AxiosError) {
   saveFeedback.pending = 0
   saveFeedback.open = true
   saveFeedback.status = 'error'
-  saveFeedback.title = 'Nao foi possivel salvar'
+  saveFeedback.title = 'Não foi possível salvar'
   saveFeedback.message = friendlyErrorMessage(error)
 }
 
@@ -124,11 +124,11 @@ function friendlyErrorMessage(error: AxiosError) {
   }
 
   if (status === 403) {
-    return 'Seu usuario nao tem permissao para salvar esta alteracao.'
+    return 'Seu usuário não tem permissão para salvar esta alteração.'
   }
 
   if (status === 404) {
-    return 'O registro nao foi encontrado. Atualize a pagina e tente novamente.'
+    return 'O registro não foi encontrado. Atualize a página e tente novamente.'
   }
 
   if (status === 422) {
@@ -136,7 +136,7 @@ function friendlyErrorMessage(error: AxiosError) {
   }
 
   if (!error.response) {
-    return 'Nao foi possivel conectar ao servidor. Verifique sua conexao e tente novamente.'
+    return 'Não foi possível conectar ao servidor. Verifique sua conexão e tente novamente.'
   }
 
   return 'Ocorreu um erro ao salvar. Tente novamente em alguns instantes.'
@@ -164,11 +164,11 @@ function translateKnownMessage(message: string, status?: number) {
   }
 
   if (normalized.includes('selected merchant company id')) {
-    return 'A empresa selecionada nao foi encontrada. Atualize a pagina e selecione a empresa novamente.'
+    return 'A empresa selecionada não foi encontrada. Atualize a página e selecione a empresa novamente.'
   }
 
   if (normalized.includes('email field must be a valid email')) {
-    return 'Informe um e-mail valido.'
+    return 'Informe um e-mail válido.'
   }
 
   if (normalized.includes('cpf field must be 11')) {
@@ -180,7 +180,7 @@ function translateKnownMessage(message: string, status?: number) {
   }
 
   if (status === 422 && normalized.includes('already been taken')) {
-    return 'Ja existe um usuario com estes dados. Confira e tente novamente.'
+    return 'Ja existe um usuário com estes dados. Confira e tente novamente.'
   }
 
   return normalized

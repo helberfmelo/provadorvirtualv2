@@ -30,7 +30,7 @@ async function loadEmails() {
     transactionalEmails.value = transactionalEmailsResponse.data.data
     emailSends.value = emailSendsResponse.data.data
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar os e-mails.'
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar os e-mails.'
   } finally {
     loading.value = false
   }
@@ -47,7 +47,7 @@ async function toggleTemplate(template: TransactionalEmail) {
     notice.value = template.is_active ? 'Template desativado.' : 'Template ativado.'
     await loadEmails()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel alterar o status do template.'
+    error.value = requestError.response?.data?.message || 'Não foi possível alterar o status do template.'
   }
 }
 </script>
@@ -58,7 +58,7 @@ async function toggleTemplate(template: TransactionalEmail) {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>E-mails</h1>
-        <p>Listagens e configuracoes de e-mails transacionais do SaaS.</p>
+        <p>Listagens e configurações de e-mails transacionais do SaaS.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadEmails">
@@ -83,7 +83,7 @@ async function toggleTemplate(template: TransactionalEmail) {
       <RouterLink to="/saas/emails/configuracoes" class="quick-card">
         <i class="fa-solid fa-server" aria-hidden="true"></i>
         <strong>Credenciais SMTP</strong>
-        <span>{{ emailSettings.is_active ? 'Envio ativo' : 'Envio inativo' }} em {{ emailSettings.host || 'host nao configurado' }}</span>
+        <span>{{ emailSettings.is_active ? 'Envio ativo' : 'Envio inativo' }} em {{ emailSettings.host || 'host não configurado' }}</span>
       </RouterLink>
       <article class="quick-card">
         <i class="fa-solid fa-envelope-circle-check" aria-hidden="true"></i>
@@ -93,7 +93,7 @@ async function toggleTemplate(template: TransactionalEmail) {
       <article class="quick-card">
         <i class="fa-solid fa-clock-rotate-left" aria-hidden="true"></i>
         <strong>{{ emailSends.length }}</strong>
-        <span>Envios recentes no historico.</span>
+        <span>Envios recentes no histórico.</span>
       </article>
     </div>
 
@@ -106,11 +106,11 @@ async function toggleTemplate(template: TransactionalEmail) {
         <table>
           <thead>
             <tr>
-              <th>Codigo</th>
+              <th>Código</th>
               <th>Nome</th>
               <th>Assunto</th>
               <th>Status</th>
-              <th>Acoes</th>
+              <th>Ações</th>
             </tr>
           </thead>
           <tbody>
@@ -121,7 +121,7 @@ async function toggleTemplate(template: TransactionalEmail) {
               <td><strong>{{ template.code }}</strong></td>
               <td>
                 <strong>{{ template.name }}</strong>
-                <small>{{ template.description || 'sem descricao' }}</small>
+                <small>{{ template.description || 'sem descrição' }}</small>
               </td>
               <td>{{ template.subject }}</td>
               <td>
@@ -145,7 +145,7 @@ async function toggleTemplate(template: TransactionalEmail) {
 
     <section class="panel-main subsection">
       <div class="subsection-heading">
-        <h2>Historico de envios</h2>
+        <h2>Histórico de envios</h2>
         <span>{{ emailSends.length }} recentes</span>
       </div>
       <div class="table-wrap">

@@ -1,29 +1,29 @@
-# Deploy e Operacao
+# Deploy e Operação
 
 Atualizado em: 2026-05-23
 
 ## Estrategia
 
-Deploy oficial por GitHub Actions via SSH, seguindo o padrao BigShop HelpDesk/Marca Hora.
+Deploy oficial por GitHub Actions via SSH, seguindo o padrão BigShop HelpDesk/Marca Hora.
 
-Publicacao inicial:
+Publicação inicial:
 
 - URL: `https://provadorvirtual.online/provadorvirtual_v2`
 - Base path: `/provadorvirtual_v2/`
 - Pasta remota: `/home1/opents62/provadorvirtual.online/provadorvirtual_v2`
 - Backup remoto: `/home1/opents62/deploy_backups/provadorvirtual_v2`
 
-Motivo: preservar `https://provadorvirtual.online/provadorvirtual_v1/` ate o cutover.
+Motivo: preservar `https://provadorvirtual.online/provadorvirtual_v1/` até o cutover.
 
-Publicacao comercial atual depois da Sprint 27:
+Publicação comercial atual depois da Sprint 27:
 
-- Site publico raiz: `https://provadorvirtual.online/`
-- Build estatica da raiz: `/home1/opents62/provadorvirtual.online`
+- Site público raiz: `https://provadorvirtual.online/`
+- Build estática da raiz: `/home1/opents62/provadorvirtual.online`
 - Backup da raiz: `/home1/opents62/deploy_backups/provadorvirtual_root`
 - Backend/app operacional e rollback continuam em `/provadorvirtual_v2/`.
 - A raiz aponta APIs e widget para `/provadorvirtual_v2/public/api/v1` e `/provadorvirtual_v2/widget/v1`.
 
-## Banco de producao
+## Banco de produção
 
 Dados ficam registrados em `docs/credentials.local.md` e no `.env` remoto:
 
@@ -37,7 +37,7 @@ DB_CHARSET=utf8mb4
 DB_COLLATION=utf8mb4_unicode_ci
 ```
 
-## SMTP de producao
+## SMTP de produção
 
 ```env
 MAIL_MAILER=smtp
@@ -62,23 +62,23 @@ Senha fica apenas em `docs/credentials.local.md`, `.env` remoto ou secret seguro
 - `SSH_USERNAME`
 - `PRODUCTION_ENV`
 
-`SSH_PRIVATE_KEY` e `SSH_PRIVATE_KEY_B64` foram cadastrados usando a chave local HostGator/opents62 ja usada no projeto Marca Hora. `PRODUCTION_ENV` foi cadastrado com o `.env` minimo de producao e uma `APP_KEY` propria para este projeto.
+`SSH_PRIVATE_KEY` e `SSH_PRIVATE_KEY_B64` foram cadastrados usando a chave local HostGator/opents62 já usada no projeto Marca Hora. `PRODUCTION_ENV` foi cadastrado com o `.env` mínimo de produção e uma `APP_KEY` própria para este projeto.
 
 Opcional:
 
 - `SSH_PASSPHRASE`, se a chave tiver senha.
 
-## Historico de bloqueio do Actions
+## Histórico de bloqueio do Actions
 
-Em 2026-05-23, o workflow foi disparado no GitHub, mas o job nao iniciou porque a conta/repositorio estava bloqueado por billing/spending limit do GitHub Actions.
+Em 2026-05-23, o workflow foi disparado no GitHub, mas o job não iniciou porque a conta/repositório estava bloqueado por billing/spending limit do GitHub Actions.
 
-No mesmo dia, o repositorio foi alterado para publico e a reexecucao do workflow terminou com sucesso.
+No mesmo dia, o repositório foi alterado para público e a reexecucao do workflow terminou com sucesso.
 
-Se o repositorio voltar a ser privado, confirmar em GitHub:
+Se o repositório voltar a ser privado, confirmar em GitHub:
 
-- Billing & plans sem pendencia de pagamento;
+- Billing & plans sem pendência de pagamento;
 - spending limit do GitHub Actions suficiente;
-- Actions habilitado para o repositorio privado.
+- Actions habilitado para o repositório privado.
 
 ## Secrets futuros conforme sprint
 
@@ -96,13 +96,13 @@ BigShop:
 Pagamentos:
 
 - `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY`, `PAGARME_WEBHOOK_SECRET`, `PAGARME_ENV`, `PAGARME_BASE_URL`, `PAGARME_CHECKOUT_SUCCESS_URL` e `PAGARME_CHECKOUT_CANCEL_URL`.
-- Para checkout publico na raiz, usar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` e `PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout`.
+- Para checkout público na raiz, usar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` e `PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout`.
 
 Hardening:
 
 - `PRIVACY_WIDGET_DATA_RETENTION_DAYS=30`;
 - `OPERATIONAL_LOG_RETENTION_DAYS=180`;
-- `CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173` para desenvolvimento local. Em producao, o widget usa validacao dinamica por dominio.
+- `CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173` para desenvolvimento local. Em produção, o widget usa validação dinâmica por domínio.
 
 ## Workflow criado
 
@@ -112,13 +112,13 @@ Arquivo:
 
 Comportamento:
 
-- se `backend/` e `frontend/` ainda nao existirem, o workflow encerra em sucesso informando que o app ainda nao foi scaffoldado;
-- publica Laravel em subpasta HostGator usando `.htaccess` raiz para encaminhar requisicoes para `public/`;
+- se `backend/` e `frontend/` ainda não existirem, o workflow encerra em sucesso informando que o app ainda não foi scaffoldado;
+- pública Laravel em subpasta HostGator usando `.htaccess` raiz para encaminhar requisições para `public/`;
 - no HostGator atual, endpoints limpos `api`, `sanctum` e `up` usam redirect 307 para `/provadorvirtual_v2/public/...`, preservando metodo/corpo em chamadas de API;
-- o frontend autenticado em producao deve usar `VITE_API_BASE_URL=/provadorvirtual_v2/public/api/v1` para evitar perda de `Authorization` em clientes que nao preservam header durante redirect;
+- o frontend autenticado em produção deve usar `VITE_API_BASE_URL=/provadorvirtual_v2/public/api/v1` para evitar perda de `Authorization` em clientes que não preservam header durante redirect;
 - instala dependencias backend/frontend;
 - valida backend em SQLite no CI;
-- builda frontend com base path de producao;
+- builda frontend com base path de produção;
 - copia `frontend/dist` para `backend/public`;
 - empacota Laravel sem `.env`;
 - autentica por SSH;
@@ -126,12 +126,12 @@ Comportamento:
 - extrai novo release;
 - aplica `PRODUCTION_ENV` se cadastrado;
 - roda `optimize:clear`, `migrate --force`, `ProductionSeeder` se existir, `storage:link` e caches;
-- publica a landing/app frontend tambem na raiz do dominio, preservando `/provadorvirtual_v1/` e `/provadorvirtual_v2/`;
-- faz smoke publico.
+- pública a landing/app frontend também na raiz do domínio, preservando `/provadorvirtual_v1/` e `/provadorvirtual_v2/`;
+- faz smoke público.
 
 ## Cron no cPanel
 
-Cron principal recomendado: executar o scheduler do Laravel a cada minuto. Ele ja dispara o monitor de pagamentos a cada 5 minutos, o dispatcher de e-mails transacionais a cada 10 minutos e as rotinas de privacidade nos horarios programados.
+Cron principal recomendado: executar o scheduler do Laravel a cada minuto. Ele já dispara o monitor de pagamentos a cada 5 minutos, o dispatcher de e-mails transacionais a cada 10 minutos e as rotinas de privacidade nos horarios programados.
 
 Tempo:
 
@@ -145,7 +145,7 @@ Comando com log:
 cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan schedule:run >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-schedule.log 2>&1
 ```
 
-Se o cPanel nao aceitar scheduler a cada minuto, cadastrar temporariamente o monitor direto a cada 5 minutos:
+Se o cPanel não aceitar scheduler a cada minuto, cadastrar temporariamente o monitor direto a cada 5 minutos:
 
 ```cron
 */5 * * * *
@@ -155,21 +155,21 @@ Se o cPanel nao aceitar scheduler a cada minuto, cadastrar temporariamente o mon
 cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:payments-sync --limit=50 >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-payments-sync.log 2>&1
 ```
 
-Validacao manual do monitor:
+Validação manual do monitor:
 
 ```bash
 cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:payments-sync --limit=10
 ```
 
-Validacao manual dos e-mails transacionais:
+Validação manual dos e-mails transacionais:
 
 ```bash
 cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:emails-dispatch --limit=10
 ```
 
-Se `/usr/local/bin/php` nao existir no HostGator, trocar pelo path exibido no cPanel ou por `php`.
+Se `/usr/local/bin/php` não existir no HostGator, trocar pelo path exibido no cPanel ou por `php`.
 
-## `.env` de producao minimo
+## `.env` de produção mínimo
 
 ```env
 APP_NAME="Provador Virtual"
@@ -214,9 +214,9 @@ PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso
 PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout
 ```
 
-## Primeira publicacao
+## Primeira publicação
 
-1. Criar banco e usuario no cPanel, se ainda nao existirem.
+1. Criar banco e usuário no cPanel, se ainda não existirem.
 2. Fazer push para `main`.
 3. Acompanhar Actions.
 4. Validar:
@@ -229,16 +229,16 @@ PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout
    - `/provadorvirtual_v2/api/v1/ops/status` com `curl -L`;
    - `/provadorvirtual_v2/up`.
 
-## Validacao de producao
+## Validação de produção
 
-Rodar apos deploy:
+Rodar após deploy:
 
 ```powershell
 .\scripts\validate-production.ps1
 ```
 
-O script usa a URL publica, valida paginas, APIs, recomendacao, CORS e o endpoint
-protegido de go-live com o usuario demo.
+O script usa a URL pública, valida páginas, APIs, recomendação, CORS e o endpoint
+protegido de go-live com o usuário demo.
 
 ## Rollback
 
@@ -246,9 +246,9 @@ O workflow gera backup em:
 
 - `/home1/opents62/deploy_backups/provadorvirtual_v2`
 
-Sprint 11 validou a criacao de backup no run `26332960822` com o arquivo `provadorvirtual-v2-backup-20260523-094207-ac1025f2a2469b9876d93764652ce87acd0e7174.tar.gz`.
+Sprint 11 validou a criação de backup no run `26332960822` com o arquivo `provadorvirtual-v2-backup-20260523-094207-ac1025f2a2469b9876d93764652ce87acd0e7174.tar.gz`.
 
-Sprint 12 validou a criacao de backup no run `26333226813` com o arquivo `provadorvirtual-v2-backup-20260523-095421-e657a75c92163ab29eae19a8cec5b5d5d1b6cd5c.tar.gz`.
+Sprint 12 validou a criação de backup no run `26333226813` com o arquivo `provadorvirtual-v2-backup-20260523-095421-e657a75c92163ab29eae19a8cec5b5d5d1b6cd5c.tar.gz`.
 
 Rollback manual:
 
