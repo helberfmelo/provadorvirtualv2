@@ -340,9 +340,11 @@ jobs:
         if: steps.scaffold.outputs.ready == 'true'
         shell: bash
         run: |
-          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/" > /dev/null
-          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/login" > /dev/null
-          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/produto-teste" > /dev/null
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/" | grep -q '<div id="app"'
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/login" | grep -q '<div id="app"'
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/produto-teste" | grep -q '<div id="app"'
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/api/v1/health" | grep -q '"status":"ok"'
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/api/v1/demo/product-test" | grep -q 'Vestido Luna Midi'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/up" > /dev/null
 
       - name: Diagnose public failure

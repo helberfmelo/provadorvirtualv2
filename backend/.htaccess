@@ -1,6 +1,8 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    RewriteRule ^(api|up|sanctum)(/.*)?$ public/index.php [L,QSA]
+
     RewriteRule ^public/ - [L]
     RewriteRule ^public$ public/ [L]
     RewriteRule ^$ public/ [L]
