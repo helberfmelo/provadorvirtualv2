@@ -101,7 +101,7 @@ jobs:
         working-directory: frontend
         env:
           VITE_APP_BASE_PATH: ${{ env.PRODUCTION_APP_BASE_PATH }}
-          VITE_API_BASE_URL: ${{ env.PRODUCTION_APP_BASE_PATH }}api/v1
+          VITE_API_BASE_URL: ${{ env.PRODUCTION_APP_BASE_PATH }}public/api/v1
           VITE_WIDGET_BASE_URL: ${{ env.PRODUCTION_APP_BASE_PATH }}widget/v1
           VITE_APP_VERSION: ${{ github.sha }}
         run: npm run build

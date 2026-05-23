@@ -9,6 +9,15 @@ class WidgetInstallApiTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_widget_install_requires_authentication_without_redirect_error(): void
+    {
+        $this->seed();
+
+        $this->get('/api/v1/widget-install')
+            ->assertUnauthorized()
+            ->assertJsonPath('message', 'Unauthenticated.');
+    }
+
     public function test_merchant_can_view_and_update_widget_install(): void
     {
         $this->seed();
