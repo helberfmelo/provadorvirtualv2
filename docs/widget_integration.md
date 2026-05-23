@@ -47,6 +47,8 @@ Permitir que qualquer e-commerce instale o Provador Virtual com um snippet simpl
 
 Status Sprint 4: implementado em `/widget/v1/provador-virtual.js` com CSS escopado em `/widget/v1/provador-virtual.css`. A pagina `/produto-teste` carrega o widget real por snippet dinamico.
 
+Status Sprint 5: o painel `/app/widget` gera o snippet a partir de `/api/v1/widget-install`, com tema, dominios liberados e produto de exemplo.
+
 ## Contrato publico atual
 
 Endpoints usados pelo widget:
@@ -115,3 +117,16 @@ Enquanto houver migracao, o widget pode aceitar aliases:
 - `data-sku-grade` -> `data-sku`.
 
 O codigo novo deve gerar somente os atributos padrao em ingles.
+
+## Painel do lojista
+
+Rotas protegidas:
+
+- `GET /api/v1/widget-install`
+- `PATCH /api/v1/widget-install`
+- `GET /api/v1/integrations`
+- `PATCH /api/v1/integrations/{platform}`
+
+Plataformas catalogadas: `bigshop`, `shopify`, `woocommerce`, `nuvemshop`, `vtex`, `tray` e `custom`.
+
+Credenciais de plataforma devem ser salvas apenas por endpoints protegidos e persistidas criptografadas. A API retorna somente flags como `has_access_token` e `has_webhook_secret`.

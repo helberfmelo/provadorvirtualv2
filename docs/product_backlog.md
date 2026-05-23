@@ -24,18 +24,21 @@ Atualizado em: 2026-05-23
 - `DONE` Motor de recomendacao.
 - `DONE` Widget universal.
 - `DONE` Feedback de recomendacao.
+- `DONE` Tela de instalacao do widget.
+- `DONE` Catalogo inicial de integracoes.
 - `TODO` Analytics.
 - `TODO` SaaS admin.
 
 ## Integracoes
 
+- `DONE` Cadastro manual de conexao por plataforma.
 - `TODO` BigShop probe.
 - `TODO` BigShop sync produtos/grades.
 - `TODO` BigShop um clique.
+- `DONE` Base do guia/snippet custom no painel.
 - `TODO` Guias Shopify.
 - `TODO` Guias WooCommerce.
 - `TODO` Guias Nuvemshop.
-- `TODO` Guia custom.
 - `TODO` Webhooks quando houver contrato.
 
 ## IA

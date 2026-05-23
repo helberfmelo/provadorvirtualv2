@@ -65,7 +65,18 @@
 - Run `26331199145` do GitHub Actions finalizou com sucesso para o commit `06144cf`.
 - Validado em producao: JS/CSS do widget e `/produto-teste`.
 
+## 2026-05-23 - Sprint 5 Painel do Lojista
+
+- Criados endpoints protegidos `/api/v1/widget-install`, `/api/v1/integrations` e `/api/v1/integrations/{platform}`.
+- Widget install passa a retornar URLs publicas, tema, dominios, produto de exemplo e snippet pronto para copiar.
+- Catalogo de integracoes inicial inclui BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray e personalizada.
+- Tokens e webhook secrets de plataformas sao persistidos criptografados e nunca retornam em claro.
+- Dashboard do lojista passou a destacar produtos, tabelas, widget e integracoes.
+- Criadas telas Vue `/app/widget` e `/app/integracoes` com estados operacionais e controles responsivos.
+- Criados testes `WidgetInstallApiTest` e `IntegrationsApiTest`.
+- Validacoes locais: `php artisan test`, `vendor/bin/pint` e `npm run build`.
+
 ## Pendencias abertas
 
-- Regularizar billing/spending limit do GitHub Actions para repositorio privado.
+- Repositorio esta publico para manter a cota do GitHub Actions disponivel.
 - Definir chave de IA quando a sprint de OCR/assistencia for iniciada.

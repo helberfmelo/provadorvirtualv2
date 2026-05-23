@@ -9,6 +9,8 @@ const summary = reactive({
   products: 0,
   measurement_tables: 0,
   widget_status: 'demo-ready',
+  widget_active: false,
+  integrations_configured: 0,
   recommendations_today: 0,
 })
 
@@ -26,8 +28,8 @@ onMounted(() => {
       <span class="eyebrow">Painel</span>
       <h1>Fundacao pronta para configurar lojas</h1>
       <p>
-        Gerencie produtos, grades e tabelas de medidas da loja demo para preparar
-        o motor de recomendacao e o widget universal.
+        Acompanhe os cadastros principais, publique o widget e mantenha as
+        conexoes da loja em um unico lugar.
       </p>
     </div>
 
@@ -44,9 +46,45 @@ onMounted(() => {
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-plug" aria-hidden="true"></i>
-        <strong>{{ summary.widget_status === 'demo-ready' ? 'Widget preparado' : 'Widget pendente' }}</strong>
+        <strong>{{ summary.widget_active ? 'Widget ativo' : 'Widget pendente' }}</strong>
         <span>{{ summary.recommendations_today }} recomendacoes registradas hoje.</span>
       </article>
+      <article class="metric-card">
+        <i class="fa-solid fa-link" aria-hidden="true"></i>
+        <strong>{{ summary.integrations_configured }} integracao{{ summary.integrations_configured === 1 ? '' : 'es' }}</strong>
+        <span>BigShop, lojas externas e instalacoes manuais.</span>
+      </article>
+    </div>
+
+    <div class="onboarding-grid">
+      <RouterLink class="onboarding-step" to="/app/produtos">
+        <i class="fa-solid fa-boxes-stacked" aria-hidden="true"></i>
+        <span>
+          <strong>Produtos</strong>
+          <small>{{ summary.products }} cadastrados</small>
+        </span>
+      </RouterLink>
+      <RouterLink class="onboarding-step" to="/app/tabelas-de-medidas">
+        <i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>
+        <span>
+          <strong>Tabelas</strong>
+          <small>{{ summary.measurement_tables }} disponiveis</small>
+        </span>
+      </RouterLink>
+      <RouterLink class="onboarding-step" to="/app/widget">
+        <i class="fa-solid fa-code" aria-hidden="true"></i>
+        <span>
+          <strong>Widget</strong>
+          <small>{{ summary.widget_active ? 'ativo' : 'pendente' }}</small>
+        </span>
+      </RouterLink>
+      <RouterLink class="onboarding-step" to="/app/integracoes">
+        <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+        <span>
+          <strong>Integracoes</strong>
+          <small>{{ summary.integrations_configured }} configuradas</small>
+        </span>
+      </RouterLink>
     </div>
 
     <div class="action-row">
@@ -57,6 +95,10 @@ onMounted(() => {
       <RouterLink class="btn btn-secondary" to="/app/tabelas-de-medidas">
         <i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>
         Tabelas de medidas
+      </RouterLink>
+      <RouterLink class="btn btn-secondary" to="/app/widget">
+        <i class="fa-solid fa-code" aria-hidden="true"></i>
+        Widget
       </RouterLink>
     </div>
   </section>

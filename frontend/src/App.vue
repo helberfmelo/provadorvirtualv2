@@ -25,6 +25,8 @@ async function logout() {
         <RouterLink to="/produto-teste">Produto teste</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/produtos">Produtos</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/tabelas-de-medidas">Tabelas</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated" to="/app/widget">Widget</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated" to="/app/integracoes">Integracoes</RouterLink>
         <RouterLink v-if="!auth.isAuthenticated" to="/login">Entrar</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app">Painel</RouterLink>
         <button v-if="auth.isAuthenticated" class="nav-button" type="button" title="Sair" @click="logout">

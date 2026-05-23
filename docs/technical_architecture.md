@@ -44,6 +44,17 @@ Modulos:
 - SaaS Admin;
 - Audit/Logs.
 
+APIs protegidas ja implementadas:
+
+- `GET /api/v1/merchant/overview`
+- `GET|POST|PATCH|DELETE /api/v1/products`
+- `POST|PATCH|DELETE /api/v1/products/{product}/variants`
+- `GET|POST|PATCH|DELETE /api/v1/measurement-tables`
+- `GET /api/v1/measurement-templates`
+- `GET|PATCH /api/v1/widget-install`
+- `GET /api/v1/integrations`
+- `PATCH /api/v1/integrations/{platform}`
+
 ## Frontend
 
 Stack:

@@ -3,14 +3,18 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DemoProductController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\MeasurementTableController;
 use App\Http\Controllers\Api\V1\MeasurementTemplateController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
 use App\Http\Controllers\Api\V1\RecommendationController;
+use App\Http\Controllers\Api\V1\WidgetInstallController;
 use App\Models\MeasurementTable;
+use App\Models\PlatformConnection;
 use App\Models\Product;
 use App\Models\RecommendationLog;
+use App\Models\WidgetInstall;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -33,6 +37,14 @@ Route::prefix('v1')->group(function (): void {
                     'products' => Product::query()->where('merchant_id', $merchant->id)->count(),
                     'measurement_tables' => MeasurementTable::query()->where('merchant_id', $merchant->id)->count(),
                     'widget_status' => 'demo-ready',
+                    'widget_active' => WidgetInstall::query()
+                        ->where('merchant_id', $merchant->id)
+                        ->where('is_active', true)
+                        ->exists(),
+                    'integrations_configured' => PlatformConnection::query()
+                        ->where('merchant_id', $merchant->id)
+                        ->whereIn('status', ['configured', 'connected'])
+                        ->count(),
                     'recommendations_today' => RecommendationLog::query()
                         ->where('merchant_id', $merchant->id)
                         ->whereDate('created_at', now()->toDateString())
@@ -41,6 +53,10 @@ Route::prefix('v1')->group(function (): void {
             ]);
         });
         Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index']);
+        Route::get('/widget-install', [WidgetInstallController::class, 'show']);
+        Route::patch('/widget-install', [WidgetInstallController::class, 'update']);
+        Route::get('/integrations', [IntegrationController::class, 'index']);
+        Route::patch('/integrations/{platform}', [IntegrationController::class, 'update']);
         Route::apiResource('measurement-tables', MeasurementTableController::class);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('products.variants', ProductVariantController::class)

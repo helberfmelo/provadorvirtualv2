@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
+import IntegrationsView from '../views/IntegrationsView.vue'
 import LoginView from '../views/LoginView.vue'
 import MeasurementTablesView from '../views/MeasurementTablesView.vue'
 import ProductsView from '../views/ProductsView.vue'
 import ProductTestView from '../views/ProductTestView.vue'
+import WidgetInstallView from '../views/WidgetInstallView.vue'
 
 const base = import.meta.env.VITE_APP_BASE_PATH || '/'
 
@@ -18,6 +20,8 @@ const router = createRouter({
     { path: '/app', component: DashboardView },
     { path: '/app/produtos', component: ProductsView },
     { path: '/app/tabelas-de-medidas', component: MeasurementTablesView },
+    { path: '/app/widget', component: WidgetInstallView },
+    { path: '/app/integracoes', component: IntegrationsView },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
   scrollBehavior() {

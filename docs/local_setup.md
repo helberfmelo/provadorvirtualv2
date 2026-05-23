@@ -63,11 +63,15 @@ npm run dev
 - `/app`
 - `/app/produtos`
 - `/app/tabelas-de-medidas`
+- `/app/widget`
+- `/app/integracoes`
 - `/api/v1/health`
 - `/api/v1/demo/product-test`
 - `/api/v1/products`
 - `/api/v1/measurement-tables`
 - `/api/v1/measurement-templates`
+- `/api/v1/widget-install`
+- `/api/v1/integrations`
 - `/api/v1/public/recommendations/config-check`
 - `/api/v1/public/recommendations`
 - `/api/v1/public/recommendations/{id}/feedback`
@@ -128,3 +132,5 @@ Status Sprint 2: painel demo permite CRUD de produtos, variacoes e tabelas de me
 Status Sprint 3: `/produto-teste` chama a API publica de recomendacao e registra log/feedback anonimo.
 
 Status Sprint 4: widget publico disponivel em `backend/public/widget/v1` e carregado na pagina `/produto-teste`.
+
+Status Sprint 5: painel demo permite configurar widget e conexoes de plataforma com tokens criptografados.

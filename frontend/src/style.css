@@ -207,7 +207,7 @@ a {
 
 .metric-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
 }
 
@@ -607,13 +607,192 @@ th {
   font-weight: 800;
 }
 
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  resize: vertical;
+  font: inherit;
+}
+
+.install-grid,
+.integrations-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
+  gap: 18px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.install-preview,
+.platform-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.install-preview {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.install-preview pre {
+  max-height: 430px;
+  margin: 0;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 8px;
+  color: #e5e7eb;
+  background: #111827;
+  line-height: 1.5;
+}
+
+.check-list,
+.connection-flags,
+.onboarding-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.check-list span,
+.connection-flags span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  color: #4b5563;
+  background: #f3f4f6;
+  font-weight: 800;
+}
+
+.check-list i,
+.connection-flags .on {
+  color: #047857;
+}
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.swatch-field {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 8px;
+}
+
+.swatch-field input[type="color"] {
+  width: 44px;
+  min-height: 42px;
+  padding: 3px;
+}
+
+.toggle-line {
+  align-content: start;
+}
+
+.toggle-line input {
+  width: 22px;
+}
+
+.platform-list {
+  display: grid;
+  gap: 10px;
+  padding: 10px;
+}
+
+.platform-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #fff;
+  text-align: left;
+  cursor: pointer;
+}
+
+.platform-card:hover,
+.platform-card.active {
+  border-color: #fecdd3;
+  background: #fff7ed;
+}
+
+.platform-icon {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 8px;
+  color: #fff;
+  background: #0f172a;
+}
+
+.platform-card strong,
+.platform-card small {
+  display: block;
+}
+
+.platform-card small,
+.platform-card em,
+.onboarding-step small {
+  color: #6b7280;
+  font-style: normal;
+}
+
+.platform-card em {
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: #9a3412;
+  background: #ffedd5;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.onboarding-grid {
+  margin-top: 18px;
+}
+
+.onboarding-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 190px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.onboarding-step i {
+  color: #ff4d5e;
+}
+
+.onboarding-step strong,
+.onboarding-step small {
+  display: block;
+}
+
 @media (max-width: 860px) {
   .hero-section,
   .product-page,
   .metric-grid,
   .app-grid,
   .form-grid,
-  .inline-form {
+  .inline-form,
+  .install-grid,
+  .integrations-grid,
+  .color-grid {
     grid-template-columns: 1fr;
   }
 

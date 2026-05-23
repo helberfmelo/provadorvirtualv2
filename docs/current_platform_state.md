@@ -11,6 +11,7 @@ Atualizado em: 2026-05-23
 - Sprint 2 publicou CRUD de produtos, variacoes, tabelas de medidas e templates operacionais no painel e na API.
 - Sprint 3 criou motor deterministico, endpoints publicos de recomendacao/config-check/feedback e conectou `/produto-teste` ao backend real.
 - Sprint 4 criou widget publico em `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`, com modal, config-check, recomendacao e feedback.
+- Sprint 5 criou configuracao operacional do widget no painel, catalogo de integracoes e persistencia de conexoes por plataforma.
 
 ## Referencias confirmadas
 
@@ -70,12 +71,20 @@ Atualizado em: 2026-05-23
 - Sprint 2 publicada em producao pelo GitHub Actions no run `26326950616`.
 - Sprint 3 publicada em producao pelo GitHub Actions no run `26327119754`.
 - Sprint 4 publicada em producao pelo GitHub Actions no run `26331199145`.
+- Sprint 5 implementada localmente aguardando publicacao pelo GitHub Actions.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
 - Falta chave de IA se as primeiras sprints incluirem OCR/geracao assistida.
 - Falta credencial BigShop real para loja de teste.
 - Falta decidir provider de pagamento quando billing sair do modo preparado.
 
+## Superficie atual
+
+- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/widget`, `/app/integracoes`.
+- APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
+- APIs publicas: health, produto demo e recomendacoes do widget.
+- Widget publico: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
+
 ## Proxima acao recomendada
 
-Iniciar a Sprint 5: Painel do Lojista.
+Publicar a Sprint 5 e iniciar a Sprint 6: Importacao e Templates Assistidos.

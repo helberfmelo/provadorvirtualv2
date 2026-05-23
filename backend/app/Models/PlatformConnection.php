@@ -18,4 +18,14 @@ class PlatformConnection extends Model
             'last_sync_at' => 'datetime',
         ];
     }
+
+    public function merchant()
+    {
+        return $this->belongsTo(Merchant::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(MerchantCompany::class, 'merchant_company_id');
+    }
 }

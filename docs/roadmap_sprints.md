@@ -92,6 +92,8 @@ Entregas:
 - estados vazios uteis;
 - ajustes mobile.
 
+Status: implementado localmente; publicar e validar em producao.
+
 ## Sprint 6 - Importacao e Templates Assistidos
 
 Objetivo: reduzir trabalho manual do lojista.

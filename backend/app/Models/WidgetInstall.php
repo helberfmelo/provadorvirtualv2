@@ -20,4 +20,14 @@ class WidgetInstall extends Model
             'is_active' => 'boolean',
         ];
     }
+
+    public function merchant()
+    {
+        return $this->belongsTo(Merchant::class);
+    }
+
+    public function company()
+    {
+        return $this->belongsTo(MerchantCompany::class, 'merchant_company_id');
+    }
 }
