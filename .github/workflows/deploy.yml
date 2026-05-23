@@ -336,6 +336,44 @@ jobs:
             -o StrictHostKeyChecking=yes \
             "${DEPLOY_USER}@${DEPLOY_HOST}" 'bash -se' < "$REMOTE_SCRIPT"
 
+      - name: Ensure master admin
+        if: steps.scaffold.outputs.ready == 'true'
+        env:
+          PV_MASTER_ADMIN_EMAIL: ${{ secrets.PV_MASTER_ADMIN_EMAIL }}
+          PV_MASTER_ADMIN_NAME: ${{ secrets.PV_MASTER_ADMIN_NAME }}
+          PV_MASTER_ADMIN_CPF: ${{ secrets.PV_MASTER_ADMIN_CPF }}
+          PV_MASTER_ADMIN_PASSWORD: ${{ secrets.PV_MASTER_ADMIN_PASSWORD }}
+        shell: bash
+        run: |
+          if [ -z "$PV_MASTER_ADMIN_EMAIL" ] || [ -z "$PV_MASTER_ADMIN_NAME" ] || [ -z "$PV_MASTER_ADMIN_PASSWORD" ]; then
+            echo "Master admin secrets not configured; skipping."
+            exit 0
+          fi
+
+          REMOTE_ADMIN_SCRIPT="$RUNNER_TEMP/provadorvirtual_v2_master_admin.sh"
+          {
+            echo 'set -e'
+            printf 'REMOTE_DIR=%q\n' "$DEPLOY_REMOTE_DIR"
+            printf 'MASTER_EMAIL=%q\n' "$PV_MASTER_ADMIN_EMAIL"
+            printf 'MASTER_NAME=%q\n' "$PV_MASTER_ADMIN_NAME"
+            printf 'MASTER_CPF=%q\n' "$PV_MASTER_ADMIN_CPF"
+            printf 'MASTER_PASSWORD=%q\n' "$PV_MASTER_ADMIN_PASSWORD"
+            echo 'cd "$REMOTE_DIR"'
+            echo 'php artisan pv:create-master-admin --email="$MASTER_EMAIL" --name="$MASTER_NAME" --cpf="$MASTER_CPF" --password="$MASTER_PASSWORD"'
+          } > "$REMOTE_ADMIN_SCRIPT"
+
+          ssh \
+            -p "$DEPLOY_PORT" \
+            -i "$DEPLOY_KEY_PATH" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no \
+            -o StrictHostKeyChecking=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" 'bash -se' < "$REMOTE_ADMIN_SCRIPT"
+
       - name: Smoke test public URLs
         if: steps.scaffold.outputs.ready == 'true'
         shell: bash
