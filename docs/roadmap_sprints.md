@@ -571,3 +571,16 @@ Entregas:
 - exclusoes para login/logout, checkout publico, preview/importacao assistida e acoes que nao sao salvamento.
 
 Status: implementado, publicado e validado em producao no run `26344601240`.
+
+### Sprint 46 - Recarregamento ao trocar empresa
+
+Objetivo: garantir que o portal da empresa recarregue os dados ao alternar a empresa ativa.
+
+Entregas:
+
+- `RouterView` operacional passa a usar chave baseada em rota e `activeCompany.id`;
+- telas do portal da empresa desmontam e montam novamente ao trocar empresa;
+- chamadas `onMounted()` de painel, produtos, tabelas, widget, integracoes, analytics, usuarios e go-live passam a buscar os dados do novo contexto;
+- fluxo vindo do SaaS para o portal da empresa preserva a separacao de menus.
+
+Status: implementado localmente, aguardando publicacao e validacao de producao.

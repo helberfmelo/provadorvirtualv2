@@ -371,3 +371,9 @@
 - Mantidas exclusoes para login/logout, checkout publico, previews e acoes que nao representam salvamento.
 - Validacoes locais: `npm run build`, `php artisan test --filter=UserAccessApiTest` e `git diff --check`.
 - Run `26344601240` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 46 Recarregamento ao trocar empresa
+
+- Corrigido o shell operacional para recriar a tela atual quando `activeCompany.id` muda.
+- A troca pelo seletor de empresa no portal agora remonta a `RouterView` do portal da empresa.
+- Com isso, painel e CRUDs executam novamente seus carregamentos de dados no novo contexto.

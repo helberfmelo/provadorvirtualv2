@@ -42,6 +42,7 @@ Atualizado em: 2026-05-23
 - Sprint 43 importou o catalogo padrao do v1, criou templates inteligentes por genero/produto/altura/peso/idade/formato corporal e reforcou IA/base brasileira no site e portal.
 - Sprint 44 separou usuarios internos do SaaS dos usuarios das empresas clientes, com CRUD proprio em `/saas/usuarios-empresas`.
 - Sprint 45 criou feedback global de salvamento nos portais, com modal de carregamento, sucesso temporario e erro persistente com mensagem amigavel.
+- Sprint 46 corrigiu o recarregamento das telas do portal da empresa quando o usuario alterna a empresa ativa.
 
 ## Referencias confirmadas
 

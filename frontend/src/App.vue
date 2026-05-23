@@ -23,6 +23,13 @@ const isWorkRoute = computed(() => isCompanyRoute.value || isSaasRoute.value)
 const contextLabel = computed(() => isSaasRoute.value ? 'SaaS admin' : 'Portal da empresa')
 const workNavTitle = computed(() => isSaasRoute.value ? 'Operacao SaaS' : 'Operacao da loja')
 const activeCompanyName = computed(() => auth.activeCompany?.name || 'Sem empresa ativa')
+const workViewKey = computed(() => {
+  if (!isCompanyRoute.value) {
+    return `${route.fullPath}:saas`
+  }
+
+  return `${route.fullPath}:company:${auth.activeCompany?.id || 'none'}`
+})
 
 const publicLinks = computed<NavLink[]>(() => [
   { to: '/produto-teste', label: 'Produto teste', icon: 'fa-bag-shopping', show: true },
@@ -176,7 +183,7 @@ async function switchCompany(event: Event) {
       </aside>
 
       <main class="work-main">
-        <RouterView />
+        <RouterView :key="workViewKey" />
       </main>
     </div>
 
