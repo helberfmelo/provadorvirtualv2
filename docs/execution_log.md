@@ -331,3 +331,10 @@
 - Ajustadas tabelas, acoes por linha, cabecalhos e largura minima de formularios/tabelas para reduzir desalinhamento e overflow espremido.
 - Validador de producao passou a cobrir rotas novas do SaaS e do portal da empresa.
 - Smoke do GitHub Actions passou a validar rotas autenticadas principais na raiz e na subpasta.
+
+## 2026-05-23 - Sprint 42 Ajustes pos-inspecao visual
+
+- Inspecao visual autenticada gerou screenshots de SaaS, portal da empresa, listagens, formularios e mobile.
+- `Nova empresa` deixou de abrir preenchida com `Loja teste`.
+- Cadastro interno de empresa agora inicia com BigShop como plataforma padrao.
+- `Novo produto` deixou de abrir com categoria e tabela incompatibilizadas por padrao.

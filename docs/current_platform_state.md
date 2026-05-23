@@ -38,6 +38,7 @@ Atualizado em: 2026-05-23
 - Sprint 39 separou os CRUDs do SaaS em listagens e formularios proprios; publicado em producao no run `26342542196`.
 - Sprint 40 separou os CRUDs principais do portal da empresa em listagens e formularios proprios; publicado em producao no run `26342724625`.
 - Sprint 41 registrou as diretrizes de UX dos portais, refinou tabelas/acoes/cabecalhos e ampliou a validacao de rotas.
+- Sprint 42 limpou defaults confusos nos formularios de nova empresa e novo produto apos inspecao visual autenticada.
 
 ## Referencias confirmadas
 

@@ -514,3 +514,16 @@ Entregas previstas:
 - publicar e validar producao apos cada ajuste.
 
 Status: implementado. A Sprint 41 consolidou as diretrizes em `docs/portal_ui_guidelines.md`, ajustou alinhamento de tabelas/acoes/cabecalhos, ampliou o validador de producao para as novas rotas SaaS e empresa e reforcou o smoke do GitHub Actions.
+
+### Sprint 42 - Ajustes pos-inspecao visual
+
+Objetivo: corrigir defaults de formularios que ainda davam sensacao de prototipo ou podiam induzir erro no cadastro.
+
+Entregas:
+
+- formulario `Nova empresa` sem nome pre-preenchido como loja teste;
+- plataforma padrao de cadastro interno ajustada para BigShop;
+- formulario `Novo produto` sem categoria/tabela incompatibilizadas por padrao;
+- nova validacao visual dos formularios em producao.
+
+Status: implementado localmente e pendente de publicacao pelo push desta sprint.

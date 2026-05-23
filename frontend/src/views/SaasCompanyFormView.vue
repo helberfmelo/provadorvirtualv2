@@ -17,9 +17,9 @@ const error = ref('')
 
 const form = reactive({
   merchant_id: '',
-  merchant_name: 'Loja teste',
+  merchant_name: '',
   billing_status: 'trialing',
-  name: 'Loja teste',
+  name: '',
   legal_name: '',
   document: '',
   zip_code: '',
@@ -30,7 +30,7 @@ const form = reactive({
   city: '',
   state: '',
   domain: '',
-  platform: 'custom',
+  platform: 'bigshop',
   external_store_id: '',
   status: 'active',
   owner_name: '',

@@ -18,8 +18,8 @@ const error = ref('')
 const form = reactive({
   name: '',
   sku: '',
-  category: 'Vestidos',
-  gender: 'female',
+  category: '',
+  gender: 'unisex',
   fit_profile: 'regular',
   status: 'active',
   measurement_table_id: null as number | null,
@@ -52,7 +52,7 @@ async function loadForm() {
       return
     }
 
-    form.measurement_table_id = measurementTables.value[0]?.id ?? null
+    form.measurement_table_id = null
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o produto.'
   } finally {
@@ -63,8 +63,8 @@ async function loadForm() {
 function fillForm(product: Product) {
   form.name = product.name
   form.sku = product.sku ?? ''
-  form.category = product.category ?? 'Vestidos'
-  form.gender = product.gender ?? 'female'
+  form.category = product.category ?? ''
+  form.gender = product.gender ?? 'unisex'
   form.fit_profile = product.fit_profile ?? 'regular'
   form.status = product.status ?? 'active'
   form.measurement_table_id = product.measurement_table_id ?? measurementTables.value[0]?.id ?? null
