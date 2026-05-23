@@ -23,10 +23,15 @@ type CompanyRow = {
   legal_name: string | null
   document: string | null
   zip_code: string | null
+  street: string | null
+  number: string | null
+  complement: string | null
+  district: string | null
   city: string | null
   state: string | null
   domain: string | null
   platform: string
+  external_store_id: string | null
   status: string
   merchant: {
     id: number
@@ -72,6 +77,7 @@ const error = ref('')
 const notice = ref('')
 const smtpPassword = ref('')
 const editingTemplateId = ref<number | null>(null)
+const editingCompanyId = ref<number | null>(null)
 
 const companyForm = reactive({
   merchant_id: '',
@@ -185,25 +191,124 @@ async function lookupCep() {
   }
 }
 
-async function createCompany() {
+function resetCompanyForm() {
+  editingCompanyId.value = null
+  Object.assign(companyForm, {
+    merchant_id: '',
+    merchant_name: 'Loja teste',
+    billing_status: 'trialing',
+    name: 'Loja teste',
+    legal_name: '',
+    document: '',
+    zip_code: '',
+    street: '',
+    number: '',
+    complement: '',
+    district: '',
+    city: '',
+    state: '',
+    domain: '',
+    platform: 'custom',
+    status: 'active',
+    owner_name: '',
+    owner_email: '',
+    owner_cpf: '',
+    owner_password: '',
+  })
+}
+
+function editCompany(company: CompanyRow) {
+  editingCompanyId.value = company.id
+  Object.assign(companyForm, {
+    merchant_id: '',
+    merchant_name: company.merchant.name,
+    billing_status: company.merchant.billing_status,
+    name: company.name,
+    legal_name: company.legal_name || '',
+    document: company.document || '',
+    zip_code: company.zip_code || '',
+    street: company.street || '',
+    number: company.number || '',
+    complement: company.complement || '',
+    district: company.district || '',
+    city: company.city || '',
+    state: company.state || '',
+    domain: company.domain || '',
+    platform: company.platform || 'custom',
+    status: company.status || 'active',
+    owner_name: '',
+    owner_email: '',
+    owner_cpf: '',
+    owner_password: '',
+  })
+}
+
+function companyPayload(includeOwner = true) {
+  const base = Object.fromEntries(
+    Object.entries(companyForm)
+      .map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
+      .filter(([, value]) => value !== ''),
+  )
+
+  if (includeOwner) {
+    return base
+  }
+
+  for (const key of ['merchant_id', 'merchant_name', 'billing_status', 'owner_name', 'owner_email', 'owner_cpf', 'owner_password']) {
+    delete base[key]
+  }
+
+  return base
+}
+
+async function saveCompany() {
   savingCompany.value = true
   notice.value = ''
   error.value = ''
 
   try {
-    const payload = Object.fromEntries(
-      Object.entries(companyForm)
-        .map(([key, value]) => [key, typeof value === 'string' ? value.trim() : value])
-        .filter(([, value]) => value !== ''),
-    )
-
-    const { data } = await api.post('/saas/companies', payload)
-    notice.value = `Empresa criada com codigo ${data.data.access_code}.`
+    const { data } = editingCompanyId.value
+      ? await api.patch(`/saas/companies/${editingCompanyId.value}`, companyPayload(false))
+      : await api.post('/saas/companies', companyPayload(true))
+    notice.value = editingCompanyId.value
+      ? 'Empresa atualizada.'
+      : `Empresa criada com codigo ${data.data.access_code}.`
+    if (!editingCompanyId.value) {
+      resetCompanyForm()
+    }
     await loadSaas()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel criar a empresa.'
+    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar a empresa.'
   } finally {
     savingCompany.value = false
+  }
+}
+
+async function toggleCompany(company: CompanyRow) {
+  notice.value = ''
+  error.value = ''
+
+  try {
+    await api.patch(`/saas/companies/${company.id}`, {
+      name: company.name,
+      legal_name: company.legal_name,
+      document: company.document,
+      zip_code: company.zip_code,
+      street: company.street,
+      number: company.number,
+      complement: company.complement,
+      district: company.district,
+      city: company.city,
+      state: company.state,
+      domain: company.domain,
+      platform: company.platform,
+      external_store_id: company.external_store_id,
+      status: company.status === 'active' ? 'inactive' : 'active',
+    })
+    notice.value = company.status === 'active' ? 'Empresa desativada.' : 'Empresa ativada.'
+    await loadSaas()
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Nao foi possivel alterar o status da empresa.'
   }
 }
 
@@ -354,16 +459,19 @@ async function toggleTemplate(template: TransactionalEmail) {
       </div>
 
       <div class="saas-grid">
-        <form class="panel-main admin-form" @submit.prevent="createCompany">
+        <form class="panel-main admin-form" @submit.prevent="saveCompany">
           <div class="subsection-heading">
-            <h2>Cadastrar empresa teste</h2>
-            <span>Sem checkout publico</span>
+            <h2>{{ editingCompanyId ? 'Editar empresa' : 'Cadastrar empresa teste' }}</h2>
+            <button class="btn btn-secondary" type="button" @click="resetCompanyForm">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Nova
+            </button>
           </div>
 
           <div class="form-grid">
             <label>
               Lojista existente
-              <select v-model="companyForm.merchant_id">
+              <select v-model="companyForm.merchant_id" :disabled="Boolean(editingCompanyId)">
                 <option value="">Criar novo lojista</option>
                 <option v-for="merchant in merchants" :key="merchant.id" :value="merchant.id">
                   {{ merchant.name }}
@@ -451,9 +559,18 @@ async function toggleTemplate(template: TransactionalEmail) {
                 <option value="custom">Personalizada</option>
               </select>
             </label>
+            <label>
+              Status da empresa
+              <select v-model="companyForm.status">
+                <option value="active">Ativa</option>
+                <option value="inactive">Inativa</option>
+                <option value="trialing">Trial</option>
+                <option value="pending_payment">Pagamento pendente</option>
+              </select>
+            </label>
           </div>
 
-          <div class="form-grid">
+          <div v-if="!editingCompanyId" class="form-grid">
             <label>
               Admin da empresa
               <input v-model="companyForm.owner_name" />
@@ -471,7 +588,7 @@ async function toggleTemplate(template: TransactionalEmail) {
           <div class="action-row compact">
             <button class="btn btn-primary" type="submit" :disabled="savingCompany">
               <i class="fa-solid fa-building-circle-check" aria-hidden="true"></i>
-              Criar empresa
+              {{ editingCompanyId ? 'Salvar empresa' : 'Criar empresa' }}
             </button>
           </div>
         </form>
@@ -491,11 +608,12 @@ async function toggleTemplate(template: TransactionalEmail) {
                   <th>Plataforma</th>
                   <th>Endereco</th>
                   <th>Status</th>
+                  <th>Acoes</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="!companies.length">
-                  <td colspan="6">Sem empresas.</td>
+                  <td colspan="7">Sem empresas.</td>
                 </tr>
                 <tr v-for="company in companies" :key="company.id">
                   <td><strong>{{ company.access_code }}</strong></td>
@@ -506,7 +624,19 @@ async function toggleTemplate(template: TransactionalEmail) {
                   <td>{{ company.merchant.name }}</td>
                   <td>{{ company.platform }}</td>
                   <td>{{ [company.city, company.state].filter(Boolean).join('/') || '-' }}</td>
-                  <td>{{ company.status }}</td>
+                  <td>
+                    <span class="status-pill" :class="{ ok: company.status === 'active', warning: company.status !== 'active' }">
+                      {{ company.status === 'active' ? 'Ativa' : company.status }}
+                    </span>
+                  </td>
+                  <td class="row-actions">
+                    <button type="button" title="Editar" aria-label="Editar empresa" @click="editCompany(company)">
+                      <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                    </button>
+                    <button type="button" :title="company.status === 'active' ? 'Desativar' : 'Ativar'" @click="toggleCompany(company)">
+                      <i :class="company.status === 'active' ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off'" aria-hidden="true"></i>
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>

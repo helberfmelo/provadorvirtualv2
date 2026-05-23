@@ -1219,6 +1219,79 @@ textarea {
   align-items: start;
 }
 
+.user-grid {
+  display: grid;
+  grid-template-columns: minmax(420px, 0.95fr) minmax(0, 1.05fr);
+  gap: 18px;
+  margin-top: 24px;
+  align-items: start;
+}
+
+.check-line {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 10px !important;
+  width: fit-content;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.check-line input {
+  width: 18px;
+  min-height: 18px;
+}
+
+.permission-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.permission-grid.disabled {
+  opacity: 0.72;
+}
+
+.permission-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 92px 104px;
+  gap: 10px;
+  align-items: center;
+  padding: 11px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.permission-row span,
+.permission-row strong,
+.permission-row small {
+  display: block;
+}
+
+.permission-row strong {
+  color: #0f172a;
+}
+
+.permission-row small {
+  color: #6b7280;
+  line-height: 1.45;
+}
+
+.permission-row label {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 7px !important;
+  margin: 0;
+}
+
+.permission-row input {
+  width: 18px;
+  min-height: 18px;
+}
+
 .admin-form small {
   color: #6b7280;
   font-weight: 600;
@@ -1650,6 +1723,7 @@ td small {
   .integrations-grid,
   .import-grid,
   .saas-grid,
+  .user-grid,
   .analytics-grid,
   .color-grid,
   .legal-grid {
@@ -1683,6 +1757,10 @@ td small {
   }
 
   .readiness-row {
+    grid-template-columns: 1fr;
+  }
+
+  .permission-row {
     grid-template-columns: 1fr;
   }
 }

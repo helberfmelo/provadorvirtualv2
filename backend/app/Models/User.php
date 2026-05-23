@@ -24,13 +24,15 @@ class User extends Authenticatable
         'email',
         'cpf',
         'role',
+        'status',
+        'permissions',
         'password',
     ];
 
     public function merchants()
     {
         return $this->belongsToMany(Merchant::class)
-            ->withPivot(['role', 'is_owner'])
+            ->withPivot(['merchant_company_id', 'role', 'status', 'is_owner', 'permissions'])
             ->withTimestamps();
     }
 
@@ -53,6 +55,7 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
+            'permissions' => 'array',
             'password' => 'hashed',
         ];
     }

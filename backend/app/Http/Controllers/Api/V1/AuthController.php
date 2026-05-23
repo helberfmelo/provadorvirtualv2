@@ -8,6 +8,7 @@ use App\Models\MerchantCompany;
 use App\Models\User;
 use App\Services\Audit\AuditLogger;
 use App\Support\ActiveTenant;
+use App\Support\PermissionCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -29,6 +30,12 @@ class AuthController extends Controller
         if (! $user || ! Hash::check($credentials['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'login' => ['Login ou senha invalidos.'],
+            ]);
+        }
+
+        if (($user->status ?? 'active') !== 'active') {
+            throw ValidationException::withMessages([
+                'login' => ['Este usuario esta inativo. Fale com o administrador.'],
             ]);
         }
 
@@ -55,6 +62,8 @@ class AuthController extends Controller
             'user' => $this->serializeUser($user),
             'active_merchant' => $merchant ? $this->serializeMerchant($merchant) : null,
             'active_company' => $company ? $this->serializeCompany($company) : null,
+            'permissions' => $merchant ? PermissionCatalog::forMerchantUser($user, $merchant) : null,
+            'saas_permissions' => PermissionCatalog::forSaasUser($user),
         ]);
     }
 
@@ -81,7 +90,13 @@ class AuthController extends Controller
             'user' => $this->serializeUser($user),
             'active_merchant' => $merchant ? $this->serializeMerchant($merchant) : null,
             'active_company' => $company ? $this->serializeCompany($company) : null,
+            'permissions' => $merchant ? PermissionCatalog::forMerchantUser($user, $merchant) : null,
+            'saas_permissions' => PermissionCatalog::forSaasUser($user),
             'merchants' => $user->merchants()
+                ->when(! in_array($user->role, ['admin', 'support'], true), fn ($query) => $query->where(function ($innerQuery): void {
+                    $innerQuery->where('merchant_user.status', 'active')
+                        ->orWhereNull('merchant_user.status');
+                }))
                 ->select('merchants.id', 'merchants.name', 'merchants.slug', 'merchants.billing_status')
                 ->get(),
         ]);
@@ -121,7 +136,12 @@ class AuthController extends Controller
             return [$merchant, $merchant?->companies()->orderBy('id')->first()];
         }
 
-        $merchantIds = $user->merchants()->pluck('merchants.id');
+        $merchantIds = $user->merchants()
+            ->where(function ($query): void {
+                $query->where('merchant_user.status', 'active')
+                    ->orWhereNull('merchant_user.status');
+            })
+            ->pluck('merchants.id');
         $companyCount = MerchantCompany::query()->whereIn('merchant_id', $merchantIds)->count();
 
         if ($companyCount > 1) {
@@ -130,7 +150,13 @@ class AuthController extends Controller
             ]);
         }
 
-        $merchant = $user->merchants()->orderBy('merchants.id')->first();
+        $merchant = $user->merchants()
+            ->where(function ($query): void {
+                $query->where('merchant_user.status', 'active')
+                    ->orWhereNull('merchant_user.status');
+            })
+            ->orderBy('merchants.id')
+            ->first();
         if (! $merchant) {
             throw ValidationException::withMessages([
                 'company_access' => ['Usuario sem empresa vinculada.'],
@@ -172,7 +198,13 @@ class AuthController extends Controller
             return true;
         }
 
-        return $user->merchants()->whereKey($merchant->id)->exists();
+        return $user->merchants()
+            ->whereKey($merchant->id)
+            ->where(function ($query): void {
+                $query->where('merchant_user.status', 'active')
+                    ->orWhereNull('merchant_user.status');
+            })
+            ->exists();
     }
 
     private function safeActiveMerchant(Request $request): ?Merchant
@@ -192,6 +224,7 @@ class AuthController extends Controller
             'email' => $user->email,
             'cpf' => $user->cpf,
             'role' => $user->role,
+            'status' => $user->status ?? 'active',
         ];
     }
 

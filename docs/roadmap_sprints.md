@@ -344,7 +344,7 @@ Status: implementado, publicado e validado em producao no run `26337254520`.
 
 Objetivo: permitir que SaaS e lojista gerenciem usuarios com permissoes granulares.
 
-Entregas previstas:
+Entregas:
 
 - CRUD de usuarios no portal SaaS;
 - CRUD de usuarios no portal da empresa;
@@ -352,6 +352,8 @@ Entregas previstas:
 - permissoes por modulo/menu com visualizar e editar;
 - ao marcar editar, visualizar fica automaticamente ativo;
 - enforcement inicial no backend para modulos criticos.
+
+Status: implementado e validado localmente. Publicacao em producao pendente do push da sprint.
 
 ## Sprints 31 a 36 - Refinamento operacional e escala
 

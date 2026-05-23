@@ -29,15 +29,17 @@ async function logout() {
       <nav class="nav" aria-label="Principal">
         <RouterLink to="/produto-teste">Produto teste</RouterLink>
         <RouterLink v-if="!auth.isAuthenticated" to="/checkout">Contratar</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app/produtos">Produtos</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app/tabelas-de-medidas">Tabelas</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app/assistente">Assistente</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app/analytics">Analytics</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app/go-live">Go-live</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app/importacoes">Importacoes</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app/widget">Widget</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated" to="/app/integracoes">Integracoes</RouterLink>
-        <RouterLink v-if="auth.isAuthenticated && canSeeSaas" to="/saas">SaaS</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('products')" to="/app/produtos">Produtos</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('measurement_tables')" to="/app/tabelas-de-medidas">Tabelas</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('ai_assistant')" to="/app/assistente">Assistente</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('analytics')" to="/app/analytics">Analytics</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('go_live')" to="/app/go-live">Go-live</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('imports')" to="/app/importacoes">Importacoes</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('widget')" to="/app/widget">Widget</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('integrations')" to="/app/integracoes">Integracoes</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && auth.canView('users')" to="/app/usuarios">Usuarios</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && canSeeSaas && auth.canSaasView('saas_dashboard')" to="/saas">SaaS</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated && canSeeSaas && auth.canSaasView('saas_users')" to="/saas/usuarios">Usuarios SaaS</RouterLink>
         <RouterLink v-if="!auth.isAuthenticated" to="/login">Entrar</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app">Painel</RouterLink>
         <button v-if="auth.isAuthenticated" class="nav-button" type="button" title="Sair" @click="logout">

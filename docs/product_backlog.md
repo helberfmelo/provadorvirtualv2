@@ -105,7 +105,7 @@ Atualizado em: 2026-05-23
 - `DONE` Login do portal da empresa com codigo/CNPJ.
 - `DONE` Login por e-mail ou CPF no SaaS e no portal da empresa.
 - `DONE` Reuso de usuario por e-mail/CPF em mais de uma empresa.
-- `TODO` CRUD de usuarios e permissoes no SaaS e no portal da empresa.
+- `DONE` CRUD de usuarios e permissoes no SaaS e no portal da empresa.
 
 ## Pagamentos
 

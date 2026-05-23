@@ -8,6 +8,7 @@ type AuthUser = {
   email: string
   cpf?: string | null
   role: string
+  status?: string
 }
 type AuthMerchant = {
   id: number
@@ -25,12 +26,15 @@ type AuthCompany = {
 }
 
 const storedToken = localStorage.getItem('pv_token')
+type PermissionMap = Record<string, { view: boolean; edit: boolean }>
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(storedToken)
   const user = ref<AuthUser | null>(null)
   const activeMerchant = ref<AuthMerchant | null>(null)
   const activeCompany = ref<AuthCompany | null>(null)
+  const permissions = ref<PermissionMap | null>(null)
+  const saasPermissions = ref<PermissionMap | null>(null)
   const isAuthenticated = computed(() => Boolean(token.value))
 
   setAuthToken(storedToken)
@@ -45,6 +49,8 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.user
     activeMerchant.value = data.active_merchant || null
     activeCompany.value = data.active_company || null
+    permissions.value = data.permissions || null
+    saasPermissions.value = data.saas_permissions || null
     localStorage.setItem('pv_token', data.token)
     setAuthToken(data.token)
   }
@@ -58,6 +64,8 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.user
     activeMerchant.value = data.active_merchant || null
     activeCompany.value = data.active_company || null
+    permissions.value = data.permissions || null
+    saasPermissions.value = data.saas_permissions || null
   }
 
   async function logout() {
@@ -69,9 +77,58 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     activeMerchant.value = null
     activeCompany.value = null
+    permissions.value = null
+    saasPermissions.value = null
     localStorage.removeItem('pv_token')
     setAuthToken(null)
   }
 
-  return { token, user, activeMerchant, activeCompany, isAuthenticated, login, loadMe, logout }
+  function canView(module: string) {
+    if (['admin', 'support'].includes(user.value?.role || '')) {
+      return true
+    }
+
+    return permissions.value ? Boolean(permissions.value[module]?.view) : true
+  }
+
+  function canEdit(module: string) {
+    if (['admin', 'support'].includes(user.value?.role || '')) {
+      return true
+    }
+
+    return permissions.value ? Boolean(permissions.value[module]?.edit) : true
+  }
+
+  function canSaasView(module: string) {
+    if (!['admin', 'support'].includes(user.value?.role || '')) {
+      return false
+    }
+
+    return saasPermissions.value ? Boolean(saasPermissions.value[module]?.view) : true
+  }
+
+  function canSaasEdit(module: string) {
+    if (!['admin', 'support'].includes(user.value?.role || '')) {
+      return false
+    }
+
+    return saasPermissions.value ? Boolean(saasPermissions.value[module]?.edit) : true
+  }
+
+  return {
+    token,
+    user,
+    activeMerchant,
+    activeCompany,
+    permissions,
+    saasPermissions,
+    isAuthenticated,
+    login,
+    loadMe,
+    logout,
+    canView,
+    canEdit,
+    canSaasView,
+    canSaasEdit,
+  }
 })

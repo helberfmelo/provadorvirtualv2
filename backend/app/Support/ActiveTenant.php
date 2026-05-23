@@ -13,10 +13,18 @@ class ActiveTenant
     {
         $user = $request->user();
         $merchantId = $this->abilityId($request, 'merchant');
+        $query = $user?->merchants();
+
+        if ($query && ! in_array($user->role, ['admin', 'support'], true)) {
+            $query->where(function ($innerQuery): void {
+                $innerQuery->where('merchant_user.status', 'active')
+                    ->orWhereNull('merchant_user.status');
+            });
+        }
 
         $merchant = $merchantId
-            ? $user?->merchants()->whereKey($merchantId)->first()
-            : $user?->merchants()->orderBy('merchants.id')->first();
+            ? $query?->whereKey($merchantId)->first()
+            : $query?->orderBy('merchants.id')->first();
 
         if (! $merchant) {
             throw new NotFoundHttpException('Lojista nao encontrado para o usuario autenticado.');

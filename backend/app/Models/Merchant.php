@@ -22,7 +22,7 @@ class Merchant extends Model
     public function users()
     {
         return $this->belongsToMany(User::class)
-            ->withPivot(['role', 'is_owner'])
+            ->withPivot(['merchant_company_id', 'role', 'status', 'is_owner', 'permissions'])
             ->withTimestamps();
     }
 

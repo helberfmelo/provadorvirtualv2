@@ -26,6 +26,7 @@ Atualizado em: 2026-05-23
 - Sprint 27 ajustou a landing para estrutura inspirada no v1, publicou build prevista para a raiz e simplificou o checkout para plano anual unico sem boleto.
 - Sprint 28 criou monitor de pagamentos pendentes, agendamento de cron/scheduler e configuracao SaaS de SMTP/templates transacionais; publicado em producao no run `26336899986`.
 - Sprint 29 preparou login por e-mail/CPF, acesso do portal por codigo/CNPJ e contexto de empresa no token; publicado em producao no run `26337254520`.
+- Sprint 30 criou CRUD de usuarios no SaaS e no portal da empresa, permissoes por modulo/menu, status global/por empresa e acoes de editar/ativar/desativar.
 
 ## Referencias confirmadas
 
@@ -103,8 +104,8 @@ Atualizado em: 2026-05-23
 
 ## Superficie atual
 
-- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`.
-- Painel SaaS protegido por papel: `/saas`.
+- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/usuarios`.
+- Painel SaaS protegido por papel/permissao: `/saas` e `/saas/usuarios`.
 - Login do portal: `/login`, aceitando e-mail ou CPF e campo de codigo/CNPJ para empresa.
 - Checkout publico: `/checkout` e `/checkout/sucesso`.
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
@@ -119,8 +120,9 @@ Atualizado em: 2026-05-23
 - APIs publicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}` e `/api/v1/webhooks/pagarme`.
 - APIs publicas de empresa: `/api/v1/public/company-access`.
 - APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.
+- APIs de usuarios/permissoes: `/api/v1/merchant/users` e `/api/v1/saas/users`.
 - Widget publico: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
 
 ## Proxima acao recomendada
 
-Publicar a Sprint 29, cadastrar `PAGARME_*` em producao com URLs da raiz, salvar o cron do scheduler no cPanel, validar checkout + widget e seguir para a Sprint 30 de usuarios e permissoes por modulo.
+Publicar a Sprint 30, validar `/app/usuarios` e `/saas/usuarios` em producao, cadastrar `PAGARME_*` com URLs da raiz, salvar o cron do scheduler no cPanel e seguir para a Sprint 31 de automacoes de e-mail e ciclo financeiro.

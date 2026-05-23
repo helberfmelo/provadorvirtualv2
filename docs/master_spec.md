@@ -44,6 +44,7 @@ O v2 nao deve ser um MVP simplista, mas tambem nao deve virar uma plataforma inc
 
 - `users`: usuarios autenticados do SaaS e lojistas.
 - `merchants`: lojistas/contas.
+- `merchant_user`: vinculo do usuario com lojista, status por empresa e permissoes do portal.
 - `merchant_companies`: empresas ou lojas vinculadas ao lojista.
 - `platform_connections`: conexoes com BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray e custom.
 - `products`: produtos canonicos no Provador Virtual.
@@ -80,6 +81,8 @@ Endpoints esperados:
 - `POST /auth/logout`
 - `GET /me`
 - `GET /merchant/overview`
+- `GET|POST|PATCH /merchant/users`
+- `GET|POST|PATCH /saas/users`
 - `GET|POST|PUT|DELETE /products`
 - `GET|POST|PUT|DELETE /products/{id}/variants`
 - `GET|POST|PUT|DELETE /measurement-tables`

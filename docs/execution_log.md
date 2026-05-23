@@ -233,3 +233,15 @@
 - Run `26337158927` aplicou backend/raiz, mas falhou no smoke por falso negativo de `curl | grep -q` com `pipefail` e exit `23`.
 - Workflow ajustado no commit `08547b8` para validar respostas HTTP em variavel antes do `grep`, evitando SIGPIPE falso.
 - Run `26337254520` finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 30 Usuarios e permissoes por modulo
+
+- Criada migration para `users.status`, `users.permissions`, `merchant_user.status`, `merchant_user.permissions` e vinculo opcional com `merchant_company_id`.
+- Criado catalogo canonico de modulos/permissoes para portal da empresa e portal SaaS.
+- Criadas APIs protegidas `/api/v1/merchant/users` e `/api/v1/saas/users`.
+- Login passa a bloquear usuario globalmente inativo e acesso de empresa desativado.
+- Menu do frontend passa a respeitar permissoes de visualizacao.
+- Criadas telas `/app/usuarios` e `/saas/usuarios` com listagem, novo, editar e ativar/desativar.
+- CRUD de empresas no SaaS ganhou editar e ativar/desativar na listagem.
+- Criado documento `docs/user_access_permissions.md`.
+- Validacoes locais: `php artisan test --filter=UserAccessApiTest`, `php artisan test`, `npm run build`.

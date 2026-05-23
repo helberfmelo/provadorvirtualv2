@@ -14,7 +14,9 @@ import PrivacyView from '../views/PrivacyView.vue'
 import ProductsView from '../views/ProductsView.vue'
 import ProductTestView from '../views/ProductTestView.vue'
 import SaasAdminView from '../views/SaasAdminView.vue'
+import SaasUsersView from '../views/SaasUsersView.vue'
 import TermsView from '../views/TermsView.vue'
+import UsersView from '../views/UsersView.vue'
 import WidgetInstallView from '../views/WidgetInstallView.vue'
 
 const base = import.meta.env.VITE_APP_BASE_PATH || '/'
@@ -40,7 +42,9 @@ const router = createRouter({
     { path: '/app/importacoes', component: ImportsView },
     { path: '/app/widget', component: WidgetInstallView },
     { path: '/app/integracoes', component: IntegrationsView },
+    { path: '/app/usuarios', component: UsersView },
     { path: '/saas', component: SaasAdminView },
+    { path: '/saas/usuarios', component: SaasUsersView },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
   scrollBehavior() {
