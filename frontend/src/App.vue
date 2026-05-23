@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from './stores/auth'
 
 const route = useRoute()
+const router = useRouter()
 const auth = useAuthStore()
 const navOpen = ref(false)
 
@@ -20,6 +21,22 @@ watch(() => route.fullPath, () => {
 
 async function logout() {
   await auth.logout()
+  navOpen.value = false
+}
+
+async function switchCompany(event: Event) {
+  const companyId = Number((event.target as HTMLSelectElement).value)
+
+  if (!companyId || companyId === auth.activeCompany?.id) {
+    return
+  }
+
+  await auth.selectCompany(companyId)
+
+  if (route.path.startsWith('/saas')) {
+    await router.push('/app')
+  }
+
   navOpen.value = false
 }
 </script>
@@ -46,6 +63,14 @@ async function logout() {
       <div v-if="navOpen" class="nav-scrim" @click="navOpen = false"></div>
 
       <nav id="main-navigation" class="nav" :class="{ open: navOpen }" aria-label="Principal">
+        <label v-if="auth.isAuthenticated && auth.companyOptions.length > 1" class="company-switcher">
+          <span>Empresa</span>
+          <select :value="auth.activeCompany?.id || ''" @change="switchCompany">
+            <option v-for="company in auth.companyOptions" :key="company.id" :value="company.id">
+              {{ company.name }}
+            </option>
+          </select>
+        </label>
         <RouterLink to="/produto-teste">Produto teste</RouterLink>
         <RouterLink v-if="!auth.isAuthenticated" to="/checkout">Contratar</RouterLink>
         <RouterLink v-if="auth.isAuthenticated && auth.canView('products')" to="/app/produtos">Produtos</RouterLink>

@@ -39,18 +39,17 @@ class AuthController extends Controller
             ]);
         }
 
+        if (! in_array($user->role, ['admin', 'support'], true)
+            && ! filled($request->input('company_access'))
+            && count($this->companyOptionsFor($user)) > 1) {
+            return response()->json([
+                'message' => 'Selecione a empresa para acessar o portal.',
+                'company_options' => $this->companyOptionsFor($user),
+            ], 409);
+        }
+
         [$merchant, $company] = $this->resolveLoginContext($user, $request);
-        $abilities = ['role:'.$user->role];
-
-        if ($merchant) {
-            $abilities[] = 'merchant:'.$merchant->id;
-        }
-
-        if ($company) {
-            $abilities[] = 'company:'.$company->id;
-        }
-
-        $token = $user->createToken('provadorvirtual-spa', $abilities)->plainTextToken;
+        $token = $this->issueToken($user, $merchant, $company);
 
         app(AuditLogger::class)->log($request, $merchant, 'auth.login', 'auth', 'info', [
             'email' => $user->email,
@@ -64,6 +63,7 @@ class AuthController extends Controller
             'active_company' => $company ? $this->serializeCompany($company) : null,
             'permissions' => $merchant ? PermissionCatalog::forMerchantUser($user, $merchant) : null,
             'saas_permissions' => PermissionCatalog::forSaasUser($user),
+            'company_options' => $this->companyOptionsFor($user),
         ]);
     }
 
@@ -92,6 +92,7 @@ class AuthController extends Controller
             'active_company' => $company ? $this->serializeCompany($company) : null,
             'permissions' => $merchant ? PermissionCatalog::forMerchantUser($user, $merchant) : null,
             'saas_permissions' => PermissionCatalog::forSaasUser($user),
+            'company_options' => $this->companyOptionsFor($user),
             'merchants' => $user->merchants()
                 ->when(! in_array($user->role, ['admin', 'support'], true), fn ($query) => $query->where(function ($innerQuery): void {
                     $innerQuery->where('merchant_user.status', 'active')
@@ -99,6 +100,45 @@ class AuthController extends Controller
                 }))
                 ->select('merchants.id', 'merchants.name', 'merchants.slug', 'merchants.billing_status')
                 ->get(),
+        ]);
+    }
+
+    public function selectCompany(Request $request)
+    {
+        $data = $request->validate([
+            'company_id' => ['nullable', 'integer'],
+            'company_access' => ['nullable', 'string', 'max:32', 'required_without:company_id'],
+        ]);
+
+        $company = filled($data['company_id'] ?? null)
+            ? MerchantCompany::query()->with('merchant')->findOrFail((int) $data['company_id'])
+            : $this->resolveCompanyByAccess((string) $data['company_access']);
+        $merchant = $company->merchant;
+        $user = $request->user();
+
+        if (! $this->canAccessCompany($user, $company)) {
+            throw ValidationException::withMessages([
+                'company_access' => ['Este usuario nao pertence a empresa informada.'],
+            ]);
+        }
+
+        $request->user()?->currentAccessToken()?->delete();
+        $token = $this->issueToken($user, $merchant, $company);
+
+        app(AuditLogger::class)->log($request, $merchant, 'auth.company_selected', 'auth', 'info', [
+            'merchant_company_id' => $company->id,
+            'module' => 'auth',
+            'action' => 'select_company',
+        ], actor: $user);
+
+        return response()->json([
+            'token' => $token,
+            'user' => $this->serializeUser($user),
+            'active_merchant' => $this->serializeMerchant($merchant),
+            'active_company' => $this->serializeCompany($company),
+            'permissions' => PermissionCatalog::forMerchantUser($user, $merchant),
+            'saas_permissions' => PermissionCatalog::forSaasUser($user),
+            'company_options' => $this->companyOptionsFor($user),
         ]);
     }
 
@@ -121,7 +161,7 @@ class AuthController extends Controller
             $company = $this->resolveCompanyByAccess($companyAccess);
             $merchant = $company->merchant;
 
-            if (! $this->canAccessMerchant($user, $merchant)) {
+            if (! $this->canAccessCompany($user, $company)) {
                 throw ValidationException::withMessages([
                     'company_access' => ['Este usuario nao pertence a empresa informada.'],
                 ]);
@@ -142,7 +182,7 @@ class AuthController extends Controller
                     ->orWhereNull('merchant_user.status');
             })
             ->pluck('merchants.id');
-        $companyCount = MerchantCompany::query()->whereIn('merchant_id', $merchantIds)->count();
+        $companyCount = count($this->companyOptionsFor($user));
 
         if ($companyCount > 1) {
             throw ValidationException::withMessages([
@@ -205,6 +245,105 @@ class AuthController extends Controller
                     ->orWhereNull('merchant_user.status');
             })
             ->exists();
+    }
+
+    private function canAccessCompany(User $user, ?MerchantCompany $company): bool
+    {
+        if (! $company || ! $company->merchant) {
+            return false;
+        }
+
+        if (($company->status ?? 'active') === 'inactive') {
+            return false;
+        }
+
+        if (in_array($user->role, ['admin', 'support'], true)) {
+            return true;
+        }
+
+        $merchant = $user->merchants()
+            ->whereKey($company->merchant_id)
+            ->where(function ($query): void {
+                $query->where('merchant_user.status', 'active')
+                    ->orWhereNull('merchant_user.status');
+            })
+            ->first();
+
+        if (! $merchant) {
+            return false;
+        }
+
+        $pivotCompanyId = $merchant->pivot?->merchant_company_id;
+
+        return ! $pivotCompanyId || (int) $pivotCompanyId === (int) $company->id;
+    }
+
+    private function issueToken(User $user, ?Merchant $merchant, ?MerchantCompany $company): string
+    {
+        $abilities = ['role:'.$user->role];
+
+        if ($merchant) {
+            $abilities[] = 'merchant:'.$merchant->id;
+        }
+
+        if ($company) {
+            $abilities[] = 'company:'.$company->id;
+        }
+
+        return $user->createToken('provadorvirtual-spa', $abilities)->plainTextToken;
+    }
+
+    private function companyOptionsFor(User $user): array
+    {
+        if (in_array($user->role, ['admin', 'support'], true)) {
+            return MerchantCompany::query()
+                ->with('merchant:id,name,slug,billing_status')
+                ->orderBy('name')
+                ->limit(100)
+                ->get()
+                ->map(fn (MerchantCompany $company): array => $this->serializeCompanyOption($company))
+                ->values()
+                ->all();
+        }
+
+        $merchants = $user->merchants()
+            ->where(function ($query): void {
+                $query->where('merchant_user.status', 'active')
+                    ->orWhereNull('merchant_user.status');
+            })
+            ->get();
+
+        return $merchants
+            ->flatMap(function (Merchant $merchant): array {
+                $companyId = $merchant->pivot?->merchant_company_id;
+                $query = $merchant->companies()
+                    ->where('status', '!=', 'inactive')
+                    ->orderBy('name');
+
+                if ($companyId) {
+                    $query->whereKey($companyId);
+                }
+
+                return $query->with('merchant:id,name,slug,billing_status')
+                    ->get()
+                    ->map(fn (MerchantCompany $company): array => $this->serializeCompanyOption($company))
+                    ->all();
+            })
+            ->values()
+            ->all();
+    }
+
+    private function serializeCompanyOption(MerchantCompany $company): array
+    {
+        return [
+            'id' => $company->id,
+            'name' => $company->name,
+            'access_code' => $company->access_code,
+            'document' => $company->document,
+            'platform' => $company->platform,
+            'status' => $company->status,
+            'merchant' => $company->merchant ? $this->serializeMerchant($company->merchant) : null,
+        ];
     }
 
     private function safeActiveMerchant(Request $request): ?Merchant

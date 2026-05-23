@@ -23,9 +23,12 @@ class AuditLogger
     ): AuditLog {
         return AuditLog::query()->create([
             'merchant_id' => $merchant?->id,
+            'merchant_company_id' => data_get($metadata, 'merchant_company_id') ?: data_get($metadata, 'company_id'),
             'user_id' => $actor?->id ?? $request->user()?->id,
             'event' => $event,
             'category' => $category,
+            'module' => data_get($metadata, 'module') ?: $category,
+            'action' => data_get($metadata, 'action'),
             'severity' => $severity,
             'auditable_type' => $auditable?->getMorphClass(),
             'auditable_id' => $auditable?->getKey(),

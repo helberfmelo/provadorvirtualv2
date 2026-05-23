@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsurePortalPermission;
 use App\Http\Middleware\EnsureWidgetOriginAllowed;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
@@ -16,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
+            'portal.permission' => EnsurePortalPermission::class,
             'widget.origin' => EnsureWidgetOriginAllowed::class,
         ]);
 

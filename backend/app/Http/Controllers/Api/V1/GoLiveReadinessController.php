@@ -18,13 +18,14 @@ class GoLiveReadinessController extends Controller
     public function __invoke(Request $request)
     {
         $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
         $checks = collect([
-            $this->productsCheck($merchant->id),
-            $this->measurementTablesCheck($merchant->id),
-            $this->productTestCheck($merchant->id),
-            $this->widgetCheck($merchant->id),
-            $this->recommendationSmokeCheck($merchant->id),
-            $this->bigShopPilotCheck($merchant->id),
+            $this->productsCheck($merchant->id, $company?->id),
+            $this->measurementTablesCheck($merchant->id, $company?->id),
+            $this->productTestCheck($merchant->id, $company?->id),
+            $this->widgetCheck($merchant->id, $company?->id),
+            $this->recommendationSmokeCheck($merchant->id, $company?->id),
+            $this->bigShopPilotCheck($merchant->id, $company?->id),
             $this->oneClickSecretCheck(),
             $this->aiProviderCheck(),
             $this->legalPagesCheck(),
@@ -53,15 +54,19 @@ class GoLiveReadinessController extends Controller
             ],
             'missing_credentials' => [
                 'bigshop_activation_secret' => ! filled(config('services.bigshop.activation_secret')),
-                'bigshop_test_store' => ! $this->hasConfiguredBigShop($merchant->id),
+                'bigshop_test_store' => ! $this->hasConfiguredBigShop($merchant->id, $company?->id),
                 'external_ai_key' => ! $this->hasExternalAiKey(),
             ],
         ]);
     }
 
-    private function productsCheck(int $merchantId): array
+    private function productsCheck(int $merchantId, ?int $companyId): array
     {
-        $count = Product::query()->where('merchant_id', $merchantId)->where('status', 'active')->count();
+        $count = Product::query()
+            ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
+            ->where('status', 'active')
+            ->count();
 
         return $this->check(
             key: 'products',
@@ -72,10 +77,11 @@ class GoLiveReadinessController extends Controller
         );
     }
 
-    private function measurementTablesCheck(int $merchantId): array
+    private function measurementTablesCheck(int $merchantId, ?int $companyId): array
     {
         $count = MeasurementTable::query()
             ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
             ->where('status', 'active')
             ->whereHas('rows')
             ->count();
@@ -89,10 +95,11 @@ class GoLiveReadinessController extends Controller
         );
     }
 
-    private function productTestCheck(int $merchantId): array
+    private function productTestCheck(int $merchantId, ?int $companyId): array
     {
         $count = Product::query()
             ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
             ->whereNotNull('measurement_table_id')
             ->whereHas('variants', fn ($query) => $query->where('is_active', true))
             ->count();
@@ -106,10 +113,11 @@ class GoLiveReadinessController extends Controller
         );
     }
 
-    private function widgetCheck(int $merchantId): array
+    private function widgetCheck(int $merchantId, ?int $companyId): array
     {
         $install = WidgetInstall::query()
             ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
             ->where('is_active', true)
             ->first();
         $domains = collect($install?->allowed_domains ?? [])->filter()->values();
@@ -123,9 +131,12 @@ class GoLiveReadinessController extends Controller
         );
     }
 
-    private function recommendationSmokeCheck(int $merchantId): array
+    private function recommendationSmokeCheck(int $merchantId, ?int $companyId): array
     {
-        $count = RecommendationLog::query()->where('merchant_id', $merchantId)->count();
+        $count = RecommendationLog::query()
+            ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
+            ->count();
 
         return $this->check(
             key: 'recommendation_smoke',
@@ -136,9 +147,9 @@ class GoLiveReadinessController extends Controller
         );
     }
 
-    private function bigShopPilotCheck(int $merchantId): array
+    private function bigShopPilotCheck(int $merchantId, ?int $companyId): array
     {
-        $configured = $this->hasConfiguredBigShop($merchantId);
+        $configured = $this->hasConfiguredBigShop($merchantId, $companyId);
 
         return $this->check(
             key: 'bigshop_pilot',
@@ -197,10 +208,11 @@ class GoLiveReadinessController extends Controller
         );
     }
 
-    private function hasConfiguredBigShop(int $merchantId): bool
+    private function hasConfiguredBigShop(int $merchantId, ?int $companyId): bool
     {
         return PlatformConnection::query()
             ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
             ->where('platform', 'bigshop')
             ->whereIn('status', ['configured', 'connected'])
             ->exists();
@@ -214,5 +226,17 @@ class GoLiveReadinessController extends Controller
     private function check(string $key, string $label, string $status, string $detail, string $action): array
     {
         return compact('key', 'label', 'status', 'detail', 'action');
+    }
+
+    private function scopeCompanyId($query, ?int $companyId)
+    {
+        if (! $companyId) {
+            return $query;
+        }
+
+        return $query->where(function ($innerQuery) use ($companyId): void {
+            $innerQuery->where('merchant_company_id', $companyId)
+                ->orWhereNull('merchant_company_id');
+        });
     }
 }

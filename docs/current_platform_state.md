@@ -29,6 +29,7 @@ Atualizado em: 2026-05-23
 - Sprint 30 criou CRUD de usuarios no SaaS e no portal da empresa, permissoes por modulo/menu, status global/por empresa e acoes de editar/ativar/desativar; publicado em producao no run `26337792120`.
 - Sprint 31 criou automacoes de e-mail transacional, historico de envios e comando/scheduler para pendencias financeiras; publicado em producao no run `26338061259`.
 - Sprint 32 implementou refinamento da oferta publica, trava de integracao BigShop, favicon/OG, footer, imagens da loja teste e menu mobile em drawer; publicado em producao no run `26338411089`.
+- Sprint 33 completou login multiempresa, seletor de empresa no painel, escopo por empresa nas APIs do portal, enforcement de permissoes por rota e auditoria com empresa/modulo/acao.
 
 ## Referencias confirmadas
 
@@ -108,9 +109,9 @@ Atualizado em: 2026-05-23
 
 - Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/usuarios`.
 - Painel SaaS protegido por papel/permissao: `/saas` e `/saas/usuarios`.
-- Login do portal: `/login`, aceitando e-mail ou CPF e campo de codigo/CNPJ para empresa.
+- Login do portal: `/login`, aceitando e-mail ou CPF, campo de codigo/CNPJ para empresa e seletor quando o usuario tem multiplas empresas.
 - Checkout publico: `/checkout` e `/checkout/sucesso`.
-- APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
+- APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes, com middleware de permissao por modulo e escopo da empresa ativa.
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`.
 - Analytics/auditoria protegidos: `/api/v1/analytics/*`, `/api/v1/audit-logs` e `/api/v1/saas/*`.
@@ -128,4 +129,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Seguir para login multiempresa refinado e enforcement completo de permissoes.
+Seguir para guias de integracao por plataforma e checklist visual de instalacao.

@@ -394,12 +394,16 @@ Status: implementado, publicado e validado em producao no run `26338411089`.
 
 Objetivo: completar a experiencia de usuarios que participam de mais de uma empresa.
 
-Entregas previstas:
+Entregas:
 
 - seletor de empresa apos login quando houver multiplas empresas;
 - escopo por empresa em todas as telas do portal;
 - enforcement completo das permissoes de visualizar/editar;
 - auditoria por usuario/empresa/modulo.
+- alternancia de empresa no topo do painel sem logout;
+- testes cobrindo login multiempresa, troca de contexto, escopo de dados e negacao auditada.
+
+Status: implementado e testado localmente; aguardando publicacao da Sprint 33.
 
 ### Sprint 34 - Guias de integracao por plataforma
 

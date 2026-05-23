@@ -102,8 +102,80 @@ class AuthTest extends TestCase
             'login' => 'multi@example.com',
             'password' => 'password123',
         ])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('company_access');
+            ->assertStatus(409)
+            ->assertJsonPath('message', 'Selecione a empresa para acessar o portal.')
+            ->assertJsonCount(2, 'company_options');
+    }
+
+    public function test_user_can_switch_active_company_and_keep_data_scoped(): void
+    {
+        $user = User::query()->create([
+            'name' => 'Switcher User',
+            'email' => 'switcher@example.com',
+            'cpf' => '33344455566',
+            'role' => 'merchant',
+            'password' => Hash::make('password123'),
+        ]);
+        $merchant = Merchant::query()->create([
+            'name' => 'Loja Switcher',
+            'slug' => 'loja-switcher',
+            'billing_status' => 'active',
+        ]);
+        $firstCompany = MerchantCompany::query()->create([
+            'merchant_id' => $merchant->id,
+            'name' => 'Loja Switcher Matriz',
+            'platform' => 'custom',
+            'status' => 'active',
+        ]);
+        $secondCompany = MerchantCompany::query()->create([
+            'merchant_id' => $merchant->id,
+            'name' => 'Loja Switcher Filial',
+            'platform' => 'bigshop',
+            'status' => 'active',
+        ]);
+        Product::query()->create([
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $firstCompany->id,
+            'slug' => 'produto-matriz',
+            'name' => 'Produto Matriz',
+            'status' => 'active',
+        ]);
+        Product::query()->create([
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $secondCompany->id,
+            'slug' => 'produto-filial',
+            'name' => 'Produto Filial',
+            'status' => 'active',
+        ]);
+        $user->merchants()->attach($merchant->id, ['role' => 'owner', 'is_owner' => true]);
+
+        $token = $this->postJson('/api/v1/auth/login', [
+            'login' => 'switcher@example.com',
+            'password' => 'password123',
+            'company_access' => $firstCompany->access_code,
+        ])
+            ->assertOk()
+            ->assertJsonPath('active_company.id', $firstCompany->id)
+            ->assertJsonCount(2, 'company_options')
+            ->json('token');
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/v1/merchant/overview')
+            ->assertOk()
+            ->assertJsonPath('summary.products', 1);
+
+        $newToken = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/v1/auth/select-company', [
+                'company_id' => $secondCompany->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('active_company.id', $secondCompany->id)
+            ->json('token');
+
+        $this->withHeader('Authorization', 'Bearer '.$newToken)
+            ->getJson('/api/v1/merchant/overview')
+            ->assertOk()
+            ->assertJsonPath('summary.products', 1);
     }
 
     public function test_company_code_selects_active_merchant_context(): void

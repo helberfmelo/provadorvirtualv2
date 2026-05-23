@@ -18,13 +18,18 @@ class AnalyticsController extends Controller
     public function recommendations(Request $request): array
     {
         $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
         $logs = RecommendationLog::query()
             ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->with('product')
             ->get();
 
         $feedbackQuery = RecommendationFeedback::query()
-            ->whereHas('recommendationLog', fn ($query) => $query->where('merchant_id', $merchant->id));
+            ->whereHas('recommendationLog', function ($query) use ($merchant, $company): void {
+                $query->where('merchant_id', $merchant->id);
+                $this->scopeCompany($query, $company);
+            });
 
         $feedbackTotal = (clone $feedbackQuery)->count();
         $positiveFeedback = (clone $feedbackQuery)
@@ -36,12 +41,14 @@ class AnalyticsController extends Controller
 
         $productsWithoutTable = Product::query()
             ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->whereNull('measurement_table_id')
             ->orderByDesc('id')
             ->get(['id', 'name', 'sku', 'category']);
 
         $failedIntegrationEvents = IntegrationEvent::query()
             ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->where('status', 'failed')
             ->where('created_at', '>=', now()->subDays(7))
             ->count();

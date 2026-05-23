@@ -19,7 +19,8 @@ class BigShopIntegrationController extends Controller
     public function probe(Request $request)
     {
         $merchant = $this->currentMerchant($request);
-        $connection = $this->connection($merchant->id);
+        $company = $this->currentCompany($request, $merchant);
+        $connection = $this->connection($merchant->id, $company?->id);
 
         try {
             return response()->json([
@@ -40,8 +41,11 @@ class BigShopIntegrationController extends Controller
     public function sync(Request $request)
     {
         $merchant = $this->currentMerchant($request);
-        $connection = $this->connection($merchant->id);
-        $company = $this->merchantCompany($merchant, $connection->merchant_company_id);
+        $company = $this->currentCompany($request, $merchant);
+        $connection = $this->connection($merchant->id, $company?->id);
+        $company = $connection->merchant_company_id
+            ? $this->merchantCompany($merchant, $connection->merchant_company_id)
+            : $company;
 
         try {
             return response()->json([
@@ -59,11 +63,18 @@ class BigShopIntegrationController extends Controller
         }
     }
 
-    private function connection(int $merchantId): PlatformConnection
+    private function connection(int $merchantId, ?int $companyId): PlatformConnection
     {
         $connection = PlatformConnection::query()
             ->where('merchant_id', $merchantId)
+            ->when($companyId, function ($query) use ($companyId): void {
+                $query->where(function ($innerQuery) use ($companyId): void {
+                    $innerQuery->where('merchant_company_id', $companyId)
+                        ->orWhereNull('merchant_company_id');
+                });
+            })
             ->where('platform', 'bigshop')
+            ->orderByRaw('merchant_company_id is null')
             ->first();
 
         if (! $connection) {

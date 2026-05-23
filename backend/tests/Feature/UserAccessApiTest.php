@@ -162,6 +162,51 @@ class UserAccessApiTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_merchant_user_without_product_permission_is_blocked_and_audited(): void
+    {
+        $this->seed();
+        $ownerHeaders = ['Authorization' => 'Bearer '.$this->merchantToken()];
+        $companyCode = now()->year.'0001';
+
+        $this->withHeaders($ownerHeaders)
+            ->postJson('/api/v1/merchant/users', [
+                'name' => 'Leitor Restrito',
+                'email' => 'restrito@example.com',
+                'password' => 'password123',
+                'merchant_role' => 'staff',
+                'merchant_user_status' => 'active',
+                'permissions' => [
+                    'dashboard' => ['view' => true, 'edit' => false],
+                ],
+            ])
+            ->assertCreated();
+
+        $this->flushHeaders();
+
+        $token = $this->postJson('/api/v1/auth/login', [
+            'login' => 'restrito@example.com',
+            'password' => 'password123',
+            'company_access' => $companyCode,
+        ])
+            ->assertOk()
+            ->assertJsonPath('permissions.products.view', false)
+            ->assertJsonPath('permissions.dashboard.view', true)
+            ->json('token');
+
+        $this->app['auth']->forgetGuards();
+
+        $this->withToken($token)
+            ->getJson('/api/v1/products')
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'permission.denied',
+            'module' => 'products',
+            'action' => 'view',
+            'severity' => 'warning',
+        ]);
+    }
+
     private function adminToken(): string
     {
         User::query()->create([

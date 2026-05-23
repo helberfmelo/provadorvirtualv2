@@ -38,11 +38,35 @@ class ActiveTenant
         $merchant ??= $this->merchant($request);
         $companyId = $this->abilityId($request, 'company');
 
-        if ($companyId) {
-            return $merchant->companies()->whereKey($companyId)->first();
+        $company = $companyId
+            ? $merchant->companies()->whereKey($companyId)->first()
+            : $merchant->companies()->orderBy('id')->first();
+
+        if (! $company) {
+            return null;
         }
 
-        return $merchant->companies()->orderBy('id')->first();
+        if (($company->status ?? 'active') === 'inactive') {
+            throw new NotFoundHttpException('Empresa inativa ou indisponivel.');
+        }
+
+        $user = $request->user();
+        if ($user && ! in_array($user->role, ['admin', 'support'], true)) {
+            $activeMerchant = $user->merchants()
+                ->whereKey($merchant->id)
+                ->where(function ($query): void {
+                    $query->where('merchant_user.status', 'active')
+                        ->orWhereNull('merchant_user.status');
+                })
+                ->first();
+            $pivotCompanyId = $activeMerchant?->pivot?->merchant_company_id;
+
+            if ($pivotCompanyId && (int) $pivotCompanyId !== (int) $company->id) {
+                throw new NotFoundHttpException('Empresa nao encontrada para o usuario autenticado.');
+            }
+        }
+
+        return $company;
     }
 
     public function abilityId(Request $request, string $prefix): ?int

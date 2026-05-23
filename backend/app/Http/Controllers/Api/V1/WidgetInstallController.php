@@ -74,6 +74,9 @@ class WidgetInstallController extends Controller
 
         app(AuditLogger::class)->log($request, $merchant, 'widget_install.updated', 'widget', 'info', [
             'platform' => $install->platform,
+            'merchant_company_id' => $install->merchant_company_id,
+            'module' => 'widget',
+            'action' => 'update',
             'is_active' => $install->is_active,
             'allowed_domains_count' => count($install->allowed_domains ?? []),
         ], $install);

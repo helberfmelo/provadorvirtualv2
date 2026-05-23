@@ -18,7 +18,8 @@ class ProductVariantController extends Controller
     public function store(StoreProductVariantRequest $request, Product $product)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedProduct($merchant, $product);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedProduct($merchant, $product, $company);
         $data = $request->validated();
 
         $variant = $product->variants()->create([
@@ -41,7 +42,8 @@ class ProductVariantController extends Controller
     public function update(UpdateProductVariantRequest $request, Product $product, ProductVariant $variant)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedProduct($merchant, $product);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedProduct($merchant, $product, $company);
         $this->scopedVariant($product, $variant);
 
         $variant->update($request->validated());
@@ -52,7 +54,8 @@ class ProductVariantController extends Controller
     public function destroy(Request $request, Product $product, ProductVariant $variant)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedProduct($merchant, $product);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedProduct($merchant, $product, $company);
         $this->scopedVariant($product, $variant);
         $variant->delete();
 

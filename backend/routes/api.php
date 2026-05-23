@@ -63,67 +63,124 @@ Route::prefix('v1')->group(function (): void {
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::post('/auth/select-company', [AuthController::class, 'selectCompany']);
         Route::get('/me', [AuthController::class, 'me']);
         Route::get('/merchant/overview', function (Request $request) {
             $merchant = app(ActiveTenant::class)->merchant($request);
+            $company = app(ActiveTenant::class)->company($request, $merchant);
+            $scopeCompany = function ($query) use ($company): void {
+                if ($company) {
+                    $query->where(function ($innerQuery) use ($company): void {
+                        $innerQuery->where('merchant_company_id', $company->id)
+                            ->orWhereNull('merchant_company_id');
+                    });
+                }
+            };
 
             return response()->json([
                 'summary' => [
-                    'products' => Product::query()->where('merchant_id', $merchant->id)->count(),
-                    'measurement_tables' => MeasurementTable::query()->where('merchant_id', $merchant->id)->count(),
+                    'products' => Product::query()->where('merchant_id', $merchant->id)->tap($scopeCompany)->count(),
+                    'measurement_tables' => MeasurementTable::query()->where('merchant_id', $merchant->id)->tap($scopeCompany)->count(),
                     'widget_status' => 'demo-ready',
                     'widget_active' => WidgetInstall::query()
                         ->where('merchant_id', $merchant->id)
+                        ->tap($scopeCompany)
                         ->where('is_active', true)
                         ->exists(),
                     'integrations_configured' => PlatformConnection::query()
                         ->where('merchant_id', $merchant->id)
+                        ->tap($scopeCompany)
                         ->whereIn('status', ['configured', 'connected'])
                         ->count(),
                     'recommendations_today' => RecommendationLog::query()
                         ->where('merchant_id', $merchant->id)
+                        ->tap($scopeCompany)
                         ->whereDate('created_at', now()->toDateString())
                         ->count(),
                 ],
             ]);
-        });
-        Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index']);
-        Route::get('/widget-install', [WidgetInstallController::class, 'show']);
-        Route::patch('/widget-install', [WidgetInstallController::class, 'update']);
-        Route::get('/integrations', [IntegrationController::class, 'index']);
-        Route::patch('/integrations/{platform}', [IntegrationController::class, 'update']);
-        Route::post('/integrations/bigshop/probe', [BigShopIntegrationController::class, 'probe']);
-        Route::post('/integrations/bigshop/sync', [BigShopIntegrationController::class, 'sync']);
-        Route::get('/imports', [ImportController::class, 'index']);
-        Route::post('/imports/preview', [ImportController::class, 'preview']);
-        Route::post('/imports', [ImportController::class, 'store']);
-        Route::get('/imports/{importJob}', [ImportController::class, 'show']);
-        Route::get('/ai/status', [AiMeasurementAssistantController::class, 'status']);
-        Route::post('/ai/measurement-table-suggestions', [AiMeasurementAssistantController::class, 'suggest']);
-        Route::get('/analytics/recommendations', [AnalyticsController::class, 'recommendations']);
-        Route::get('/audit-logs', [AuditLogController::class, 'index']);
-        Route::get('/go-live/readiness', GoLiveReadinessController::class);
-        Route::get('/merchant/users', [UserAccessController::class, 'merchantIndex']);
-        Route::post('/merchant/users', [UserAccessController::class, 'merchantStore']);
-        Route::patch('/merchant/users/{user}', [UserAccessController::class, 'merchantUpdate']);
-        Route::get('/saas/overview', [SaasAdminController::class, 'overview']);
-        Route::get('/saas/merchants', [SaasAdminController::class, 'merchants']);
-        Route::get('/saas/companies', [SaasAdminController::class, 'companies']);
-        Route::post('/saas/companies', [SaasAdminController::class, 'storeCompany']);
-        Route::patch('/saas/companies/{company}', [SaasAdminController::class, 'updateCompany']);
-        Route::get('/saas/users', [UserAccessController::class, 'saasIndex']);
-        Route::post('/saas/users', [UserAccessController::class, 'saasStore']);
-        Route::patch('/saas/users/{user}', [UserAccessController::class, 'saasUpdate']);
-        Route::get('/saas/email-settings', [SaasEmailController::class, 'showSettings']);
-        Route::patch('/saas/email-settings', [SaasEmailController::class, 'updateSettings']);
-        Route::get('/saas/transactional-emails', [SaasEmailController::class, 'templates']);
-        Route::post('/saas/transactional-emails', [SaasEmailController::class, 'storeTemplate']);
-        Route::patch('/saas/transactional-emails/{transactionalEmail}', [SaasEmailController::class, 'updateTemplate']);
-        Route::get('/saas/transactional-email-sends', [SaasEmailController::class, 'sendHistory']);
-        Route::apiResource('measurement-tables', MeasurementTableController::class);
-        Route::apiResource('products', ProductController::class);
+        })->middleware('portal.permission:merchant,dashboard,view');
+        Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index'])
+            ->middleware('portal.permission:merchant,measurement_tables,view');
+        Route::get('/widget-install', [WidgetInstallController::class, 'show'])
+            ->middleware('portal.permission:merchant,widget,view');
+        Route::patch('/widget-install', [WidgetInstallController::class, 'update'])
+            ->middleware('portal.permission:merchant,widget,edit');
+        Route::get('/integrations', [IntegrationController::class, 'index'])
+            ->middleware('portal.permission:merchant,integrations,view');
+        Route::patch('/integrations/{platform}', [IntegrationController::class, 'update'])
+            ->middleware('portal.permission:merchant,integrations,edit');
+        Route::post('/integrations/bigshop/probe', [BigShopIntegrationController::class, 'probe'])
+            ->middleware('portal.permission:merchant,integrations,edit');
+        Route::post('/integrations/bigshop/sync', [BigShopIntegrationController::class, 'sync'])
+            ->middleware('portal.permission:merchant,integrations,edit');
+        Route::get('/imports', [ImportController::class, 'index'])
+            ->middleware('portal.permission:merchant,imports,view');
+        Route::post('/imports/preview', [ImportController::class, 'preview'])
+            ->middleware('portal.permission:merchant,imports,edit');
+        Route::post('/imports', [ImportController::class, 'store'])
+            ->middleware('portal.permission:merchant,imports,edit');
+        Route::get('/imports/{importJob}', [ImportController::class, 'show'])
+            ->middleware('portal.permission:merchant,imports,view');
+        Route::get('/ai/status', [AiMeasurementAssistantController::class, 'status'])
+            ->middleware('portal.permission:merchant,ai_assistant,view');
+        Route::post('/ai/measurement-table-suggestions', [AiMeasurementAssistantController::class, 'suggest'])
+            ->middleware('portal.permission:merchant,ai_assistant,edit');
+        Route::get('/analytics/recommendations', [AnalyticsController::class, 'recommendations'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/audit-logs', [AuditLogController::class, 'index'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/go-live/readiness', GoLiveReadinessController::class)
+            ->middleware('portal.permission:merchant,go_live,view');
+        Route::get('/merchant/users', [UserAccessController::class, 'merchantIndex'])
+            ->middleware('portal.permission:merchant,users,view');
+        Route::post('/merchant/users', [UserAccessController::class, 'merchantStore'])
+            ->middleware('portal.permission:merchant,users,edit');
+        Route::patch('/merchant/users/{user}', [UserAccessController::class, 'merchantUpdate'])
+            ->middleware('portal.permission:merchant,users,edit');
+        Route::get('/saas/overview', [SaasAdminController::class, 'overview'])
+            ->middleware('portal.permission:saas,saas_dashboard,view');
+        Route::get('/saas/merchants', [SaasAdminController::class, 'merchants'])
+            ->middleware('portal.permission:saas,saas_dashboard,view');
+        Route::get('/saas/companies', [SaasAdminController::class, 'companies'])
+            ->middleware('portal.permission:saas,saas_companies,view');
+        Route::post('/saas/companies', [SaasAdminController::class, 'storeCompany'])
+            ->middleware('portal.permission:saas,saas_companies,edit');
+        Route::patch('/saas/companies/{company}', [SaasAdminController::class, 'updateCompany'])
+            ->middleware('portal.permission:saas,saas_companies,edit');
+        Route::get('/saas/users', [UserAccessController::class, 'saasIndex'])
+            ->middleware('portal.permission:saas,saas_users,view');
+        Route::post('/saas/users', [UserAccessController::class, 'saasStore'])
+            ->middleware('portal.permission:saas,saas_users,edit');
+        Route::patch('/saas/users/{user}', [UserAccessController::class, 'saasUpdate'])
+            ->middleware('portal.permission:saas,saas_users,edit');
+        Route::get('/saas/email-settings', [SaasEmailController::class, 'showSettings'])
+            ->middleware('portal.permission:saas,saas_emails,view');
+        Route::patch('/saas/email-settings', [SaasEmailController::class, 'updateSettings'])
+            ->middleware('portal.permission:saas,saas_emails,edit');
+        Route::get('/saas/transactional-emails', [SaasEmailController::class, 'templates'])
+            ->middleware('portal.permission:saas,saas_emails,view');
+        Route::post('/saas/transactional-emails', [SaasEmailController::class, 'storeTemplate'])
+            ->middleware('portal.permission:saas,saas_emails,edit');
+        Route::patch('/saas/transactional-emails/{transactionalEmail}', [SaasEmailController::class, 'updateTemplate'])
+            ->middleware('portal.permission:saas,saas_emails,edit');
+        Route::get('/saas/transactional-email-sends', [SaasEmailController::class, 'sendHistory'])
+            ->middleware('portal.permission:saas,saas_emails,view');
+        Route::apiResource('measurement-tables', MeasurementTableController::class)
+            ->only(['index', 'show'])
+            ->middleware('portal.permission:merchant,measurement_tables,view');
+        Route::apiResource('measurement-tables', MeasurementTableController::class)
+            ->only(['store', 'update', 'destroy'])
+            ->middleware('portal.permission:merchant,measurement_tables,edit');
+        Route::apiResource('products', ProductController::class)
+            ->only(['index', 'show'])
+            ->middleware('portal.permission:merchant,products,view');
+        Route::apiResource('products', ProductController::class)
+            ->only(['store', 'update', 'destroy'])
+            ->middleware('portal.permission:merchant,products,edit');
         Route::apiResource('products.variants', ProductVariantController::class)
-            ->only(['store', 'update', 'destroy']);
+            ->only(['store', 'update', 'destroy'])
+            ->middleware('portal.permission:merchant,products,edit');
         Route::post('/recommendations/config-check', [RecommendationController::class, 'configCheck']);
         Route::post('/recommendations', [RecommendationController::class, 'store']);
     });

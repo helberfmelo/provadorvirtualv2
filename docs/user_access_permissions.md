@@ -6,7 +6,7 @@ Atualizado em: 2026-05-23
 
 Permitir que o SaaS e cada empresa cliente gerenciem usuarios com acesso por modulo, mantendo o login simples por e-mail ou CPF e o contexto da empresa por codigo/CNPJ.
 
-## Status Sprint 30
+## Status Sprint 33
 
 Implementado:
 
@@ -21,7 +21,13 @@ Implementado:
 - `users.permissions` para permissoes SaaS;
 - `merchant_user.permissions` para permissoes do portal da empresa;
 - menu Vue passa a respeitar permissoes de visualizacao;
-- backend bloqueia CRUD de usuarios quando o usuario nao tem permissao `users.edit`.
+- backend bloqueia CRUD de usuarios quando o usuario nao tem permissao `users.edit`;
+- middleware `portal.permission` protege as rotas dos modulos do portal da empresa e do SaaS;
+- usuarios com mais de uma empresa recebem uma lista de empresas no login e escolhem o contexto;
+- painel permite trocar a empresa ativa pelo seletor do topo sem logout;
+- token Sanctum carrega `merchant:{id}` e `company:{id}`;
+- queries de produtos, tabelas, widget, integracoes, importacoes, analytics, go-live e auditoria respeitam a empresa ativa;
+- `audit_logs` registra `merchant_company_id`, `module` e `action` para eventos novos e negacoes de permissao.
 
 ## Modulos do portal da empresa
 
@@ -52,6 +58,8 @@ Implementado:
 - Usuario globalmente inativo nao consegue fazer login.
 - Usuario desativado em uma empresa nao consegue entrar naquela empresa, mesmo que exista em outra.
 - O sistema impede o usuario de desativar o proprio acesso no CRUD correspondente.
+- Se o usuario estiver vinculado a varias empresas e tentar entrar sem codigo/CNPJ, a API responde `409` com `company_options`.
+- Negacoes de acesso geram evento `permission.denied` com escopo, modulo e acao.
 
 ## Endpoints
 
@@ -66,9 +74,8 @@ Portal da empresa:
 - `GET /api/v1/merchant/users`
 - `POST /api/v1/merchant/users`
 - `PATCH /api/v1/merchant/users/{user}`
+- `POST /api/v1/auth/select-company`
 
 ## Pendencias
 
-- Completar enforcement de permissao nos demais modulos alem do CRUD de usuarios.
-- Criar seletor pos-login para usuarios com muitas empresas.
 - Registrar auditoria detalhada por alteracao de permissao.

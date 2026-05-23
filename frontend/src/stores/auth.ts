@@ -24,6 +24,9 @@ type AuthCompany = {
   platform: string
   status: string
 }
+type CompanyOption = AuthCompany & {
+  merchant: AuthMerchant | null
+}
 
 const storedToken = localStorage.getItem('pv_token')
 type PermissionMap = Record<string, { view: boolean; edit: boolean }>
@@ -33,6 +36,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref<AuthUser | null>(null)
   const activeMerchant = ref<AuthMerchant | null>(null)
   const activeCompany = ref<AuthCompany | null>(null)
+  const companyOptions = ref<CompanyOption[]>([])
   const permissions = ref<PermissionMap | null>(null)
   const saasPermissions = ref<PermissionMap | null>(null)
   const isAuthenticated = computed(() => Boolean(token.value))
@@ -49,6 +53,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.user
     activeMerchant.value = data.active_merchant || null
     activeCompany.value = data.active_company || null
+    companyOptions.value = data.company_options || []
     permissions.value = data.permissions || null
     saasPermissions.value = data.saas_permissions || null
     localStorage.setItem('pv_token', data.token)
@@ -64,8 +69,25 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = data.user
     activeMerchant.value = data.active_merchant || null
     activeCompany.value = data.active_company || null
+    companyOptions.value = data.company_options || []
     permissions.value = data.permissions || null
     saasPermissions.value = data.saas_permissions || null
+  }
+
+  async function selectCompany(companyId: number) {
+    const { data } = await api.post('/auth/select-company', {
+      company_id: companyId,
+    })
+
+    token.value = data.token
+    user.value = data.user
+    activeMerchant.value = data.active_merchant || null
+    activeCompany.value = data.active_company || null
+    companyOptions.value = data.company_options || []
+    permissions.value = data.permissions || null
+    saasPermissions.value = data.saas_permissions || null
+    localStorage.setItem('pv_token', data.token)
+    setAuthToken(data.token)
   }
 
   async function logout() {
@@ -77,6 +99,7 @@ export const useAuthStore = defineStore('auth', () => {
     user.value = null
     activeMerchant.value = null
     activeCompany.value = null
+    companyOptions.value = []
     permissions.value = null
     saasPermissions.value = null
     localStorage.removeItem('pv_token')
@@ -120,11 +143,13 @@ export const useAuthStore = defineStore('auth', () => {
     user,
     activeMerchant,
     activeCompany,
+    companyOptions,
     permissions,
     saasPermissions,
     isAuthenticated,
     login,
     loadMe,
+    selectCompany,
     logout,
     canView,
     canEdit,

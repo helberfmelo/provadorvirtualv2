@@ -26,6 +26,7 @@ class IntegrationController extends Controller
         $company = $this->activeCompany($request, $merchant);
         $connections = PlatformConnection::query()
             ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->get()
             ->keyBy('platform');
 
@@ -86,6 +87,9 @@ class IntegrationController extends Controller
 
         app(AuditLogger::class)->log($request, $merchant, 'integration.updated', 'integrations', 'info', [
             'platform' => $platform,
+            'merchant_company_id' => $company?->id,
+            'module' => 'integrations',
+            'action' => 'update',
             'status' => $connection->status,
             'has_access_token' => filled($connection->access_token_encrypted),
             'has_webhook_secret' => filled($connection->webhook_secret_encrypted),

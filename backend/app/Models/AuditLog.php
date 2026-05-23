@@ -23,6 +23,11 @@ class AuditLog extends Model
         return $this->belongsTo(Merchant::class);
     }
 
+    public function company()
+    {
+        return $this->belongsTo(MerchantCompany::class, 'merchant_company_id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

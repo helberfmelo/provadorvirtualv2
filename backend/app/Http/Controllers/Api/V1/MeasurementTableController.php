@@ -19,9 +19,11 @@ class MeasurementTableController extends Controller
     public function index(Request $request)
     {
         $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
 
         $tables = MeasurementTable::query()
             ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->with('company')
             ->withCount(['rows', 'products'])
             ->when($request->string('search')->toString(), function ($query, string $search): void {
@@ -44,8 +46,11 @@ class MeasurementTableController extends Controller
     public function store(StoreMeasurementTableRequest $request)
     {
         $merchant = $this->currentMerchant($request);
+        $activeCompany = $this->currentCompany($request, $merchant);
         $data = $request->validated();
-        $company = $this->merchantCompany($merchant, $data['merchant_company_id'] ?? null);
+        $company = array_key_exists('merchant_company_id', $data)
+            ? $this->merchantCompany($merchant, $data['merchant_company_id'])
+            : $activeCompany;
 
         $table = DB::transaction(function () use ($merchant, $company, $data): MeasurementTable {
             $table = MeasurementTable::query()->create([
@@ -68,6 +73,9 @@ class MeasurementTableController extends Controller
 
         app(AuditLogger::class)->log($request, $merchant, 'measurement_table.created', 'measurement_tables', 'info', [
             'measurement_table_id' => $table->id,
+            'merchant_company_id' => $company?->id,
+            'module' => 'measurement_tables',
+            'action' => 'create',
             'rows_count' => $table->rows()->count(),
         ], $table);
 
@@ -79,7 +87,8 @@ class MeasurementTableController extends Controller
     public function show(Request $request, MeasurementTable $measurementTable)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedMeasurementTable($merchant, $measurementTable);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedMeasurementTable($merchant, $measurementTable, $company);
 
         return new MeasurementTableResource($measurementTable->load(['company', 'rows']));
     }
@@ -87,7 +96,8 @@ class MeasurementTableController extends Controller
     public function update(UpdateMeasurementTableRequest $request, MeasurementTable $measurementTable)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedMeasurementTable($merchant, $measurementTable);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedMeasurementTable($merchant, $measurementTable, $company);
         $data = $request->validated();
 
         DB::transaction(function () use ($merchant, $measurementTable, $data): void {
@@ -107,6 +117,9 @@ class MeasurementTableController extends Controller
 
         app(AuditLogger::class)->log($request, $merchant, 'measurement_table.updated', 'measurement_tables', 'info', [
             'measurement_table_id' => $measurementTable->id,
+            'merchant_company_id' => $measurementTable->merchant_company_id,
+            'module' => 'measurement_tables',
+            'action' => 'update',
             'rows_count' => $measurementTable->rows()->count(),
         ], $measurementTable);
 
@@ -116,7 +129,8 @@ class MeasurementTableController extends Controller
     public function destroy(Request $request, MeasurementTable $measurementTable)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedMeasurementTable($merchant, $measurementTable);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedMeasurementTable($merchant, $measurementTable, $company);
 
         DB::transaction(function () use ($measurementTable): void {
             $measurementTable->products()->update(['measurement_table_id' => null]);
@@ -125,6 +139,9 @@ class MeasurementTableController extends Controller
 
         app(AuditLogger::class)->log($request, $merchant, 'measurement_table.deleted', 'measurement_tables', 'warning', [
             'measurement_table_id' => $measurementTable->id,
+            'merchant_company_id' => $measurementTable->merchant_company_id,
+            'module' => 'measurement_tables',
+            'action' => 'delete',
         ], $measurementTable);
 
         return response()->json([

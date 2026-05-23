@@ -10,6 +10,14 @@ const companyAccess = ref('')
 const password = ref('provador123')
 const error = ref('')
 const loading = ref(false)
+const companyOptions = ref<Array<{
+  id: number
+  name: string
+  access_code: string
+  document: string | null
+  platform: string
+  merchant: { name: string } | null
+}>>([])
 
 async function submit() {
   error.value = ''
@@ -19,6 +27,11 @@ async function submit() {
     await auth.login(identifier.value, password.value, companyAccess.value)
     await router.push(['admin', 'support'].includes(auth.user?.role || '') && !companyAccess.value ? '/saas' : '/app')
   } catch (requestError: any) {
+    if (requestError.response?.status === 409 && Array.isArray(requestError.response?.data?.company_options)) {
+      companyOptions.value = requestError.response.data.company_options
+      companyAccess.value = companyOptions.value[0]?.access_code || ''
+    }
+
     error.value = requestError.response?.data?.message
       || requestError.response?.data?.errors?.company_access?.[0]
       || requestError.response?.data?.errors?.login?.[0]
@@ -41,7 +54,17 @@ async function submit() {
         </label>
         <label>
           Codigo da loja ou CNPJ
-          <input v-model="companyAccess" inputmode="numeric" autocomplete="organization" />
+          <input
+            v-if="companyOptions.length === 0"
+            v-model="companyAccess"
+            inputmode="numeric"
+            autocomplete="organization"
+          />
+          <select v-else v-model="companyAccess" autocomplete="organization">
+            <option v-for="company in companyOptions" :key="company.id" :value="company.access_code">
+              {{ company.name }} - {{ company.access_code }}
+            </option>
+          </select>
           <small>Obrigatorio para o portal da empresa. Admin SaaS pode deixar vazio.</small>
         </label>
         <label>

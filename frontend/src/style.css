@@ -101,6 +101,29 @@ a {
   color: #374151;
 }
 
+.company-switcher {
+  display: inline-grid;
+  gap: 3px;
+  min-width: 170px;
+  color: #6b7280;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.company-switcher select {
+  width: 100%;
+  min-height: 38px;
+  padding: 7px 30px 7px 10px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  color: #0f172a;
+  background: #fff7ed;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-transform: none;
+}
+
 .nav-button {
   display: inline-grid;
   width: 38px;
@@ -691,6 +714,7 @@ a {
 }
 
 .form input,
+.form select,
 .measure-grid input,
 .admin-form input,
 .admin-form select,
@@ -1849,7 +1873,8 @@ td small {
   }
 
   .nav a,
-  .nav-button {
+  .nav-button,
+  .company-switcher {
     width: 100%;
     justify-content: flex-start;
   }

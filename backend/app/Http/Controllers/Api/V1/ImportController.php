@@ -22,9 +22,11 @@ class ImportController extends Controller
     public function index(Request $request)
     {
         $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
 
         $jobs = ImportJob::query()
             ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->orderByDesc('id')
             ->limit(20)
             ->get();
@@ -35,8 +37,11 @@ class ImportController extends Controller
     public function preview(PreviewImportRequest $request)
     {
         $merchant = $this->currentMerchant($request);
+        $activeCompany = $this->currentCompany($request, $merchant);
         $data = $request->validated();
-        $company = $this->merchantCompany($merchant, $data['merchant_company_id'] ?? null);
+        $company = array_key_exists('merchant_company_id', $data)
+            ? $this->merchantCompany($merchant, $data['merchant_company_id'])
+            : $activeCompany;
 
         try {
             return response()->json([
@@ -52,8 +57,11 @@ class ImportController extends Controller
     public function store(StoreImportRequest $request)
     {
         $merchant = $this->currentMerchant($request);
+        $activeCompany = $this->currentCompany($request, $merchant);
         $data = $request->validated();
-        $company = $this->merchantCompany($merchant, $data['merchant_company_id'] ?? null);
+        $company = array_key_exists('merchant_company_id', $data)
+            ? $this->merchantCompany($merchant, $data['merchant_company_id'])
+            : $activeCompany;
         try {
             $job = $this->imports->commit($merchant, $company, $data);
         } catch (RuntimeException $exception) {
@@ -70,8 +78,10 @@ class ImportController extends Controller
     public function show(Request $request, ImportJob $importJob)
     {
         $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
 
         abort_unless((int) $importJob->merchant_id === (int) $merchant->id, 404);
+        abort_if($company && $importJob->merchant_company_id && (int) $importJob->merchant_company_id !== (int) $company->id, 404);
 
         return new ImportJobResource($importJob);
     }

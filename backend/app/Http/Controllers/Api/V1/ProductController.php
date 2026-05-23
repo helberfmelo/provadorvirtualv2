@@ -19,9 +19,11 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
 
         $products = Product::query()
             ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->with(['company', 'measurementTable'])
             ->withCount('variants')
             ->when($request->string('search')->toString(), function ($query, string $search): void {
@@ -45,9 +47,12 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         $merchant = $this->currentMerchant($request);
+        $activeCompany = $this->currentCompany($request, $merchant);
         $data = $request->validated();
-        $company = $this->merchantCompany($merchant, $data['merchant_company_id'] ?? null);
-        $measurementTable = $this->resolveMeasurementTable($merchant->id, $data['measurement_table_id'] ?? null);
+        $company = array_key_exists('merchant_company_id', $data)
+            ? $this->merchantCompany($merchant, $data['merchant_company_id'])
+            : $activeCompany;
+        $measurementTable = $this->resolveMeasurementTable($merchant->id, $company, $data['measurement_table_id'] ?? null);
 
         $product = Product::query()->create([
             'merchant_id' => $merchant->id,
@@ -73,7 +78,8 @@ class ProductController extends Controller
     public function show(Request $request, Product $product)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedProduct($merchant, $product);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedProduct($merchant, $product, $company);
 
         return new ProductResource($product->load([
             'company',
@@ -85,7 +91,8 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedProduct($merchant, $product);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedProduct($merchant, $product, $company);
         $data = $request->validated();
 
         if (array_key_exists('merchant_company_id', $data)) {
@@ -93,7 +100,9 @@ class ProductController extends Controller
         }
 
         if (array_key_exists('measurement_table_id', $data)) {
-            $data['measurement_table_id'] = $this->resolveMeasurementTable($merchant->id, $data['measurement_table_id'])?->id;
+            $targetCompanyId = $data['merchant_company_id'] ?? $product->merchant_company_id;
+            $resolvedCompany = $targetCompanyId ? $this->merchantCompany($merchant, $targetCompanyId) : $company;
+            $data['measurement_table_id'] = $this->resolveMeasurementTable($merchant->id, $resolvedCompany, $data['measurement_table_id'])?->id;
         }
 
         if (array_key_exists('slug', $data) && $data['slug']) {
@@ -110,7 +119,8 @@ class ProductController extends Controller
     public function destroy(Request $request, Product $product)
     {
         $merchant = $this->currentMerchant($request);
-        $this->scopedProduct($merchant, $product);
+        $company = $this->currentCompany($request, $merchant);
+        $this->scopedProduct($merchant, $product, $company);
         $product->delete();
 
         return response()->json([
@@ -118,7 +128,7 @@ class ProductController extends Controller
         ]);
     }
 
-    private function resolveMeasurementTable(int $merchantId, ?int $measurementTableId): ?MeasurementTable
+    private function resolveMeasurementTable(int $merchantId, $company, ?int $measurementTableId): ?MeasurementTable
     {
         if (! $measurementTableId) {
             return null;
@@ -126,6 +136,7 @@ class ProductController extends Controller
 
         return MeasurementTable::query()
             ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->whereKey($measurementTableId)
             ->firstOrFail();
     }
