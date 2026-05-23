@@ -349,3 +349,4 @@
 - Tela de nova/editar tabela passou a ter seletor de modelo inteligente filtrado por produto/genero.
 - Site publico e assistente IA passaram a destacar base brasileira, IA assistiva, revisao humana e aprendizado seguro.
 - `docs/credentials.local.md` foi limpo localmente para exibir somente as duas URLs de login pedidas.
+- Run `26343538804` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

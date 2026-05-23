@@ -541,7 +541,7 @@ Entregas previstas:
 - reforcar no site publico e no portal da empresa que a IA acelera tabelas, usa base brasileira e exige revisao humana;
 - limpar a documentacao local de URLs para manter somente login master SaaS e login do portal da empresa.
 
-Status: em execucao.
+Status: implementado, publicado e validado em producao no run `26343538804`.
 
 ### Sprint 44 - CRUD SaaS de usuarios das empresas
 
