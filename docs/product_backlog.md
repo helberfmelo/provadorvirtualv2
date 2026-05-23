@@ -121,6 +121,7 @@ Atualizado em: 2026-05-23
 - `DONE` Refatorar CRUDs do portal da empresa para listagem em tela propria e formulario em tela propria.
 - `DONE` Revisar responsividade, alinhamento e padrao list-first dos portais autenticados.
 - `DONE` Limpar defaults confusos nos formularios de nova empresa e novo produto.
+- `DONE` Feedback global de salvamento, sucesso e erro nos portais SaaS e empresa.
 
 ## Pagamentos
 

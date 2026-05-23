@@ -1580,6 +1580,70 @@ th {
   color: #0f172a;
 }
 
+.save-modal-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.18);
+}
+
+.save-modal {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  width: min(420px, calc(100vw - 32px));
+  min-height: 92px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+}
+
+.save-modal strong,
+.save-modal p {
+  display: block;
+  margin: 0;
+}
+
+.save-modal strong {
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.save-modal p {
+  margin-top: 4px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.save-modal-icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 8px;
+  color: #fff;
+  background: #ff6b35;
+}
+
+.save-modal-success .save-modal-icon {
+  background: #16a34a;
+}
+
+.save-modal-error .save-modal-icon {
+  background: #dc2626;
+}
+
+.save-modal .btn {
+  grid-column: 2;
+  width: fit-content;
+  margin-top: 10px;
+}
+
 textarea {
   width: 100%;
   padding: 10px 12px;

@@ -556,3 +556,18 @@ Entregas previstas:
 - atualizar menu, permissao e documentacao para nao misturar usuarios SaaS com usuarios de clientes.
 
 Status: implementado, publicado e validado em producao no run `26343868801`.
+
+### Sprint 45 - Feedback global de salvamento
+
+Objetivo: garantir que qualquer salvamento nos portais SaaS e empresa tenha retorno claro para o usuario.
+
+Entregas:
+
+- modal pequeno central para estado `Salvando`;
+- modal de sucesso com fechamento automatico em 4 segundos;
+- modal de erro persistente com botao `Fechar`;
+- tratamento amigavel para erros `422`, permissao, registro ausente e falha de conexao;
+- interceptador global para `POST`, `PATCH`, `PUT` e `DELETE` autenticados dos portais;
+- exclusoes para login/logout, checkout publico, preview/importacao assistida e acoes que nao sao salvamento.
+
+Status: implementado localmente, aguardando publicacao e validacao de producao.

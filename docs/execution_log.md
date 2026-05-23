@@ -361,3 +361,12 @@
 - `pv:create-master-admin` passou a garantir permissoes SaaS completas.
 - Validacoes locais: `php artisan test --filter=UserAccessApiTest`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.
 - Run `26343868801` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 45 Feedback global de salvamento
+
+- Criado modal global pequeno e central para salvamento, sucesso e erro.
+- `api.ts` passou a interceptar mutacoes autenticadas dos portais SaaS/empresa.
+- Sucesso fica visivel por 4 segundos e fecha automaticamente.
+- Erros ficam abertos ate o usuario fechar e mostram motivo amigavel, inclusive `422` de validacao.
+- Mantidas exclusoes para login/logout, checkout publico, previews e acoes que nao representam salvamento.
+- Validacoes locais: `npm run build`, `php artisan test --filter=UserAccessApiTest` e `git diff --check`.

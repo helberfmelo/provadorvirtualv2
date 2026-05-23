@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import SaveFeedbackModal from './components/SaveFeedbackModal.vue'
 import { useAuthStore } from './stores/auth'
 
 type NavLink = {
@@ -182,5 +183,7 @@ async function switchCompany(event: Event) {
     <main v-else>
       <RouterView />
     </main>
+
+    <SaveFeedbackModal />
   </div>
 </template>
