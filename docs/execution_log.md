@@ -377,3 +377,5 @@
 - Corrigido o shell operacional para recriar a tela atual quando `activeCompany.id` muda.
 - A troca pelo seletor de empresa no portal agora remonta a `RouterView` do portal da empresa.
 - Com isso, painel e CRUDs executam novamente seus carregamentos de dados no novo contexto.
+- Validacoes locais: `npm run build` e `git diff --check`.
+- Run `26344923662` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

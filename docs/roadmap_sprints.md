@@ -583,4 +583,4 @@ Entregas:
 - chamadas `onMounted()` de painel, produtos, tabelas, widget, integracoes, analytics, usuarios e go-live passam a buscar os dados do novo contexto;
 - fluxo vindo do SaaS para o portal da empresa preserva a separacao de menus.
 
-Status: implementado localmente, aguardando publicacao e validacao de producao.
+Status: implementado, publicado e validado em producao no run `26344923662`.
