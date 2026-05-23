@@ -150,7 +150,7 @@ Entregas:
 - logs de custo/uso;
 - guardrails.
 
-Status: implementado localmente; publicar e validar em producao. OCR de imagem real depende de `OPENAI_API_KEY` ou `GEMINI_API_KEY` e ativacao do provider externo.
+Status: concluido e publicado em producao no run `26332326042`. OCR de imagem real depende de `OPENAI_API_KEY` ou `GEMINI_API_KEY` e ativacao do provider externo.
 
 ## Sprint 10 - Analytics e SaaS Admin
 

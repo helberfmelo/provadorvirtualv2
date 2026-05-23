@@ -131,6 +131,8 @@
 - Criado documento `docs/ai_assistant.md`.
 - Criados testes `AiMeasurementAssistantTest`.
 - Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build`, `php artisan route:list --path=api/v1/ai`, `git diff --check` e smoke autenticado local com 2 linhas sugeridas.
+- Run `26332326042` do GitHub Actions finalizou com sucesso para o commit `b7a88d1`.
+- Validado em producao: `/app/assistente`, `GET /public/api/v1/ai/status` e `POST /public/api/v1/ai/measurement-table-suggestions` com 2 linhas sugeridas.
 
 ## Pendencias abertas
 
