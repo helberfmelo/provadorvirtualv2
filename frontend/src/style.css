@@ -842,6 +842,45 @@ textarea {
   font-weight: 800;
 }
 
+.analytics-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.bar-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.bar-row {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) 42px;
+  gap: 10px;
+  align-items: center;
+}
+
+.bar-row div {
+  height: 10px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f3f4f6;
+}
+
+.bar-row i {
+  display: block;
+  height: 100%;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ff4d5e, #ff7a1a);
+}
+
+td small {
+  display: block;
+  color: #6b7280;
+}
+
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -898,6 +937,7 @@ textarea {
   .install-grid,
   .integrations-grid,
   .import-grid,
+  .analytics-grid,
   .color-grid {
     grid-template-columns: 1fr;
   }

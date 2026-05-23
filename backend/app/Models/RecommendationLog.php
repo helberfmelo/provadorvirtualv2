@@ -21,4 +21,14 @@ class RecommendationLog extends Model
             'warnings' => 'array',
         ];
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    public function feedbacks()
+    {
+        return $this->hasMany(RecommendationFeedback::class);
+    }
 }

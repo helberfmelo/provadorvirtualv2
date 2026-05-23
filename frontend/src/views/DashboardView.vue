@@ -85,6 +85,13 @@ onMounted(() => {
           <small>{{ summary.widget_active ? 'ativo' : 'pendente' }}</small>
         </span>
       </RouterLink>
+      <RouterLink class="onboarding-step" to="/app/analytics">
+        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        <span>
+          <strong>Analytics</strong>
+          <small>{{ summary.recommendations_today }} hoje</small>
+        </span>
+      </RouterLink>
       <RouterLink class="onboarding-step" to="/app/importacoes">
         <i class="fa-solid fa-file-import" aria-hidden="true"></i>
         <span>
@@ -113,6 +120,10 @@ onMounted(() => {
       <RouterLink class="btn btn-secondary" to="/app/assistente">
         <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
         Assistente
+      </RouterLink>
+      <RouterLink class="btn btn-secondary" to="/app/analytics">
+        <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
+        Analytics
       </RouterLink>
       <RouterLink class="btn btn-secondary" to="/app/widget">
         <i class="fa-solid fa-code" aria-hidden="true"></i>

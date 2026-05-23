@@ -22,4 +22,9 @@ class RecommendationFeedback extends Model
             'created_at' => 'datetime',
         ];
     }
+
+    public function recommendationLog()
+    {
+        return $this->belongsTo(RecommendationLog::class);
+    }
 }

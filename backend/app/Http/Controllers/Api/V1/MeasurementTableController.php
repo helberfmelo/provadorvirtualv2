@@ -8,6 +8,7 @@ use App\Http\Requests\StoreMeasurementTableRequest;
 use App\Http\Requests\UpdateMeasurementTableRequest;
 use App\Http\Resources\MeasurementTableResource;
 use App\Models\MeasurementTable;
+use App\Services\Audit\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -65,6 +66,11 @@ class MeasurementTableController extends Controller
             return $table;
         });
 
+        app(AuditLogger::class)->log($request, $merchant, 'measurement_table.created', 'measurement_tables', 'info', [
+            'measurement_table_id' => $table->id,
+            'rows_count' => $table->rows()->count(),
+        ], $table);
+
         return (new MeasurementTableResource($table->load(['company', 'rows'])))
             ->response()
             ->setStatusCode(201);
@@ -99,6 +105,11 @@ class MeasurementTableController extends Controller
             }
         });
 
+        app(AuditLogger::class)->log($request, $merchant, 'measurement_table.updated', 'measurement_tables', 'info', [
+            'measurement_table_id' => $measurementTable->id,
+            'rows_count' => $measurementTable->rows()->count(),
+        ], $measurementTable);
+
         return new MeasurementTableResource($measurementTable->refresh()->load(['company', 'rows']));
     }
 
@@ -111,6 +122,10 @@ class MeasurementTableController extends Controller
             $measurementTable->products()->update(['measurement_table_id' => null]);
             $measurementTable->delete();
         });
+
+        app(AuditLogger::class)->log($request, $merchant, 'measurement_table.deleted', 'measurement_tables', 'warning', [
+            'measurement_table_id' => $measurementTable->id,
+        ], $measurementTable);
 
         return response()->json([
             'message' => 'Tabela de medidas removida com sucesso.',

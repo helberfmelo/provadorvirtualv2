@@ -62,6 +62,10 @@ APIs protegidas ja implementadas:
 - `GET /api/v1/imports/{importJob}`
 - `GET /api/v1/ai/status`
 - `POST /api/v1/ai/measurement-table-suggestions`
+- `GET /api/v1/analytics/recommendations`
+- `GET /api/v1/audit-logs`
+- `GET /api/v1/saas/overview`
+- `GET /api/v1/saas/merchants`
 
 ## Frontend
 
@@ -87,6 +91,7 @@ Rotas iniciais:
 - `/app/produtos`
 - `/app/tabelas-de-medidas`
 - `/app/assistente`
+- `/app/analytics`
 - `/app/integracoes`
 - `/app/widget`
 - `/saas`
@@ -201,4 +206,4 @@ Producao inicial:
 - tabela `integration_events`;
 - tabela `recommendation_logs`;
 - tabela `ai_usage_logs`;
-- audit log para credenciais e acoes sensiveis.
+- tabela `audit_logs` para acoes sensiveis.

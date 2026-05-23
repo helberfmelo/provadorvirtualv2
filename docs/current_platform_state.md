@@ -16,6 +16,7 @@ Atualizado em: 2026-05-23
 - Sprint 7 criou conector BigShop base com probe, sync de produtos/grades/tabelas e eventos de integracao.
 - Sprint 8 criou ativacao BigShop um clique por endpoint publico assinado com HMAC.
 - Sprint 9 criou assistente de tabelas com parser local, logs de uso de IA e revisao obrigatoria.
+- Sprint 10 criou analytics do lojista, SaaS admin basico e trilha `audit_logs`.
 
 ## Referencias confirmadas
 
@@ -90,10 +91,12 @@ Atualizado em: 2026-05-23
 
 ## Superficie atual
 
-- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/widget`, `/app/integracoes`.
+- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`.
+- Painel SaaS protegido por papel: `/saas`.
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`.
+- Analytics/auditoria protegidos: `/api/v1/analytics/*`, `/api/v1/audit-logs` e `/api/v1/saas/*`.
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
 - BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
 - APIs publicas: health, produto demo e recomendacoes do widget.
@@ -101,4 +104,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 10: Analytics e SaaS Admin.
+Publicar a Sprint 10 e iniciar a Sprint 11: Hardening, LGPD e Observabilidade.

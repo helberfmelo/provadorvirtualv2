@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePlatformConnectionRequest;
 use App\Http\Resources\PlatformConnectionResource;
 use App\Models\PlatformConnection;
+use App\Services\Audit\AuditLogger;
 use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -73,6 +74,13 @@ class IntegrationController extends Controller
         }
 
         $connection->save();
+
+        app(AuditLogger::class)->log($request, $merchant, 'integration.updated', 'integrations', 'info', [
+            'platform' => $platform,
+            'status' => $connection->status,
+            'has_access_token' => filled($connection->access_token_encrypted),
+            'has_webhook_secret' => filled($connection->webhook_secret_encrypted),
+        ], $connection);
 
         return (new PlatformConnectionResource($connection->refresh()))
             ->response()

@@ -60,4 +60,9 @@ class Merchant extends Model
     {
         return $this->hasMany(IntegrationEvent::class);
     }
+
+    public function auditLogs()
+    {
+        return $this->hasMany(AuditLog::class);
+    }
 }

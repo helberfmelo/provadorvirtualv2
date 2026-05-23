@@ -29,8 +29,8 @@ Atualizado em: 2026-05-23
 - `DONE` Importacao CSV de produtos.
 - `DONE` Importacao CSV de tabelas.
 - `DONE` Parser inicial Google XML.
-- `TODO` Analytics.
-- `TODO` SaaS admin.
+- `DONE` Analytics.
+- `DONE` SaaS admin basico.
 
 ## Integracoes
 

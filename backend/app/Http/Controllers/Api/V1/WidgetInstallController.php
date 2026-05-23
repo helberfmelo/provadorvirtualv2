@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateWidgetInstallRequest;
 use App\Http\Resources\WidgetInstallResource;
 use App\Models\WidgetInstall;
+use App\Services\Audit\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -53,6 +54,12 @@ class WidgetInstallController extends Controller
             'theme',
             'is_active',
         ]));
+
+        app(AuditLogger::class)->log($request, $merchant, 'widget_install.updated', 'widget', 'info', [
+            'platform' => $install->platform,
+            'is_active' => $install->is_active,
+            'allowed_domains_count' => count($install->allowed_domains ?? []),
+        ], $install);
 
         return new WidgetInstallResource($install->refresh()->load('company'));
     }

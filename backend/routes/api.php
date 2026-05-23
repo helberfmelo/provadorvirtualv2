@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AiMeasurementAssistantController;
+use App\Http\Controllers\Api\V1\AnalyticsController;
+use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BigShopActivationController;
 use App\Http\Controllers\Api\V1\BigShopIntegrationController;
@@ -13,6 +15,7 @@ use App\Http\Controllers\Api\V1\MeasurementTemplateController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
 use App\Http\Controllers\Api\V1\RecommendationController;
+use App\Http\Controllers\Api\V1\SaasAdminController;
 use App\Http\Controllers\Api\V1\WidgetInstallController;
 use App\Models\MeasurementTable;
 use App\Models\PlatformConnection;
@@ -70,6 +73,10 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/imports/{importJob}', [ImportController::class, 'show']);
         Route::get('/ai/status', [AiMeasurementAssistantController::class, 'status']);
         Route::post('/ai/measurement-table-suggestions', [AiMeasurementAssistantController::class, 'suggest']);
+        Route::get('/analytics/recommendations', [AnalyticsController::class, 'recommendations']);
+        Route::get('/audit-logs', [AuditLogController::class, 'index']);
+        Route::get('/saas/overview', [SaasAdminController::class, 'overview']);
+        Route::get('/saas/merchants', [SaasAdminController::class, 'merchants']);
         Route::apiResource('measurement-tables', MeasurementTableController::class);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('products.variants', ProductVariantController::class)

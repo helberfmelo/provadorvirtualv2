@@ -69,3 +69,5 @@ Auditar:
 - mudanca de plano/status;
 - uso de IA;
 - falhas de webhook.
+
+Status Sprint 10: `audit_logs` registra acoes em tabelas de medidas, widget e integracoes com hash de IP/user-agent e metadata sem secrets.

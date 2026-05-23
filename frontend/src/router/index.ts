@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AiAssistantView from '../views/AiAssistantView.vue'
+import AnalyticsView from '../views/AnalyticsView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
 import ImportsView from '../views/ImportsView.vue'
@@ -8,6 +9,7 @@ import LoginView from '../views/LoginView.vue'
 import MeasurementTablesView from '../views/MeasurementTablesView.vue'
 import ProductsView from '../views/ProductsView.vue'
 import ProductTestView from '../views/ProductTestView.vue'
+import SaasAdminView from '../views/SaasAdminView.vue'
 import WidgetInstallView from '../views/WidgetInstallView.vue'
 
 const base = import.meta.env.VITE_APP_BASE_PATH || '/'
@@ -23,9 +25,11 @@ const router = createRouter({
     { path: '/app/produtos', component: ProductsView },
     { path: '/app/tabelas-de-medidas', component: MeasurementTablesView },
     { path: '/app/assistente', component: AiAssistantView },
+    { path: '/app/analytics', component: AnalyticsView },
     { path: '/app/importacoes', component: ImportsView },
     { path: '/app/widget', component: WidgetInstallView },
     { path: '/app/integracoes', component: IntegrationsView },
+    { path: '/saas', component: SaasAdminView },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
   scrollBehavior() {
@@ -34,7 +38,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  if (to.path.startsWith('/app') && !localStorage.getItem('pv_token')) {
+  if ((to.path.startsWith('/app') || to.path.startsWith('/saas')) && !localStorage.getItem('pv_token')) {
     return '/login'
   }
 

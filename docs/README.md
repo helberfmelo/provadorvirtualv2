@@ -15,13 +15,14 @@ Antes de desenvolver qualquer sprint, ajuste, correcao ou deploy, reler nesta or
 6. `docs/widget_integration.md`
 7. `docs/imports_data_quality.md`
 8. `docs/ai_assistant.md`
-9. `docs/bigshop_integration.md`
-10. `docs/deploy_runbook.md`
-11. `docs/sprint_governance.md`
-12. `docs/roadmap_sprints.md`
-13. `docs/product_backlog.md`
-14. `docs/security_compliance.md`
-15. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
+9. `docs/analytics_admin.md`
+10. `docs/bigshop_integration.md`
+11. `docs/deploy_runbook.md`
+12. `docs/sprint_governance.md`
+13. `docs/roadmap_sprints.md`
+14. `docs/product_backlog.md`
+15. `docs/security_compliance.md`
+16. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
 
 Nenhuma sprint deve comecar sem essa releitura.
 

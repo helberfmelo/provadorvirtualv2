@@ -134,6 +134,19 @@
 - Run `26332326042` do GitHub Actions finalizou com sucesso para o commit `b7a88d1`.
 - Validado em producao: `/app/assistente`, `GET /public/api/v1/ai/status` e `POST /public/api/v1/ai/measurement-table-suggestions` com 2 linhas sugeridas.
 
+## 2026-05-23 - Sprint 10 Analytics e SaaS Admin
+
+- Criada tabela `audit_logs`.
+- Criado `AuditLogger` com hash de IP/user-agent e filtro de tokens/secrets/senhas em metadata.
+- Criados endpoints protegidos `/api/v1/analytics/recommendations` e `/api/v1/audit-logs`.
+- Criados endpoints admin `/api/v1/saas/overview` e `/api/v1/saas/merchants`, restritos a `admin` ou `support`.
+- Analytics retorna recomendacoes, feedback positivo, produtos sem tabela, alertas, series diarias, tamanhos e produtos.
+- Criadas telas Vue `/app/analytics` e `/saas`.
+- Auditoria inicial cobre tabelas de medidas, widget e integracoes.
+- Criado documento `docs/analytics_admin.md`.
+- Criados testes `AnalyticsApiTest` e `SaasAdminApiTest`.
+- Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build`, `php artisan route:list --path=api/v1/analytics`, `php artisan route:list --path=api/v1/saas`, `git diff --check` e smoke local com analytics 200 e SaaS 403 para lojista comum.
+
 ## Pendencias abertas
 
 - Repositorio esta publico para manter a cota do GitHub Actions disponivel.

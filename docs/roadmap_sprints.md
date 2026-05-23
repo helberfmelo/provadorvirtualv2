@@ -165,6 +165,8 @@ Entregas:
 - painel SaaS para lojistas;
 - audit logs.
 
+Status: implementado localmente; publicar e validar em producao.
+
 ## Sprint 11 - Hardening, LGPD e Observabilidade
 
 Objetivo: preparar release publico com seguranca.

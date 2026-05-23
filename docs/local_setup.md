@@ -64,6 +64,7 @@ npm run dev
 - `/app/produtos`
 - `/app/tabelas-de-medidas`
 - `/app/assistente`
+- `/app/analytics`
 - `/app/importacoes`
 - `/app/widget`
 - `/app/integracoes`
@@ -80,6 +81,10 @@ npm run dev
 - `/api/v1/imports/preview`
 - `/api/v1/ai/status`
 - `/api/v1/ai/measurement-table-suggestions`
+- `/api/v1/analytics/recommendations`
+- `/api/v1/audit-logs`
+- `/api/v1/saas/overview`
+- `/api/v1/saas/merchants`
 - `/api/v1/public/recommendations/config-check`
 - `/api/v1/public/recommendations`
 - `/api/v1/public/recommendations/{id}/feedback`
@@ -156,3 +161,5 @@ Status Sprint 7: backend possui conector BigShop com probe/sync testados via `Ht
 Status Sprint 8: ativacao BigShop um clique disponivel por endpoint assinado; sem `BIGSHOP_ACTIVATION_SECRET`, retorna `503`.
 
 Status Sprint 9: painel demo possui `/app/assistente`; texto/CSV gera sugestao de tabela em rascunho e `ai_usage_logs` registra uso sem conteudo bruto.
+
+Status Sprint 10: painel demo possui `/app/analytics`; `/saas` exige usuario com papel `admin` ou `support`.
