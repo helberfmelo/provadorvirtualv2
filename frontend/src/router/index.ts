@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import AiAssistantView from '../views/AiAssistantView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
 import ImportsView from '../views/ImportsView.vue'
@@ -21,6 +22,7 @@ const router = createRouter({
     { path: '/app', component: DashboardView },
     { path: '/app/produtos', component: ProductsView },
     { path: '/app/tabelas-de-medidas', component: MeasurementTablesView },
+    { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/importacoes', component: ImportsView },
     { path: '/app/widget', component: WidgetInstallView },
     { path: '/app/integracoes', component: IntegrationsView },

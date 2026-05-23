@@ -71,6 +71,13 @@ onMounted(() => {
           <small>{{ summary.measurement_tables }} disponiveis</small>
         </span>
       </RouterLink>
+      <RouterLink class="onboarding-step" to="/app/assistente">
+        <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+        <span>
+          <strong>Assistente</strong>
+          <small>Texto e imagem</small>
+        </span>
+      </RouterLink>
       <RouterLink class="onboarding-step" to="/app/widget">
         <i class="fa-solid fa-code" aria-hidden="true"></i>
         <span>
@@ -102,6 +109,10 @@ onMounted(() => {
       <RouterLink class="btn btn-secondary" to="/app/tabelas-de-medidas">
         <i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>
         Tabelas de medidas
+      </RouterLink>
+      <RouterLink class="btn btn-secondary" to="/app/assistente">
+        <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+        Assistente
       </RouterLink>
       <RouterLink class="btn btn-secondary" to="/app/widget">
         <i class="fa-solid fa-code" aria-hidden="true"></i>

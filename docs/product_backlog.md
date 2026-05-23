@@ -49,10 +49,11 @@ Atualizado em: 2026-05-23
 
 ## IA
 
-- `TODO` Decidir provider inicial.
-- `TODO` Cadastrar chave quando sprint pedir.
-- `TODO` OCR de tabela.
-- `TODO` Sugestao de tabela com revisao.
+- `DONE` Decidir provider inicial.
+- `TODO` Cadastrar chave externa para OCR real de imagem.
+- `DONE` Extracao de tabela por texto/CSV.
+- `TODO` OCR real de imagem com provider externo.
+- `DONE` Sugestao de tabela com revisao.
 - `TODO` Analise de feedback.
 
 ## Operacao

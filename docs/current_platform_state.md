@@ -15,6 +15,7 @@ Atualizado em: 2026-05-23
 - Sprint 6 criou importacao com preview/commit para CSV de produtos, CSV de tabelas e Google XML inicial.
 - Sprint 7 criou conector BigShop base com probe, sync de produtos/grades/tabelas e eventos de integracao.
 - Sprint 8 criou ativacao BigShop um clique por endpoint publico assinado com HMAC.
+- Sprint 9 criou assistente de tabelas com parser local, logs de uso de IA e revisao obrigatoria.
 
 ## Referencias confirmadas
 
@@ -81,16 +82,17 @@ Atualizado em: 2026-05-23
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em producao usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que nao preservam header durante redirect.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
-- Falta chave de IA se as primeiras sprints incluirem OCR/geracao assistida.
+- Falta chave de IA externa (`OPENAI_API_KEY` ou `GEMINI_API_KEY`) para OCR real de imagem.
 - Falta credencial BigShop real para loja de teste.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativacao um clique real.
 - Falta decidir provider de pagamento quando billing sair do modo preparado.
 
 ## Superficie atual
 
-- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/widget`, `/app/integracoes`.
+- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/widget`, `/app/integracoes`.
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
+- Assistente protegido: status e sugestoes em `/api/v1/ai/*`.
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
 - BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
 - APIs publicas: health, produto demo e recomendacoes do widget.
@@ -98,4 +100,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 9: IA para OCR e Tabelas.
+Publicar a Sprint 9 e iniciar a Sprint 10: Analytics e SaaS Admin.

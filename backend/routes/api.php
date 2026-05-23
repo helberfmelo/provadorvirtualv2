@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AiMeasurementAssistantController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BigShopActivationController;
 use App\Http\Controllers\Api\V1\BigShopIntegrationController;
@@ -67,6 +68,8 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/imports/preview', [ImportController::class, 'preview']);
         Route::post('/imports', [ImportController::class, 'store']);
         Route::get('/imports/{importJob}', [ImportController::class, 'show']);
+        Route::get('/ai/status', [AiMeasurementAssistantController::class, 'status']);
+        Route::post('/ai/measurement-table-suggestions', [AiMeasurementAssistantController::class, 'suggest']);
         Route::apiResource('measurement-tables', MeasurementTableController::class);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('products.variants', ProductVariantController::class)

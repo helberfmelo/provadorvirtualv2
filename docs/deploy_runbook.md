@@ -76,6 +76,7 @@ Se o repositorio voltar a ser privado, confirmar em GitHub:
 
 IA:
 
+- `AI_PROVIDER=local` e `AI_MODEL=local-table-parser-v1` podem ficar no `.env` para operar o parser local.
 - `OPENAI_API_KEY` se usarmos OpenAI;
 - ou `GEMINI_API_KEY` se mantivermos Gemini para OCR/legado.
 

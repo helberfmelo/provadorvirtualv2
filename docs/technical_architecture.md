@@ -60,6 +60,8 @@ APIs protegidas ja implementadas:
 - `GET|POST /api/v1/imports`
 - `POST /api/v1/imports/preview`
 - `GET /api/v1/imports/{importJob}`
+- `GET /api/v1/ai/status`
+- `POST /api/v1/ai/measurement-table-suggestions`
 
 ## Frontend
 
@@ -84,6 +86,7 @@ Rotas iniciais:
 - `/app`
 - `/app/produtos`
 - `/app/tabelas-de-medidas`
+- `/app/assistente`
 - `/app/integracoes`
 - `/app/widget`
 - `/saas`
@@ -122,6 +125,7 @@ Tabelas propostas:
 - `recommendation_feedbacks`
 - `import_jobs`
 - `integration_events`
+- `ai_usage_logs`
 - `audit_logs`
 
 Chaves comuns:
@@ -196,4 +200,5 @@ Producao inicial:
 - logs Laravel;
 - tabela `integration_events`;
 - tabela `recommendation_logs`;
+- tabela `ai_usage_logs`;
 - audit log para credenciais e acoes sensiveis.

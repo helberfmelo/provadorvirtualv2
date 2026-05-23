@@ -56,6 +56,7 @@ Nunca commitar:
 - Evitar enviar dados pessoais identificaveis.
 - Guardar versao do prompt/provider/modelo quando usado.
 - Toda tabela sugerida por IA requer revisao humana.
+- Logs de IA guardam hash/resumo operacional, nao conteudo bruto enviado pelo lojista.
 
 ## Auditoria
 

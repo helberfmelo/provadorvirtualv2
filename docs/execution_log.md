@@ -120,7 +120,19 @@
 - Run `26332055677` do GitHub Actions finalizou com sucesso para o commit `729e1c3`.
 - Validado em producao: `POST /public/api/v1/public/bigshop/activate` retorna `503` controlado enquanto `BIGSHOP_ACTIVATION_SECRET` nao esta configurado.
 
+## 2026-05-23 - Sprint 9 IA para OCR e Tabelas
+
+- Criada tabela `ai_usage_logs` para registrar uso, provider, modelo, tokens estimados, custo estimado e resumo sem conteudo bruto.
+- Criados endpoints protegidos `/api/v1/ai/status` e `/api/v1/ai/measurement-table-suggestions`.
+- Criado parser local para texto/CSV de tabela de medidas.
+- Imagens ficam preparadas no front; enquanto provider externo nao estiver ativo, a API retorna `needs_provider` em vez de simular OCR.
+- Sugestoes sempre retornam `review_required=true` e `status=draft`.
+- Criada tela Vue `/app/assistente` para colar texto/CSV, enviar imagem, revisar medidas e criar rascunho.
+- Criado documento `docs/ai_assistant.md`.
+- Criados testes `AiMeasurementAssistantTest`.
+- Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build`, `php artisan route:list --path=api/v1/ai`, `git diff --check` e smoke autenticado local com 2 linhas sugeridas.
+
 ## Pendencias abertas
 
 - Repositorio esta publico para manter a cota do GitHub Actions disponivel.
-- Definir chave de IA quando a sprint de OCR/assistencia for iniciada.
+- Cadastrar `OPENAI_API_KEY` ou `GEMINI_API_KEY` e ativar provider externo para OCR real de imagem.

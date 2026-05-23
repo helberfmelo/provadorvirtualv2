@@ -39,4 +39,11 @@ return [
         'activation_secret' => env('BIGSHOP_ACTIVATION_SECRET'),
     ],
 
+    'ai' => [
+        'provider' => env('AI_PROVIDER', 'local'),
+        'model' => env('AI_MODEL', 'local-table-parser-v1'),
+        'openai_api_key' => env('OPENAI_API_KEY'),
+        'gemini_api_key' => env('GEMINI_API_KEY'),
+    ],
+
 ];

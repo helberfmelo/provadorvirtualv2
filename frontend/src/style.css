@@ -823,8 +823,29 @@ textarea {
   margin-top: 4px;
 }
 
+.assistant-status,
+.warning-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.warning-list span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #92400e;
+  background: #fffbeb;
+  font-weight: 800;
+}
+
 .status-pill {
   display: inline-flex;
+  align-items: center;
+  gap: 7px;
   max-width: 220px;
   padding: 5px 8px;
   border-radius: 8px;

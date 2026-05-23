@@ -63,6 +63,7 @@ npm run dev
 - `/app`
 - `/app/produtos`
 - `/app/tabelas-de-medidas`
+- `/app/assistente`
 - `/app/importacoes`
 - `/app/widget`
 - `/app/integracoes`
@@ -77,6 +78,8 @@ npm run dev
 - `/api/v1/integrations/bigshop/sync`
 - `/api/v1/imports`
 - `/api/v1/imports/preview`
+- `/api/v1/ai/status`
+- `/api/v1/ai/measurement-table-suggestions`
 - `/api/v1/public/recommendations/config-check`
 - `/api/v1/public/recommendations`
 - `/api/v1/public/recommendations/{id}/feedback`
@@ -106,6 +109,9 @@ CACHE_STORE=file
 QUEUE_CONNECTION=sync
 
 MAIL_MAILER=log
+
+AI_PROVIDER=local
+AI_MODEL=local-table-parser-v1
 ```
 
 ## Validacoes locais esperadas
@@ -148,3 +154,5 @@ Status Sprint 6: painel demo permite analisar e importar CSV de produtos, CSV de
 Status Sprint 7: backend possui conector BigShop com probe/sync testados via `Http::fake`; tela de integracoes mostra acoes BigShop.
 
 Status Sprint 8: ativacao BigShop um clique disponivel por endpoint assinado; sem `BIGSHOP_ACTIVATION_SECRET`, retorna `503`.
+
+Status Sprint 9: painel demo possui `/app/assistente`; texto/CSV gera sugestao de tabela em rascunho e `ai_usage_logs` registra uso sem conteudo bruto.
