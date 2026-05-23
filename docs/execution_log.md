@@ -44,6 +44,15 @@
 - Run `26326950616` do GitHub Actions finalizou com sucesso para o commit `3b37c90`.
 - Validado em producao: `/app/produtos`, `/app/tabelas-de-medidas`, login demo, `/api/v1/products` e `/api/v1/measurement-tables`.
 
+## 2026-05-23 - Sprint 3 Motor de Recomendacao
+
+- Criado `RecommendationEngine` deterministico com normalizacao de medidas, scoring por faixa, confianca, notas de caimento e alertas.
+- Criados endpoints publicos `/api/v1/public/recommendations/config-check`, `/api/v1/public/recommendations` e `/api/v1/public/recommendations/{id}/feedback`.
+- Recomendacoes criam `recommendation_sessions` e `recommendation_logs` com hash de IP/user-agent, sem coletar nome, email ou telefone.
+- Pagina `/produto-teste` passou a chamar a API real e registrar feedback.
+- Smoke do GitHub Actions passou a postar uma recomendacao real e validar `recommended_size = M`.
+- Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build`, YAML do workflow e smoke integrado em `php artisan serve`.
+
 ## Pendencias abertas
 
 - Regularizar billing/spending limit do GitHub Actions para repositorio privado.

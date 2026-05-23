@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\MeasurementTableController;
 use App\Http\Controllers\Api\V1\MeasurementTemplateController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
+use App\Http\Controllers\Api\V1\RecommendationController;
 use App\Models\MeasurementTable;
 use App\Models\Product;
 use App\Models\RecommendationLog;
@@ -15,6 +16,9 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function (): void {
     Route::get('/health', HealthController::class);
     Route::get('/demo/product-test', [DemoProductController::class, 'show']);
+    Route::post('/public/recommendations/config-check', [RecommendationController::class, 'configCheck']);
+    Route::post('/public/recommendations', [RecommendationController::class, 'store']);
+    Route::post('/public/recommendations/{recommendationLog}/feedback', [RecommendationController::class, 'feedback']);
 
     Route::post('/auth/login', [AuthController::class, 'login']);
 
@@ -41,5 +45,7 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('products', ProductController::class);
         Route::apiResource('products.variants', ProductVariantController::class)
             ->only(['store', 'update', 'destroy']);
+        Route::post('/recommendations/config-check', [RecommendationController::class, 'configCheck']);
+        Route::post('/recommendations', [RecommendationController::class, 'store']);
     });
 });

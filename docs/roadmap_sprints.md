@@ -61,6 +61,8 @@ Entregas:
 - endpoints publicos;
 - testes de casos comuns e extremos.
 
+Status: implementado com `RecommendationEngine`, logs anonimos, feedback e `/produto-teste` usando API real; aguardando deploy verde para encerrar a sprint.
+
 ## Sprint 4 - Widget Universal v1
 
 Objetivo: snippet funcionar em qualquer pagina.

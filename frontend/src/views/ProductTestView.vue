@@ -43,59 +43,78 @@ const waist = ref(72)
 const hip = ref(98)
 const height = ref(165)
 const weight = ref(60)
+const recommending = ref(false)
+const recommendation = ref<{
+  recommendation_id: number
+  recommended_size: string | null
+  confidence: number
+  fit_notes: string[]
+  warnings: string[]
+  needs_more_data: boolean
+} | null>(null)
+const recommendationError = ref('')
+const feedbackSent = ref(false)
 
 const selectedVariant = computed(() => {
   return payload.value?.variants.find((variant) => variant.id === selectedVariantId.value)
 })
-
-const recommendation = computed(() => {
-  if (!payload.value) {
-    return null
-  }
-
-  const scored = payload.value.measurement_table.rows.map((row) => {
-    const penalties = [
-      rangePenalty(bust.value, row.bust),
-      rangePenalty(waist.value, row.waist),
-      rangePenalty(hip.value, row.hip),
-      rangePenalty(height.value, row.height),
-      rangePenalty(weight.value, row.weight),
-    ]
-    const score = penalties.reduce((sum, value) => sum + value, 0)
-    return { size: row.size_label, score }
-  })
-
-  const best = scored.sort((a, b) => a.score - b.score)[0]
-  const confidence = Math.max(62, Math.round(96 - best.score * 7))
-
-  return { size: best.size, confidence }
-})
-
-function rangePenalty(value: number, range: [string | null, string | null]) {
-  const min = Number(range[0])
-  const max = Number(range[1])
-
-  if (!Number.isFinite(min) || !Number.isFinite(max)) {
-    return 0
-  }
-
-  if (value < min) {
-    return (min - value) / 4
-  }
-
-  if (value > max) {
-    return (value - max) / 4
-  }
-
-  return 0
-}
 
 onMounted(async () => {
   const { data } = await api.get<DemoPayload>('/demo/product-test')
   payload.value = data
   selectedVariantId.value = data.variants[1]?.id ?? data.variants[0]?.id ?? null
   loading.value = false
+  await requestRecommendation()
 })
+
+async function requestRecommendation() {
+  if (!payload.value) {
+    return
+  }
+
+  recommending.value = true
+  recommendationError.value = ''
+  feedbackSent.value = false
+
+  try {
+    const { data } = await api.post('/public/recommendations', {
+      merchant_id: payload.value.product.merchant_id,
+      store_id: payload.value.product.store_id,
+      product_id: payload.value.product.id,
+      variant_id: selectedVariantId.value,
+      platform: payload.value.widget.platform,
+      measurements: {
+        bust: bust.value,
+        waist: waist.value,
+        hip: hip.value,
+        height: height.value,
+        weight: weight.value,
+      },
+      shopper_profile: {
+        gender: 'female',
+        fit_preference: 'regular',
+      },
+    })
+
+    recommendation.value = data
+  } catch {
+    recommendationError.value = 'Nao foi possivel calcular agora.'
+  } finally {
+    recommending.value = false
+  }
+}
+
+async function sendFeedback(wasHelpful: boolean) {
+  if (!recommendation.value) {
+    return
+  }
+
+  await api.post(`/public/recommendations/${recommendation.value.recommendation_id}/feedback`, {
+    was_helpful: wasHelpful,
+    selected_size: selectedVariant.value?.size_label,
+  })
+  feedbackSent.value = true
+}
 </script>
 
 <template>
@@ -144,12 +163,30 @@ onMounted(async () => {
           <label> Peso <input v-model.number="weight" type="number" min="35" max="160" /> </label>
         </div>
 
+        <button class="btn btn-primary" type="button" :disabled="recommending" @click="requestRecommendation">
+          <i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>
+          {{ recommending ? 'Calculando...' : 'Calcular tamanho' }}
+        </button>
+
+        <p v-if="recommendationError" class="form-error">{{ recommendationError }}</p>
+
         <div v-if="recommendation" class="recommendation">
           <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
           <div>
             <span>Tamanho recomendado</span>
-            <strong>{{ recommendation.size }}</strong>
-            <small>{{ recommendation.confidence }}% de confianca com a tabela demo</small>
+            <strong>{{ recommendation.recommended_size }}</strong>
+            <small>{{ Math.round(recommendation.confidence) }}% de confianca com a tabela demo</small>
+            <small v-for="note in recommendation.fit_notes" :key="note">{{ note }}</small>
+            <small v-for="warning in recommendation.warnings" :key="warning">{{ warning }}</small>
+            <div class="feedback-row" v-if="!feedbackSent">
+              <button type="button" title="Ajudou" @click="sendFeedback(true)">
+                <i class="fa-solid fa-thumbs-up" aria-hidden="true"></i>
+              </button>
+              <button type="button" title="Nao ajudou" @click="sendFeedback(false)">
+                <i class="fa-solid fa-thumbs-down" aria-hidden="true"></i>
+              </button>
+            </div>
+            <small v-else>Feedback registrado. Obrigado.</small>
           </div>
         </div>
       </div>

@@ -345,6 +345,10 @@ jobs:
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/produto-teste" | grep -q '<div id="app"'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/api/v1/health" | grep -q '"status":"ok"'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/api/v1/demo/product-test" | grep -q 'Vestido Luna Midi'
+          curl --fail --silent --show-error -L \
+            -H 'Content-Type: application/json' \
+            -d '{"merchant_id":1,"store_id":1,"product_id":1,"platform":"custom","measurements":{"bust":92,"waist":74,"hip":100,"height":166,"weight":62}}' \
+            "${PRODUCTION_APP_URL}/api/v1/public/recommendations" | grep -q '"recommended_size":"M"'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/up" > /dev/null
 
       - name: Diagnose public failure

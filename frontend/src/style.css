@@ -394,6 +394,24 @@ a {
   font-size: 2rem;
 }
 
+.feedback-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.feedback-row button {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  color: #065f46;
+  background: #fff;
+  cursor: pointer;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;

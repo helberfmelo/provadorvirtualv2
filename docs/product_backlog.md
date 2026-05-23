@@ -21,9 +21,9 @@ Atualizado em: 2026-05-23
 - `DONE` CRUD de variacoes.
 - `DONE` CRUD de tabelas de medidas.
 - `DONE` Templates por tipo de peca/genero.
-- `TODO` Motor de recomendacao.
+- `DONE` Motor de recomendacao.
 - `TODO` Widget universal.
-- `TODO` Feedback de recomendacao.
+- `DONE` Feedback de recomendacao.
 - `TODO` Analytics.
 - `TODO` SaaS admin.
 

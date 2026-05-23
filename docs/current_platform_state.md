@@ -9,6 +9,7 @@ Atualizado em: 2026-05-23
 - Foram criados documentos iniciais, `.gitignore` e workflow de deploy.
 - Sprint 1 scaffoldou `backend/` Laravel 12 e `frontend/` Vue 3/Vite.
 - Sprint 2 publicou CRUD de produtos, variacoes, tabelas de medidas e templates operacionais no painel e na API.
+- Sprint 3 criou motor deterministico, endpoints publicos de recomendacao/config-check/feedback e conectou `/produto-teste` ao backend real.
 
 ## Referencias confirmadas
 
@@ -74,4 +75,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 3: motor de recomendacao deterministico.
+Concluir deploy acompanhado da Sprint 3 e iniciar a Sprint 4: Widget Universal v1.
