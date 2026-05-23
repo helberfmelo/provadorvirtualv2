@@ -403,7 +403,7 @@ Entregas:
 - alternancia de empresa no topo do painel sem logout;
 - testes cobrindo login multiempresa, troca de contexto, escopo de dados e negacao auditada.
 
-Status: implementado e testado localmente; aguardando publicacao da Sprint 33.
+Status: implementado, publicado e validado em producao no run `26338888072`.
 
 ### Sprint 34 - Guias de integracao por plataforma
 
