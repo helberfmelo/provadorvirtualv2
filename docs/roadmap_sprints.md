@@ -322,7 +322,7 @@ Entregas:
 - templates iniciais: cadastro realizado, pagamento confirmado, aguardando pagamento com Pix, erro no pagamento, recuperacao de senha e renovacao de plano;
 - testes para API de e-mails e comando de sincronizacao de pagamentos.
 
-Status: implementado nesta sprint; publicar e validar no Actions.
+Status: implementado, publicado e validado em producao no run `26336899986`.
 
 ### Sprint 29 - Login contextual e acesso de empresa
 

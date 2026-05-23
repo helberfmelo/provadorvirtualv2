@@ -215,3 +215,6 @@
 - Scheduler configurado para rodar monitor de pagamentos a cada 5 minutos, anonimizacao diaria e limpeza operacional semanal.
 - Documentado cron cPanel com log em `docs/deploy_runbook.md`.
 - Validacoes locais focadas: `php artisan test --filter=SaasEmailApiTest`, `php artisan test --filter=PaymentSyncCommandTest` e `npm run build`.
+- Validacoes locais completas: `php artisan test`, `npm run build`, build raiz com `VITE_APP_BASE_PATH=/`, `git diff --check` e `vendor/bin/pint --dirty`.
+- Run `26336899986` do GitHub Actions finalizou com sucesso para o commit `ce65f82`.
+- Validado em producao: raiz, paginas publicas, API health/ops/demo/recommendation, CORS, login demo e go-live com `scripts/validate-production.ps1`.
