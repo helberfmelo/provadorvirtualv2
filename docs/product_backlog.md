@@ -50,11 +50,27 @@ Atualizado em: 2026-05-23
 ## IA
 
 - `DONE` Decidir provider inicial.
-- `TODO` Cadastrar chave externa para OCR real de imagem.
+- `DONE` Localizar `GEMINI_API_KEY` no v1 e documentar somente em `docs/credentials.local.md`.
+- `TODO` Cadastrar `GEMINI_API_KEY` em producao quando aprovar provider externo.
 - `DONE` Extracao de tabela por texto/CSV.
 - `TODO` OCR real de imagem com provider externo.
 - `DONE` Sugestao de tabela com revisao.
 - `TODO` Analise de feedback.
+- `TODO` Importar catalogo padrao do v1 para templates inteligentes.
+- `TODO` Wizard IA/OCR completo para lojista.
+- `TODO` Prompt registry e limite de custo por lojista.
+
+## Inteligencia de tamanho
+
+- `TODO` Criar perfis anonimos de consumidor.
+- `TODO` Criar perfis conhecidos/editaveis.
+- `TODO` Persistir medidas anteriores com consentimento.
+- `TODO` Reusar medidas no widget com aviso claro.
+- `TODO` Implementar formato corporal e barra de precisao no widget v2.
+- `TODO` Criar score de qualidade de tabela.
+- `TODO` Criar deteccao de outliers.
+- `TODO` Criar pipeline de aprendizado com compra/devolucao/feedback.
+- `TODO` Criar base inicial Zak como benchmark operacional revisado.
 
 ## Operacao
 
@@ -71,3 +87,11 @@ Atualizado em: 2026-05-23
 - `DONE` Tela de prontidao para go-live.
 - `DONE` Script de validacao de producao.
 - `DONE` Plano de cutover para raiz do dominio.
+
+## Benchmark e mercado
+
+- `DONE` Estudar documentacao publica Sizebay.
+- `DONE` Capturar fluxo Zak com Sizebay em camisa e calca.
+- `DONE` Identificar tenant Zak Sizebay `1235` e contrato tecnico observado.
+- `TODO` Capturar outras lojas com Sizebay de forma controlada.
+- `TODO` Documentar matriz de plataformas: Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart, Custom e BigShop.

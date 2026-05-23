@@ -180,6 +180,16 @@
 ## Pendencias abertas
 
 - Repositorio esta publico para manter a cota do GitHub Actions disponivel.
-- Cadastrar `OPENAI_API_KEY` ou `GEMINI_API_KEY` e ativar provider externo para OCR real de imagem.
+- `GEMINI_API_KEY` foi encontrada no v1 e copiada para `docs/credentials.local.md`; ainda falta cadastrar/ativar em producao quando aprovado.
+- Opcional: cadastrar `OPENAI_API_KEY` como provider alternativo.
 - Cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV`.
 - Receber loja piloto BigShop, `store_id`, token `x-api` e webhook secret, se existir.
+
+## 2026-05-23 - Roadmap inteligente pos Sprint 12
+
+- Estudado `D:\Projetos\provadorvirtual_v1` para migrar conceitos de catalogo padrao, Gemini, OCR, modelo por IA, wizard de tabela e widget gamificado.
+- Encontrada `GEMINI_API_KEY` no `.env` do v1; valor documentado apenas em `docs/credentials.local.md`, ignorado pelo Git.
+- Estudada documentacao publica Sizebay sobre script, API, produto, XML, OnPage, order tracking, devolucoes, Size Tailor, Shopify e categorias.
+- Capturado fluxo publico Zak/Sizebay em camisa e calca: tenant `1235`, botoes `DESCUBRA SEU TAMANHO`/`TABELA DE MEDIDAS`, cookies `SIZEBAY_SESSION_ID_V4` e recomendacoes por perfis de teste.
+- Criados documentos `docs/v1_intelligence_migration.md`, `docs/sizebay_benchmark.md`, `docs/data_learning_lgpd_outliers.md` e `docs/intelligent_sizing_roadmap.md`.
+- Atualizados docs obrigatorios, backlog, arquitetura, widget e IA.

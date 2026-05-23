@@ -211,6 +211,34 @@ Producao inicial:
 - tabela `ai_usage_logs`;
 - tabela `audit_logs` para acoes sensiveis.
 
+## Evolucao inteligente planejada
+
+Documentos de referencia:
+
+- `docs/v1_intelligence_migration.md`
+- `docs/sizebay_benchmark.md`
+- `docs/data_learning_lgpd_outliers.md`
+- `docs/intelligent_sizing_roadmap.md`
+
+Novos modulos previstos:
+
+- `StandardMeasurementCatalog`
+- `MeasurementQuality`
+- `ShopperProfiles`
+- `LearningSignals`
+- `OutlierDetection`
+- `PlatformInstallers`
+
+Tabelas provaveis:
+
+- `shopper_profiles`
+- `shopper_profile_versions`
+- `recommendation_events`
+- `recommendation_learning_signals`
+- `merchant_table_quality_checks`
+- `measurement_catalog_sources`
+- `learning_cohorts`
+
 ## Hardening Sprint 11
 
 - CORS global restrito a origens locais de desenvolvimento via `CORS_ALLOWED_ORIGINS`.

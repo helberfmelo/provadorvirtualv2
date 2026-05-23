@@ -51,6 +51,19 @@ Status Sprint 5: o painel `/app/widget` gera o snippet a partir de `/api/v1/widg
 
 Status Sprint 11: as rotas publicas de recomendacao validam `Origin` contra `allowed_domains` da instalacao ativa. Requisicoes sem `Origin` continuam liberadas para smokes e chamadas server-to-server; dominios nao cadastrados recebem `403`.
 
+## Evolucao inteligente prevista
+
+Benchmark Sizebay/Zak em `docs/sizebay_benchmark.md` confirmou que o widget deve evoluir para:
+
+- carregar de forma assincrona;
+- esconder o botao quando produto/tabela nao estiver pronto;
+- reconhecer consumidor anonimo por cookie/localStorage;
+- reusar medidas anteriores com aviso claro;
+- abrir edicao de medidas em modal;
+- mostrar recomendacao rapida com altura/peso/idade;
+- permitir refinamento por formato corporal e medidas detalhadas;
+- registrar eventos de carrinho, pedido e devolucao quando a plataforma permitir.
+
 ## Contrato publico atual
 
 Endpoints usados pelo widget:
@@ -141,5 +154,7 @@ Rotas protegidas:
 - `PATCH /api/v1/integrations/{platform}`
 
 Plataformas catalogadas: `bigshop`, `shopify`, `woocommerce`, `nuvemshop`, `vtex`, `tray` e `custom`.
+
+Plataformas a adicionar no roadmap inteligente: `loja_integrada`, `magento`, `opencart` e guias de Tag Manager quando fizer sentido.
 
 Credenciais de plataforma devem ser salvas apenas por endpoints protegidos e persistidas criptografadas. A API retorna somente flags como `has_access_token` e `has_webhook_secret`.

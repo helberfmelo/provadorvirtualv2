@@ -98,8 +98,22 @@ P,88,94,70,76,92,98
 M,94,100,76,82,98,104
 ```
 
+## Credencial legado v1
+
+Foi encontrada `GEMINI_API_KEY` em `D:\Projetos\provadorvirtual_v1\.env`.
+
+O valor foi copiado para `docs/credentials.local.md`, que esta ignorado pelo Git. Nao registrar o valor em docs versionadas, logs, commits ou respostas. O v1 usava Gemini com modelo `gemini-2.0-flash` para gerar conteudo, extrair tabela de imagem e sugerir modelos de medidas.
+
+Para ativar em producao, cadastrar `GEMINI_API_KEY` no ambiente/Actions e trocar:
+
+```env
+AI_PROVIDER=gemini
+AI_MODEL=gemini-2.0-flash
+```
+
 ## Pendencias
 
-- Cadastrar `OPENAI_API_KEY` ou `GEMINI_API_KEY` e ativar provider externo para OCR real de imagem.
+- Cadastrar `GEMINI_API_KEY` em producao e ativar provider externo para OCR real de imagem, se aprovado para a proxima sprint.
+- Opcional: cadastrar `OPENAI_API_KEY` para provider alternativo.
 - Definir prompt externo final e custo por 1k tokens quando provider externo for ativado.
 - Usar logs de feedback para analise assistida em sprint futura.

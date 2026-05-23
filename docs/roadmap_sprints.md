@@ -197,3 +197,22 @@ Entregas:
 - plano para raiz `provadorvirtual.online`.
 
 Status: concluido e publicado em producao no run `26333226813`. Go-live assistido permanece na subpasta `/provadorvirtual_v2/`; cutover para a raiz depende de aceite comercial e piloto BigShop.
+
+## Roadmap de Evolucao - Sprints 13 a 22
+
+Documento detalhado: `docs/intelligent_sizing_roadmap.md`.
+
+Resumo:
+
+- Sprint 13: catalogo inteligente de medidas, importando e normalizando a base do v1.
+- Sprint 14: wizard de tabelas para lojista com modelo pronto, IA, OCR e validacao.
+- Sprint 15: widget inteligente e gamificado com precisao progressiva.
+- Sprint 16: perfis anonimos/conhecidos de consumidor e consentimento.
+- Sprint 17: benchmark e base por marca, com Zak como primeira referencia controlada.
+- Sprint 18: pacotes de integracao por plataforma, priorizando BigShop um clique.
+- Sprint 19: IA externa em producao com Gemini/OpenAI, custo e guardrails.
+- Sprint 20: pipeline de aprendizado e outliers.
+- Sprint 21: recomendacao contextual e comercial.
+- Sprint 22: preparacao comercial Sizebay-like e piloto.
+
+Status: planejado. Nao iniciar Sprint 13 sem reler os documentos obrigatorios em `docs/README.md`.

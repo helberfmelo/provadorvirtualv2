@@ -15,16 +15,20 @@ Antes de desenvolver qualquer sprint, ajuste, correcao ou deploy, reler nesta or
 6. `docs/widget_integration.md`
 7. `docs/imports_data_quality.md`
 8. `docs/ai_assistant.md`
-9. `docs/analytics_admin.md`
-10. `docs/hardening_lgpd_observability.md`
-11. `docs/go_live_cutover.md`
-12. `docs/bigshop_integration.md`
-13. `docs/deploy_runbook.md`
-14. `docs/sprint_governance.md`
-15. `docs/roadmap_sprints.md`
-16. `docs/product_backlog.md`
-17. `docs/security_compliance.md`
-18. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
+9. `docs/v1_intelligence_migration.md`
+10. `docs/sizebay_benchmark.md`
+11. `docs/data_learning_lgpd_outliers.md`
+12. `docs/analytics_admin.md`
+13. `docs/hardening_lgpd_observability.md`
+14. `docs/go_live_cutover.md`
+15. `docs/bigshop_integration.md`
+16. `docs/deploy_runbook.md`
+17. `docs/sprint_governance.md`
+18. `docs/roadmap_sprints.md`
+19. `docs/intelligent_sizing_roadmap.md`
+20. `docs/product_backlog.md`
+21. `docs/security_compliance.md`
+22. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
 
 Nenhuma sprint deve comecar sem essa releitura.
 
@@ -37,6 +41,8 @@ Nenhuma sprint deve comecar sem essa releitura.
 - `D:\Projetos\bigbangshop2.0`
 - `D:\Projetos\bigshop\172.16.151.5`
 - Documentacao publica: `https://documenter.getpostman.com/view/4253101/2s93sdYrsi`
+- Documentacao publica Sizebay: `https://docs.sizebay.com/`
+- Captura tecnica publica Zak/Sizebay em `https://www.zak.com.br/`
 
 ## Decisoes iniciais
 
