@@ -215,4 +215,72 @@ Resumo:
 - Sprint 21: recomendacao contextual e comercial.
 - Sprint 22: preparacao comercial Sizebay-like e piloto.
 
-Status: planejado. Nao iniciar Sprint 13 sem reler os documentos obrigatorios em `docs/README.md`.
+Status: Sprint 13 a 22 continuam como trilha evolutiva inteligente.
+
+## Sprints 23 a 26 - Evolucao Comercial Executada
+
+### Sprint 23 - SaaS admin, empresas e identidade
+
+Objetivo: permitir operacao interna de empresas sem checkout publico e preparar acesso por codigo.
+
+Entregas:
+
+- `cpf` no usuario;
+- endereco completo em `merchant_companies`;
+- `access_code` no formato `aaaa + id com 4 digitos`;
+- comando `php artisan pv:create-master-admin`;
+- endpoints SaaS para listar/criar/editar empresas;
+- endpoint publico para resolver empresa por codigo ou CNPJ;
+- CEP primeiro no formulario SaaS com ViaCEP no frontend.
+
+Status: implementado e testado.
+
+### Sprint 24 - Loja teste realista e widget Sizebay-like
+
+Objetivo: simular uma loja real com produtos e botoes do Provador Virtual dentro da pagina de produto.
+
+Entregas:
+
+- loja demo `Provador Virtual Loja Teste`;
+- 4 produtos demo: 2 femininos e 2 masculinos;
+- 4 tabelas de medidas por tipo de produto;
+- storefront publica em `/produto-teste`;
+- pagina de produto por slug;
+- widget com botoes `Descubra seu tamanho` e `Tabela de Medidas`;
+- modal de tabela de medidas;
+- assinatura `desenvolvido por provadorvirtual.online`;
+- reuso local de medidas anteriores pelo navegador.
+
+Status: implementado e testado.
+
+### Sprint 25 - Personalizador visual do widget
+
+Objetivo: lojista ajustar o visual do widget/tabela e ver o resultado antes de publicar.
+
+Entregas:
+
+- tema ampliado: cores, fundo, texto, fonte, tamanho, peso e raio;
+- validacao backend dos novos campos;
+- visualizador em tempo real em `/app/widget`;
+- snippet continua independente por plataforma.
+
+Status: implementado e testado.
+
+### Sprint 26 - Landing e checkout Pagar.me transparente
+
+Objetivo: abrir contratacao publica com checkout transparente e provisionamento inicial.
+
+Entregas:
+
+- landing publica clean com CTAs;
+- rota `/checkout`;
+- checkout com CEP primeiro e ViaCEP;
+- tokenizacao de cartao no navegador via chave publica Pagar.me;
+- pedido direto na Pagar.me pelo backend;
+- Pix, boleto e cartao;
+- tabelas `checkout_sessions` e `payment_events`;
+- webhook `POST /api/v1/webhooks/pagarme`;
+- liberacao da empresa quando pagamento aprovado;
+- tela `/checkout/sucesso`.
+
+Status: implementado e testado. Producao depende de `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY` e `PAGARME_WEBHOOK_SECRET` em `PRODUCTION_ENV`.

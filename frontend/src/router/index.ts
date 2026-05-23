@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AiAssistantView from '../views/AiAssistantView.vue'
 import AnalyticsView from '../views/AnalyticsView.vue'
+import CheckoutSuccessView from '../views/CheckoutSuccessView.vue'
+import CheckoutView from '../views/CheckoutView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
 import GoLiveView from '../views/GoLiveView.vue'
@@ -25,6 +27,8 @@ const router = createRouter({
     { path: '/cadastro', component: LoginView },
     { path: '/produto-teste', component: ProductTestView },
     { path: '/produto-teste/:slug', component: ProductTestView },
+    { path: '/checkout', component: CheckoutView },
+    { path: '/checkout/sucesso', component: CheckoutSuccessView },
     { path: '/privacidade', component: PrivacyView },
     { path: '/termos', component: TermsView },
     { path: '/app', component: DashboardView },

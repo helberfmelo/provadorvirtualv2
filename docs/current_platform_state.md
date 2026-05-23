@@ -19,6 +19,10 @@ Atualizado em: 2026-05-23
 - Sprint 10 criou analytics do lojista, SaaS admin basico e trilha `audit_logs`.
 - Sprint 11 criou paginas legais, CORS por dominio do widget, rate limits, status operacional e rotinas de privacidade.
 - Sprint 12 criou checklist de go-live, endpoint/tela de prontidao, script de validacao de producao e plano de cutover.
+- Sprint 23 criou cadastro interno de empresas no SaaS, endereco completo, CPF de usuario, codigo de acesso `aaaa + id`, busca publica por codigo/CNPJ e comando para master admin.
+- Sprint 24 criou loja teste realista com 4 produtos, 4 tabelas demo e widget com os botoes `Descubra seu tamanho` e `Tabela de Medidas`.
+- Sprint 25 criou personalizador visual do widget/tabela com preview em tempo real no painel do lojista.
+- Sprint 26 criou landing publica, checkout transparente Pagar.me, sessoes/eventos de pagamento e webhook de ativacao.
 
 ## Referencias confirmadas
 
@@ -92,12 +96,13 @@ Atualizado em: 2026-05-23
 - Falta chave de IA externa (`OPENAI_API_KEY` ou `GEMINI_API_KEY`) para OCR real de imagem.
 - Falta credencial BigShop real para loja de teste.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativacao um clique real.
-- Falta decidir provider de pagamento quando billing sair do modo preparado.
+- Falta cadastrar as chaves Pagar.me em `PRODUCTION_ENV` e validar uma transacao real de baixo valor.
 
 ## Superficie atual
 
 - Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`.
 - Painel SaaS protegido por papel: `/saas`.
+- Checkout publico: `/checkout` e `/checkout/sucesso`.
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`.
@@ -107,8 +112,10 @@ Atualizado em: 2026-05-23
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
 - BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
 - APIs publicas: health, produto demo e recomendacoes do widget.
+- APIs publicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}` e `/api/v1/webhooks/pagarme`.
+- APIs publicas de empresa: `/api/v1/public/company-access`.
 - Widget publico: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
 
 ## Proxima acao recomendada
 
-Operar go-live assistido em `/provadorvirtual_v2/` e aguardar credenciais reais de BigShop/IA para os proximos passos.
+Publicar a evolucao em `/provadorvirtual_v2/`, cadastrar `PAGARME_*` em producao, criar o master admin em producao e validar checkout + widget na loja teste.

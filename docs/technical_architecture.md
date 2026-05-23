@@ -67,7 +67,17 @@ APIs protegidas ja implementadas:
 - `GET /api/v1/go-live/readiness`
 - `GET /api/v1/saas/overview`
 - `GET /api/v1/saas/merchants`
+- `GET|POST /api/v1/saas/companies`
+- `PATCH /api/v1/saas/companies/{company}`
 - `GET /api/v1/ops/status`
+
+APIs publicas adicionais:
+
+- `POST /api/v1/public/company-access`
+- `GET /api/v1/public/checkout/config`
+- `POST /api/v1/public/checkout`
+- `GET /api/v1/public/checkout/{reference}`
+- `POST /api/v1/webhooks/pagarme`
 
 ## Frontend
 
@@ -89,6 +99,9 @@ Rotas iniciais:
 - `/login`
 - `/cadastro`
 - `/produto-teste`
+- `/produto-teste/:slug`
+- `/checkout`
+- `/checkout/sucesso`
 - `/app`
 - `/app/produtos`
 - `/app/tabelas-de-medidas`
@@ -134,6 +147,8 @@ Tabelas propostas:
 - `integration_events`
 - `ai_usage_logs`
 - `audit_logs`
+- `checkout_sessions`
+- `payment_events`
 
 Chaves comuns:
 
@@ -149,12 +164,21 @@ Chaves comuns:
 
 1. Pagina de produto carrega o widget com dados de produto/loja.
 2. Widget chama `config-check`.
-3. Se produto estiver configurado, mostra botao.
-4. Consumidor informa medidas.
-5. API normaliza entrada e busca tabela.
-6. Motor calcula pontuacao por tamanho.
-7. API salva log anonimo e retorna resultado.
-8. Widget exibe recomendacao e coleta feedback.
+3. Se produto estiver configurado, mostra `Descubra seu tamanho` e `Tabela de Medidas`.
+4. Consumidor pode abrir tabela do produto ou informar medidas.
+5. Widget reusa medidas salvas localmente, com aviso e edicao livre.
+6. API normaliza entrada e busca tabela.
+7. Motor calcula pontuacao por tamanho.
+8. API salva log anonimo e retorna resultado.
+9. Widget exibe recomendacao e coleta feedback.
+
+## Checkout Pagar.me
+
+- Cartao e tokenizado no navegador usando `PAGARME_PUBLIC_KEY`.
+- Backend nunca recebe PAN/CVV; recebe apenas `card_token`.
+- Backend cria pedido transparente em `POST /orders` na API Core v5 da Pagar.me.
+- Pix e boleto retornam instrucoes na tela `/checkout/sucesso`.
+- Empresa nasce como `pending_payment` e e ativada por retorno imediato pago ou webhook.
 
 ## Motor de recomendacao
 

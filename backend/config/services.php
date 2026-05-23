@@ -39,6 +39,21 @@ return [
         'activation_secret' => env('BIGSHOP_ACTIVATION_SECRET'),
     ],
 
+    'pagarme' => [
+        'env' => env('PAGARME_ENV', 'sandbox'),
+        'api_version' => env('PAGARME_API_VERSION', 'v5'),
+        'base_url' => env(
+            'PAGARME_BASE_URL',
+            (env('PAGARME_ENV', 'sandbox') === 'sandbox' ? 'https://sdx-api.pagar.me/core/' : 'https://api.pagar.me/core/')
+            .env('PAGARME_API_VERSION', 'v5')
+        ),
+        'secret_key' => env('PAGARME_SECRET_KEY'),
+        'public_key' => env('PAGARME_PUBLIC_KEY'),
+        'webhook_secret' => env('PAGARME_WEBHOOK_SECRET'),
+        'checkout_success_url' => env('PAGARME_CHECKOUT_SUCCESS_URL'),
+        'checkout_cancel_url' => env('PAGARME_CHECKOUT_CANCEL_URL'),
+    ],
+
     'ai' => [
         'provider' => env('AI_PROVIDER', 'local'),
         'model' => env('AI_MODEL', 'local-table-parser-v1'),

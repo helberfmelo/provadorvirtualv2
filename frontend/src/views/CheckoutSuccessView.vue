@@ -1,0 +1,78 @@
+<script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
+import { api } from '../services/api'
+
+const route = useRoute()
+const loading = ref(true)
+const error = ref('')
+const session = ref<any>(null)
+const payment = ref<any>(null)
+
+onMounted(async () => {
+  const reference = String(route.query.ref || '')
+  if (!reference) {
+    error.value = 'Referencia de checkout nao informada.'
+    loading.value = false
+    return
+  }
+
+  try {
+    const { data } = await api.get(`/public/checkout/${reference}`)
+    session.value = data.session
+    payment.value = data.payment
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o checkout.'
+  } finally {
+    loading.value = false
+  }
+})
+</script>
+
+<template>
+  <section class="checkout-page">
+    <div class="checkout-result panel-main">
+      <span class="eyebrow">Checkout</span>
+      <h1>{{ session?.status_label || 'Pagamento iniciado' }}</h1>
+      <p v-if="loading">Carregando pagamento...</p>
+      <p v-else-if="error" class="form-error">{{ error }}</p>
+      <template v-else-if="session">
+        <div class="summary-strip">
+          <span>
+            <strong>{{ session.company?.access_code }}</strong>
+            <small>Codigo da empresa</small>
+          </span>
+          <span>
+            <strong>{{ session.company?.status }}</strong>
+            <small>Status da empresa</small>
+          </span>
+          <span>
+            <strong>{{ session.payment_method }}</strong>
+            <small>Pagamento</small>
+          </span>
+        </div>
+
+        <div v-if="payment?.pix?.qr_code" class="payment-box">
+          <strong>Pix copia e cola</strong>
+          <textarea :value="payment.pix.qr_code" rows="4" readonly></textarea>
+        </div>
+
+        <div v-if="payment?.boleto?.line" class="payment-box">
+          <strong>Linha digitavel</strong>
+          <textarea :value="payment.boleto.line" rows="3" readonly></textarea>
+        </div>
+
+        <div class="action-row">
+          <RouterLink to="/login" class="btn btn-primary">
+            <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
+            Acessar painel
+          </RouterLink>
+          <RouterLink to="/" class="btn btn-secondary">
+            <i class="fa-solid fa-house" aria-hidden="true"></i>
+            Voltar ao site
+          </RouterLink>
+        </div>
+      </template>
+    </div>
+  </section>
+</template>

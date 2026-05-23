@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\MeasurementTemplateController;
 use App\Http\Controllers\Api\V1\OperationalStatusController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
+use App\Http\Controllers\Api\V1\PublicCheckoutController;
 use App\Http\Controllers\Api\V1\RecommendationController;
 use App\Http\Controllers\Api\V1\SaasAdminController;
 use App\Http\Controllers\Api\V1\WidgetInstallController;
@@ -43,6 +44,14 @@ Route::prefix('v1')->group(function (): void {
         ->middleware(['widget.origin', 'throttle:120,1']);
     Route::post('/public/company-access', [SaasAdminController::class, 'resolveCompanyAccess'])
         ->middleware('throttle:30,1');
+    Route::get('/public/checkout/config', [PublicCheckoutController::class, 'config'])
+        ->middleware('throttle:60,1');
+    Route::post('/public/checkout', [PublicCheckoutController::class, 'store'])
+        ->middleware('throttle:12,1');
+    Route::get('/public/checkout/{reference}', [PublicCheckoutController::class, 'show'])
+        ->middleware('throttle:60,1');
+    Route::post('/webhooks/pagarme', [PublicCheckoutController::class, 'webhook'])
+        ->middleware('throttle:120,1');
     Route::post('/public/bigshop/activate', BigShopActivationController::class)
         ->middleware('throttle:20,1');
 

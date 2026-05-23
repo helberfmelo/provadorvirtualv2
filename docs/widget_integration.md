@@ -39,17 +39,21 @@ Permitir que qualquer e-commerce instale o Provador Virtual com um snippet simpl
 1. Widget carrega sem bloquear a loja.
 2. Executa config-check.
 3. Se produto nao estiver configurado, nao mostra botao ou mostra aviso discreto apenas em modo debug.
-4. Se produto estiver configurado, mostra botao "Qual meu tamanho?".
-5. Abre modal/drawer.
-6. Coleta dados em etapas.
-7. Retorna recomendacao.
-8. Coleta feedback.
+4. Se produto estiver configurado, mostra dois botoes: `Descubra seu tamanho` e `Tabela de Medidas`.
+5. `Descubra seu tamanho` abre modal/drawer de recomendacao.
+6. `Tabela de Medidas` abre a tabela do produto com as faixas cadastradas.
+7. Coleta dados em etapas e reusa medidas salvas localmente no navegador quando houver.
+8. Retorna recomendacao.
+9. Coleta feedback.
+10. Exibe `desenvolvido por provadorvirtual.online` com link para o site publico.
 
 Status Sprint 4: implementado em `/widget/v1/provador-virtual.js` com CSS escopado em `/widget/v1/provador-virtual.css`. A pagina `/produto-teste` carrega o widget real por snippet dinamico.
 
 Status Sprint 5: o painel `/app/widget` gera o snippet a partir de `/api/v1/widget-install`, com tema, dominios liberados e produto de exemplo.
 
 Status Sprint 11: as rotas publicas de recomendacao validam `Origin` contra `allowed_domains` da instalacao ativa. Requisicoes sem `Origin` continuam liberadas para smokes e chamadas server-to-server; dominios nao cadastrados recebem `403`.
+
+Status Sprint 24/25: o widget agora segue o padrao comercial de pagina de produto com os botoes `Descubra seu tamanho` e `Tabela de Medidas`, modal de tabela, assinatura do Provador Virtual e tema ampliado. O painel `/app/widget` permite personalizar primaria, secundaria, destaque, fundo, texto, fonte, tamanho, peso e raio, com visualizador em tempo real.
 
 ## Evolucao inteligente prevista
 
@@ -71,6 +75,8 @@ Endpoints usados pelo widget:
 - `POST /api/v1/public/recommendations/config-check`
 - `POST /api/v1/public/recommendations`
 - `POST /api/v1/public/recommendations/{id}/feedback`
+
+`config-check` retorna tambem a tabela de medidas normalizada para o modal publico, quando o produto estiver configurado.
 
 O widget resolve a base da API a partir do proprio `src`. Em producao, chamadas para `/provadorvirtual_v2/api/...` passam por redirect 307 para a entrada Laravel funcional em `/provadorvirtual_v2/public/api/...`.
 

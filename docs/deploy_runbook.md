@@ -87,7 +87,7 @@ BigShop:
 
 Pagamentos:
 
-- `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY`, `PAGARME_WEBHOOK_SECRET`; ou credenciais Mercado Pago, se essa escolha for retomada.
+- `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY`, `PAGARME_WEBHOOK_SECRET`, `PAGARME_ENV`, `PAGARME_BASE_URL`, `PAGARME_CHECKOUT_SUCCESS_URL` e `PAGARME_CHECKOUT_CANCEL_URL`.
 
 Hardening:
 
@@ -153,6 +153,15 @@ MAIL_FROM_NAME="Provador Virtual"
 PRIVACY_WIDGET_DATA_RETENTION_DAYS=30
 OPERATIONAL_LOG_RETENTION_DAYS=180
 CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
+
+PAGARME_ENV=production
+PAGARME_API_VERSION=v5
+PAGARME_BASE_URL=https://api.pagar.me/core/v5
+PAGARME_SECRET_KEY=<secret>
+PAGARME_PUBLIC_KEY=<public>
+PAGARME_WEBHOOK_SECRET=<webhook>
+PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/provadorvirtual_v2/checkout/sucesso
+PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/provadorvirtual_v2/checkout
 ```
 
 ## Primeira publicacao

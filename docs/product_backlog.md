@@ -15,8 +15,8 @@ Atualizado em: 2026-05-23
 
 ## Produto
 
-- `TODO` Cadastro/login de lojista.
-- `TODO` Cadastro de empresa/loja.
+- `DONE` Cadastro/login de lojista via checkout publico e criacao interna SaaS.
+- `DONE` Cadastro de empresa/loja sem checkout pelo SaaS admin.
 - `DONE` CRUD de produtos.
 - `DONE` CRUD de variacoes.
 - `DONE` CRUD de tabelas de medidas.
@@ -24,6 +24,8 @@ Atualizado em: 2026-05-23
 - `DONE` Motor de recomendacao.
 - `DONE` Widget universal.
 - `DONE` Feedback de recomendacao.
+- `DONE` Widget com botoes `Descubra seu tamanho` e `Tabela de Medidas`.
+- `DONE` Widget reusa medidas salvas localmente com aviso ao comprador.
 - `DONE` Tela de instalacao do widget.
 - `DONE` Catalogo inicial de integracoes.
 - `DONE` Importacao CSV de produtos.
@@ -31,6 +33,9 @@ Atualizado em: 2026-05-23
 - `DONE` Parser inicial Google XML.
 - `DONE` Analytics.
 - `DONE` SaaS admin basico.
+- `DONE` Codigo de acesso da empresa no formato `aaaa + id`.
+- `DONE` Busca de empresa por codigo ou CNPJ.
+- `DONE` Personalizador visual do widget com preview.
 
 ## Integracoes
 
@@ -87,6 +92,16 @@ Atualizado em: 2026-05-23
 - `DONE` Tela de prontidao para go-live.
 - `DONE` Script de validacao de producao.
 - `DONE` Plano de cutover para raiz do dominio.
+- `DONE` Landing publica limpa com CTA para checkout, teste e contato.
+- `DONE` Checkout transparente Pagar.me com Pix, boleto e cartao.
+- `DONE` Webhook Pagar.me e ativacao de empresa paga.
+
+## Pagamentos
+
+- `DONE` Checkout transparente Pagar.me com tokenizacao de cartao no navegador.
+- `DONE` Persistencia de `checkout_sessions` e `payment_events`.
+- `TODO` Cadastrar `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY` e `PAGARME_WEBHOOK_SECRET` em producao.
+- `TODO` Definir planos/precos comerciais finais antes do go-live na raiz.
 
 ## Benchmark e mercado
 

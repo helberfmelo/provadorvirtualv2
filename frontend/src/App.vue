@@ -28,6 +28,7 @@ async function logout() {
 
       <nav class="nav" aria-label="Principal">
         <RouterLink to="/produto-teste">Produto teste</RouterLink>
+        <RouterLink v-if="!auth.isAuthenticated" to="/checkout">Contratar</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/produtos">Produtos</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/tabelas-de-medidas">Tabelas</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/assistente">Assistente</RouterLink>
