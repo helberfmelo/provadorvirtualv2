@@ -2,6 +2,8 @@
 
 Atualizado em: 2026-05-23
 
+Status: publicado e validado em producao no GitHub Actions run `26339426665`. A ativacao real ainda depende de `BIGSHOP_ACTIVATION_SECRET` oficial, loja piloto BigShop, `store_id` e token `x-api`.
+
 ## Objetivo
 
 Definir o contrato final do lado Provador Virtual para a ativacao nativa de lojas BigShop, deixando pronto o que depende do nosso SaaS e separando o que ainda depende de credenciais/ajuste no codigo BigShop.

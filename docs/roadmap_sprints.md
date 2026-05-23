@@ -429,7 +429,7 @@ Entregas:
 - ajustes no codigo da BigShop para instalar widget e mapear produto/tabela;
 - monitoramento de ativacoes BigShop.
 
-Status: em implementacao. O contrato, o snippet de instalacao e o monitoramento ficam prontos no SaaS; teste com loja piloto real depende de `BIGSHOP_ACTIVATION_SECRET`, `store_id` e token `x-api` oficiais.
+Status: implementado, publicado e validado em producao no run `26339426665`. O contrato, o snippet de instalacao e o monitoramento estao prontos no SaaS; teste com loja piloto real segue pendente de `BIGSHOP_ACTIVATION_SECRET`, `store_id` e token `x-api` oficiais.
 
 ### Sprint 36 - Inteligencia de perfis e aprendizado
 
