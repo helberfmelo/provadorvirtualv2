@@ -41,8 +41,8 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
-        $merchant->users()->syncWithoutDetaching([
-            $user->id => ['role' => 'owner', 'is_owner' => true],
+        $user->merchants()->sync([
+            $merchant->id => ['role' => 'owner', 'is_owner' => true],
         ]);
 
         $company = MerchantCompany::query()->updateOrCreate(

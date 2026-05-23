@@ -48,10 +48,14 @@ $demo = Invoke-RestMethod -Uri "$ApiBase/demo/product-test" -Headers @{ Accept =
 Assert-True ($demo.product.name -eq "Vestido Midi Aurora") "produto demo fora do esperado"
 "API demo product OK"
 
+$merchantId = [int] $demo.product.merchant_id
+$storeId = [int] $demo.product.store_id
+$productId = [int] $demo.product.id
+
 $recommendationBody = @{
-    merchant_id = 1
-    store_id = 1
-    product_id = 1
+    merchant_id = $merchantId
+    store_id = $storeId
+    product_id = $productId
     platform = "custom"
     measurements = @{
         bust = 92
@@ -67,9 +71,9 @@ Assert-True ($recommendation.recommended_size -eq "M") "recomendacao nao retorno
 "API recommendation OK"
 
 $identityBody = @{
-    merchant_id = 1
-    store_id = 1
-    product_id = 1
+    merchant_id = $merchantId
+    store_id = $storeId
+    product_id = $productId
     platform = "custom"
 } | ConvertTo-Json -Depth 3
 
