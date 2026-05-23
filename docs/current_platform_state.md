@@ -26,7 +26,7 @@ Atualizado em: 2026-05-23
 - Sprint 27 ajustou a landing para estrutura inspirada no v1, publicou build prevista para a raiz e simplificou o checkout para plano anual unico sem boleto.
 - Sprint 28 criou monitor de pagamentos pendentes, agendamento de cron/scheduler e configuracao SaaS de SMTP/templates transacionais; publicado em producao no run `26336899986`.
 - Sprint 29 preparou login por e-mail/CPF, acesso do portal por codigo/CNPJ e contexto de empresa no token; publicado em producao no run `26337254520`.
-- Sprint 30 criou CRUD de usuarios no SaaS e no portal da empresa, permissoes por modulo/menu, status global/por empresa e acoes de editar/ativar/desativar.
+- Sprint 30 criou CRUD de usuarios no SaaS e no portal da empresa, permissoes por modulo/menu, status global/por empresa e acoes de editar/ativar/desativar; publicado em producao no run `26337792120`.
 
 ## Referencias confirmadas
 
@@ -125,4 +125,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Publicar a Sprint 30, validar `/app/usuarios` e `/saas/usuarios` em producao, cadastrar `PAGARME_*` com URLs da raiz, salvar o cron do scheduler no cPanel e seguir para a Sprint 31 de automacoes de e-mail e ciclo financeiro.
+Seguir para a Sprint 31 de automacoes de e-mail e ciclo financeiro, mantendo pendente cadastrar `PAGARME_*` com URLs da raiz e salvar o cron do scheduler no cPanel.

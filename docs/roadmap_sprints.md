@@ -353,7 +353,7 @@ Entregas:
 - ao marcar editar, visualizar fica automaticamente ativo;
 - enforcement inicial no backend para modulos criticos.
 
-Status: implementado e validado localmente. Publicacao em producao pendente do push da sprint.
+Status: implementado, publicado e validado em producao no run `26337792120`.
 
 ## Sprints 31 a 36 - Refinamento operacional e escala
 
