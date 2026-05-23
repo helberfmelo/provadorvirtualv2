@@ -110,6 +110,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,integrations,view');
         Route::patch('/integrations/{platform}', [IntegrationController::class, 'update'])
             ->middleware('portal.permission:merchant,integrations,edit');
+        Route::post('/integrations/{platform}/validate-install', [IntegrationController::class, 'validateInstall'])
+            ->middleware('portal.permission:merchant,integrations,edit');
         Route::post('/integrations/bigshop/probe', [BigShopIntegrationController::class, 'probe'])
             ->middleware('portal.permission:merchant,integrations,edit');
         Route::post('/integrations/bigshop/sync', [BigShopIntegrationController::class, 'sync'])

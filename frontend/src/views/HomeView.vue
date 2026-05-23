@@ -110,7 +110,7 @@ const currentYear = new Date().getFullYear()
       <article>
         <span>Demais plataformas</span>
         <strong>R$ 189,90/mes</strong>
-        <p>Para lojas em Shopify, WooCommerce, Nuvemshop, VTEX, Tray ou instalacao personalizada.</p>
+        <p>Para lojas em Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou instalacao personalizada.</p>
         <small>Total anual em ate 12x no cartao. Pix a vista com 5% de desconto.</small>
         <RouterLink :to="checkoutDefault" class="btn btn-secondary">
           <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
@@ -150,7 +150,7 @@ const currentYear = new Date().getFullYear()
       <article class="metric-card">
         <i class="fa-solid fa-plug" aria-hidden="true"></i>
         <strong>Integracao padrao</strong>
-        <span>BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray e script universal.</span>
+        <span>BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e script universal.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-palette" aria-hidden="true"></i>

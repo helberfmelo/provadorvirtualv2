@@ -30,7 +30,19 @@ const error = ref('')
 const checkoutConfig = ref<PublicCheckoutConfig | null>(null)
 const plans = ref<Plan[]>([])
 const pricing = ref<Record<string, PricingVariant>>({})
-const allowedPlatforms = ['bigshop', 'shopify', 'woocommerce', 'nuvemshop', 'vtex', 'tray', 'custom']
+const platformOptions = [
+  { value: 'bigshop', label: 'BigShop' },
+  { value: 'shopify', label: 'Shopify' },
+  { value: 'woocommerce', label: 'WooCommerce' },
+  { value: 'nuvemshop', label: 'Nuvemshop' },
+  { value: 'vtex', label: 'VTEX' },
+  { value: 'tray', label: 'Tray' },
+  { value: 'loja_integrada', label: 'Loja Integrada' },
+  { value: 'magento', label: 'Magento' },
+  { value: 'opencart', label: 'OpenCart' },
+  { value: 'custom', label: 'Personalizada' },
+]
+const allowedPlatforms = platformOptions.map((platform) => platform.value)
 
 const form = reactive({
   plan_code: 'annual',
@@ -202,13 +214,9 @@ function price(cents: number) {
           <label>
             Plataforma
             <select v-model="form.platform">
-              <option value="bigshop">BigShop</option>
-              <option value="shopify">Shopify</option>
-              <option value="woocommerce">WooCommerce</option>
-              <option value="nuvemshop">Nuvemshop</option>
-              <option value="vtex">VTEX</option>
-              <option value="tray">Tray</option>
-              <option value="custom">Personalizada</option>
+              <option v-for="platform in platformOptions" :key="platform.value" :value="platform.value">
+                {{ platform.label }}
+              </option>
             </select>
             <small v-if="form.platform === 'bigshop'">Cliente BigShop tem preco especial.</small>
           </label>

@@ -30,6 +30,7 @@ Atualizado em: 2026-05-23
 - Sprint 31 criou automacoes de e-mail transacional, historico de envios e comando/scheduler para pendencias financeiras; publicado em producao no run `26338061259`.
 - Sprint 32 implementou refinamento da oferta publica, trava de integracao BigShop, favicon/OG, footer, imagens da loja teste e menu mobile em drawer; publicado em producao no run `26338411089`.
 - Sprint 33 completou login multiempresa, seletor de empresa no painel, escopo por empresa nas APIs do portal, enforcement de permissoes por rota e auditoria com empresa/modulo/acao; publicado em producao no run `26338888072`.
+- Sprint 34 criou guias de integracao por plataforma, snippets, checklist visual, matriz de dados suportados e validacao protegida de instalacao por URL publica.
 
 ## Referencias confirmadas
 
@@ -119,6 +120,7 @@ Atualizado em: 2026-05-23
 - Go-live protegido: `/api/v1/go-live/readiness` e `/app/go-live`.
 - Observabilidade publica: `/api/v1/ops/status`.
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
+- Validacao de instalacao protegida: `POST /api/v1/integrations/{platform}/validate-install`.
 - BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
 - APIs publicas: health, produto demo e recomendacoes do widget.
 - APIs publicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}` e `/api/v1/webhooks/pagarme`.
@@ -130,4 +132,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Seguir para guias de integracao por plataforma e checklist visual de instalacao.
+Seguir para preparacao de BigShop um clique em producao e contrato final de payload.

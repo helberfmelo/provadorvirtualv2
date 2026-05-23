@@ -159,10 +159,10 @@ Rotas protegidas:
 - `GET /api/v1/integrations`
 - `PATCH /api/v1/integrations/{platform}`
 
-Plataformas catalogadas: `bigshop`, `shopify`, `woocommerce`, `nuvemshop`, `vtex`, `tray` e `custom`.
+Plataformas catalogadas: `bigshop`, `shopify`, `woocommerce`, `nuvemshop`, `vtex`, `tray`, `loja_integrada`, `magento`, `opencart` e `custom`.
 
 Regra comercial Sprint 32: empresas que contrataram como BigShop recebem o desconto BigShop e, no painel, podem visualizar/configurar apenas instalacao BigShop. O backend tambem bloqueia tentativas de salvar Shopify, WooCommerce, Nuvemshop, VTEX, Tray ou custom para esse contrato.
 
-Plataformas a adicionar no roadmap inteligente: `loja_integrada`, `magento`, `opencart` e guias de Tag Manager quando fizer sentido.
+Status Sprint 34: o catalogo de integracoes passou a incluir `loja_integrada`, `magento` e `opencart`, alem das plataformas anteriores. `GET /api/v1/integrations` retorna guia, snippet, checklist e matriz de dados por plataforma. `POST /api/v1/integrations/{platform}/validate-install` valida dominio publico, container, script, plataforma e identificadores do produto sem salvar o HTML da loja.
 
 Credenciais de plataforma devem ser salvas apenas por endpoints protegidos e persistidas criptografadas. A API retorna somente flags como `has_access_token` e `has_webhook_secret`.

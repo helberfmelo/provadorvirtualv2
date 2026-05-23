@@ -14,6 +14,13 @@ type PlatformConnection = {
   last_error: string | null
 }
 
+type PlatformGuide = {
+  steps: string[]
+  snippet: string
+  checklist: Array<{ key: string; label: string }>
+  data_support: Record<string, string>
+}
+
 type Platform = {
   key: string
   name: string
@@ -21,8 +28,24 @@ type Platform = {
   icon: string
   install_mode: string
   status: string
+  summary: string
+  guide: PlatformGuide
   has_connection: boolean
   connection: PlatformConnection | null
+}
+
+type ValidationCheck = {
+  key: string
+  label: string
+  status: 'passed' | 'warning' | 'failed'
+  action: string | null
+}
+
+type ValidationResult = {
+  status: 'passed' | 'warning' | 'failed'
+  url: string
+  http_status: number | null
+  checks: ValidationCheck[]
 }
 
 const auth = useAuthStore()
@@ -31,9 +54,12 @@ const selectedKey = ref('bigshop')
 const loading = ref(false)
 const saving = ref(false)
 const running = ref(false)
+const validating = ref(false)
+const copied = ref(false)
 const notice = ref('')
 const error = ref('')
 const integrationReport = ref<Record<string, number | string> | null>(null)
+const validation = ref<ValidationResult | null>(null)
 
 const form = reactive({
   external_store_id: '',
@@ -41,6 +67,7 @@ const form = reactive({
   status: 'draft',
   access_token: '',
   webhook_secret: '',
+  validation_url: '',
 })
 
 const selected = computed(() => platforms.value.find((platform) => platform.key === selectedKey.value) || platforms.value[0] || null)
@@ -73,6 +100,7 @@ async function loadPlatforms() {
 function selectPlatform(platform: Platform) {
   selectedKey.value = platform.key
   integrationReport.value = null
+  validation.value = null
   error.value = ''
   fillForm(platform)
 }
@@ -148,6 +176,45 @@ async function syncBigShop() {
   }
 }
 
+async function validateInstall() {
+  if (!selected.value) {
+    return
+  }
+
+  validating.value = true
+  notice.value = ''
+  error.value = ''
+  validation.value = null
+
+  try {
+    const { data } = await api.post(`/integrations/${selected.value.key}/validate-install`, {
+      url: form.validation_url || undefined,
+    })
+    validation.value = data.data
+    notice.value = validation.value?.status === 'passed'
+      ? 'Instalacao validada.'
+      : 'Validacao concluida com pendencias.'
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message
+      || requestError.response?.data?.errors?.url?.[0]
+      || 'Nao foi possivel validar a instalacao.'
+  } finally {
+    validating.value = false
+  }
+}
+
+async function copyGuideSnippet() {
+  if (!selected.value?.guide?.snippet) {
+    return
+  }
+
+  await navigator.clipboard.writeText(selected.value.guide.snippet)
+  copied.value = true
+  window.setTimeout(() => {
+    copied.value = false
+  }, 1800)
+}
+
 function statusLabel(status: string) {
   return {
     draft: 'Rascunho',
@@ -155,7 +222,28 @@ function statusLabel(status: string) {
     connected: 'Conectada',
     disabled: 'Pausada',
     error: 'Erro',
+    passed: 'Validado',
+    warning: 'Atencao',
+    failed: 'Falhou',
   }[status] || status
+}
+
+function checkStatus(key: string) {
+  return validation.value?.checks.find((check) => check.key === key)?.status || 'pending'
+}
+
+function checkIcon(key: string) {
+  const status = checkStatus(key)
+
+  if (status === 'passed') {
+    return 'fa-circle-check'
+  }
+
+  if (status === 'failed') {
+    return 'fa-circle-xmark'
+  }
+
+  return 'fa-circle-exclamation'
 }
 </script>
 
@@ -202,6 +290,7 @@ function statusLabel(status: string) {
           <h2>{{ selected?.name }}</h2>
           <span>{{ selected?.install_mode === 'one_click' ? 'Um clique' : 'Manual' }}</span>
         </div>
+        <p class="guide-summary">{{ selected?.summary }}</p>
 
         <div class="form-grid">
           <label>
@@ -244,6 +333,78 @@ function statusLabel(status: string) {
             <i class="fa-solid fa-link" aria-hidden="true"></i>
             Conexao
           </span>
+        </div>
+
+        <div class="guide-panel">
+          <div class="subsection-heading">
+            <h2>Checklist</h2>
+            <span>{{ validation?.status ? statusLabel(validation.status) : 'Pendente' }}</span>
+          </div>
+          <div class="check-list install-checklist">
+            <span
+              v-for="item in selected?.guide.checklist"
+              :key="item.key"
+              :class="checkStatus(item.key)"
+            >
+              <i class="fa-solid" :class="checkIcon(item.key)" aria-hidden="true"></i>
+              {{ item.label }}
+            </span>
+          </div>
+
+          <div v-if="validation" class="validation-result">
+            <strong>{{ validation.url }}</strong>
+            <small>HTTP {{ validation.http_status || '-' }}</small>
+            <p v-for="check in validation.checks.filter((item) => item.action)" :key="check.key">
+              {{ check.action }}
+            </p>
+          </div>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            URL para validar
+            <input v-model="form.validation_url" type="url" placeholder="https://loja.com.br/produto" />
+          </label>
+          <label class="inline-action-label">
+            Validacao
+            <button class="btn btn-secondary" type="button" :disabled="validating" @click="validateInstall">
+              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+              {{ validating ? 'Validando...' : 'Validar instalacao' }}
+            </button>
+          </label>
+        </div>
+
+        <div class="guide-panel">
+          <div class="subsection-heading">
+            <h2>Passo a passo</h2>
+            <span>{{ selected?.name }}</span>
+          </div>
+          <ol class="guide-steps">
+            <li v-for="step in selected?.guide.steps" :key="step">{{ step }}</li>
+          </ol>
+        </div>
+
+        <div class="guide-panel">
+          <div class="subsection-heading">
+            <h2>Dados suportados</h2>
+            <span>Matriz</span>
+          </div>
+          <div class="data-support-grid">
+            <span v-for="(value, key) in selected?.guide.data_support" :key="key">
+              <small>{{ key }}</small>
+              <strong>{{ value }}</strong>
+            </span>
+          </div>
+        </div>
+
+        <div class="guide-panel">
+          <div class="subsection-heading">
+            <h2>Snippet</h2>
+            <button class="icon-link" type="button" :title="copied ? 'Copiado' : 'Copiar snippet'" @click="copyGuideSnippet">
+              <i class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'" aria-hidden="true"></i>
+            </button>
+          </div>
+          <pre class="guide-snippet"><code>{{ selected?.guide.snippet }}</code></pre>
         </div>
 
         <div class="action-row compact">

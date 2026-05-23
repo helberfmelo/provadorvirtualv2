@@ -409,12 +409,14 @@ Status: implementado, publicado e validado em producao no run `26338888072`.
 
 Objetivo: deixar a implantacao default para o maximo de plataformas.
 
-Entregas previstas:
+Entregas:
 
 - guias e snippets para Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom;
 - checklist visual por plataforma no portal;
 - validacao de dominio/snippet instalado;
 - matriz de dados suportados por plataforma.
+
+Status: implementado e testado localmente; aguardando publicacao da Sprint 34.
 
 ### Sprint 35 - BigShop um clique em producao
 

@@ -55,6 +55,7 @@ APIs protegidas ja implementadas:
 - `POST /api/v1/public/bigshop/activate`
 - `GET /api/v1/integrations`
 - `PATCH /api/v1/integrations/{platform}`
+- `POST /api/v1/integrations/{platform}/validate-install`
 - `POST /api/v1/integrations/bigshop/probe`
 - `POST /api/v1/integrations/bigshop/sync`
 - `GET|POST /api/v1/imports`
@@ -241,6 +242,7 @@ Regra comercial da Sprint 32:
 
 - quando a empresa ativa/contratada tiver `platform=bigshop`, `GET /integrations` retorna somente BigShop;
 - `PATCH /integrations/{platform}` bloqueia plataformas diferentes de `bigshop`;
+- `POST /integrations/{platform}/validate-install` tambem respeita a trava BigShop e valida somente URL publica;
 - `GET|PATCH /widget-install` mantem `platform=bigshop` para esse contrato;
 - o front do painel tambem mostra apenas a opcao BigShop nesses casos.
 

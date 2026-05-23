@@ -81,6 +81,9 @@ const platformOptions = computed(() => {
     { value: 'nuvemshop', label: 'Nuvemshop' },
     { value: 'vtex', label: 'VTEX' },
     { value: 'tray', label: 'Tray' },
+    { value: 'loja_integrada', label: 'Loja Integrada' },
+    { value: 'magento', label: 'Magento' },
+    { value: 'opencart', label: 'OpenCart' },
     { value: 'custom', label: 'Personalizada' },
   ]
 })

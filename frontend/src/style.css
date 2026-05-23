@@ -1545,6 +1545,130 @@ textarea {
   color: #047857;
 }
 
+.guide-summary {
+  margin: -4px 0 4px;
+  color: #4b5563;
+  line-height: 1.55;
+}
+
+.guide-panel {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.install-checklist span.passed {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.install-checklist span.warning,
+.install-checklist span.pending {
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.install-checklist span.failed {
+  color: #b91c1c;
+  background: #fef2f2;
+}
+
+.validation-result {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fff7ed;
+}
+
+.validation-result strong,
+.validation-result small,
+.validation-result p {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.validation-result small,
+.validation-result p {
+  color: #6b7280;
+}
+
+.inline-action-label {
+  align-content: end;
+}
+
+.inline-action-label .btn {
+  width: fit-content;
+}
+
+.guide-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: #374151;
+  line-height: 1.55;
+}
+
+.data-support-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.data-support-grid span {
+  display: grid;
+  gap: 4px;
+  min-height: 68px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.data-support-grid small {
+  color: #6b7280;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.data-support-grid strong {
+  color: #0f172a;
+}
+
+.guide-snippet {
+  max-height: 280px;
+  margin: 0;
+  overflow: auto;
+  padding: 14px;
+  border-radius: 8px;
+  color: #e5e7eb;
+  background: #111827;
+  line-height: 1.5;
+}
+
+.icon-link {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+}
+
+.icon-link:hover {
+  color: #0f172a;
+  background: #fff7ed;
+}
+
 .color-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1905,6 +2029,7 @@ td small {
   .user-grid,
   .analytics-grid,
   .color-grid,
+  .data-support-grid,
   .legal-grid {
     grid-template-columns: 1fr;
   }

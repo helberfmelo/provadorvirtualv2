@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\WidgetInstall;
 use App\Services\PagarMeCheckoutService;
 use App\Services\TransactionalEmailService;
+use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -201,7 +202,7 @@ class PublicCheckoutController extends Controller
         return $request->validate([
             'plan_code' => ['required', 'string', Rule::in(array_keys($this->plans()))],
             'payment_method' => ['required', 'string', 'in:credit_card,pix'],
-            'platform' => ['nullable', 'string', 'in:bigshop,shopify,woocommerce,nuvemshop,vtex,tray,custom'],
+            'platform' => ['nullable', 'string', Rule::in(PlatformCatalog::keys())],
             'company_name' => ['required', 'string', 'max:255'],
             'company_legal_name' => ['required', 'string', 'max:255'],
             'company_document' => ['required', 'string', 'min:11', 'max:14'],

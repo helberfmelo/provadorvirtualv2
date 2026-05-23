@@ -572,6 +572,9 @@ async function toggleTemplate(template: TransactionalEmail) {
                 <option value="nuvemshop">Nuvemshop</option>
                 <option value="vtex">VTEX</option>
                 <option value="tray">Tray</option>
+                <option value="loja_integrada">Loja Integrada</option>
+                <option value="magento">Magento</option>
+                <option value="opencart">OpenCart</option>
                 <option value="custom">Personalizada</option>
               </select>
             </label>

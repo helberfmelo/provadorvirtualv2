@@ -47,10 +47,11 @@ Atualizado em: 2026-05-23
 - `DONE` BigShop um clique por endpoint assinado.
 - `TODO` Cadastrar `BIGSHOP_ACTIVATION_SECRET` para teste real.
 - `DONE` Base do guia/snippet custom no painel.
+- `DONE` Guias e snippets para Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom.
+- `DONE` Checklist visual por plataforma no portal.
+- `DONE` Validacao de dominio/snippet instalado por URL publica.
+- `DONE` Matriz de dados suportados por plataforma.
 - `DONE` Tabelas `import_jobs` e `integration_events`.
-- `TODO` Guias Shopify.
-- `TODO` Guias WooCommerce.
-- `TODO` Guias Nuvemshop.
 - `TODO` Webhooks quando houver contrato.
 
 ## IA
@@ -126,4 +127,4 @@ Atualizado em: 2026-05-23
 - `DONE` Capturar fluxo Zak com Sizebay em camisa e calca.
 - `DONE` Identificar tenant Zak Sizebay `1235` e contrato tecnico observado.
 - `TODO` Capturar outras lojas com Sizebay de forma controlada.
-- `TODO` Documentar matriz de plataformas: Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart, Custom e BigShop.
+- `DONE` Documentar matriz de plataformas: Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart, Custom e BigShop.
