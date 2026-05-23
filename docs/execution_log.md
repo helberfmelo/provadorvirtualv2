@@ -160,6 +160,9 @@
 - Criados comandos `pv:privacy-anonymize` e `pv:privacy-prune`.
 - Criado documento `docs/hardening_lgpd_observability.md`.
 - Validacoes locais: `php artisan test --filter=HardeningApiTest`, `vendor/bin/pint`, `php artisan test`, `npm run build` e `git diff --check`.
+- Run `26332960822` do GitHub Actions finalizou com sucesso para o commit `ac1025f`.
+- Validado em producao: `/privacidade`, `/termos`, `GET /public/api/v1/ops/status`, bloqueio de origem nao cadastrada com `403` e origem `https://provadorvirtual.online` com CORS correto.
+- Rollback readiness validado pelo backup criado no deploy: `provadorvirtual-v2-backup-20260523-094207-ac1025f2a2469b9876d93764652ce87acd0e7174.tar.gz`.
 
 ## Pendencias abertas
 

@@ -174,6 +174,8 @@ O workflow gera backup em:
 
 - `/home1/opents62/deploy_backups/provadorvirtual_v2`
 
+Sprint 11 validou a criacao de backup no run `26332960822` com o arquivo `provadorvirtual-v2-backup-20260523-094207-ac1025f2a2469b9876d93764652ce87acd0e7174.tar.gz`.
+
 Rollback manual:
 
 1. escolher backup anterior;

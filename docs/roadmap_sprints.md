@@ -181,7 +181,7 @@ Entregas:
 - incident runbook;
 - smoke e rollback testados.
 
-Status: implementado localmente em 2026-05-23; aguardando deploy/validacao final da sprint.
+Status: concluido e publicado em producao no run `26332960822`.
 
 ## Sprint 12 - Go-live Assistido
 
