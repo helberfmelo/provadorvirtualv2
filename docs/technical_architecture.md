@@ -113,6 +113,7 @@ Rotas iniciais:
 - `/como-funciona`
 - `/planos`
 - `/login`
+- `/saas/login`
 - `/cadastro`
 - `/produto-teste`
 - `/produto-teste/:slug`

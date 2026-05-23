@@ -26,6 +26,7 @@ const router = createRouter({
   routes: [
     { path: '/', component: HomeView },
     { path: '/login', component: LoginView },
+    { path: '/saas/login', component: LoginView },
     { path: '/cadastro', component: LoginView },
     { path: '/produto-teste', component: ProductTestView },
     { path: '/produto-teste/:slug', component: ProductTestView },
@@ -53,8 +54,14 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-  if ((to.path.startsWith('/app') || to.path.startsWith('/saas')) && !localStorage.getItem('pv_token')) {
-    return '/login'
+  const needsCompanyAuth = to.path === '/app' || to.path.startsWith('/app/')
+  const needsSaasAuth = (to.path === '/saas' || to.path.startsWith('/saas/')) && to.path !== '/saas/login'
+
+  if ((needsCompanyAuth || needsSaasAuth) && !localStorage.getItem('pv_token')) {
+    return {
+      path: needsSaasAuth ? '/saas/login' : '/login',
+      query: { redirect: to.fullPath },
+    }
   }
 
   return true

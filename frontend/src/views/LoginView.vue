@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
+const route = useRoute()
 const auth = useAuthStore()
-const identifier = ref('demo@provadorvirtual.online')
+const identifier = ref('')
 const companyAccess = ref('')
-const password = ref('provador123')
+const password = ref('')
 const error = ref('')
 const loading = ref(false)
 const companyOptions = ref<Array<{
@@ -18,14 +19,41 @@ const companyOptions = ref<Array<{
   platform: string
   merchant: { name: string } | null
 }>>([])
+const isSaasLogin = computed(() => {
+  const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+
+  return route.path === '/saas/login' || redirect.startsWith('/saas')
+})
+
+const loginEyebrow = computed(() => isSaasLogin.value ? 'Acesso SaaS' : 'Acesso da empresa')
+const loginTitle = computed(() => isSaasLogin.value ? 'Entrar no SaaS' : 'Entrar no portal da empresa')
+const companyAccessHelp = computed(() => (
+  companyOptions.value.length > 0
+    ? 'Selecione a empresa para continuar no portal.'
+    : 'Obrigatorio para o portal da empresa. Use codigo da loja ou CNPJ.'
+))
 
 async function submit() {
   error.value = ''
   loading.value = true
 
   try {
-    await auth.login(identifier.value, password.value, companyAccess.value)
-    await router.push(['admin', 'support'].includes(auth.user?.role || '') && !companyAccess.value ? '/saas' : '/app')
+    await auth.login(identifier.value, password.value, isSaasLogin.value ? '' : companyAccess.value)
+
+    const isAdmin = ['admin', 'support'].includes(auth.user?.role || '')
+
+    if (isSaasLogin.value && !isAdmin) {
+      await auth.logout()
+      error.value = 'Este acesso e exclusivo para administradores do SaaS.'
+
+      return
+    }
+
+    const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+    const fallback = isAdmin && (isSaasLogin.value || !companyAccess.value) ? '/saas' : '/app'
+    const target = redirect.startsWith(isSaasLogin.value ? '/saas' : '/app') ? redirect : fallback
+
+    await router.push(target)
   } catch (requestError: any) {
     if (requestError.response?.status === 409 && Array.isArray(requestError.response?.data?.company_options)) {
       companyOptions.value = requestError.response.data.company_options
@@ -45,14 +73,14 @@ async function submit() {
 <template>
   <section class="auth-page">
     <div class="auth-panel">
-      <span class="eyebrow">Acesso do lojista</span>
-      <h1>Entrar no painel</h1>
+      <span class="eyebrow">{{ loginEyebrow }}</span>
+      <h1>{{ loginTitle }}</h1>
       <form class="form" @submit.prevent="submit">
         <label>
           E-mail ou CPF
           <input v-model="identifier" autocomplete="username" required />
         </label>
-        <label>
+        <label v-if="!isSaasLogin || companyOptions.length > 0">
           Codigo da loja ou CNPJ
           <input
             v-if="companyOptions.length === 0"
@@ -65,7 +93,7 @@ async function submit() {
               {{ company.name }} - {{ company.access_code }}
             </option>
           </select>
-          <small>Obrigatorio para o portal da empresa. Admin SaaS pode deixar vazio.</small>
+          <small>{{ companyAccessHelp }}</small>
         </label>
         <label>
           Senha
