@@ -115,8 +115,8 @@ Atualizado em: 2026-05-23
 - `DONE` CRUD de usuarios e permissoes no SaaS e no portal da empresa.
 - `DONE` Pacote comercial/piloto assistido em `/app/go-live`.
 - `DONE` Validacao de producao cobre checkout, widget, perfil consentido, sinal de aprendizado e pacote de piloto.
-- `TODO` Separar completamente a navegacao do SaaS e do portal da empresa.
-- `TODO` Refatorar CRUDs do SaaS para listagem em tela propria e formulario em tela propria.
+- `DONE` Separar completamente a navegacao do SaaS e do portal da empresa.
+- `DONE` Refatorar CRUDs do SaaS para listagem em tela propria e formulario em tela propria.
 - `TODO` Refatorar CRUDs do portal da empresa para listagem em tela propria e formulario em tela propria.
 - `TODO` Revisar responsividade e alinhamento tela por tela nos portais autenticados.
 

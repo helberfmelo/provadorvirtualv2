@@ -772,6 +772,42 @@ a {
   line-height: 1.5;
 }
 
+.quick-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.quick-card {
+  display: grid;
+  gap: 8px;
+  min-height: 132px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.quick-card:hover {
+  border-color: #fed7aa;
+  background: #fff7ed;
+}
+
+.quick-card i {
+  color: #ff4d5e;
+  font-size: 1.2rem;
+}
+
+.quick-card strong {
+  color: #0f172a;
+}
+
+.quick-card span {
+  color: #6b7280;
+  line-height: 1.5;
+}
+
 .auth-page,
 .dashboard,
 .legal-page {
@@ -1338,6 +1374,11 @@ th {
 .admin-form {
   display: grid;
   gap: 18px;
+}
+
+.form-page {
+  max-width: 980px;
+  margin-top: 24px;
 }
 
 .form-grid {
@@ -2263,10 +2304,11 @@ td small {
   .public-flow,
   .product-page,
   .product-card-grid,
-  .checkout-grid,
-  .plan-choice-grid,
-  .metric-grid,
-  .app-grid,
+    .checkout-grid,
+    .plan-choice-grid,
+    .metric-grid,
+    .quick-grid,
+    .app-grid,
   .form-grid,
   .inline-form,
   .install-grid,

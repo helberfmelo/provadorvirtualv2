@@ -127,6 +127,16 @@ Rotas iniciais:
 - `/app/integracoes`
 - `/app/widget`
 - `/saas`
+- `/saas/empresas`
+- `/saas/empresas/nova`
+- `/saas/empresas/:id/editar`
+- `/saas/usuarios`
+- `/saas/usuarios/novo`
+- `/saas/usuarios/:id/editar`
+- `/saas/emails`
+- `/saas/emails/configuracoes`
+- `/saas/emails/novo`
+- `/saas/emails/:id/editar`
 
 ## Widget
 

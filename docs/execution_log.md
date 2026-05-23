@@ -307,3 +307,12 @@
 - SaaS deixou de exibir menus de lojista; portal da empresa deixou de misturar atalhos de SaaS no menu principal.
 - Areas autenticadas passaram a usar menu lateral no desktop e drawer no mobile.
 - Validacoes locais: `npm run build` e `git diff --check`.
+
+## 2026-05-23 - Sprint 39 SaaS list-first e subpaginas
+
+- `/saas` foi reduzida para visao geral com metricas, atalhos e tabelas resumidas.
+- Empresas SaaS foram separadas em `/saas/empresas`, `/saas/empresas/nova` e `/saas/empresas/:id/editar`.
+- Usuarios SaaS foram separados em `/saas/usuarios`, `/saas/usuarios/novo` e `/saas/usuarios/:id/editar`.
+- E-mails foram separados em `/saas/emails`, `/saas/emails/configuracoes`, `/saas/emails/novo` e `/saas/emails/:id/editar`.
+- O menu SaaS passou a listar visao geral, empresas, usuarios e e-mails, sem misturar modulos do portal da empresa.
+- Validacoes locais: `npm run build`.

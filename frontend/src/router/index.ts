@@ -14,6 +14,12 @@ import PrivacyView from '../views/PrivacyView.vue'
 import ProductsView from '../views/ProductsView.vue'
 import ProductTestView from '../views/ProductTestView.vue'
 import SaasAdminView from '../views/SaasAdminView.vue'
+import SaasCompaniesView from '../views/SaasCompaniesView.vue'
+import SaasCompanyFormView from '../views/SaasCompanyFormView.vue'
+import SaasEmailFormView from '../views/SaasEmailFormView.vue'
+import SaasEmailsView from '../views/SaasEmailsView.vue'
+import SaasEmailSettingsView from '../views/SaasEmailSettingsView.vue'
+import SaasUserFormView from '../views/SaasUserFormView.vue'
 import SaasUsersView from '../views/SaasUsersView.vue'
 import TermsView from '../views/TermsView.vue'
 import UsersView from '../views/UsersView.vue'
@@ -45,7 +51,16 @@ const router = createRouter({
     { path: '/app/integracoes', component: IntegrationsView },
     { path: '/app/usuarios', component: UsersView },
     { path: '/saas', component: SaasAdminView },
+    { path: '/saas/empresas', component: SaasCompaniesView },
+    { path: '/saas/empresas/nova', component: SaasCompanyFormView },
+    { path: '/saas/empresas/:id/editar', component: SaasCompanyFormView },
     { path: '/saas/usuarios', component: SaasUsersView },
+    { path: '/saas/usuarios/novo', component: SaasUserFormView },
+    { path: '/saas/usuarios/:id/editar', component: SaasUserFormView },
+    { path: '/saas/emails', component: SaasEmailsView },
+    { path: '/saas/emails/configuracoes', component: SaasEmailSettingsView },
+    { path: '/saas/emails/novo', component: SaasEmailFormView },
+    { path: '/saas/emails/:id/editar', component: SaasEmailFormView },
     { path: '/:pathMatch(.*)*', redirect: '/' },
   ],
   scrollBehavior() {

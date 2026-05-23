@@ -118,7 +118,8 @@ Atualizado em: 2026-05-23
 ## Superficie atual
 
 - Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/usuarios`.
-- Painel SaaS protegido por papel/permissao: `/saas` e `/saas/usuarios`, com entrada administrativa em `/saas/login`.
+- Painel SaaS protegido por papel/permissao: `/saas`, `/saas/empresas`, `/saas/usuarios` e `/saas/emails`, com entrada administrativa em `/saas/login`.
+- CRUDs do SaaS seguem padrao list-first: listagem ocupa a tela e novo/editar abre rota propria.
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de codigo/CNPJ para empresa e seletor quando o usuario tem multiplas empresas.
 - Checkout publico: `/checkout` e `/checkout/sucesso`.
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes, com middleware de permissao por modulo e escopo da empresa ativa.
