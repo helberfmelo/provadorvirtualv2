@@ -97,6 +97,7 @@ Comportamento:
 
 - se `backend/` e `frontend/` ainda nao existirem, o workflow encerra em sucesso informando que o app ainda nao foi scaffoldado;
 - publica Laravel em subpasta HostGator usando `.htaccess` raiz para encaminhar requisicoes para `public/`;
+- no HostGator atual, endpoints limpos `api`, `sanctum` e `up` usam redirect 307 para `/provadorvirtual_v2/public/...`, preservando metodo/corpo em chamadas de API;
 - instala dependencias backend/frontend;
 - valida backend em SQLite no CI;
 - builda frontend com base path de producao;
@@ -150,6 +151,7 @@ MAIL_FROM_NAME="Provador Virtual"
    - `/provadorvirtual_v2/`;
    - `/provadorvirtual_v2/login`;
    - `/provadorvirtual_v2/produto-teste`;
+   - `/provadorvirtual_v2/api/v1/health` com `curl -L`;
    - `/provadorvirtual_v2/up`.
 
 ## Rollback

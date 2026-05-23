@@ -48,8 +48,8 @@ Atualizado em: 2026-05-23
 
 ## Operacao
 
-- `TODO` Deploy v2 em subpasta.
-- `TODO` Smoke publico.
-- `TODO` Backup/rollback.
-- `TODO` Registro de incidentes.
+- `DONE` Deploy v2 em subpasta.
+- `DONE` Smoke publico com frontend e API JSON.
+- `DONE` Backup/rollback automatizado pelo workflow.
+- `DONE` Registro de incidentes em `docs/execution_log.md`.
 - `TODO` Checklist de go-live.
