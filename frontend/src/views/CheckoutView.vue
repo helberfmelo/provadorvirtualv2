@@ -12,6 +12,15 @@ type Plan = {
   description: string
 }
 
+type PricingVariant = {
+  label: string
+  monthly_cents: number
+  annual_card_cents: number
+  annual_pix_cents: number
+  pix_discount_percent: number
+  max_installments: number
+}
+
 const router = useRouter()
 const loading = ref(true)
 const submitting = ref(false)
@@ -19,11 +28,12 @@ const cepLoading = ref(false)
 const error = ref('')
 const checkoutConfig = ref<PublicCheckoutConfig | null>(null)
 const plans = ref<Plan[]>([])
+const pricing = ref<Record<string, PricingVariant>>({})
 
 const form = reactive({
-  plan_code: 'starter',
+  plan_code: 'annual',
   payment_method: 'pix',
-  platform: 'custom',
+  platform: 'bigshop',
   company_name: '',
   company_legal_name: '',
   company_document: '',
@@ -41,7 +51,7 @@ const form = reactive({
   admin_phone: '',
   password: '',
   password_confirmation: '',
-  installments: '1',
+  installments: '12',
 })
 
 const card = reactive({
@@ -54,6 +64,21 @@ const card = reactive({
 
 const selectedPlan = computed(() => plans.value.find((plan) => plan.code === form.plan_code))
 const canUseCreditCard = computed(() => Boolean(checkoutConfig.value?.credit_card_enabled))
+const activePricing = computed(() => pricing.value[form.platform === 'bigshop' ? 'bigshop' : 'default'])
+const payableCents = computed(() => {
+  const values = activePricing.value
+  if (!values) {
+    return 0
+  }
+
+  return form.payment_method === 'pix' ? values.annual_pix_cents : values.annual_card_cents
+})
+const monthlyCents = computed(() => activePricing.value?.monthly_cents || 0)
+const cardInstallmentCents = computed(() => Math.ceil((activePricing.value?.annual_card_cents || 0) / Number(form.installments || 12)))
+const pixDiscountCents = computed(() => {
+  const values = activePricing.value
+  return values ? values.annual_card_cents - values.annual_pix_cents : 0
+})
 
 onMounted(async () => {
   await loadConfig()
@@ -65,7 +90,8 @@ async function loadConfig() {
     const { data } = await api.get('/public/checkout/config')
     checkoutConfig.value = data.checkout
     plans.value = data.plans
-    form.plan_code = data.plans?.[0]?.code || 'starter'
+    pricing.value = data.pricing || {}
+    form.plan_code = data.plans?.[0]?.code || 'annual'
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Nao foi possivel iniciar o checkout.'
   } finally {
@@ -119,7 +145,7 @@ async function submitCheckout() {
 
     const payload = {
       ...form,
-      installments: Number(form.installments || 1),
+      installments: Number(form.installments || 12),
       ...cardTokenPayload,
     }
 
@@ -132,8 +158,8 @@ async function submitCheckout() {
   }
 }
 
-function price(plan?: Plan) {
-  return ((plan?.price_cents || 0) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+function price(cents: number) {
+  return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 }
 </script>
 
@@ -144,7 +170,7 @@ function price(plan?: Plan) {
         <span class="eyebrow">Checkout</span>
         <h1>Contratar Provador Virtual</h1>
       </div>
-      <strong v-if="selectedPlan" class="checkout-total">{{ price(selectedPlan) }}/mes</strong>
+      <strong class="checkout-total">{{ price(monthlyCents) }}/mes</strong>
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
@@ -153,17 +179,17 @@ function price(plan?: Plan) {
     <form v-else class="checkout-grid" @submit.prevent="submitCheckout">
       <section class="panel-main admin-form">
         <div class="subsection-heading">
-          <h2>Plano</h2>
-          <span>{{ selectedPlan?.name }}</span>
+          <h2>{{ selectedPlan?.name }}</h2>
+          <span>Plano anual unico</span>
         </div>
 
-        <div class="plan-choice-grid">
-          <label v-for="plan in plans" :key="plan.code" :class="{ active: form.plan_code === plan.code }">
-            <input v-model="form.plan_code" type="radio" :value="plan.code" />
-            <strong>{{ plan.name }}</strong>
-            <span>{{ price(plan) }}/mes</span>
-            <small>{{ plan.description }}</small>
-          </label>
+        <div class="annual-plan-summary">
+          <div>
+            <strong>{{ price(monthlyCents) }}/mes</strong>
+            <span>{{ activePricing?.label }}</span>
+          </div>
+          <p>{{ selectedPlan?.description }}</p>
+          <small>Cartao em ate 12x ou Pix a vista com {{ activePricing?.pix_discount_percent || 5 }}% de desconto.</small>
         </div>
 
         <div class="form-grid">
@@ -178,6 +204,7 @@ function price(plan?: Plan) {
               <option value="tray">Tray</option>
               <option value="custom">Personalizada</option>
             </select>
+            <small v-if="form.platform === 'bigshop'">Cliente BigShop tem preco especial.</small>
           </label>
           <label>
             Empresa
@@ -239,7 +266,7 @@ function price(plan?: Plan) {
       <section class="panel-main admin-form">
         <div class="subsection-heading">
           <h2>Acesso e pagamento</h2>
-          <span>{{ form.payment_method === 'credit_card' ? 'Cartao' : form.payment_method }}</span>
+          <span>{{ form.payment_method === 'credit_card' ? 'Cartao' : 'Pix' }}</span>
         </div>
 
         <div class="form-grid">
@@ -276,9 +303,6 @@ function price(plan?: Plan) {
           <button type="button" :class="{ active: form.payment_method === 'pix' }" @click="form.payment_method = 'pix'">
             Pix
           </button>
-          <button type="button" :class="{ active: form.payment_method === 'boleto' }" @click="form.payment_method = 'boleto'">
-            Boleto
-          </button>
           <button
             type="button"
             :disabled="!canUseCreditCard"
@@ -313,16 +337,20 @@ function price(plan?: Plan) {
           <label>
             Parcelas
             <select v-model="form.installments">
-              <option value="1">1x</option>
-              <option value="2">2x</option>
-              <option value="3">3x</option>
+              <option v-for="item in 12" :key="item" :value="String(item)">
+                {{ item }}x de {{ price(Math.ceil((activePricing?.annual_card_cents || 0) / item)) }}
+              </option>
             </select>
           </label>
         </div>
 
         <div class="checkout-summary">
-          <span>Total mensal</span>
-          <strong>{{ price(selectedPlan) }}</strong>
+          <span>{{ form.payment_method === 'pix' ? 'Total no Pix' : `${form.installments}x no cartao` }}</span>
+          <strong>{{ form.payment_method === 'pix' ? price(payableCents) : price(cardInstallmentCents) }}</strong>
+        </div>
+        <div class="checkout-summary muted">
+          <span>{{ form.payment_method === 'pix' ? 'Desconto Pix' : 'Total anual' }}</span>
+          <strong>{{ form.payment_method === 'pix' ? price(pixDiscountCents) : price(activePricing?.annual_card_cents || 0) }}</strong>
         </div>
 
         <button class="btn btn-primary" type="submit" :disabled="submitting">

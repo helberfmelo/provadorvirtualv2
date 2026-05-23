@@ -49,6 +49,7 @@ class PublicCheckoutFlowTest extends TestCase
 
             return $request->url() === 'https://api.pagar.me/core/v5/orders'
                 && data_get($payload, 'payments.0.payment_method') === 'pix'
+                && data_get($payload, 'items.0.amount') === 216486
                 && data_get($payload, 'customer.address.zip_code') === '01001000'
                 && str_starts_with((string) data_get($payload, 'code'), 'PV-');
         });
@@ -56,6 +57,55 @@ class PublicCheckoutFlowTest extends TestCase
         $this->getJson('/api/v1/public/checkout/'.$response->json('reference'))
             ->assertOk()
             ->assertJsonPath('session.company.access_code', now()->year.'0001');
+    }
+
+    public function test_bigshop_platform_receives_discounted_annual_price(): void
+    {
+        $this->configurePagarme();
+
+        Http::fake([
+            'https://api.pagar.me/core/v5/orders' => Http::response([
+                'id' => 'or_pv_bigshop',
+                'status' => 'pending',
+                'charges' => [
+                    [
+                        'id' => 'ch_pv_bigshop',
+                        'status' => 'pending',
+                        'payment_method' => 'pix',
+                        'last_transaction' => [
+                            'qr_code' => '000201-pix-bigshop',
+                            'expires_at' => now()->addDay()->toIso8601String(),
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'platform' => 'bigshop',
+        ])->assertCreated();
+
+        Http::assertSent(function ($request): bool {
+            return data_get($request->data(), 'items.0.amount') === 148086
+                && data_get($request->data(), 'metadata.merchant_company_id') === '1';
+        });
+
+        $this->assertDatabaseHas('merchant_companies', [
+            'name' => 'Loja Checkout Teste',
+            'platform' => 'bigshop',
+        ]);
+    }
+
+    public function test_checkout_does_not_accept_boleto(): void
+    {
+        $this->configurePagarme();
+
+        $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'payment_method' => 'boleto',
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('payment_method');
     }
 
     public function test_pagarme_webhook_activates_paid_company(): void
@@ -96,7 +146,7 @@ class PublicCheckoutFlowTest extends TestCase
     private function payload(): array
     {
         return [
-            'plan_code' => 'starter',
+            'plan_code' => 'annual',
             'payment_method' => 'pix',
             'platform' => 'custom',
             'company_name' => 'Loja Checkout Teste',

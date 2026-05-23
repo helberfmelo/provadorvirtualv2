@@ -55,11 +55,7 @@ onMounted(async () => {
         <div v-if="payment?.pix?.qr_code" class="payment-box">
           <strong>Pix copia e cola</strong>
           <textarea :value="payment.pix.qr_code" rows="4" readonly></textarea>
-        </div>
-
-        <div v-if="payment?.boleto?.line" class="payment-box">
-          <strong>Linha digitavel</strong>
-          <textarea :value="payment.boleto.line" rows="3" readonly></textarea>
+          <small>O acesso da empresa sera liberado automaticamente quando a Pagar.me confirmar o pagamento.</small>
         </div>
 
         <div class="action-row">

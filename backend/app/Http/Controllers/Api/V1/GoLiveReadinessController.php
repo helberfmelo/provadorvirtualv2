@@ -191,9 +191,9 @@ class GoLiveReadinessController extends Controller
         return $this->check(
             key: 'root_cutover',
             label: 'Plano da raiz do dominio',
-            status: 'warning',
-            detail: 'Operacao atual permanece em /provadorvirtual_v2 para preservar o v1.',
-            action: 'Executar cutover para a raiz somente depois do piloto BigShop e aceite comercial.'
+            status: 'passed',
+            detail: 'Site publico v2 publicado na raiz; backend permanece em /provadorvirtual_v2 para rollback.',
+            action: 'Validar raiz e subpasta em cada deploy.'
         );
     }
 

@@ -15,6 +15,14 @@ Publicacao inicial:
 
 Motivo: preservar `https://provadorvirtual.online/provadorvirtual_v1/` ate o cutover.
 
+Publicacao comercial atual depois da Sprint 27:
+
+- Site publico raiz: `https://provadorvirtual.online/`
+- Build estatica da raiz: `/home1/opents62/provadorvirtual.online`
+- Backup da raiz: `/home1/opents62/deploy_backups/provadorvirtual_root`
+- Backend/app operacional e rollback continuam em `/provadorvirtual_v2/`.
+- A raiz aponta APIs e widget para `/provadorvirtual_v2/public/api/v1` e `/provadorvirtual_v2/widget/v1`.
+
 ## Banco de producao
 
 Dados ficam registrados em `docs/credentials.local.md` e no `.env` remoto:
@@ -88,6 +96,7 @@ BigShop:
 Pagamentos:
 
 - `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY`, `PAGARME_WEBHOOK_SECRET`, `PAGARME_ENV`, `PAGARME_BASE_URL`, `PAGARME_CHECKOUT_SUCCESS_URL` e `PAGARME_CHECKOUT_CANCEL_URL`.
+- Para checkout publico na raiz, usar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` e `PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout`.
 
 Hardening:
 
@@ -117,6 +126,7 @@ Comportamento:
 - extrai novo release;
 - aplica `PRODUCTION_ENV` se cadastrado;
 - roda `optimize:clear`, `migrate --force`, `ProductionSeeder` se existir, `storage:link` e caches;
+- publica a landing/app frontend tambem na raiz do dominio, preservando `/provadorvirtual_v1/` e `/provadorvirtual_v2/`;
 - faz smoke publico.
 
 ## `.env` de producao minimo
@@ -160,8 +170,8 @@ PAGARME_BASE_URL=https://api.pagar.me/core/v5
 PAGARME_SECRET_KEY=<secret>
 PAGARME_PUBLIC_KEY=<public>
 PAGARME_WEBHOOK_SECRET=<webhook>
-PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/provadorvirtual_v2/checkout/sucesso
-PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/provadorvirtual_v2/checkout
+PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso
+PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout
 ```
 
 ## Primeira publicacao
@@ -170,6 +180,8 @@ PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/provadorvirtual_v2/ch
 2. Fazer push para `main`.
 3. Acompanhar Actions.
 4. Validar:
+   - `/`;
+   - `/checkout`;
    - `/provadorvirtual_v2/`;
    - `/provadorvirtual_v2/login`;
    - `/provadorvirtual_v2/produto-teste`;

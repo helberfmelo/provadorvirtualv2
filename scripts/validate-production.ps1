@@ -1,5 +1,6 @@
 param(
-    [string] $BaseUrl = "https://provadorvirtual.online/provadorvirtual_v2",
+    [string] $BaseUrl = "https://provadorvirtual.online",
+    [string] $ApiBase = "",
     [string] $Email = "demo@provadorvirtual.online",
     [string] $Password = "provador123"
 )
@@ -7,7 +8,15 @@ param(
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = $BaseUrl.TrimEnd("/")
-$ApiBase = "$BaseUrl/public/api/v1"
+if ([string]::IsNullOrWhiteSpace($ApiBase)) {
+    if ($BaseUrl.EndsWith("/provadorvirtual_v2")) {
+        $ApiBase = "$BaseUrl/public/api/v1"
+    } else {
+        $ApiBase = "$BaseUrl/provadorvirtual_v2/public/api/v1"
+    }
+} else {
+    $ApiBase = $ApiBase.TrimEnd("/")
+}
 
 function Assert-True {
     param(

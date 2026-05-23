@@ -177,7 +177,7 @@ Chaves comuns:
 - Cartao e tokenizado no navegador usando `PAGARME_PUBLIC_KEY`.
 - Backend nunca recebe PAN/CVV; recebe apenas `card_token`.
 - Backend cria pedido transparente em `POST /orders` na API Core v5 da Pagar.me.
-- Pix e boleto retornam instrucoes na tela `/checkout/sucesso`.
+- Pix retorna instrucoes na tela `/checkout/sucesso`; boleto nao e oferecido no checkout atual.
 - Empresa nasce como `pending_payment` e e ativada por retorno imediato pago ou webhook.
 
 ## Motor de recomendacao

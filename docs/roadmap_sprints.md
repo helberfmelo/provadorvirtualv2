@@ -284,3 +284,64 @@ Entregas:
 - tela `/checkout/sucesso`.
 
 Status: implementado e testado. Producao depende de `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY` e `PAGARME_WEBHOOK_SECRET` em `PRODUCTION_ENV`.
+
+## Sprints 27 a 30 - Nova trilha comercial e operacional
+
+### Sprint 27 - Site publico raiz e checkout anual unico
+
+Objetivo: substituir a landing v1 na raiz pelo site publico v2 e fechar a regra comercial atual.
+
+Entregas:
+
+- landing v2 com estrutura inspirada no v1, sem promessa de gratuidade;
+- cores v2 no lugar do lilas legado;
+- publicacao da build publica em `https://provadorvirtual.online/`;
+- preservacao da aplicacao em `/provadorvirtual_v2/` para backend, widget e rollback;
+- checkout com um plano anual unico;
+- select de plataforma com BigShop como primeira opcao;
+- preco padrao `R$ 189,90/mes` no anual;
+- preco BigShop `R$ 129,90/mes` no anual;
+- cartao em ate 12x e Pix a vista com 5% de desconto;
+- boleto removido;
+- plataforma salva na empresa e no widget;
+- testes de preco por plataforma e bloqueio de boleto.
+
+Status: implementado nesta sprint; publicar e validar no Actions.
+
+### Sprint 28 - Monitor de pagamentos e e-mails transacionais
+
+Objetivo: reduzir dependencia exclusiva do webhook e criar operacao de comunicacao transacional.
+
+Entregas previstas:
+
+- comando Artisan para sincronizar pagamentos pendentes com a Pagar.me;
+- documentacao de cron cPanel com log;
+- configuracao SaaS de credenciais SMTP por ambiente;
+- CRUD SaaS de e-mails transacionais;
+- templates iniciais: cadastro realizado, pagamento confirmado, aguardando pagamento com Pix, erro no pagamento, recuperacao de senha e renovacao de plano;
+- disparos baseados em eventos de checkout e plano.
+
+### Sprint 29 - Login contextual e acesso de empresa
+
+Objetivo: permitir acesso por e-mail ou CPF e selecionar empresa por codigo/CNPJ quando for portal do lojista.
+
+Entregas previstas:
+
+- login por e-mail ou CPF no SaaS;
+- login do portal da empresa exigindo codigo da loja ou CNPJ;
+- reuso seguro de usuario com mesmo e-mail/CPF em mais de uma empresa;
+- ajuste de checkout/cadastro para vincular usuario existente quando aplicavel;
+- mensagens claras quando o usuario nao pertence a empresa informada.
+
+### Sprint 30 - Usuarios e permissoes por modulo
+
+Objetivo: permitir que SaaS e lojista gerenciem usuarios com permissoes granulares.
+
+Entregas previstas:
+
+- CRUD de usuarios no portal SaaS;
+- CRUD de usuarios no portal da empresa;
+- listagem, novo, editar e ativar/desativar em todos os CRUDs;
+- permissoes por modulo/menu com visualizar e editar;
+- ao marcar editar, visualizar fica automaticamente ativo;
+- enforcement inicial no backend para modulos criticos.

@@ -7,6 +7,9 @@ on:
   workflow_dispatch:
 
 env:
+  PRODUCTION_ROOT_URL: https://provadorvirtual.online
+  PRODUCTION_ROOT_DIR: /home1/opents62/provadorvirtual.online
+  PRODUCTION_ROOT_BACKUP_DIR: /home1/opents62/deploy_backups/provadorvirtual_root
   PRODUCTION_APP_URL: https://provadorvirtual.online/provadorvirtual_v2
   PRODUCTION_APP_BASE_PATH: /provadorvirtual_v2/
   PRODUCTION_REMOTE_DIR: /home1/opents62/provadorvirtual.online/provadorvirtual_v2
@@ -114,6 +117,16 @@ jobs:
           cp -r frontend/dist/* backend/public/
           rm -f backend/bootstrap/cache/*.php
 
+      - name: Build root public frontend
+        if: steps.scaffold.outputs.ready == 'true'
+        working-directory: frontend
+        env:
+          VITE_APP_BASE_PATH: /
+          VITE_API_BASE_URL: ${{ env.PRODUCTION_APP_BASE_PATH }}public/api/v1
+          VITE_WIDGET_BASE_URL: ${{ env.PRODUCTION_APP_BASE_PATH }}widget/v1
+          VITE_APP_VERSION: ${{ github.sha }}
+        run: npx vite build --outDir dist-root
+
       - name: Create deploy archive
         if: steps.scaffold.outputs.ready == 'true'
         shell: bash
@@ -131,6 +144,9 @@ jobs:
             -czf "../${ARCHIVE_NAME}" .
           cd ..
           echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> "$GITHUB_ENV"
+          ROOT_ARCHIVE_NAME="provadorvirtual-root-${GITHUB_SHA}.tar.gz"
+          tar -czf "${ROOT_ARCHIVE_NAME}" -C frontend/dist-root .
+          echo "ROOT_ARCHIVE_NAME=${ROOT_ARCHIVE_NAME}" >> "$GITHUB_ENV"
 
       - name: Prepare production env file
         if: steps.scaffold.outputs.ready == 'true'
@@ -260,6 +276,19 @@ jobs:
             -o StrictHostKeyChecking=yes \
             "$ARCHIVE_NAME" "${DEPLOY_USER}@${DEPLOY_HOST}:${REMOTE_ARCHIVE}"
           echo "DEPLOY_REMOTE_ARCHIVE=${REMOTE_ARCHIVE}" >> "$GITHUB_ENV"
+          REMOTE_ROOT_ARCHIVE="/home1/${DEPLOY_USER}/${ROOT_ARCHIVE_NAME}"
+          scp \
+            -P "$DEPLOY_PORT" \
+            -i "$DEPLOY_KEY_PATH" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no \
+            -o StrictHostKeyChecking=yes \
+            "$ROOT_ARCHIVE_NAME" "${DEPLOY_USER}@${DEPLOY_HOST}:${REMOTE_ROOT_ARCHIVE}"
+          echo "DEPLOY_REMOTE_ROOT_ARCHIVE=${REMOTE_ROOT_ARCHIVE}" >> "$GITHUB_ENV"
 
           if [ "${PRODUCTION_ENV_PRESENT}" = "true" ]; then
             REMOTE_ENV="/home1/${DEPLOY_USER}/provadorvirtual-v2-${GITHUB_SHA}.env"
@@ -336,6 +365,58 @@ jobs:
             -o StrictHostKeyChecking=yes \
             "${DEPLOY_USER}@${DEPLOY_HOST}" 'bash -se' < "$REMOTE_SCRIPT"
 
+      - name: Run root public deploy
+        if: steps.scaffold.outputs.ready == 'true'
+        shell: bash
+        run: |
+          REMOTE_ROOT_SCRIPT="$RUNNER_TEMP/provadorvirtual_root_deploy.sh"
+          {
+            echo 'set -e'
+            printf 'PUBLIC_ROOT=%q\n' "$PRODUCTION_ROOT_DIR"
+            printf 'ROOT_ARCHIVE=%q\n' "$DEPLOY_REMOTE_ROOT_ARCHIVE"
+            printf 'ROOT_BACKUP_ROOT=%q\n' "$PRODUCTION_ROOT_BACKUP_DIR"
+            printf 'BACKUP_KEEP=%q\n' "${PRODUCTION_BACKUP_KEEP}"
+            printf 'RELEASE_SHA=%q\n' "${GITHUB_SHA}"
+            echo 'mkdir -p "$PUBLIC_ROOT" "$ROOT_BACKUP_ROOT"'
+            echo 'if [ -f "$PUBLIC_ROOT/index.html" ] || [ -f "$PUBLIC_ROOT/index.php" ]; then'
+            echo '  BACKUP_NAME="provadorvirtual-root-backup-$(date +%Y%m%d-%H%M%S)-${RELEASE_SHA}.tar.gz"'
+            echo '  tar --exclude="./provadorvirtual_v1" --exclude="./provadorvirtual_v2" --exclude="./cgi-bin" --exclude="./.well-known" -czf "$ROOT_BACKUP_ROOT/$BACKUP_NAME" -C "$PUBLIC_ROOT" . || true'
+            echo '  echo "ROOT_BACKUP_CREATED=$BACKUP_NAME"'
+            echo 'fi'
+            echo 'ls -1dt "$ROOT_BACKUP_ROOT"/*.tar.gz 2>/dev/null | tail -n +$((BACKUP_KEEP + 1)) | xargs -r rm -f'
+            echo 'rm -rf "$PUBLIC_ROOT/assets" "$PUBLIC_ROOT/images"'
+            echo 'tar -xzf "$ROOT_ARCHIVE" -C "$PUBLIC_ROOT"'
+            echo 'rm -f "$ROOT_ARCHIVE"'
+            echo 'cat > "$PUBLIC_ROOT/.htaccess" <<'\''HTACCESS'\'''
+            echo 'DirectoryIndex index.html index.php'
+            echo '<IfModule mod_rewrite.c>'
+            echo '    Options -MultiViews -Indexes'
+            echo '    RewriteEngine On'
+            echo '    RewriteRule ^provadorvirtual_v1(/.*)?$ - [L]'
+            echo '    RewriteRule ^provadorvirtual_v2(/.*)?$ - [L]'
+            echo '    RewriteRule ^api/(.*)$ /provadorvirtual_v2/public/api/$1 [L,R=307]'
+            echo '    RewriteRule ^widget/(.*)$ /provadorvirtual_v2/widget/$1 [L,R=307]'
+            echo '    RewriteRule ^up$ /provadorvirtual_v2/public/up [L,R=307]'
+            echo '    RewriteCond %{REQUEST_FILENAME} !-d'
+            echo '    RewriteCond %{REQUEST_FILENAME} !-f'
+            echo '    RewriteRule ^ index.html [L]'
+            echo '</IfModule>'
+            echo 'HTACCESS'
+            echo 'chmod 644 "$PUBLIC_ROOT/.htaccess" "$PUBLIC_ROOT/index.html" 2>/dev/null || true'
+          } > "$REMOTE_ROOT_SCRIPT"
+
+          ssh \
+            -p "$DEPLOY_PORT" \
+            -i "$DEPLOY_KEY_PATH" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no \
+            -o StrictHostKeyChecking=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" 'bash -se' < "$REMOTE_ROOT_SCRIPT"
+
       - name: Ensure master admin
         if: steps.scaffold.outputs.ready == 'true'
         env:
@@ -391,6 +472,10 @@ jobs:
             -d '{"merchant_id":1,"store_id":1,"product_id":1,"platform":"custom","measurements":{"bust":92,"waist":74,"hip":100,"height":166,"weight":62}}' \
             "${PRODUCTION_APP_URL}/api/v1/public/recommendations" | grep -q '"recommended_size":"M"'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/up" > /dev/null
+          curl --fail --silent --show-error -L "${PRODUCTION_ROOT_URL}/" | grep -q '<div id="app"'
+          curl --fail --silent --show-error -L "${PRODUCTION_ROOT_URL}/checkout" | grep -q '<div id="app"'
+          curl --fail --silent --show-error -L "${PRODUCTION_ROOT_URL}/api/v1/health" | grep -q '"status":"ok"'
+          curl --fail --silent --show-error -L "${PRODUCTION_ROOT_URL}/widget/v1/provador-virtual.js" | grep -q 'data-pv-submit'
 
       - name: Diagnose public failure
         if: failure() && steps.scaffold.outputs.ready == 'true'
@@ -400,6 +485,10 @@ jobs:
           curl --silent --show-error -L -D - "${PRODUCTION_APP_URL}/" | head -n 120 || true
           echo "==== HTTP ${PRODUCTION_APP_URL}/produto-teste ===="
           curl --silent --show-error -L -D - "${PRODUCTION_APP_URL}/produto-teste" | head -n 120 || true
+          echo "==== HTTP ${PRODUCTION_ROOT_URL}/ ===="
+          curl --silent --show-error -L -D - "${PRODUCTION_ROOT_URL}/" | head -n 120 || true
+          echo "==== HTTP ${PRODUCTION_ROOT_URL}/checkout ===="
+          curl --silent --show-error -L -D - "${PRODUCTION_ROOT_URL}/checkout" | head -n 120 || true
           echo "==== Remote app diagnostics ===="
           if [ -n "${DEPLOY_PORT:-}" ] && [ -n "${DEPLOY_KEY_PATH:-}" ] && [ -n "${DEPLOY_USER:-}" ] && [ -n "${DEPLOY_HOST:-}" ]; then
             ssh \

@@ -4,12 +4,16 @@ Atualizado em: 2026-05-23
 
 ## Decisao atual
 
-Manter o v2 publicado em:
+Depois da Sprint 27, o site publico comercial do v2 deve rodar na raiz:
+
+- `https://provadorvirtual.online/`
+
+A aplicacao/backend v2 continua preservada em:
 
 - `https://provadorvirtual.online/provadorvirtual_v2/`
 
-Nao mover para a raiz do dominio ate concluir o piloto BigShop ou haver aceite
-comercial explicito. O v1 permanece preservado em `/provadorvirtual_v1/`.
+Motivo: entregar a marca sem sufixo para visitantes e checkout, preservando o v1
+em `/provadorvirtual_v1/` e mantendo rollback simples da aplicacao v2.
 
 ## Status Sprint 12
 
@@ -76,21 +80,22 @@ final em `/app/widget` antes de instalar o snippet.
 
 ## Cutover para raiz
 
-Plano recomendado em duas etapas:
+Estrategia executada:
 
-1. Cutover leve: raiz `https://provadorvirtual.online/` redireciona para
-   `/provadorvirtual_v2/`, mantendo a aplicacao na subpasta.
-2. Cutover pleno: publicar app na raiz apenas se for necessario para SEO, marca ou
-   instalacao do widget.
+- build estatica Vue com `VITE_APP_BASE_PATH=/` publicada no docroot;
+- API e widget continuam servidos por `/provadorvirtual_v2/`;
+- `.htaccess` da raiz preserva `/provadorvirtual_v1/` e `/provadorvirtual_v2/`;
+- `/api/*`, `/widget/*` e `/up` na raiz encaminham para o v2 quando necessario;
+- backup da raiz fica em `/home1/opents62/deploy_backups/provadorvirtual_root`.
 
-Antes do cutover pleno:
+Validar apos cada deploy:
 
-- atualizar `APP_URL` e `FRONTEND_URL`;
-- ajustar `VITE_APP_BASE_PATH`;
-- revisar `VITE_API_BASE_URL`;
-- manter backup do release atual;
-- validar `/`, `/login`, `/produto-teste`, widget e APIs;
-- preservar `/provadorvirtual_v1/` ate decisao explicita.
+- `/`;
+- `/checkout`;
+- `/produto-teste`;
+- `/api/v1/health`;
+- `/widget/v1/provador-virtual.js`;
+- `/provadorvirtual_v2/` como caminho de rollback.
 
 ## BigShop piloto
 

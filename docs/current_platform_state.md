@@ -23,6 +23,7 @@ Atualizado em: 2026-05-23
 - Sprint 24 criou loja teste realista com 4 produtos, 4 tabelas demo e widget com os botoes `Descubra seu tamanho` e `Tabela de Medidas`.
 - Sprint 25 criou personalizador visual do widget/tabela com preview em tempo real no painel do lojista.
 - Sprint 26 criou landing publica, checkout transparente Pagar.me, sessoes/eventos de pagamento e webhook de ativacao.
+- Sprint 27 ajustou a landing para estrutura inspirada no v1, publicou build prevista para a raiz e simplificou o checkout para plano anual unico sem boleto.
 
 ## Referencias confirmadas
 
@@ -92,11 +93,11 @@ Atualizado em: 2026-05-23
 - Sprint 12 publicada em producao pelo GitHub Actions no run `26333226813`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em producao usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que nao preservam header durante redirect.
-- Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
+- A raiz `https://provadorvirtual.online/` passa a ser o site publico comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
 - Falta chave de IA externa (`OPENAI_API_KEY` ou `GEMINI_API_KEY`) para OCR real de imagem.
 - Falta credencial BigShop real para loja de teste.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativacao um clique real.
-- Falta cadastrar as chaves Pagar.me em `PRODUCTION_ENV` e validar uma transacao real de baixo valor.
+- Falta cadastrar as chaves Pagar.me em `PRODUCTION_ENV`, com URLs de retorno na raiz, e validar uma transacao real de baixo valor.
 
 ## Superficie atual
 
@@ -118,4 +119,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Publicar a evolucao em `/provadorvirtual_v2/`, cadastrar `PAGARME_*` em producao, criar o master admin em producao e validar checkout + widget na loja teste.
+Publicar a evolucao na raiz e em `/provadorvirtual_v2/`, cadastrar `PAGARME_*` em producao com URLs da raiz, validar checkout + widget e seguir para a Sprint 28 de cron/e-mails transacionais.

@@ -93,15 +93,24 @@ Atualizado em: 2026-05-23
 - `DONE` Script de validacao de producao.
 - `DONE` Plano de cutover para raiz do dominio.
 - `DONE` Landing publica limpa com CTA para checkout, teste e contato.
-- `DONE` Checkout transparente Pagar.me com Pix, boleto e cartao.
+- `DONE` Checkout transparente Pagar.me; regra atual usa Pix e cartao, sem boleto.
 - `DONE` Webhook Pagar.me e ativacao de empresa paga.
+- `DONE` Landing publica v2 inspirada no v1 e preparada para rodar na raiz.
+- `DONE` Checkout anual unico sem boleto, com desconto BigShop e Pix.
+- `TODO` Configurar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` em producao junto com as chaves reais.
+- `TODO` Monitorar pagamento pendente por cron alem do webhook.
+- `TODO` CRUD de credenciais SMTP e e-mails transacionais.
+- `TODO` Login do portal da empresa com codigo/CNPJ.
+- `TODO` CRUD de usuarios e permissoes no SaaS e no portal da empresa.
 
 ## Pagamentos
 
 - `DONE` Checkout transparente Pagar.me com tokenizacao de cartao no navegador.
 - `DONE` Persistencia de `checkout_sessions` e `payment_events`.
+- `DONE` Regra comercial atual: plano anual unico, cartao ate 12x, Pix com 5% de desconto, sem boleto.
+- `DONE` Preco padrao `R$ 189,90/mes` e preco BigShop `R$ 129,90/mes`.
 - `TODO` Cadastrar `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY` e `PAGARME_WEBHOOK_SECRET` em producao.
-- `TODO` Definir planos/precos comerciais finais antes do go-live na raiz.
+- `TODO` Cadastrar URLs Pagar.me de sucesso/cancelamento apontando para a raiz do dominio.
 
 ## Benchmark e mercado
 

@@ -24,7 +24,7 @@ class PagarMeCheckoutService
 
         return [
             'provider' => 'pagarme',
-            'payment_methods' => $publicKey !== '' ? ['pix', 'boleto', 'credit_card'] : ['pix', 'boleto'],
+            'payment_methods' => $publicKey !== '' ? ['pix', 'credit_card'] : ['pix'],
             'credit_card_enabled' => $publicKey !== '',
             'public_key' => $publicKey !== '' ? $publicKey : null,
             'token_url' => $this->baseUrl().'/tokens',
@@ -122,7 +122,7 @@ class PagarMeCheckoutService
                 [
                     'code' => $session->plan_code,
                     'amount' => $session->amount_cents,
-                    'description' => $session->plan_name,
+                    'description' => $session->plan_name.' - 12 meses',
                     'quantity' => 1,
                 ],
             ],
@@ -159,15 +159,6 @@ class PagarMeCheckoutService
                     'card_token' => trim((string) ($buyerData['card_token'] ?? '')),
                 ],
             ]),
-            'boleto' => $this->cleanArray([
-                'payment_method' => 'boleto',
-                'boleto' => [
-                    'instructions' => 'Pagamento de assinatura Provador Virtual',
-                    'document_number' => preg_replace('/\D+/', '', (string) ($buyerData['company_document'] ?? '')) ?: null,
-                    'due_at' => CarbonImmutable::now()->addDays(3)->endOfDay()->toIso8601String(),
-                    'type' => 'DM',
-                ],
-            ]),
             default => [
                 'payment_method' => 'pix',
                 'pix' => [
@@ -175,6 +166,7 @@ class PagarMeCheckoutService
                     'additional_information' => [
                         ['name' => 'Plano', 'value' => Str::limit($session->plan_name, 50, '')],
                         ['name' => 'Empresa', 'value' => Str::limit($session->lead_company, 50, '')],
+                        ['name' => 'Periodo', 'value' => '12 meses'],
                     ],
                 ],
             ],
@@ -347,13 +339,6 @@ class PagarMeCheckoutService
                 'qr_code_url' => $this->extractString($payload, ['charges.0.last_transaction.qr_code_url']),
                 'expires_at' => $this->extractString($payload, ['charges.0.last_transaction.expires_at']),
             ] : null,
-            'boleto' => $method === 'boleto' ? [
-                'url' => $this->extractString($payload, ['charges.0.last_transaction.url']),
-                'pdf' => $this->extractString($payload, ['charges.0.last_transaction.pdf']),
-                'line' => $this->extractString($payload, ['charges.0.last_transaction.line', 'charges.0.last_transaction.line_digits']),
-                'barcode' => $this->extractString($payload, ['charges.0.last_transaction.barcode']),
-                'due_at' => $this->extractString($payload, ['charges.0.last_transaction.due_at']),
-            ] : null,
         ]);
     }
 
@@ -393,7 +378,6 @@ class PagarMeCheckoutService
     private function resolveExpiresAt(array $payload, array $snapshot): ?CarbonImmutable
     {
         $value = data_get($snapshot, 'pix.expires_at')
-            ?: data_get($snapshot, 'boleto.due_at')
             ?: $this->extractString($payload, ['charges.0.last_transaction.expires_at', 'charges.0.last_transaction.due_at']);
 
         if (! $value) {
@@ -502,7 +486,6 @@ class PagarMeCheckoutService
     {
         return match (Str::lower(trim($value))) {
             'credit_card' => 'credit_card',
-            'boleto' => 'boleto',
             default => 'pix',
         };
     }

@@ -25,6 +25,7 @@ class PublicCheckoutController extends Controller
         return [
             'checkout' => $this->checkoutService->configuration(),
             'plans' => array_values($this->plans()),
+            'pricing' => $this->pricingConfig(),
         ];
     }
 
@@ -32,11 +33,12 @@ class PublicCheckoutController extends Controller
     {
         $data = $this->validateCheckout($request);
         $plan = $this->plans()[$data['plan_code']] ?? null;
+        $pricing = $this->pricingFor($data);
 
         abort_if(! $plan, 422, 'Plano selecionado indisponivel.');
 
         try {
-            $session = DB::transaction(function () use ($data, $plan): CheckoutSession {
+            $session = DB::transaction(function () use ($data, $plan, $pricing): CheckoutSession {
                 $merchant = Merchant::query()->create([
                     'name' => $data['company_name'],
                     'slug' => $this->uniqueMerchantSlug($data['company_name']),
@@ -112,13 +114,15 @@ class PublicCheckoutController extends Controller
                     'lead_company' => $data['company_name'],
                     'lead_email' => $data['admin_email'],
                     'lead_phone' => $data['admin_phone'],
-                    'amount_cents' => $plan['price_cents'],
+                    'amount_cents' => $pricing['payable_cents'],
                     'currency' => 'BRL',
                     'provider' => 'pagarme',
                     'payment_method' => $data['payment_method'],
                     'status' => CheckoutSession::STATUS_PENDING,
                     'metadata' => [
                         'plan' => $plan,
+                        'pricing' => $pricing,
+                        'platform' => $company->platform,
                         'company_access_code' => $company->access_code,
                     ],
                 ]);
@@ -196,11 +200,12 @@ class PublicCheckoutController extends Controller
             'admin_cpf' => preg_replace('/\D+/', '', (string) $request->input('admin_cpf')) ?: '',
             'admin_email' => mb_strtolower(trim((string) $request->input('admin_email'))),
             'company_address_state' => mb_strtoupper(trim((string) $request->input('company_address_state'))),
+            'platform' => $request->input('platform') ?: 'bigshop',
         ]);
 
         return $request->validate([
             'plan_code' => ['required', 'string', Rule::in(array_keys($this->plans()))],
-            'payment_method' => ['required', 'string', 'in:credit_card,pix,boleto'],
+            'payment_method' => ['required', 'string', 'in:credit_card,pix'],
             'platform' => ['nullable', 'string', 'in:bigshop,shopify,woocommerce,nuvemshop,vtex,tray,custom'],
             'company_name' => ['required', 'string', 'max:255'],
             'company_legal_name' => ['required', 'string', 'max:255'],
@@ -226,20 +231,51 @@ class PublicCheckoutController extends Controller
     private function plans(): array
     {
         return [
-            'starter' => [
-                'code' => 'starter',
-                'name' => 'Provador Virtual Starter',
-                'price_cents' => 9900,
+            'annual' => [
+                'code' => 'annual',
+                'name' => 'Provador Virtual Anual',
+                'price_cents' => 18990,
                 'currency' => 'BRL',
-                'description' => 'Widget, tabela de medidas e recomendacao inteligente para lojas em validacao.',
+                'description' => 'Plano anual unico com widget, tabela de medidas, recomendacao inteligente, integracoes padrao e suporte de ativacao.',
             ],
-            'growth' => [
-                'code' => 'growth',
-                'name' => 'Provador Virtual Growth',
-                'price_cents' => 19900,
-                'currency' => 'BRL',
-                'description' => 'Mais produtos, personalizacao e suporte para integracoes padrao.',
-            ],
+        ];
+    }
+
+    private function pricingConfig(): array
+    {
+        return [
+            'default' => $this->pricingVariant('Demais plataformas', 18990),
+            'bigshop' => $this->pricingVariant('Cliente BigShop', 12990),
+        ];
+    }
+
+    private function pricingFor(array $data): array
+    {
+        $platform = $data['platform'] === 'bigshop' ? 'bigshop' : 'default';
+        $variant = $this->pricingConfig()[$platform];
+        $paymentMethod = $data['payment_method'] === 'credit_card' ? 'credit_card' : 'pix';
+
+        return [
+            ...$variant,
+            'platform_price_key' => $platform,
+            'payment_method' => $paymentMethod,
+            'payable_cents' => $paymentMethod === 'pix'
+                ? $variant['annual_pix_cents']
+                : $variant['annual_card_cents'],
+        ];
+    }
+
+    private function pricingVariant(string $label, int $monthlyCents): array
+    {
+        $annualCardCents = $monthlyCents * 12;
+
+        return [
+            'label' => $label,
+            'monthly_cents' => $monthlyCents,
+            'annual_card_cents' => $annualCardCents,
+            'annual_pix_cents' => (int) round($annualCardCents * 0.95),
+            'pix_discount_percent' => 5,
+            'max_installments' => 12,
         ];
     }
 

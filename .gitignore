@@ -29,6 +29,7 @@ frontend/.env.*
 !frontend/.env.example
 frontend/node_modules/
 frontend/dist/
+frontend/dist-root/
 
 node_modules/
 vendor/
