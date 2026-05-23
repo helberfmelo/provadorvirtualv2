@@ -130,3 +130,5 @@ Sem chave externa, o assistente continua operando com parser local para texto/CS
 - pacote de piloto com links comerciais, onboarding, comandos e pendencias reais.
 
 Roteiro completo em `docs/commercial_pilot_package.md`.
+
+Publicado em producao no run `26340033238`; `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

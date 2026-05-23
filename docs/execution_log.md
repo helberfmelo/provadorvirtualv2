@@ -290,3 +290,12 @@
 - Run `26339739429` falhou no deploy remoto porque o MySQL recusou a foreign key automatica `recommendation_learning_events_recommendation_feedback_id_foreign` por exceder 64 caracteres.
 - Commit `5d5b5dc` tornou a migration idempotente para recuperar a tentativa parcial e usou nomes curtos para foreign key/indices.
 - Run `26339824157` finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 37 Pacote comercial e piloto assistido
+
+- `GET /api/v1/go-live/readiness` passou a incluir checks de Pagar.me, transacao real, cron, performance do widget, acessibilidade/mobile e pacote de piloto.
+- `/app/go-live` passou a exibir links comerciais, onboarding, comandos de automacao e pendencias reais.
+- Criado `docs/commercial_pilot_package.md`.
+- `scripts/validate-production.ps1` passou a validar `/checkout`, widget JS/CSS, perfil consentido, esquecimento de perfil, sinal de aprendizado e pacote de piloto.
+- Validacoes locais: `vendor/bin/pint --dirty`, `php artisan test`, `npm run build` e `php artisan test --filter=GoLiveReadinessApiTest`.
+- Run `26340033238` finalizou com sucesso e o validador ampliado retornou `PRODUCTION VALIDATION OK`.

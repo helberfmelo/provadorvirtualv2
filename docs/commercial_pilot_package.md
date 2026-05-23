@@ -17,6 +17,8 @@ Implementado em `/app/go-live` via `GET /api/v1/go-live/readiness`:
 - pendencias reais que ainda dependem de credenciais ou loja piloto;
 - checks de Pagar.me, cron, performance do widget, acessibilidade/mobile e BigShop.
 
+Publicado e validado em producao no run `26340033238`.
+
 ## Materiais comerciais
 
 - Site publico: `https://provadorvirtual.online/`
