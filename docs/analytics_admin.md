@@ -73,9 +73,10 @@ Eventos iniciais:
 - `measurement_table.deleted`;
 - `widget_install.updated`;
 - `integration.updated`.
+- `auth.login`;
+- `auth.logout`.
 
 ## Pendencias
 
 - Criar usuario admin real em producao quando for operar suporte.
-- Expandir auditoria para login/logout quando a Sprint 11 endurecer seguranca.
 - Adicionar filtros por periodo quando houver maior volume.

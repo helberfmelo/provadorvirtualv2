@@ -62,4 +62,9 @@ Atualizado em: 2026-05-23
 - `DONE` Smoke publico com frontend e API JSON.
 - `DONE` Backup/rollback automatizado pelo workflow.
 - `DONE` Registro de incidentes em `docs/execution_log.md`.
+- `DONE` Paginas publicas de privacidade e termos.
+- `DONE` CORS dinamico por dominio do widget.
+- `DONE` Rate limit nas rotas publicas criticas.
+- `DONE` Status operacional publico.
+- `DONE` Comandos de anonimizacao e limpeza de logs.
 - `TODO` Checklist de go-live.

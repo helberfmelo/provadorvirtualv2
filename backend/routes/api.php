@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\ImportController;
 use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\MeasurementTableController;
 use App\Http\Controllers\Api\V1\MeasurementTemplateController;
+use App\Http\Controllers\Api\V1\OperationalStatusController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
 use App\Http\Controllers\Api\V1\RecommendationController;
@@ -26,13 +27,21 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
     Route::get('/health', HealthController::class);
+    Route::get('/ops/status', OperationalStatusController::class)->middleware('throttle:60,1');
     Route::get('/demo/product-test', [DemoProductController::class, 'show']);
-    Route::post('/public/recommendations/config-check', [RecommendationController::class, 'configCheck']);
-    Route::post('/public/recommendations', [RecommendationController::class, 'store']);
-    Route::post('/public/recommendations/{recommendationLog}/feedback', [RecommendationController::class, 'feedback']);
-    Route::post('/public/bigshop/activate', BigShopActivationController::class);
+    Route::options('/public/recommendations/{path?}', fn () => response()->noContent())
+        ->where('path', '.*')
+        ->middleware('widget.origin');
+    Route::post('/public/recommendations/config-check', [RecommendationController::class, 'configCheck'])
+        ->middleware(['widget.origin', 'throttle:60,1']);
+    Route::post('/public/recommendations', [RecommendationController::class, 'store'])
+        ->middleware(['widget.origin', 'throttle:60,1']);
+    Route::post('/public/recommendations/{recommendationLog}/feedback', [RecommendationController::class, 'feedback'])
+        ->middleware(['widget.origin', 'throttle:120,1']);
+    Route::post('/public/bigshop/activate', BigShopActivationController::class)
+        ->middleware('throttle:20,1');
 
-    Route::post('/auth/login', [AuthController::class, 'login']);
+    Route::post('/auth/login', [AuthController::class, 'login'])->middleware('throttle:10,1');
 
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);

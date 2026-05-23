@@ -30,9 +30,10 @@ P3:
 1. Identificar URL/ambiente.
 2. Verificar GitHub Actions.
 3. Testar `/up`, `/api/v1/health`, `/produto-teste`.
-4. Consultar logs Laravel.
-5. Confirmar se houve deploy recente.
-6. Registrar em `docs/execution_log.md`.
+4. Testar `/api/v1/ops/status`.
+5. Consultar logs Laravel.
+6. Confirmar se houve deploy recente.
+7. Registrar em `docs/execution_log.md`.
 
 ## Widget nao aparece
 
@@ -55,6 +56,14 @@ Verificar:
 - logs de scoring;
 - status do lojista;
 - rate limit.
+
+## Suspeita de dado pessoal antigo
+
+1. Rodar `php artisan pv:privacy-anonymize --dry-run`.
+2. Validar contagens retornadas.
+3. Rodar `php artisan pv:privacy-anonymize`.
+4. Para logs operacionais antigos, rodar `php artisan pv:privacy-prune --dry-run` e depois sem `--dry-run`.
+5. Registrar a acao em `docs/execution_log.md`.
 
 ## Deploy falhou
 

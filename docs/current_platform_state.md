@@ -17,6 +17,7 @@ Atualizado em: 2026-05-23
 - Sprint 8 criou ativacao BigShop um clique por endpoint publico assinado com HMAC.
 - Sprint 9 criou assistente de tabelas com parser local, logs de uso de IA e revisao obrigatoria.
 - Sprint 10 criou analytics do lojista, SaaS admin basico e trilha `audit_logs`.
+- Sprint 11 criou paginas legais, CORS por dominio do widget, rate limits, status operacional e rotinas de privacidade.
 
 ## Referencias confirmadas
 
@@ -98,6 +99,7 @@ Atualizado em: 2026-05-23
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`.
 - Analytics/auditoria protegidos: `/api/v1/analytics/*`, `/api/v1/audit-logs` e `/api/v1/saas/*`.
+- Observabilidade publica: `/api/v1/ops/status`.
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
 - BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
 - APIs publicas: health, produto demo e recomendacoes do widget.
@@ -105,4 +107,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 11: Hardening, LGPD e Observabilidade.
+Concluir validacao/deploy da Sprint 11 e iniciar a Sprint 12: Go-live Assistido.

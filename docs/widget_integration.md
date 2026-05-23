@@ -49,6 +49,8 @@ Status Sprint 4: implementado em `/widget/v1/provador-virtual.js` com CSS escopa
 
 Status Sprint 5: o painel `/app/widget` gera o snippet a partir de `/api/v1/widget-install`, com tema, dominios liberados e produto de exemplo.
 
+Status Sprint 11: as rotas publicas de recomendacao validam `Origin` contra `allowed_domains` da instalacao ativa. Requisicoes sem `Origin` continuam liberadas para smokes e chamadas server-to-server; dominios nao cadastrados recebem `403`.
+
 ## Contrato publico atual
 
 Endpoints usados pelo widget:
@@ -58,6 +60,8 @@ Endpoints usados pelo widget:
 - `POST /api/v1/public/recommendations/{id}/feedback`
 
 O widget resolve a base da API a partir do proprio `src`. Em producao, chamadas para `/provadorvirtual_v2/api/...` passam por redirect 307 para a entrada Laravel funcional em `/provadorvirtual_v2/public/api/...`.
+
+Em navegadores, o CORS permitido e calculado por lojista a partir do dominio da pagina de origem. O painel deve manter `allowed_domains` atualizado antes de instalar o widget em producao.
 
 ## Guias por plataforma
 

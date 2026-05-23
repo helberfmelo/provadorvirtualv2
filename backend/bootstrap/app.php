@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureWidgetOriginAllowed;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -14,6 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->alias([
+            'widget.origin' => EnsureWidgetOriginAllowed::class,
+        ]);
+
         $middleware->redirectGuestsTo(function (Request $request): ?string {
             if ($request->is('api/*') || str_contains($request->path(), '/api/')) {
                 return null;

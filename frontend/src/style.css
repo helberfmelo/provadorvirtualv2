@@ -205,6 +205,26 @@ a {
   padding: 16px 0 56px;
 }
 
+.legal-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.legal-strip a {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 38px;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  background: #fff;
+  font-weight: 800;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -236,8 +256,46 @@ a {
 }
 
 .auth-page,
-.dashboard {
+.dashboard,
+.legal-page {
   padding: 58px 0;
+}
+
+.legal-page {
+  width: min(1060px, calc(100% - 36px));
+  margin: 0 auto;
+}
+
+.legal-page h1 {
+  margin: 8px 0 14px;
+  color: #0f172a;
+  font-size: clamp(2rem, 4vw, 3.2rem);
+}
+
+.legal-page p {
+  color: #4b5563;
+  line-height: 1.7;
+}
+
+.legal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.legal-grid article {
+  min-height: 156px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.legal-grid h2 {
+  margin: 0 0 10px;
+  color: #0f172a;
+  font-size: 1.12rem;
 }
 
 .auth-panel {
@@ -938,7 +996,8 @@ td small {
   .integrations-grid,
   .import-grid,
   .analytics-grid,
-  .color-grid {
+  .color-grid,
+  .legal-grid {
     grid-template-columns: 1fr;
   }
 

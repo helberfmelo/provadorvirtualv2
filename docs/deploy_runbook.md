@@ -89,6 +89,12 @@ Pagamentos:
 
 - `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY`, `PAGARME_WEBHOOK_SECRET`; ou credenciais Mercado Pago, se essa escolha for retomada.
 
+Hardening:
+
+- `PRIVACY_WIDGET_DATA_RETENTION_DAYS=30`;
+- `OPERATIONAL_LOG_RETENTION_DAYS=180`;
+- `CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173` para desenvolvimento local. Em producao, o widget usa validacao dinamica por dominio.
+
 ## Workflow criado
 
 Arquivo:
@@ -143,6 +149,10 @@ MAIL_PASSWORD=<senha>
 MAIL_ENCRYPTION=tls
 MAIL_FROM_ADDRESS=noreply@provadorvirtual.online
 MAIL_FROM_NAME="Provador Virtual"
+
+PRIVACY_WIDGET_DATA_RETENTION_DAYS=30
+OPERATIONAL_LOG_RETENTION_DAYS=180
+CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
 ```
 
 ## Primeira publicacao
@@ -155,6 +165,7 @@ MAIL_FROM_NAME="Provador Virtual"
    - `/provadorvirtual_v2/login`;
    - `/provadorvirtual_v2/produto-teste`;
    - `/provadorvirtual_v2/api/v1/health` com `curl -L`;
+   - `/provadorvirtual_v2/api/v1/ops/status` com `curl -L`;
    - `/provadorvirtual_v2/up`.
 
 ## Rollback

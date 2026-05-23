@@ -85,6 +85,7 @@ npm run dev
 - `/api/v1/audit-logs`
 - `/api/v1/saas/overview`
 - `/api/v1/saas/merchants`
+- `/api/v1/ops/status`
 - `/api/v1/public/recommendations/config-check`
 - `/api/v1/public/recommendations`
 - `/api/v1/public/recommendations/{id}/feedback`
@@ -117,6 +118,10 @@ MAIL_MAILER=log
 
 AI_PROVIDER=local
 AI_MODEL=local-table-parser-v1
+
+PRIVACY_WIDGET_DATA_RETENTION_DAYS=30
+OPERATIONAL_LOG_RETENTION_DAYS=180
+CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
 ```
 
 ## Validacoes locais esperadas
@@ -163,3 +168,5 @@ Status Sprint 8: ativacao BigShop um clique disponivel por endpoint assinado; se
 Status Sprint 9: painel demo possui `/app/assistente`; texto/CSV gera sugestao de tabela em rascunho e `ai_usage_logs` registra uso sem conteudo bruto.
 
 Status Sprint 10: painel demo possui `/app/analytics`; `/saas` exige usuario com papel `admin` ou `support`.
+
+Status Sprint 11: paginas `/privacidade` e `/termos` disponiveis; rotas publicas do widget validam origem por dominio; comandos `pv:privacy-anonymize` e `pv:privacy-prune` disponiveis.

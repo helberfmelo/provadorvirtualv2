@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Services\Audit\AuditLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
@@ -26,6 +27,11 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('provadorvirtual-spa')->plainTextToken;
+        $merchant = $user->merchants()->first();
+
+        app(AuditLogger::class)->log($request, $merchant, 'auth.login', 'auth', 'info', [
+            'email' => $user->email,
+        ], actor: $user);
 
         return response()->json([
             'token' => $token,
@@ -40,6 +46,10 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $merchant = $request->user()?->merchants()->first();
+
+        app(AuditLogger::class)->log($request, $merchant, 'auth.logout', 'auth', 'info');
+
         $request->user()?->currentAccessToken()?->delete();
 
         return response()->json([

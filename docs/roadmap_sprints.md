@@ -181,6 +181,8 @@ Entregas:
 - incident runbook;
 - smoke e rollback testados.
 
+Status: implementado localmente em 2026-05-23; aguardando deploy/validacao final da sprint.
+
 ## Sprint 12 - Go-live Assistido
 
 Objetivo: publicar v2 com seguranca e decidir cutover.

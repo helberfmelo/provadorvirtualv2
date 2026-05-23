@@ -45,5 +45,16 @@ const widgetPreviewUrl = `${import.meta.env.BASE_URL}images/widget-preview.jpg`
         <span>Logs e feedback preparados para melhorar recomendacao e conversao.</span>
       </article>
     </div>
+
+    <div class="legal-strip">
+      <RouterLink to="/privacidade">
+        <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+        Privacidade
+      </RouterLink>
+      <RouterLink to="/termos">
+        <i class="fa-solid fa-file-contract" aria-hidden="true"></i>
+        Termos
+      </RouterLink>
+    </div>
   </section>
 </template>

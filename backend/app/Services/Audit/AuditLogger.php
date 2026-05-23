@@ -4,8 +4,10 @@ namespace App\Services\Audit;
 
 use App\Models\AuditLog;
 use App\Models\Merchant;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class AuditLogger
 {
@@ -17,10 +19,11 @@ class AuditLogger
         string $severity = 'info',
         array $metadata = [],
         ?Model $auditable = null,
+        ?User $actor = null,
     ): AuditLog {
         return AuditLog::query()->create([
             'merchant_id' => $merchant?->id,
-            'user_id' => $request->user()?->id,
+            'user_id' => $actor?->id ?? $request->user()?->id,
             'event' => $event,
             'category' => $category,
             'severity' => $severity,
@@ -34,9 +37,30 @@ class AuditLogger
 
     private function sanitize(array $metadata): array
     {
-        return collect($metadata)
-            ->reject(fn ($value, string $key): bool => str_contains($key, 'token') || str_contains($key, 'secret') || str_contains($key, 'password'))
-            ->all();
+        return collect($metadata)->mapWithKeys(function ($value, string $key): array {
+            return [$key => $this->sanitizeValue($key, $value)];
+        })->all();
+    }
+
+    private function sanitizeValue(string $key, mixed $value): mixed
+    {
+        if ($this->isSensitiveKey($key)) {
+            return '[masked]';
+        }
+
+        if (is_array($value)) {
+            return $this->sanitize($value);
+        }
+
+        return $value;
+    }
+
+    private function isSensitiveKey(string $key): bool
+    {
+        $normalized = Str::lower($key);
+
+        return collect(['token', 'secret', 'password', 'authorization', 'api_key', 'x-api'])
+            ->contains(fn (string $needle): bool => str_contains($normalized, $needle));
     }
 
     private function hashValue(?string $value): ?string

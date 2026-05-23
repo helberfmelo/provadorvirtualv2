@@ -149,6 +149,18 @@
 - Run `26332544138` do GitHub Actions finalizou com sucesso para o commit `4f93032`.
 - Validado em producao: `/app/analytics`, `/saas`, `GET /public/api/v1/analytics/recommendations` e `GET /public/api/v1/saas/overview` retornando `403` para lojista comum.
 
+## 2026-05-23 - Sprint 11 Hardening, LGPD e Observabilidade
+
+- Criadas paginas publicas `/privacidade` e `/termos`.
+- Criado endpoint publico `GET /api/v1/ops/status`.
+- Adicionados rate limits em login, recomendacoes publicas, feedback, ativacao BigShop e status operacional.
+- Criado middleware de origem do widget, validando `Origin` contra `widget_installs.allowed_domains`.
+- Configuracao CORS global passou a atender apenas origens locais de desenvolvimento; o widget usa validacao dinamica por dominio.
+- `AuditLogger` passou a mascarar metadata sensivel de forma recursiva e auth passou a registrar login/logout.
+- Criados comandos `pv:privacy-anonymize` e `pv:privacy-prune`.
+- Criado documento `docs/hardening_lgpd_observability.md`.
+- Validacoes locais: `php artisan test --filter=HardeningApiTest`, `vendor/bin/pint`, `php artisan test`, `npm run build` e `git diff --check`.
+
 ## Pendencias abertas
 
 - Repositorio esta publico para manter a cota do GitHub Actions disponivel.

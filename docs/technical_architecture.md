@@ -66,6 +66,7 @@ APIs protegidas ja implementadas:
 - `GET /api/v1/audit-logs`
 - `GET /api/v1/saas/overview`
 - `GET /api/v1/saas/merchants`
+- `GET /api/v1/ops/status`
 
 ## Frontend
 
@@ -201,9 +202,17 @@ Producao inicial:
 ## Observabilidade
 
 - `GET /api/v1/health`;
+- `GET /api/v1/ops/status`;
 - `GET /up` do Laravel;
 - logs Laravel;
 - tabela `integration_events`;
 - tabela `recommendation_logs`;
 - tabela `ai_usage_logs`;
 - tabela `audit_logs` para acoes sensiveis.
+
+## Hardening Sprint 11
+
+- CORS global restrito a origens locais de desenvolvimento via `CORS_ALLOWED_ORIGINS`.
+- Rotas publicas do widget usam middleware proprio para validar `Origin` contra dominios ativos do lojista.
+- Rate limit inicial aplicado em login, recomendacao publica, feedback, ativacao BigShop e status operacional.
+- Comandos `pv:privacy-anonymize` e `pv:privacy-prune` fazem retencao operacional sem apagar analytics de recomendacao.

@@ -71,3 +71,5 @@ Auditar:
 - falhas de webhook.
 
 Status Sprint 10: `audit_logs` registra acoes em tabelas de medidas, widget e integracoes com hash de IP/user-agent e metadata sem secrets.
+
+Status Sprint 11: `audit_logs` tambem registra login/logout; metadata sensivel e mascarada recursivamente. Widget publico valida `Origin` por dominio configurado, rotas publicas tem rate limit e existem comandos de anonimizacao/limpeza para retencao LGPD.
