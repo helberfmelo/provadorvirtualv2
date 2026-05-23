@@ -18,7 +18,8 @@ class MeasurementTablesApiTest extends TestCase
         $this->withHeaders($headers)
             ->getJson('/api/v1/measurement-templates')
             ->assertOk()
-            ->assertJsonPath('data.0.key', 'female_dress_regular');
+            ->assertJsonPath('data.0.source', 'standard_catalog')
+            ->assertJsonPath('meta.source', 'v1_standard_models');
 
         $tableId = $this->withHeaders($headers)
             ->postJson('/api/v1/measurement-tables', [

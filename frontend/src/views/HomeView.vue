@@ -19,8 +19,8 @@ const currentYear = new Date().getFullYear()
       </span>
       <h1>Transforme a experiencia de compra na sua loja de moda</h1>
       <p>
-        Com o Provador Virtual, seus clientes descobrem o tamanho ideal de cada roupa em poucos passos.
-        Menos trocas, mais confianca na compra e uma integracao simples com sua plataforma.
+        Com o Provador Virtual, seus clientes descobrem o tamanho ideal em poucos passos. A IA usa tabelas da loja,
+        base brasileira de medidas, perfil corporal e historico autorizado para reduzir duvida, troca e abandono.
       </p>
       <div class="hero-actions">
         <RouterLink to="/produto-teste" class="btn btn-primary">
@@ -75,24 +75,24 @@ const currentYear = new Date().getFullYear()
         </span>
         <h2>IA e regras de medidas trabalhando sem complicar a compra</h2>
         <p>
-          O fluxo combina tabela da loja, perfil corporal, medidas opcionais e historico autorizado do comprador
-          para entregar uma recomendacao cada vez mais precisa.
+          O lojista parte de modelos prontos do mercado brasileiro, pode extrair tabela por texto, CSV ou imagem e
+          revisa tudo antes de publicar. Na loja, o motor combina esses dados com sinais reais de uso para evoluir com seguranca.
         </p>
         <div class="landing-steps">
           <article>
             <span>1</span>
             <strong>Medidas e preferencias</strong>
-            <small>O cliente informa o basico e refina apenas se quiser mais precisao.</small>
+            <small>O cliente informa o basico, refina se quiser e pode reaproveitar dados salvos com consentimento.</small>
           </article>
           <article>
             <span>2</span>
-            <strong>Analise inteligente</strong>
-            <small>O motor cruza medidas, tabela, categoria, modelagem e aprendizado seguro.</small>
+            <strong>IA + base brasileira</strong>
+            <small>O motor cruza categoria, modelagem, altura, peso, idade, medidas e outliers bloqueados.</small>
           </article>
           <article>
             <span>3</span>
             <strong>Tamanho recomendado</strong>
-            <small>A loja mostra a indicacao e tambem a tabela de medidas do produto.</small>
+            <small>A loja mostra a indicacao, a tabela de medidas do produto e aprende com feedbacks confiaveis.</small>
           </article>
         </div>
       </div>
@@ -144,8 +144,8 @@ const currentYear = new Date().getFullYear()
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-table-list" aria-hidden="true"></i>
-        <strong>Tabela de medidas</strong>
-        <span>Botao dedicado para o comprador consultar a tabela como nas melhores lojas do mercado.</span>
+        <strong>Tabelas com IA</strong>
+        <span>Modelos prontos por categoria, sugestao por texto/CSV/imagem e revisao humana antes de publicar.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-plug" aria-hidden="true"></i>
@@ -159,8 +159,8 @@ const currentYear = new Date().getFullYear()
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
-        <strong>Analytics</strong>
-        <span>Dados de uso, recomendacoes, produtos sem tabela e oportunidades de melhoria.</span>
+        <strong>Aprendizado seguro</strong>
+        <span>Dados de uso, recomendacoes, produtos sem tabela e descarte de sinais fora da media.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>

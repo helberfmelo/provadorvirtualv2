@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Services\Measurement\StandardMeasurementCatalog;
 
 class MeasurementTemplateController extends Controller
 {
-    public function index()
+    public function index(StandardMeasurementCatalog $catalog)
     {
+        $templates = $catalog->templates();
+
         return response()->json([
-            'data' => [
+            'data' => $templates ?: [
                 [
                     'key' => 'female_dress_regular',
                     'name' => 'Vestido feminino regular',
@@ -38,6 +41,7 @@ class MeasurementTemplateController extends Controller
                     ],
                 ],
             ],
+            'meta' => $catalog->metadata(),
         ]);
     }
 }

@@ -527,3 +527,32 @@ Entregas:
 - nova validacao visual dos formularios em producao.
 
 Status: implementado, publicado e validado em producao no run `26343135605`.
+
+### Sprint 43 - Cerebro inteligente do v1 no v2
+
+Objetivo: transformar a base padrao do v1 no catalogo inteligente inicial do Provador Virtual v2.
+
+Entregas previstas:
+
+- importar `default_measurement_tables_data.json` do v1 para `backend/database/data`;
+- normalizar genero, tipo de produto, altura, peso, idade e campos de medidas para templates do v2;
+- trocar os templates fixos por modelos inteligentes consultados pela API `/measurement-templates`;
+- melhorar a tela de nova tabela com seletor de modelo inteligente filtrado por produto/genero;
+- reforcar no site publico e no portal da empresa que a IA acelera tabelas, usa base brasileira e exige revisao humana;
+- limpar a documentacao local de URLs para manter somente login master SaaS e login do portal da empresa.
+
+Status: em execucao.
+
+### Sprint 44 - CRUD SaaS de usuarios das empresas
+
+Objetivo: separar usuarios internos do SaaS dos usuarios das empresas clientes.
+
+Entregas previstas:
+
+- criar APIs SaaS especificas para listar, criar, editar e ativar/desativar usuarios de empresas clientes;
+- incluir selecao de empresa por codigo/nome/CNPJ e vinculo correto com lojista;
+- criar listagem em tela cheia e formularios dedicados em `/saas/usuarios-empresas`;
+- manter permissoes por modulo do portal da empresa com regra editar seleciona visualizar;
+- atualizar menu, permissao e documentacao para nao misturar usuarios SaaS com usuarios de clientes.
+
+Status: planejado.

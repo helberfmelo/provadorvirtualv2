@@ -53,6 +53,23 @@ const form = reactive({
   image_data: '',
 })
 
+const productTypeOptions = [
+  { value: 'shirt', label: 'Camisa/Camiseta' },
+  { value: 'blouse', label: 'Blusa' },
+  { value: 'dress', label: 'Vestido' },
+  { value: 'pants', label: 'Calca' },
+  { value: 'skirt', label: 'Saia' },
+  { value: 'shorts', label: 'Bermuda/Shorts' },
+  { value: 'jacket', label: 'Jaqueta' },
+  { value: 'sweatshirt', label: 'Moletom' },
+  { value: 'bra', label: 'Sutia' },
+  { value: 'kids_shirt', label: 'Camiseta infantil' },
+  { value: 'kids_pants', label: 'Calca infantil' },
+  { value: 'baby_body', label: 'Body bebe' },
+  { value: 'shoes', label: 'Calcado' },
+  { value: 'custom', label: 'Personalizado' },
+]
+
 const canSave = computed(() => Boolean(suggestion.value?.rows.length))
 
 onMounted(() => {
@@ -189,6 +206,9 @@ function readAsDataUrl(file: File): Promise<string> {
       <div>
         <span class="eyebrow">Assistente</span>
         <h1>Tabelas por imagem ou texto</h1>
+        <p>
+          A IA acelera a leitura de tabelas e o lojista compara a sugestao com a base inteligente de medidas do mercado brasileiro.
+        </p>
       </div>
       <button class="btn btn-secondary" type="button" @click="applySample">
         <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
@@ -203,6 +223,10 @@ function readAsDataUrl(file: File): Promise<string> {
       <span class="status-pill ok">
         <i class="fa-solid fa-font" aria-hidden="true"></i>
         Texto ativo
+      </span>
+      <span class="status-pill ok">
+        <i class="fa-solid fa-database" aria-hidden="true"></i>
+        Base brasileira ativa
       </span>
       <span class="status-pill" :class="{ ok: status.image_ocr }">
         <i class="fa-solid fa-image" aria-hidden="true"></i>
@@ -228,10 +252,9 @@ function readAsDataUrl(file: File): Promise<string> {
           <label>
             Tipo
             <select v-model="form.product_type">
-              <option value="shirt">Camisa</option>
-              <option value="dress">Vestido</option>
-              <option value="pants">Calca</option>
-              <option value="skirt">Saia</option>
+              <option v-for="option in productTypeOptions" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </option>
             </select>
           </label>
           <label>
@@ -329,6 +352,8 @@ function readAsDataUrl(file: File): Promise<string> {
                   <th>Quadril</th>
                   <th>Altura</th>
                   <th>Peso</th>
+                  <th>Comp.</th>
+                  <th>Ombro</th>
                   <th></th>
                 </tr>
               </thead>
@@ -354,6 +379,14 @@ function readAsDataUrl(file: File): Promise<string> {
                   <td class="range-cell">
                     <input v-model.number="row.weight_min" class="table-input mini" type="number" min="0" />
                     <input v-model.number="row.weight_max" class="table-input mini" type="number" min="0" />
+                  </td>
+                  <td class="range-cell">
+                    <input v-model.number="row.length_min" class="table-input mini" type="number" min="0" />
+                    <input v-model.number="row.length_max" class="table-input mini" type="number" min="0" />
+                  </td>
+                  <td class="range-cell">
+                    <input v-model.number="row.shoulder_min" class="table-input mini" type="number" min="0" />
+                    <input v-model.number="row.shoulder_max" class="table-input mini" type="number" min="0" />
                   </td>
                   <td class="row-actions">
                     <button type="button" title="Remover linha" @click="removeRow(index)">

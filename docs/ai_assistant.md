@@ -21,6 +21,16 @@ Implementado:
 
 Sem chave de IA, OCR real de imagem fica pendente e a API retorna `needs_provider` quando recebe somente imagem.
 
+## Status Sprint 43
+
+Implementado:
+
+- catalogo inteligente importado do v1 em `backend/database/data/default_measurement_tables_data.json`;
+- servico `StandardMeasurementCatalog` normalizando modelos de genero, tipo, altura, peso, idade, formato corporal e campos de medidas;
+- `/api/v1/measurement-templates` entrega a base brasileira para a tela de tabelas;
+- tela `/app/tabelas-de-medidas/nova` permite iniciar por modelo inteligente e depois revisar manualmente;
+- site publico e assistente comunicam IA como ferramenta de automacao, qualidade e aprendizado seguro.
+
 ## Variaveis
 
 ```env

@@ -45,6 +45,8 @@ Quando for ativar em producao, cadastrar `GEMINI_API_KEY` no GitHub Actions/ambi
 
 Cada modelo inclui campos de medida, tamanhos, altura/peso/idade recomendados e compatibilidade com formato corporal. O v2 deve importar esse conceito para uma base canonica, com normalizacao de nomes e unidades.
 
+Status no v2: o arquivo foi versionado em `backend/database/data/default_measurement_tables_data.json` e normalizado por `App\Services\Measurement\StandardMeasurementCatalog`. A API `/api/v1/measurement-templates` agora entrega os modelos do v1 como templates inteligentes para a tela de criacao/edicao de tabelas.
+
 ### Modelo padrao com fallback de IA
 
 `ajax_get_default_table.php` primeiro tenta buscar `standard_models` por genero/tipo de peca. Se nao encontra, chama Gemini para gerar um modelo. O v2 deve manter essa ordem:
@@ -138,7 +140,7 @@ As tabelas atuais do v2 ja aceitam `metadata`, mas o schema e as telas ainda pre
 ## Pendencias
 
 - Ativar provider Gemini no backend do v2 usando a chave ja copiada localmente.
-- Importar e normalizar o catalogo `default_measurement_tables_data.json`.
+- Evoluir o catalogo importado para salvar campos extras como idade, formato corporal, manga, entrepernas e pe em `metadata`.
 - Definir imagens/ilustracoes proprias para formatos corporais do widget.
 - Decidir se o v2 tambem tera OpenAI como provider alternativo para OCR e geracao.
 - Cadastrar `GEMINI_API_KEY` em producao quando for liberar OCR real.

@@ -339,3 +339,13 @@
 - Cadastro interno de empresa agora inicia com BigShop como plataforma padrao.
 - `Novo produto` deixou de abrir com categoria e tabela incompatibilizadas por padrao.
 - Run `26343135605` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 43 Cerebro inteligente do v1 no v2
+
+- Reestudados `table_new.php`, `ajax_get_default_table.php`, `ajax_get_gender_and_types.php`, `ajax_ocr_table.php`, `includes/gemini-ai.php` e `default_measurement_tables_data.json` do v1.
+- Confirmado que o v1 buscava primeiro modelos em `standard_models`, com medidas por genero/produto/altura/peso/idade/formato corporal, antes de sugerir via Gemini.
+- Importado o JSON padrao do v1 para `backend/database/data/default_measurement_tables_data.json`.
+- Criado `StandardMeasurementCatalog` para normalizar os modelos em templates do v2 consumidos por `/api/v1/measurement-templates`.
+- Tela de nova/editar tabela passou a ter seletor de modelo inteligente filtrado por produto/genero.
+- Site publico e assistente IA passaram a destacar base brasileira, IA assistiva, revisao humana e aprendizado seguro.
+- `docs/credentials.local.md` foi limpo localmente para exibir somente as duas URLs de login pedidas.

@@ -1,0 +1,1332 @@
+{
+  "produtos": [
+  {
+  "genero": "Masculino",
+  "tipo_produto": "Camiseta",
+  "nome_referencia": "Camiseta Masculina Padrão",
+  "campos_medida": [
+  "peito_torax_cm",
+  "cintura_masculina_cm",
+  "comprimento_frente_cm",
+  "manga_curta_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "P",
+  "medidas": {
+  "peito_torax_cm": { "min": 88, "max": 92 },
+  "cintura_masculina_cm": { "min": 72, "max": 76 },
+  "comprimento_frente_cm": { "min": 68, "max": 70 },
+  "manga_curta_cm": { "min": 19, "max": 20 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 170,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "trapezoidal"]
+  },
+  {
+  "nome": "M",
+  "medidas": {
+  "peito_torax_cm": { "min": 92, "max": 98 },
+  "cintura_masculina_cm": { "min": 76, "max": 82 },
+  "comprimento_frente_cm": { "min": 70, "max": 73 },
+  "manga_curta_cm": { "min": 20, "max": 21 }
+  },
+  "altura_recomendada_min_cm": 170,
+  "altura_recomendada_max_cm": 178,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "trapezoidal"]
+  },
+  {
+  "nome": "G",
+  "medidas": {
+  "peito_torax_cm": { "min": 98, "max": 104 },
+  "cintura_masculina_cm": { "min": 82, "max": 88 },
+  "comprimento_frente_cm": { "min": 72, "max": 75 },
+  "manga_curta_cm": { "min": 21, "max": 22 }
+  },
+  "altura_recomendada_min_cm": 178,
+  "altura_recomendada_max_cm": 185,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido", "trapezoidal"]
+  },
+  {
+  "nome": "GG",
+  "medidas": {
+  "peito_torax_cm": { "min": 104, "max": 110 },
+  "cintura_masculina_cm": { "min": 88, "max": 94 },
+  "comprimento_frente_cm": { "min": 74, "max": 77 },
+  "manga_curta_cm": { "min": 22, "max": 23 }
+  },
+  "altura_recomendada_min_cm": 185,
+  "altura_recomendada_max_cm": 192,
+  "peso_recomendado_min_kg": 85,
+  "peso_recomendado_max_kg": 95,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo_invertido", "oval"]
+  }
+  ]
+  },
+  {
+  "genero": "Masculino",
+  "tipo_produto": "Calça Jeans",
+  "nome_referencia": "Calça Jeans Masculina Padrão",
+  "campos_medida": [
+  "cintura_masculina_cm",
+  "quadril_cm",
+  "entrepernas_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "P (38-40)",
+  "medidas": {
+  "cintura_masculina_cm": { "min": 76, "max": 80 },
+  "quadril_cm": { "min": 96, "max": 100 },
+  "entrepernas_cm": { "min": 78, "max": 80 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 170,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "trapezoidal"]
+  },
+  {
+  "nome": "M (42)",
+  "medidas": {
+  "cintura_masculina_cm": { "min": 80, "max": 84 },
+  "quadril_cm": { "min": 100, "max": 104 },
+  "entrepernas_cm": { "min": 80, "max": 82 }
+  },
+  "altura_recomendada_min_cm": 170,
+  "altura_recomendada_max_cm": 178,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "trapezoidal"]
+  },
+  {
+  "nome": "G (44)",
+  "medidas": {
+  "cintura_masculina_cm": { "min": 84, "max": 88 },
+  "quadril_cm": { "min": 104, "max": 108 },
+  "entrepernas_cm": { "min": 82, "max": 84 }
+  },
+  "altura_recomendada_min_cm": 178,
+  "altura_recomendada_max_cm": 185,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido", "trapezoidal"]
+  },
+  {
+  "nome": "GG (46-48)",
+  "medidas": {
+  "cintura_masculina_cm": { "min": 88, "max": 94 },
+  "quadril_cm": { "min": 108, "max": 114 },
+  "entrepernas_cm": { "min": 84, "max": 86 }
+  },
+  "altura_recomendada_min_cm": 185,
+  "altura_recomendada_max_cm": 192,
+  "peso_recomendado_min_kg": 85,
+  "peso_recomendado_max_kg": 95,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo_invertido", "oval"]
+  }
+  ]
+  },
+  {
+  "genero": "Masculino",
+  "tipo_produto": "Camisa Social",
+  "nome_referencia": "Camisa Social Masculina Padrão",
+  "campos_medida": [
+  "pescoco_cm",
+  "peito_torax_cm",
+  "cintura_masculina_cm",
+  "comprimento_manga_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "P (38)",
+  "medidas": {
+  "pescoco_cm": { "min": 38, "max": 39 },
+  "peito_torax_cm": { "min": 94, "max": 98 },
+  "cintura_masculina_cm": { "min": 80, "max": 84 },
+  "comprimento_manga_cm": { "min": 62, "max": 63 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 170,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "trapezoidal"]
+  },
+  {
+  "nome": "M (40)",
+  "medidas": {
+  "pescoco_cm": { "min": 39, "max": 40 },
+  "peito_torax_cm": { "min": 98, "max": 102 },
+  "cintura_masculina_cm": { "min": 84, "max": 88 },
+  "comprimento_manga_cm": { "min": 63, "max": 64 }
+  },
+  "altura_recomendada_min_cm": 170,
+  "altura_recomendada_max_cm": 178,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "trapezoidal"]
+  },
+  {
+  "nome": "G (42)",
+  "medidas": {
+  "pescoco_cm": { "min": 40, "max": 41 },
+  "peito_torax_cm": { "min": 102, "max": 106 },
+  "cintura_masculina_cm": { "min": 88, "max": 92 },
+  "comprimento_manga_cm": { "min": 64, "max": 65 }
+  },
+  "altura_recomendada_min_cm": 178,
+  "altura_recomendada_max_cm": 185,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido", "trapezoidal"]
+  },
+  {
+  "nome": "GG (44)",
+  "medidas": {
+  "pescoco_cm": { "min": 41, "max": 42 },
+  "peito_torax_cm": { "min": 106, "max": 110 },
+  "cintura_masculina_cm": { "min": 92, "max": 96 },
+  "comprimento_manga_cm": { "min": 65, "max": 66 }
+  },
+  "altura_recomendada_min_cm": 185,
+  "altura_recomendada_max_cm": 192,
+  "peso_recomendado_min_kg": 85,
+  "peso_recomendado_max_kg": 95,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo_invertido", "oval"]
+  }
+  ]
+  },
+  {
+  "genero": "Masculino",
+  "tipo_produto": "Bermuda",
+  "nome_referencia": "Bermuda Masculina Padrão",
+  "campos_medida": [
+  "cintura_masculina_cm",
+  "quadril_cm",
+  "comprimento_bermuda_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "P (38-40)",
+  "medidas": {
+  "cintura_masculina_cm": { "min": 72, "max": 78 },
+  "quadril_cm": { "min": 92, "max": 98 },
+  "comprimento_bermuda_cm": { "min": 48, "max": 50 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 170,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "trapezoidal"]
+  },
+  {
+  "nome": "M (42)",
+  "medidas": {
+  "cintura_masculina_cm": { "min": 78, "max": 84 },
+  "quadril_cm": { "min": 98, "max": 104 },
+  "comprimento_bermuda_cm": { "min": 50, "max": 52 }
+  },
+  "altura_recomendada_min_cm": 170,
+  "altura_recomendada_max_cm": 178,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "trapezoidal"]
+  },
+  {
+  "nome": "G (44)",
+  "medidas": {
+  "cintura_masculina_cm": { "min": 84, "max": 90 },
+  "quadril_cm": { "min": 104, "max": 110 },
+  "comprimento_bermuda_cm": { "min": 52, "max": 54 }
+  },
+  "altura_recomendada_min_cm": 178,
+  "altura_recomendada_max_cm": 185,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido", "trapezoidal"]
+  },
+  {
+  "nome": "GG (46-48)",
+  "medidas": {
+  "cintura_masculina_cm": { "min": 90, "max": 96 },
+  "quadril_cm": { "min": 110, "max": 116 },
+  "comprimento_bermuda_cm": { "min": 54, "max": 56 }
+  },
+  "altura_recomendada_min_cm": 185,
+  "altura_recomendada_max_cm": 192,
+  "peso_recomendado_min_kg": 85,
+  "peso_recomendado_max_kg": 95,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo_invertido", "oval"]
+  }
+  ]
+  },
+  {
+  "genero": "Masculino",
+  "tipo_produto": "Jaqueta",
+  "nome_referencia": "Jaqueta Masculina Padrão",
+  "campos_medida": [
+  "peito_torax_cm",
+  "cintura_masculina_cm",
+  "comprimento_jaqueta_cm",
+  "comprimento_manga_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "P",
+  "medidas": {
+  "peito_torax_cm": { "min": 92, "max": 96 },
+  "cintura_masculina_cm": { "min": 78, "max": 82 },
+  "comprimento_jaqueta_cm": { "min": 65, "max": 67 },
+  "comprimento_manga_cm": { "min": 62, "max": 63 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 170,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "trapezoidal"]
+  },
+  {
+  "nome": "M",
+  "medidas": {
+  "peito_torax_cm": { "min": 96, "max": 102 },
+  "cintura_masculina_cm": { "min": 82, "max": 88 },
+  "comprimento_jaqueta_cm": { "min": 67, "max": 69 },
+  "comprimento_manga_cm": { "min": 63, "max": 64 }
+  },
+  "altura_recomendada_min_cm": 170,
+  "altura_recomendada_max_cm": 178,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "trapezoidal"]
+  },
+  {
+  "nome": "G",
+  "medidas": {
+  "peito_torax_cm": { "min": 102, "max": 108 },
+  "cintura_masculina_cm": { "min": 88, "max": 94 },
+  "comprimento_jaqueta_cm": { "min": 69, "max": 71 },
+  "comprimento_manga_cm": { "min": 64, "max": 65 }
+  },
+  "altura_recomendada_min_cm": 178,
+  "altura_recomendada_max_cm": 185,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido", "trapezoidal"]
+  },
+  {
+  "nome": "GG",
+  "medidas": {
+  "peito_torax_cm": { "min": 108, "max": 114 },
+  "cintura_masculina_cm": { "min": 94, "max": 100 },
+  "comprimento_jaqueta_cm": { "min": 71, "max": 73 },
+  "comprimento_manga_cm": { "min": 65, "max": 66 }
+  },
+  "altura_recomendada_min_cm": 185,
+  "altura_recomendada_max_cm": 192,
+  "peso_recomendado_min_kg": 85,
+  "peso_recomendado_max_kg": 95,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo_invertido", "oval"]
+  }
+  ]
+  },
+  {
+  "genero": "Feminino",
+  "tipo_produto": "Camiseta/Blusa",
+  "nome_referencia": "Camiseta Blusa Feminina Padrão",
+  "campos_medida": [
+  "busto_cm",
+  "cintura_feminina_cm",
+  "quadril_cm",
+  "comprimento_frente_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "PP",
+  "medidas": {
+  "busto_cm": { "min": 80, "max": 84 },
+  "cintura_feminina_cm": { "min": 64, "max": 68 },
+  "quadril_cm": { "min": 88, "max": 92 },
+  "comprimento_frente_cm": { "min": 58, "max": 60 }
+  },
+  "altura_recomendada_min_cm": 150,
+  "altura_recomendada_max_cm": 160,
+  "peso_recomendado_min_kg": 45,
+  "peso_recomendado_max_kg": 55,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta"]
+  },
+  {
+  "nome": "P",
+  "medidas": {
+  "busto_cm": { "min": 84, "max": 90 },
+  "cintura_feminina_cm": { "min": 68, "max": 74 },
+  "quadril_cm": { "min": 92, "max": 98 },
+  "comprimento_frente_cm": { "min": 60, "max": 62 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 168,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta", "oval"]
+  },
+  {
+  "nome": "M",
+  "medidas": {
+  "busto_cm": { "min": 90, "max": 96 },
+  "cintura_feminina_cm": { "min": 74, "max": 80 },
+  "quadril_cm": { "min": 98, "max": 104 },
+  "comprimento_frente_cm": { "min": 62, "max": 64 }
+  },
+  "altura_recomendada_min_cm": 168,
+  "altura_recomendada_max_cm": 175,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "oval"]
+  },
+  {
+  "nome": "G",
+  "medidas": {
+  "busto_cm": { "min": 96, "max": 102 },
+  "cintura_feminina_cm": { "min": 80, "max": 86 },
+  "quadril_cm": { "min": 104, "max": 110 },
+  "comprimento_frente_cm": { "min": 64, "max": 66 }
+  },
+  "altura_recomendada_min_cm": 175,
+  "altura_recomendada_max_cm": 182,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido"]
+  },
+  {
+  "nome": "GG",
+  "medidas": {
+  "busto_cm": { "min": 102, "max": 108 },
+  "cintura_feminina_cm": { "min": 86, "max": 92 },
+  "quadril_cm": { "min": 110, "max": 116 },
+  "comprimento_frente_cm": { "min": 66, "max": 68 }
+  },
+  "altura_recomendada_min_cm": 182,
+  "altura_recomendada_max_cm": 190,
+  "peso_recomendado_min_kg": 85,
+  "peso_recomendado_max_kg": 95,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido"]
+  }
+  ]
+  },
+  {
+  "genero": "Feminino",
+  "tipo_produto": "Calça Jeans",
+  "nome_referencia": "Calça Jeans Feminina Padrão",
+  "campos_medida": [
+  "cintura_feminina_cm",
+  "quadril_cm",
+  "entrepernas_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "P (36-38)",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 68, "max": 72 },
+  "quadril_cm": { "min": 92, "max": 96 },
+  "entrepernas_cm": { "min": 76, "max": 78 }
+  },
+  "altura_recomendada_min_cm": 150,
+  "altura_recomendada_max_cm": 160,
+  "peso_recomendado_min_kg": 45,
+  "peso_recomendado_max_kg": 55,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta"]
+  },
+  {
+  "nome": "M (40)",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 72, "max": 76 },
+  "quadril_cm": { "min": 96, "max": 100 },
+  "entrepernas_cm": { "min": 78, "max": 80 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 168,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta", "oval"]
+  },
+  {
+  "nome": "G (42)",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 76, "max": 80 },
+  "quadril_cm": { "min": 100, "max": 104 },
+  "entrepernas_cm": { "min": 80, "max": 82 }
+  },
+  "altura_recomendada_min_cm": 168,
+  "altura_recomendada_max_cm": 175,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "oval"]
+  },
+  {
+  "nome": "GG (44)",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 80, "max": 84 },
+  "quadril_cm": { "min": 104, "max": 108 },
+  "entrepernas_cm": { "min": 82, "max": 84 }
+  },
+  "altura_recomendada_min_cm": 175,
+  "altura_recomendada_max_cm": 182,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido"]
+  }
+  ]
+  },
+  {
+  "genero": "Feminino",
+  "tipo_produto": "Vestido",
+  "nome_referencia": "Vestido Feminino Padrão",
+  "campos_medida": [
+  "busto_cm",
+  "cintura_feminina_cm",
+  "quadril_cm",
+  "comprimento_vestido_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "PP",
+  "medidas": {
+  "busto_cm": { "min": 80, "max": 84 },
+  "cintura_feminina_cm": { "min": 64, "max": 68 },
+  "quadril_cm": { "min": 88, "max": 92 },
+  "comprimento_vestido_cm": { "min": 85, "max": 90 }
+  },
+  "altura_recomendada_min_cm": 150,
+  "altura_recomendada_max_cm": 160,
+  "peso_recomendado_min_kg": 45,
+  "peso_recomendado_max_kg": 55,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta"]
+  },
+  {
+  "nome": "P",
+  "medidas": {
+  "busto_cm": { "min": 84, "max": 90 },
+  "cintura_feminina_cm": { "min": 68, "max": 74 },
+  "quadril_cm": { "min": 92, "max": 98 },
+  "comprimento_vestido_cm": { "min": 90, "max": 95 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 168,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta", "oval"]
+  },
+  {
+  "nome": "M",
+  "medidas": {
+  "busto_cm": { "min": 90, "max": 96 },
+  "cintura_feminina_cm": { "min": 74, "max": 80 },
+  "quadril_cm": { "min": 98, "max": 104 },
+  "comprimento_vestido_cm": { "min": 95, "max": 100 }
+  },
+  "altura_recomendada_min_cm": 168,
+  "altura_recomendada_max_cm": 175,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "oval"]
+  },
+  {
+  "nome": "G",
+  "medidas": {
+  "busto_cm": { "min": 96, "max": 102 },
+  "cintura_feminina_cm": { "min": 80, "max": 86 },
+  "quadril_cm": { "min": 104, "max": 110 },
+  "comprimento_vestido_cm": { "min": 100, "max": 105 }
+  },
+  "altura_recomendada_min_cm": 175,
+  "altura_recomendada_max_cm": 182,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido"]
+  },
+  {
+  "nome": "GG",
+  "medidas": {
+  "busto_cm": { "min": 102, "max": 108 },
+  "cintura_feminina_cm": { "min": 86, "max": 92 },
+  "quadril_cm": { "min": 110, "max": 116 },
+  "comprimento_vestido_cm": { "min": 105, "max": 110 }
+  },
+  "altura_recomendada_min_cm": 182,
+  "altura_recomendada_max_cm": 190,
+  "peso_recomendado_min_kg": 85,
+  "peso_recomendado_max_kg": 95,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido"]
+  }
+  ]
+  },
+  {
+  "genero": "Feminino",
+  "tipo_produto": "Saia",
+  "nome_referencia": "Saia Feminina Padrão",
+  "campos_medida": [
+  "cintura_feminina_cm",
+  "quadril_cm",
+  "comprimento_saia_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "PP",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 60, "max": 64 },
+  "quadril_cm": { "min": 84, "max": 88 },
+  "comprimento_saia_cm": { "min": 40, "max": 45 }
+  },
+  "altura_recomendada_min_cm": 150,
+  "altura_recomendada_max_cm": 160,
+  "peso_recomendado_min_kg": 45,
+  "peso_recomendado_max_kg": 55,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta"]
+  },
+  {
+  "nome": "P",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 64, "max": 70 },
+  "quadril_cm": { "min": 88, "max": 94 },
+  "comprimento_saia_cm": { "min": 45, "max": 50 }
+  },
+  "altura_recomendada_min_cm": 160,
+  "altura_recomendada_max_cm": 168,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 65,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta", "oval"]
+  },
+  {
+  "nome": "M",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 70, "max": 76 },
+  "quadril_cm": { "min": 94, "max": 100 },
+  "comprimento_saia_cm": { "min": 50, "max": 55 }
+  },
+  "altura_recomendada_min_cm": 168,
+  "altura_recomendada_max_cm": 175,
+  "peso_recomendado_min_kg": 65,
+  "peso_recomendado_max_kg": 75,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "oval"]
+  },
+  {
+  "nome": "G",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 76, "max": 82 },
+  "quadril_cm": { "min": 100, "max": 106 },
+  "comprimento_saia_cm": { "min": 55, "max": 60 }
+  },
+  "altura_recomendada_min_cm": 175,
+  "altura_recomendada_max_cm": 182,
+  "peso_recomendado_min_kg": 75,
+  "peso_recomendado_max_kg": 85,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido"]
+  },
+  {
+  "nome": "GG",
+  "medidas": {
+  "cintura_feminina_cm": { "min": 82, "max": 88 },
+  "quadril_cm": { "min": 106, "max": 112 },
+  "comprimento_saia_cm": { "min": 60, "max": 65 }
+  },
+  "altura_recomendada_min_cm": 182,
+  "altura_recomendada_max_cm": 190,
+  "peso_recomendado_min_kg": 85,
+  "peso_recomendado_max_kg": 95,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido"]
+  }
+  ]
+  },
+  {
+  "genero": "Feminino",
+  "tipo_produto": "Sutiã",
+  "nome_referencia": "Sutiã Feminino Padrão",
+  "campos_medida": [
+  "medida_torax_abaixo_busto_cm",
+  "medida_busto_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "40 (P)",
+  "medidas": {
+  "medida_torax_abaixo_busto_cm": { "min": 68, "max": 72 },
+  "medida_busto_cm": { "min": 80, "max": 84 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta"]
+  },
+  {
+  "nome": "42 (M)",
+  "medidas": {
+  "medida_torax_abaixo_busto_cm": { "min": 73, "max": 77 },
+  "medida_busto_cm": { "min": 85, "max": 89 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "triangulo_invertido"]
+  },
+  {
+  "nome": "44 (G)",
+  "medidas": {
+  "medida_torax_abaixo_busto_cm": { "min": 78, "max": 82 },
+  "medida_busto_cm": { "min": 90, "max": 94 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "triangulo_invertido", "oval"]
+  },
+  {
+  "nome": "46 (GG)",
+  "medidas": {
+  "medida_torax_abaixo_busto_cm": { "min": 83, "max": 87 },
+  "medida_busto_cm": { "min": 95, "max": 99 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["ampulheta", "triangulo_invertido", "oval"]
+  }
+  ]
+  },
+  {
+  "genero": "Unissex",
+  "tipo_produto": "Camiseta",
+  "nome_referencia": "Camiseta Unissex Padrão",
+  "campos_medida": [
+  "peito_torax_cm",
+  "comprimento_frente_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "P",
+  "medidas": {
+  "peito_torax_cm": { "min": 90, "max": 94 },
+  "comprimento_frente_cm": { "min": 66, "max": 68 }
+  },
+  "altura_recomendada_min_cm": 155,
+  "altura_recomendada_max_cm": 165,
+  "peso_recomendado_min_kg": 50,
+  "peso_recomendado_max_kg": 60,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta"]
+  },
+  {
+  "nome": "M",
+  "medidas": {
+  "peito_torax_cm": { "min": 94, "max": 100 },
+  "comprimento_frente_cm": { "min": 68, "max": 71 }
+  },
+  "altura_recomendada_min_cm": 165,
+  "altura_recomendada_max_cm": 175,
+  "peso_recomendado_min_kg": 60,
+  "peso_recomendado_max_kg": 70,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "trapezoidal"]
+  },
+  {
+  "nome": "G",
+  "medidas": {
+  "peito_torax_cm": { "min": 100, "max": 106 },
+  "comprimento_frente_cm": { "min": 71, "max": 74 }
+  },
+  "altura_recomendada_min_cm": 175,
+  "altura_recomendada_max_cm": 185,
+  "peso_recomendado_min_kg": 70,
+  "peso_recomendado_max_kg": 80,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido", "trapezoidal"]
+  },
+  {
+  "nome": "GG",
+  "medidas": {
+  "peito_torax_cm": { "min": 106, "max": 112 },
+  "comprimento_frente_cm": { "min": 74, "max": 77 }
+  },
+  "altura_recomendada_min_cm": 185,
+  "altura_recomendada_max_cm": 195,
+  "peso_recomendado_min_kg": 80,
+  "peso_recomendado_max_kg": 90,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo_invertido", "oval"]
+  }
+  ]
+  },
+  {
+  "genero": "Unissex",
+  "tipo_produto": "Moletom",
+  "nome_referencia": "Moletom Unissex Padrão",
+  "campos_medida": [
+  "peito_torax_cm",
+  "comprimento_frente_cm",
+  "comprimento_manga_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "P",
+  "medidas": {
+  "peito_torax_cm": { "min": 98, "max": 104 },
+  "comprimento_frente_cm": { "min": 65, "max": 68 },
+  "comprimento_manga_cm": { "min": 60, "max": 62 }
+  },
+  "altura_recomendada_min_cm": 155,
+  "altura_recomendada_max_cm": 168,
+  "peso_recomendado_min_kg": 55,
+  "peso_recomendado_max_kg": 68,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo", "ampulheta", "trapezoidal"]
+  },
+  {
+  "nome": "M",
+  "medidas": {
+  "peito_torax_cm": { "min": 104, "max": 110 },
+  "comprimento_frente_cm": { "min": 68, "max": 71 },
+  "comprimento_manga_cm": { "min": 62, "max": 64 }
+  },
+  "altura_recomendada_min_cm": 168,
+  "altura_recomendada_max_cm": 178,
+  "peso_recomendado_min_kg": 68,
+  "peso_recomendado_max_kg": 80,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "ampulheta", "oval", "trapezoidal"]
+  },
+  {
+  "nome": "G",
+  "medidas": {
+  "peito_torax_cm": { "min": 110, "max": 116 },
+  "comprimento_frente_cm": { "min": 71, "max": 74 },
+  "comprimento_manga_cm": { "min": 64, "max": 66 }
+  },
+  "altura_recomendada_min_cm": 178,
+  "altura_recomendada_max_cm": 188,
+  "peso_recomendado_min_kg": 80,
+  "peso_recomendado_max_kg": 92,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "oval", "triangulo_invertido"]
+  },
+  {
+  "nome": "GG",
+  "medidas": {
+  "peito_torax_cm": { "min": 116, "max": 122 },
+  "comprimento_frente_cm": { "min": 74, "max": 77 },
+  "comprimento_manga_cm": { "min": 66, "max": 68 }
+  },
+  "altura_recomendada_min_cm": 188,
+  "altura_recomendada_max_cm": 198,
+  "peso_recomendado_min_kg": 92,
+  "peso_recomendado_max_kg": 105,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["retangular", "triangulo_invertido", "oval"]
+  }
+  ]
+  },
+  {
+  "genero": "Infantil",
+  "tipo_produto": "Camiseta Infantil",
+  "nome_referencia": "Camiseta Infantil Padrão",
+  "campos_medida": [
+  "peito_torax_cm",
+  "comprimento_frente_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "1 ano",
+  "medidas": {
+  "peito_torax_cm": { "min": 50, "max": 54 },
+  "comprimento_frente_cm": { "min": 33, "max": 36 }
+  },
+  "altura_recomendada_min_cm": 74,
+  "altura_recomendada_max_cm": 80,
+  "peso_recomendado_min_kg": 9,
+  "peso_recomendado_max_kg": 11,
+  "idade_recomendada_min_anos": 1,
+  "idade_recomendada_max_anos": 1,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  },
+  {
+  "nome": "2 anos",
+  "medidas": {
+  "peito_torax_cm": { "min": 54, "max": 58 },
+  "comprimento_frente_cm": { "min": 36, "max": 39 }
+  },
+  "altura_recomendada_min_cm": 80,
+  "altura_recomendada_max_cm": 90,
+  "peso_recomendado_min_kg": 11,
+  "peso_recomendado_max_kg": 13,
+  "idade_recomendada_min_anos": 2,
+  "idade_recomendada_max_anos": 2,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  },
+  {
+  "nome": "4 anos",
+  "medidas": {
+  "peito_torax_cm": { "min": 58, "max": 62 },
+  "comprimento_frente_cm": { "min": 39, "max": 42 }
+  },
+  "altura_recomendada_min_cm": 90,
+  "altura_recomendada_max_cm": 105,
+  "peso_recomendado_min_kg": 13,
+  "peso_recomendado_max_kg": 17,
+  "idade_recomendada_min_anos": 4,
+  "idade_recomendada_max_anos": 4,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  },
+  {
+  "nome": "6 anos",
+  "medidas": {
+  "peito_torax_cm": { "min": 62, "max": 66 },
+  "comprimento_frente_cm": { "min": 42, "max": 45 }
+  },
+  "altura_recomendada_min_cm": 105,
+  "altura_recomendada_max_cm": 115,
+  "peso_recomendado_min_kg": 17,
+  "peso_recomendado_max_kg": 22,
+  "idade_recomendada_min_anos": 6,
+  "idade_recomendada_max_anos": 6,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  },
+  {
+  "nome": "8 anos",
+  "medidas": {
+  "peito_torax_cm": { "min": 66, "max": 70 },
+  "comprimento_frente_cm": { "min": 45, "max": 48 }
+  },
+  "altura_recomendada_min_cm": 115,
+  "altura_recomendada_max_cm": 125,
+  "peso_recomendado_min_kg": 22,
+  "peso_recomendado_max_kg": 28,
+  "idade_recomendada_min_anos": 8,
+  "idade_recomendada_max_anos": 8,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  }
+  ]
+  },
+  {
+  "genero": "Infantil",
+  "tipo_produto": "Calça Infantil",
+  "nome_referencia": "Calça Infantil Padrão",
+  "campos_medida": [
+  "cintura_infantil_cm",
+  "quadril_infantil_cm",
+  "entrepernas_infantil_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "1 ano",
+  "medidas": {
+  "cintura_infantil_cm": { "min": 48, "max": 52 },
+  "quadril_infantil_cm": { "min": 52, "max": 56 },
+  "entrepernas_infantil_cm": { "min": 28, "max": 31 }
+  },
+  "altura_recomendada_min_cm": 74,
+  "altura_recomendada_max_cm": 80,
+  "peso_recomendado_min_kg": 9,
+  "peso_recomendado_max_kg": 11,
+  "idade_recomendada_min_anos": 1,
+  "idade_recomendada_max_anos": 1,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  },
+  {
+  "nome": "2 anos",
+  "medidas": {
+  "cintura_infantil_cm": { "min": 50, "max": 54 },
+  "quadril_infantil_cm": { "min": 54, "max": 58 },
+  "entrepernas_infantil_cm": { "min": 31, "max": 34 }
+  },
+  "altura_recomendada_min_cm": 80,
+  "altura_recomendada_max_cm": 90,
+  "peso_recomendado_min_kg": 11,
+  "peso_recomendado_max_kg": 13,
+  "idade_recomendada_min_anos": 2,
+  "idade_recomendada_max_anos": 2,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  },
+  {
+  "nome": "4 anos",
+  "medidas": {
+  "cintura_infantil_cm": { "min": 52, "max": 56 },
+  "quadril_infantil_cm": { "min": 56, "max": 60 },
+  "entrepernas_infantil_cm": { "min": 37, "max": 40 }
+  },
+  "altura_recomendada_min_cm": 90,
+  "altura_recomendada_max_cm": 105,
+  "peso_recomendado_min_kg": 13,
+  "peso_recomendado_max_kg": 17,
+  "idade_recomendada_min_anos": 4,
+  "idade_recomendada_max_anos": 4,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  },
+  {
+  "nome": "6 anos",
+  "medidas": {
+  "cintura_infantil_cm": { "min": 54, "max": 58 },
+  "quadril_infantil_cm": { "min": 58, "max": 62 },
+  "entrepernas_infantil_cm": { "min": 43, "max": 46 }
+  },
+  "altura_recomendada_min_cm": 105,
+  "altura_recomendada_max_cm": 115,
+  "peso_recomendado_min_kg": 17,
+  "peso_recomendado_max_kg": 22,
+  "idade_recomendada_min_anos": 6,
+  "idade_recomendada_max_anos": 6,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  },
+  {
+  "nome": "8 anos",
+  "medidas": {
+  "cintura_infantil_cm": { "min": 56, "max": 60 },
+  "quadril_infantil_cm": { "min": 60, "max": 64 },
+  "entrepernas_infantil_cm": { "min": 49, "max": 52 }
+  },
+  "altura_recomendada_min_cm": 115,
+  "altura_recomendada_max_cm": 125,
+  "peso_recomendado_min_kg": 22,
+  "peso_recomendado_max_kg": 28,
+  "idade_recomendada_min_anos": 8,
+  "idade_recomendada_max_anos": 8,
+  "compatibilidade_formato_corpo": ["padrao_infantil"]
+  }
+  ]
+  },
+  {
+  "genero": "Infantil",
+  "tipo_produto": "Body Bebê",
+  "nome_referencia": "Body Bebê Padrão",
+  "campos_medida": [
+  "peso_kg",
+  "altura_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "RN (Recém-Nascido)",
+  "medidas": {
+  "peso_kg": { "min": 2.5, "max": 4 },
+  "altura_cm": { "min": 45, "max": 52 }
+  },
+  "altura_recomendada_min_cm": 45,
+  "altura_recomendada_max_cm": 52,
+  "peso_recomendado_min_kg": 2.5,
+  "peso_recomendado_max_kg": 4,
+  "idade_recomendada_min_anos": 0,
+  "idade_recomendada_max_anos": 0,
+  "compatibilidade_formato_corpo": ["padrao_bebe"]
+  },
+  {
+  "nome": "P (0-3 meses)",
+  "medidas": {
+  "peso_kg": { "min": 4, "max": 6 },
+  "altura_cm": { "min": 52, "max": 62 }
+  },
+  "altura_recomendada_min_cm": 52,
+  "altura_recomendada_max_cm": 62,
+  "peso_recomendado_min_kg": 4,
+  "peso_recomendado_max_kg": 6,
+  "idade_recomendada_min_anos": 0,
+  "idade_recomendada_max_anos": 0.25,
+  "compatibilidade_formato_corpo": ["padrao_bebe"]
+  },
+  {
+  "nome": "M (3-6 meses)",
+  "medidas": {
+  "peso_kg": { "min": 6, "max": 8 },
+  "altura_cm": { "min": 62, "max": 68 }
+  },
+  "altura_recomendada_min_cm": 62,
+  "altura_recomendada_max_cm": 68,
+  "peso_recomendado_min_kg": 6,
+  "peso_recomendado_max_kg": 8,
+  "idade_recomendada_min_anos": 0.25,
+  "idade_recomendada_max_anos": 0.5,
+  "compatibilidade_formato_corpo": ["padrao_bebe"]
+  },
+  {
+  "nome": "G (6-9 meses)",
+  "medidas": {
+  "peso_kg": { "min": 8, "max": 9.5 },
+  "altura_cm": { "min": 68, "max": 74 }
+  },
+  "altura_recomendada_min_cm": 68,
+  "altura_recomendada_max_cm": 74,
+  "peso_recomendado_min_kg": 8,
+  "peso_recomendado_max_kg": 9.5,
+  "idade_recomendada_min_anos": 0.5,
+  "idade_recomendada_max_anos": 0.75,
+  "compatibilidade_formato_corpo": ["padrao_bebe"]
+  },
+  {
+  "nome": "GG (9-12 meses)",
+  "medidas": {
+  "peso_kg": { "min": 9.5, "max": 11 },
+  "altura_cm": { "min": 74, "max": 80 }
+  },
+  "altura_recomendada_min_cm": 74,
+  "altura_recomendada_max_cm": 80,
+  "peso_recomendado_min_kg": 9.5,
+  "peso_recomendado_max_kg": 11,
+  "idade_recomendada_min_anos": 0.75,
+  "idade_recomendada_max_anos": 1,
+  "compatibilidade_formato_corpo": ["padrao_bebe"]
+  }
+  ]
+  },
+  {
+  "genero": "Outro",
+  "tipo_produto": "Calçado",
+  "nome_referencia": "Calçado Padrão",
+  "campos_medida": [
+  "comprimento_pe_cm"
+  ],
+  "tamanhos": [
+  {
+  "nome": "34",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 22.5, "max": 23 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "35",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 23, "max": 23.5 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "36",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 23.5, "max": 24 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "37",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 24, "max": 24.5 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "38",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 24.5, "max": 25 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "39",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 25, "max": 25.5 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "40",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 25.5, "max": 26 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "41",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 26, "max": 26.5 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "42",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 26.5, "max": 27 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "43",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 27, "max": 27.5 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  },
+  {
+  "nome": "44",
+  "medidas": {
+  "comprimento_pe_cm": { "min": 27.5, "max": 28 }
+  },
+  "altura_recomendada_min_cm": null,
+  "altura_recomendada_max_cm": null,
+  "peso_recomendado_min_kg": null,
+  "peso_recomendado_max_kg": null,
+  "idade_recomendada_min_anos": null,
+  "idade_recomendada_max_anos": null,
+  "compatibilidade_formato_corpo": ["padrao_geral"]
+  }
+  ]
+  }
+  ]
+ }

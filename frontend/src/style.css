@@ -1426,7 +1426,7 @@ th {
 }
 
 .form-wide .table-wrap table {
-  min-width: 980px;
+  min-width: 1120px;
 }
 
 .table-input {
@@ -1506,6 +1506,55 @@ th {
   background: #fff7ed;
   cursor: pointer;
   font-weight: 800;
+}
+
+.smart-catalog-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(320px, 0.65fr);
+  gap: 18px;
+  margin-top: 18px;
+  align-items: end;
+  border-color: #fed7aa;
+  background: linear-gradient(135deg, #fff7ed 0%, #fff 58%);
+}
+
+.smart-catalog-panel h2 {
+  margin: 6px 0 8px;
+  font-size: clamp(1.1rem, 2vw, 1.55rem);
+  letter-spacing: 0;
+}
+
+.smart-catalog-panel p {
+  max-width: 760px;
+  margin: 0;
+  color: #475569;
+  line-height: 1.7;
+}
+
+.smart-catalog-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.smart-catalog-meta {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.smart-catalog-meta span {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  color: #9a3412;
+  background: #fff;
+  font-size: 0.86rem;
+  font-weight: 700;
 }
 
 textarea {
@@ -2339,6 +2388,7 @@ td small {
   .app-grid,
   .form-grid,
   .inline-form,
+  .smart-catalog-panel,
   .install-grid,
   .integrations-grid,
   .import-grid,
@@ -2398,7 +2448,7 @@ td small {
   }
 
   .form-wide .table-wrap table {
-    min-width: 920px;
+    min-width: 1120px;
   }
 }
 

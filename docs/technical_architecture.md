@@ -50,7 +50,7 @@ APIs protegidas ja implementadas:
 - `GET|POST|PATCH|DELETE /api/v1/products`
 - `POST|PATCH|DELETE /api/v1/products/{product}/variants`
 - `GET|POST|PATCH|DELETE /api/v1/measurement-tables`
-- `GET /api/v1/measurement-templates`
+- `GET /api/v1/measurement-templates`: retorna templates inteligentes normalizados a partir de `backend/database/data/default_measurement_tables_data.json`, herdado do v1, com base brasileira por genero, tipo de produto, altura, peso, idade e formato corporal.
 - `GET|PATCH /api/v1/widget-install`
 - `POST /api/v1/public/bigshop/activate`
 - `GET /api/v1/integrations`

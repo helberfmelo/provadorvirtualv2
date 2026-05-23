@@ -10,9 +10,46 @@ const tableId = computed(() => Number(route.params.id || 0))
 const editing = computed(() => Boolean(tableId.value))
 
 const templates = ref<MeasurementTemplate[]>([])
+const selectedTemplateKey = ref('')
 const loading = ref(false)
 const saving = ref(false)
 const error = ref('')
+
+const baseProductTypes = [
+  { value: 'dress', label: 'Vestido' },
+  { value: 'shirt', label: 'Camisa/Camiseta' },
+  { value: 'blouse', label: 'Blusa' },
+  { value: 'pants', label: 'Calca' },
+  { value: 'skirt', label: 'Saia' },
+  { value: 'shorts', label: 'Bermuda/Shorts' },
+  { value: 'jacket', label: 'Jaqueta' },
+  { value: 'sweatshirt', label: 'Moletom' },
+  { value: 'bra', label: 'Sutia' },
+  { value: 'kids_shirt', label: 'Camiseta infantil' },
+  { value: 'kids_pants', label: 'Calca infantil' },
+  { value: 'baby_body', label: 'Body bebe' },
+  { value: 'shoes', label: 'Calcado' },
+  { value: 'custom', label: 'Personalizado' },
+]
+
+const productTypeOptions = computed(() => {
+  const options = new Map(baseProductTypes.map((option) => [option.value, option.label]))
+  templates.value.forEach((template) => {
+    options.set(template.product_type, template.product_type_label || options.get(template.product_type) || template.product_type)
+  })
+
+  return Array.from(options, ([value, label]) => ({ value, label }))
+})
+
+const filteredTemplates = computed(() => templates.value.filter((template) => {
+  const typeOk = !form.product_type || template.product_type === form.product_type
+  const genderOk = !form.gender || template.gender === form.gender || template.gender === 'unisex' || form.gender === 'unisex'
+
+  return typeOk && genderOk
+}))
+
+const visibleTemplates = computed(() => filteredTemplates.value.length ? filteredTemplates.value : templates.value.slice(0, 12))
+const selectedTemplate = computed(() => templates.value.find((template) => template.key === selectedTemplateKey.value) || null)
 
 const form = reactive({
   name: '',
@@ -71,7 +108,37 @@ function applyTemplate(template: MeasurementTemplate) {
   form.gender = template.gender
   form.fit_profile = template.fit_profile
   form.source = 'template'
+  form.notes = [
+    template.market_basis,
+    template.fields?.length ? `Campos originais: ${template.fields.join(', ')}` : '',
+  ].filter(Boolean).join('\n')
   form.rows = JSON.parse(JSON.stringify(template.rows))
+}
+
+function applySelectedTemplate() {
+  const template = selectedTemplate.value || visibleTemplates.value[0]
+
+  if (template) {
+    selectedTemplateKey.value = template.key
+    applyTemplate(template)
+  }
+}
+
+function fieldSummary(template: MeasurementTemplate) {
+  const labels: Record<string, string> = {
+    bust: 'busto',
+    waist: 'cintura',
+    hip: 'quadril',
+    height: 'altura',
+    weight: 'peso',
+    length: 'comprimento',
+    shoulder: 'ombro',
+  }
+  const fields = Object.entries(labels)
+    .filter(([field]) => template.rows.some((row) => row[`${field}_min` as keyof MeasurementRow] || row[`${field}_max` as keyof MeasurementRow]))
+    .map(([, label]) => label)
+
+  return fields.length ? fields.join(', ') : 'medidas principais'
 }
 
 function addRow() {
@@ -132,12 +199,39 @@ async function saveTable() {
 
     <p v-if="error" class="form-error">{{ error }}</p>
 
-    <div class="template-strip">
-      <button v-for="template in templates" :key="template.key" type="button" @click="applyTemplate(template)">
-        <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
-        {{ template.name }}
-      </button>
-    </div>
+    <section class="panel-main smart-catalog-panel">
+      <div>
+        <span class="eyebrow">
+          <i class="fa-solid fa-brain" aria-hidden="true"></i>
+          Base inteligente + IA
+        </span>
+        <h2>Comece por uma tabela pronta do mercado brasileiro</h2>
+        <p>
+          A base herdada do v1 cruza genero, categoria, altura, peso, idade e formato corporal. A IA ajuda a acelerar
+          a criacao, mas a tabela sempre fica sob revisao do lojista antes de ir para a loja.
+        </p>
+      </div>
+      <div class="smart-catalog-actions">
+        <label>
+          Modelo
+          <select v-model="selectedTemplateKey">
+            <option value="">Selecionar modelo inteligente</option>
+            <option v-for="template in visibleTemplates" :key="template.key" :value="template.key">
+              {{ template.name }} - {{ template.gender_label || template.gender }} / {{ template.product_type_label || template.product_type }}
+            </option>
+          </select>
+        </label>
+        <button class="btn btn-primary" type="button" @click="applySelectedTemplate">
+          <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+          Carregar modelo
+        </button>
+      </div>
+      <div class="smart-catalog-meta">
+        <span><strong>{{ templates.length }}</strong> modelos padrao</span>
+        <span><strong>{{ visibleTemplates.length }}</strong> compativeis com os filtros atuais</span>
+        <span v-if="selectedTemplate">Campos: {{ fieldSummary(selectedTemplate) }}</span>
+      </div>
+    </section>
 
     <form class="panel-main admin-form form-wide" @submit.prevent="saveTable">
       <div class="form-grid">
@@ -148,10 +242,9 @@ async function saveTable() {
         <label>
           Tipo
           <select v-model="form.product_type">
-            <option value="dress">Vestido</option>
-            <option value="shirt">Camiseta</option>
-            <option value="pants">Calca</option>
-            <option value="skirt">Saia</option>
+            <option v-for="option in productTypeOptions" :key="option.value" :value="option.value">
+              {{ option.label }}
+            </option>
           </select>
         </label>
         <label>
@@ -199,6 +292,8 @@ async function saveTable() {
               <th>Quadril</th>
               <th>Altura</th>
               <th>Peso</th>
+              <th>Comp.</th>
+              <th>Ombro</th>
               <th></th>
             </tr>
           </thead>
@@ -224,6 +319,14 @@ async function saveTable() {
               <td class="range-cell">
                 <input v-model.number="row.weight_min" class="table-input mini" type="number" min="0" />
                 <input v-model.number="row.weight_max" class="table-input mini" type="number" min="0" />
+              </td>
+              <td class="range-cell">
+                <input v-model.number="row.length_min" class="table-input mini" type="number" min="0" />
+                <input v-model.number="row.length_max" class="table-input mini" type="number" min="0" />
+              </td>
+              <td class="range-cell">
+                <input v-model.number="row.shoulder_min" class="table-input mini" type="number" min="0" />
+                <input v-model.number="row.shoulder_max" class="table-input mini" type="number" min="0" />
               </td>
               <td class="row-actions">
                 <button type="button" title="Remover linha" @click="removeRow(index)">

@@ -64,8 +64,14 @@ export type MeasurementTemplate = {
   key: string
   name: string
   product_type: string
+  product_type_label?: string
   gender: string
+  gender_label?: string
   fit_profile: string
+  source?: string
+  source_label?: string
+  market_basis?: string
+  fields?: string[]
   rows: MeasurementRow[]
 }
 
