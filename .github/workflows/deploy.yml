@@ -482,7 +482,10 @@ jobs:
 
           assert_contains "${PRODUCTION_APP_URL}/" '<div id="app"'
           assert_contains "${PRODUCTION_APP_URL}/login" '<div id="app"'
+          assert_contains "${PRODUCTION_APP_URL}/saas/login" '<div id="app"'
           assert_contains "${PRODUCTION_APP_URL}/produto-teste" '<div id="app"'
+          assert_contains "${PRODUCTION_APP_URL}/saas/empresas" '<div id="app"'
+          assert_contains "${PRODUCTION_APP_URL}/app/produtos/novo" '<div id="app"'
           assert_contains "${PRODUCTION_APP_URL}/widget/v1/provador-virtual.js" 'data-pv-submit'
           assert_contains "${PRODUCTION_APP_URL}/widget/v1/provador-virtual.css" '.pv-trigger'
           assert_contains "${PRODUCTION_APP_URL}/api/v1/health" '"status":"ok"'
@@ -494,6 +497,9 @@ jobs:
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/up" > /dev/null
           assert_contains "${PRODUCTION_ROOT_URL}/" '<div id="app"'
           assert_contains "${PRODUCTION_ROOT_URL}/checkout" '<div id="app"'
+          assert_contains "${PRODUCTION_ROOT_URL}/saas/login" '<div id="app"'
+          assert_contains "${PRODUCTION_ROOT_URL}/saas/empresas" '<div id="app"'
+          assert_contains "${PRODUCTION_ROOT_URL}/app/produtos/novo" '<div id="app"'
           assert_contains "${PRODUCTION_ROOT_URL}/api/v1/health" '"status":"ok"'
           assert_contains "${PRODUCTION_ROOT_URL}/widget/v1/provador-virtual.js" 'data-pv-submit'
 

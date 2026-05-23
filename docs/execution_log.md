@@ -324,3 +324,10 @@
 - Usuarios da empresa foram separados em `/app/usuarios`, `/app/usuarios/novo` e `/app/usuarios/:id/editar`.
 - As listagens agora ocupam a tela e as edicoes abrem em telas proprias.
 - Validacoes locais: `npm run build`.
+
+## 2026-05-23 - Sprint 41 Revisao visual, responsiva e QA de telas
+
+- Registrado `docs/portal_ui_guidelines.md` como referencia obrigatoria para separar listagem, cadastro e edicao nos CRUDs.
+- Ajustadas tabelas, acoes por linha, cabecalhos e largura minima de formularios/tabelas para reduzir desalinhamento e overflow espremido.
+- Validador de producao passou a cobrir rotas novas do SaaS e do portal da empresa.
+- Smoke do GitHub Actions passou a validar rotas autenticadas principais na raiz e na subpasta.

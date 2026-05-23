@@ -34,6 +34,10 @@ Atualizado em: 2026-05-23
 - Sprint 35 preparou o contrato BigShop um clique com snippet/contract na resposta da ativacao e monitor protegido de ativacoes no painel; publicado em producao no run `26339426665`.
 - Sprint 36 criou perfis anonimos com consentimento, token local, esquecimento, eventos de aprendizado, sinais comerciais, outlier score e analytics de qualidade; publicado em producao no run `26339824157`.
 - Sprint 37 ampliou o pacote de piloto/go-live com checks de Pagar.me, transacao real, cron, performance do widget, acessibilidade/mobile, comandos de automacao e onboarding comercial; publicado em producao no run `26340033238`.
+- Sprint 38 separou a navegacao do SaaS e do portal da empresa, com menu lateral autenticado e drawer no mobile; publicado em producao no run `26342322716`.
+- Sprint 39 separou os CRUDs do SaaS em listagens e formularios proprios; publicado em producao no run `26342542196`.
+- Sprint 40 separou os CRUDs principais do portal da empresa em listagens e formularios proprios; publicado em producao no run `26342724625`.
+- Sprint 41 registrou as diretrizes de UX dos portais, refinou tabelas/acoes/cabecalhos e ampliou a validacao de rotas.
 
 ## Referencias confirmadas
 
@@ -106,6 +110,9 @@ Atualizado em: 2026-05-23
 - Sprint 35 publicada em producao pelo GitHub Actions no run `26339426665`.
 - Sprint 36 publicada em producao pelo GitHub Actions no run `26339824157`; o run `26339739429` falhou por limite de tamanho de nome de foreign key MySQL e foi corrigido no commit `5d5b5dc`.
 - Sprint 37 publicada em producao pelo GitHub Actions no run `26340033238`.
+- Sprint 38 publicada em producao pelo GitHub Actions no run `26342322716`.
+- Sprint 39 publicada em producao pelo GitHub Actions no run `26342542196`.
+- Sprint 40 publicada em producao pelo GitHub Actions no run `26342724625`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em producao usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que nao preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site publico comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -122,6 +129,7 @@ Atualizado em: 2026-05-23
 - CRUDs do SaaS seguem padrao list-first: listagem ocupa a tela e novo/editar abre rota propria.
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de codigo/CNPJ para empresa e seletor quando o usuario tem multiplas empresas.
 - CRUDs principais do portal da empresa tambem seguem padrao list-first: produtos, tabelas e usuarios possuem listagem em tela propria e rotas separadas para novo/editar.
+- Diretriz obrigatoria de telas: `docs/portal_ui_guidelines.md`.
 - Checkout publico: `/checkout` e `/checkout/sucesso`.
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes, com middleware de permissao por modulo e escopo da empresa ativa.
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.

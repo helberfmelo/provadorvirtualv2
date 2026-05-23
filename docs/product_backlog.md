@@ -118,7 +118,7 @@ Atualizado em: 2026-05-23
 - `DONE` Separar completamente a navegacao do SaaS e do portal da empresa.
 - `DONE` Refatorar CRUDs do SaaS para listagem em tela propria e formulario em tela propria.
 - `DONE` Refatorar CRUDs do portal da empresa para listagem em tela propria e formulario em tela propria.
-- `TODO` Revisar responsividade e alinhamento tela por tela nos portais autenticados.
+- `DONE` Revisar responsividade, alinhamento e padrao list-first dos portais autenticados.
 
 ## Pagamentos
 

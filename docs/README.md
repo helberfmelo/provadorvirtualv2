@@ -21,19 +21,20 @@ Antes de desenvolver qualquer sprint, ajuste, correcao ou deploy, reler nesta or
 12. `docs/data_learning_lgpd_outliers.md`
 13. `docs/analytics_admin.md`
 14. `docs/user_access_permissions.md`
-15. `docs/transactional_email_automation.md`
-16. `docs/hardening_lgpd_observability.md`
-17. `docs/go_live_cutover.md`
-18. `docs/bigshop_integration.md`
-19. `docs/bigshop_one_click_contract.md`
-20. `docs/commercial_pilot_package.md`
-21. `docs/deploy_runbook.md`
-22. `docs/sprint_governance.md`
-23. `docs/roadmap_sprints.md`
-24. `docs/intelligent_sizing_roadmap.md`
-25. `docs/product_backlog.md`
-26. `docs/security_compliance.md`
-27. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
+15. `docs/portal_ui_guidelines.md`
+16. `docs/transactional_email_automation.md`
+17. `docs/hardening_lgpd_observability.md`
+18. `docs/go_live_cutover.md`
+19. `docs/bigshop_integration.md`
+20. `docs/bigshop_one_click_contract.md`
+21. `docs/commercial_pilot_package.md`
+22. `docs/deploy_runbook.md`
+23. `docs/sprint_governance.md`
+24. `docs/roadmap_sprints.md`
+25. `docs/intelligent_sizing_roadmap.md`
+26. `docs/product_backlog.md`
+27. `docs/security_compliance.md`
+28. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
 
 Nenhuma sprint deve comecar sem essa releitura.
 

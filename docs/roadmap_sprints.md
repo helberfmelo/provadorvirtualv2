@@ -499,7 +499,7 @@ Entregas previstas:
 - revisao de widget, integracoes, assistente, analytics e go-live para reduzir secoes misturadas;
 - submenus claros por operacao: catalogo, configuracao, inteligencia, publicacao e acessos.
 
-Status: em execucao. Produtos, tabelas de medidas e usuarios foram separados em listagens e formularios proprios; widget, integracoes, assistente, analytics e go-live seguem para refinamento visual da Sprint 41.
+Status: implementado, publicado e validado em producao no run `26342724625`. Produtos, tabelas de medidas e usuarios foram separados em listagens e formularios proprios.
 
 ### Sprint 41 - Revisao visual, responsiva e QA de telas
 
@@ -512,3 +512,5 @@ Entregas previstas:
 - garantir drawer mobile para SaaS e portal da empresa;
 - ampliar checklist de validacao visual/rotas;
 - publicar e validar producao apos cada ajuste.
+
+Status: implementado. A Sprint 41 consolidou as diretrizes em `docs/portal_ui_guidelines.md`, ajustou alinhamento de tabelas/acoes/cabecalhos, ampliou o validador de producao para as novas rotas SaaS e empresa e reforcou o smoke do GitHub Actions.

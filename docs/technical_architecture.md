@@ -227,9 +227,16 @@ Chaves comuns:
 
 - `email_settings` guarda as credenciais SMTP do SaaS; senha usa cast `encrypted` e nunca volta em claro pela API.
 - `transactional_emails` guarda templates editaveis para cadastro, pagamento confirmado, aguardando pagamento, erro de pagamento, recuperacao de senha e renovacao.
-- A tela `/saas` possui configuracao SMTP e CRUD de templates com listagem, novo, editar e ativar/desativar.
+- As telas `/saas/emails`, `/saas/emails/configuracoes`, `/saas/emails/novo` e `/saas/emails/:id/editar` separam listagem, credenciais SMTP e formularios de templates.
 - Sprint 31 criou `TransactionalEmailService`, historico `transactional_email_sends`, disparos por checkout/pagamento e comando `php artisan pv:emails-dispatch --limit=50`.
 - O scheduler executa o dispatcher de e-mails a cada 10 minutos; Pix pendente pode ser reenviado apos 6 horas sem duplicar confirmacoes/erros ja enviados.
+
+## Diretrizes de UX autenticada
+
+- CRUDs devem seguir o padrao list-first: listagem na rota base, cadastro em `/novo` e edicao em `/:id/editar`.
+- SaaS e portal da empresa usam menus separados; links entre contextos sao secundarios.
+- O menu autenticado deve abrir em drawer no mobile.
+- Documento de referencia: `docs/portal_ui_guidelines.md`.
 
 ## Motor de recomendacao
 
