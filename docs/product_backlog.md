@@ -7,7 +7,7 @@ Atualizado em: 2026-05-23
 - `DONE` Inicializar repositorio Git ou clonar `helberfmelo/provadorvirtualv2` nesta pasta.
 - `DONE` Cadastrar `SSH_PRIVATE_KEY`, `SSH_PRIVATE_KEY_B64` e `PRODUCTION_ENV` no GitHub Actions.
 - `DONE` Regularizar billing/spending limit do GitHub Actions tornando o repositorio publico.
-- `TODO` Confirmar path remoto final do v2.
+- `DONE` Confirmar path remoto final do v2: `/home1/opents62/provadorvirtual.online/provadorvirtual_v2`.
 - `DONE` Scaffold Laravel/Vue.
 - `DONE` Criar `.env.example` backend/frontend.
 - `DONE` Criar migrations iniciais.

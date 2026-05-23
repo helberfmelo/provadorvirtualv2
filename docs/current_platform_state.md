@@ -61,8 +61,8 @@ Atualizado em: 2026-05-23
 ## Bloqueios e informacoes faltantes
 
 - GitHub Actions voltou a executar apos o repositorio ser alterado para publico.
-- Falta confirmar se o path remoto de v2 sera `/home1/opents62/public_html/provadorvirtual_v2`.
-- Acesso SSH local ao HostGator/opents62 foi validado; `/home1/opents62/public_html` existe e a pasta `provadorvirtual_v2` ainda nao foi criada.
+- Path remoto confirmado pelo v1: `/home1/opents62/provadorvirtual.online/provadorvirtual_v2`.
+- Acesso SSH local ao HostGator/opents62 foi validado; `https://provadorvirtual.online/provadorvirtual_v1/` responde a partir de `/home1/opents62/provadorvirtual.online/provadorvirtual_v1`.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
 - Falta chave de IA se as primeiras sprints incluirem OCR/geracao assistida.
 - Falta credencial BigShop real para loja de teste.
@@ -70,4 +70,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Concluir a publicacao da Sprint 1 pelo GitHub Actions e, se estiver verde, iniciar a Sprint 2: produtos, variacoes e tabelas de medidas.
+Concluir a publicacao da Sprint 1 pelo GitHub Actions no docroot correto e, se estiver verde, iniciar a Sprint 2: produtos, variacoes e tabelas de medidas.

@@ -9,7 +9,7 @@ on:
 env:
   PRODUCTION_APP_URL: https://provadorvirtual.online/provadorvirtual_v2
   PRODUCTION_APP_BASE_PATH: /provadorvirtual_v2/
-  PRODUCTION_REMOTE_DIR: /home1/opents62/public_html/provadorvirtual_v2
+  PRODUCTION_REMOTE_DIR: /home1/opents62/provadorvirtual.online/provadorvirtual_v2
   PRODUCTION_BACKUP_DIR: /home1/opents62/deploy_backups/provadorvirtual_v2
   PRODUCTION_BACKUP_KEEP: '5'
 

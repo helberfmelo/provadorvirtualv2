@@ -169,7 +169,7 @@ Local:
 Producao inicial:
 
 - `https://provadorvirtual.online/provadorvirtual_v2/`;
-- pasta remota esperada: `/home1/opents62/public_html/provadorvirtual_v2`;
+- pasta remota: `/home1/opents62/provadorvirtual.online/provadorvirtual_v2`;
 - banco: `opents62_provadorvirtual_v2`.
 
 ## Observabilidade

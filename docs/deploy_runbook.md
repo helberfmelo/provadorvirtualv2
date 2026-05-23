@@ -10,7 +10,7 @@ Publicacao inicial:
 
 - URL: `https://provadorvirtual.online/provadorvirtual_v2`
 - Base path: `/provadorvirtual_v2/`
-- Pasta remota esperada: `/home1/opents62/public_html/provadorvirtual_v2`
+- Pasta remota: `/home1/opents62/provadorvirtual.online/provadorvirtual_v2`
 - Backup remoto: `/home1/opents62/deploy_backups/provadorvirtual_v2`
 
 Motivo: preservar `https://provadorvirtual.online/provadorvirtual_v1/` ate o cutover.
@@ -143,12 +143,10 @@ MAIL_FROM_NAME="Provador Virtual"
 
 ## Primeira publicacao
 
-1. Confirmar path remoto.
-2. Criar banco e usuario no cPanel, se ainda nao existirem.
-3. Regularizar billing/spending limit do GitHub Actions.
-4. Fazer push para `main`.
-5. Acompanhar Actions.
-6. Validar:
+1. Criar banco e usuario no cPanel, se ainda nao existirem.
+2. Fazer push para `main`.
+3. Acompanhar Actions.
+4. Validar:
    - `/provadorvirtual_v2/`;
    - `/provadorvirtual_v2/login`;
    - `/provadorvirtual_v2/produto-teste`;
@@ -164,7 +162,7 @@ Rollback manual:
 
 1. escolher backup anterior;
 2. fazer backup do estado atual;
-3. extrair backup escolhido em `/home1/opents62/public_html/provadorvirtual_v2`;
+3. extrair backup escolhido em `/home1/opents62/provadorvirtual.online/provadorvirtual_v2`;
 4. preservar `.env` e `storage`;
 5. rodar `php artisan optimize:clear`;
 6. validar smokes.
