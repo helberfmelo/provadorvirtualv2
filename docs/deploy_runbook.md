@@ -116,7 +116,6 @@ APP_NAME="Provador Virtual"
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://provadorvirtual.online/provadorvirtual_v2
-APP_BASE_PATH=/provadorvirtual_v2/
 FRONTEND_URL=https://provadorvirtual.online/provadorvirtual_v2
 
 DB_CONNECTION=mysql
