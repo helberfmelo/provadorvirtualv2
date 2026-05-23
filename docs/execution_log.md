@@ -259,3 +259,6 @@
 - SaaS ganhou historico de envios em `/api/v1/saas/transactional-email-sends` e listagem na tela `/saas`.
 - Criado documento `docs/transactional_email_automation.md`.
 - Validacoes locais focadas: `php artisan test --filter=TransactionalEmailDispatchTest`, `php artisan test --filter=SaasEmailApiTest`, `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=PaymentSyncCommandTest` e `npm run build`.
+- Validacoes locais completas: `php artisan test`, `npm run build`, build raiz com `VITE_APP_BASE_PATH=/`, `git diff --check` e `vendor/bin/pint --dirty`.
+- Run `26338061259` do GitHub Actions finalizou com sucesso para o commit `62e0830`.
+- Validado em producao: `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

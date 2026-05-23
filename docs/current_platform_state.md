@@ -27,7 +27,7 @@ Atualizado em: 2026-05-23
 - Sprint 28 criou monitor de pagamentos pendentes, agendamento de cron/scheduler e configuracao SaaS de SMTP/templates transacionais; publicado em producao no run `26336899986`.
 - Sprint 29 preparou login por e-mail/CPF, acesso do portal por codigo/CNPJ e contexto de empresa no token; publicado em producao no run `26337254520`.
 - Sprint 30 criou CRUD de usuarios no SaaS e no portal da empresa, permissoes por modulo/menu, status global/por empresa e acoes de editar/ativar/desativar; publicado em producao no run `26337792120`.
-- Sprint 31 criou automacoes de e-mail transacional, historico de envios e comando/scheduler para pendencias financeiras.
+- Sprint 31 criou automacoes de e-mail transacional, historico de envios e comando/scheduler para pendencias financeiras; publicado em producao no run `26338061259`.
 
 ## Referencias confirmadas
 
@@ -127,4 +127,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Publicar a Sprint 31, validar historico de e-mails em producao e seguir para a Sprint 32 de login multiempresa refinado e enforcement completo de permissoes.
+Seguir para a proxima sprint de refinamento comercial, bloqueio de integracao BigShop, responsividade e ajustes do site publico.

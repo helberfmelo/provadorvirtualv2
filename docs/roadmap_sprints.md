@@ -369,7 +369,7 @@ Entregas:
 - links de checkout de renovacao;
 - historico de envios por empresa e template.
 
-Status: implementado e validado localmente. Publicacao em producao pendente do push da sprint.
+Status: implementado, publicado e validado em producao no run `26338061259`.
 
 ### Sprint 32 - Login multiempresa e permissoes refinadas
 
