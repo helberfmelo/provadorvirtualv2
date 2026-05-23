@@ -3,6 +3,8 @@
 use App\Models\AiUsageLog;
 use App\Models\AuditLog;
 use App\Models\IntegrationEvent;
+use App\Models\Merchant;
+use App\Models\MerchantCompany;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
@@ -11,10 +13,12 @@ use App\Models\ShopperProfile;
 use App\Models\User;
 use App\Services\PagarMeCheckoutService;
 use App\Services\TransactionalEmailService;
+use App\Support\PermissionCatalog;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schedule;
+use Illuminate\Support\Facades\Schema;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -52,6 +56,116 @@ Artisan::command('pv:create-master-admin {--email=} {--name=} {--cpf=} {--passwo
 
     return 0;
 })->purpose('Cria ou atualiza um master admin do SaaS sem expor a senha no banco de versao.');
+
+Artisan::command('pv:ensure-demo-store-owner {--email=} {--name=} {--cpf=} {--password=}', function (): int {
+    $email = mb_strtolower(trim((string) $this->option('email')));
+    $name = trim((string) $this->option('name'));
+    $cpf = preg_replace('/\D+/', '', (string) $this->option('cpf')) ?: null;
+    $password = (string) $this->option('password');
+
+    if ($email === '' || $name === '' || $password === '') {
+        $this->error('Informe --email, --name e --password.');
+
+        return 1;
+    }
+
+    if ($cpf !== null && strlen($cpf) !== 11) {
+        $this->error('CPF deve conter 11 digitos.');
+
+        return 1;
+    }
+
+    $merchant = Merchant::query()->updateOrCreate(
+        ['slug' => 'provador-virtual-demo'],
+        [
+            'name' => 'Provador Virtual Demo Store',
+            'billing_status' => 'trialing',
+            'trial_ends_at' => now()->addDays(14),
+        ],
+    );
+
+    $companyData = [
+        'name' => 'Provador Virtual Loja Teste',
+        'legal_name' => 'Provador Virtual Loja Teste Ltda',
+        'document' => '12345678000195',
+        'domain' => 'provadorvirtual.online',
+        'platform' => 'custom',
+        'status' => 'active',
+    ];
+
+    foreach ([
+        'zip_code' => '01001000',
+        'street' => 'Praca da Se',
+        'number' => '100',
+        'district' => 'Se',
+        'city' => 'Sao Paulo',
+        'state' => 'SP',
+        'country' => 'BR',
+    ] as $column => $value) {
+        if (Schema::hasColumn('merchant_companies', $column)) {
+            $companyData[$column] = $value;
+        }
+    }
+
+    $company = MerchantCompany::query()->updateOrCreate(
+        [
+            'merchant_id' => $merchant->id,
+            'external_store_id' => 'pv-demo-store',
+        ],
+        $companyData,
+    );
+
+    if (Schema::hasColumn('merchant_companies', 'access_code')) {
+        $company->ensureAccessCode();
+        $company->refresh();
+    }
+
+    $userData = [
+        'name' => $name,
+        'role' => 'admin',
+        'password' => Hash::make($password),
+    ];
+
+    if (Schema::hasColumn('users', 'cpf')) {
+        $userData['cpf'] = $cpf;
+    }
+
+    if (Schema::hasColumn('users', 'status')) {
+        $userData['status'] = 'active';
+    }
+
+    if (Schema::hasColumn('users', 'permissions')) {
+        $userData['permissions'] = PermissionCatalog::full('saas');
+    }
+
+    $user = User::query()->updateOrCreate(['email' => $email], $userData);
+
+    $pivotData = [
+        'role' => 'owner',
+        'is_owner' => true,
+    ];
+
+    if (Schema::hasColumn('merchant_user', 'merchant_company_id')) {
+        $pivotData['merchant_company_id'] = $company->id;
+    }
+
+    if (Schema::hasColumn('merchant_user', 'status')) {
+        $pivotData['status'] = 'active';
+    }
+
+    if (Schema::hasColumn('merchant_user', 'permissions')) {
+        $pivotData['permissions'] = json_encode(PermissionCatalog::full('merchant'));
+    }
+
+    $user->merchants()->syncWithoutDetaching([
+        $merchant->id => $pivotData,
+    ]);
+
+    $storeAccess = $company->access_code ?: $company->document ?: (string) $company->id;
+    $this->info("Usuario {$user->email} vinculado como owner da loja teste {$storeAccess}.");
+
+    return 0;
+})->purpose('Vincula o master admin como owner da loja teste usada no provador virtual demo.');
 
 Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do widget} {--dry-run}', function (): int {
     $days = (int) ($this->option('days') ?: config('privacy.widget_data_retention_days', 30));

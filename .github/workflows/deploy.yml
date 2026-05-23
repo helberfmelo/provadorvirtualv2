@@ -441,6 +441,7 @@ jobs:
             printf 'MASTER_PASSWORD=%q\n' "$PV_MASTER_ADMIN_PASSWORD"
             echo 'cd "$REMOTE_DIR"'
             echo 'php artisan pv:create-master-admin --email="$MASTER_EMAIL" --name="$MASTER_NAME" --cpf="$MASTER_CPF" --password="$MASTER_PASSWORD"'
+            echo 'php artisan pv:ensure-demo-store-owner --email="$MASTER_EMAIL" --name="$MASTER_NAME" --cpf="$MASTER_CPF" --password="$MASTER_PASSWORD"'
           } > "$REMOTE_ADMIN_SCRIPT"
 
           ADMIN_EXIT=1
