@@ -45,7 +45,7 @@ Entregas:
 - vinculo produto/tabela;
 - validacoes e testes.
 
-Status: implementado em API protegida por Sanctum e telas `/app/produtos` e `/app/tabelas-de-medidas`; aguardando deploy verde para encerrar a sprint.
+Status: concluido e publicado em producao no run `26326950616`.
 
 ## Sprint 3 - Motor de Recomendacao
 

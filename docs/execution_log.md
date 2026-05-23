@@ -41,6 +41,8 @@
 - Criadas telas Vue `/app/produtos` e `/app/tabelas-de-medidas` para CRUD operacional da loja demo.
 - Criados testes `ProductsApiTest` e `MeasurementTablesApiTest`.
 - Validacoes locais: `php artisan route:list --path=api/v1`, `php artisan test`, `vendor/bin/pint` e `npm run build`.
+- Run `26326950616` do GitHub Actions finalizou com sucesso para o commit `3b37c90`.
+- Validado em producao: `/app/produtos`, `/app/tabelas-de-medidas`, login demo, `/api/v1/products` e `/api/v1/measurement-tables`.
 
 ## Pendencias abertas
 

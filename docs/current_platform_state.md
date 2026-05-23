@@ -8,7 +8,7 @@ Atualizado em: 2026-05-23
 - Git local foi inicializado em `main` e conectado ao remoto `git@github.com:helberfmelo/provadorvirtualv2.git`.
 - Foram criados documentos iniciais, `.gitignore` e workflow de deploy.
 - Sprint 1 scaffoldou `backend/` Laravel 12 e `frontend/` Vue 3/Vite.
-- Sprint 2 criou CRUD de produtos, variacoes, tabelas de medidas e templates operacionais no painel e na API.
+- Sprint 2 publicou CRUD de produtos, variacoes, tabelas de medidas e templates operacionais no painel e na API.
 
 ## Referencias confirmadas
 
@@ -65,6 +65,7 @@ Atualizado em: 2026-05-23
 - Path remoto confirmado pelo v1: `/home1/opents62/provadorvirtual.online/provadorvirtual_v2`.
 - Acesso SSH local ao HostGator/opents62 foi validado; `https://provadorvirtual.online/provadorvirtual_v1/` responde a partir de `/home1/opents62/provadorvirtual.online/provadorvirtual_v1`.
 - Sprint 1 publicada em producao pelo GitHub Actions no run `26326675713`.
+- Sprint 2 publicada em producao pelo GitHub Actions no run `26326950616`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
 - Falta chave de IA se as primeiras sprints incluirem OCR/geracao assistida.
@@ -73,4 +74,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Concluir deploy acompanhado da Sprint 2 e iniciar a Sprint 3: motor de recomendacao deterministico.
+Iniciar a Sprint 3: motor de recomendacao deterministico.
