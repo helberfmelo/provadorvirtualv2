@@ -55,6 +55,14 @@
 - Run `26327119754` do GitHub Actions finalizou com sucesso para o commit `1c31542`.
 - Validado em producao: `/produto-teste` e POST em `/api/v1/public/recommendations`, retornando `recommended_size = M`.
 
+## 2026-05-23 - Sprint 4 Widget Universal v1
+
+- Criados assets publicos `backend/public/widget/v1/provador-virtual.js` e `backend/public/widget/v1/provador-virtual.css`.
+- Widget le atributos padrao e aliases legados, executa `config-check`, renderiza botao, abre modal responsivo, chama recomendacao e registra feedback.
+- Pagina `/produto-teste` passou a carregar o mesmo snippet publico usado por lojas externas.
+- Smoke do GitHub Actions passou a validar entrega do JS/CSS do widget.
+- Validacoes locais: `php artisan test`, `npm run build`, YAML do workflow e asset test `WidgetAssetTest`.
+
 ## Pendencias abertas
 
 - Regularizar billing/spending limit do GitHub Actions para repositorio privado.

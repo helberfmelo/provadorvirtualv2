@@ -22,7 +22,7 @@ Atualizado em: 2026-05-23
 - `DONE` CRUD de tabelas de medidas.
 - `DONE` Templates por tipo de peca/genero.
 - `DONE` Motor de recomendacao.
-- `TODO` Widget universal.
+- `DONE` Widget universal.
 - `DONE` Feedback de recomendacao.
 - `TODO` Analytics.
 - `TODO` SaaS admin.

@@ -10,6 +10,7 @@ Atualizado em: 2026-05-23
 - Sprint 1 scaffoldou `backend/` Laravel 12 e `frontend/` Vue 3/Vite.
 - Sprint 2 publicou CRUD de produtos, variacoes, tabelas de medidas e templates operacionais no painel e na API.
 - Sprint 3 criou motor deterministico, endpoints publicos de recomendacao/config-check/feedback e conectou `/produto-teste` ao backend real.
+- Sprint 4 criou widget publico em `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`, com modal, config-check, recomendacao e feedback.
 
 ## Referencias confirmadas
 
@@ -76,4 +77,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 4: Widget Universal v1.
+Concluir deploy acompanhado da Sprint 4 e iniciar a Sprint 5: Painel do Lojista.

@@ -45,6 +45,18 @@ Permitir que qualquer e-commerce instale o Provador Virtual com um snippet simpl
 7. Retorna recomendacao.
 8. Coleta feedback.
 
+Status Sprint 4: implementado em `/widget/v1/provador-virtual.js` com CSS escopado em `/widget/v1/provador-virtual.css`. A pagina `/produto-teste` carrega o widget real por snippet dinamico.
+
+## Contrato publico atual
+
+Endpoints usados pelo widget:
+
+- `POST /api/v1/public/recommendations/config-check`
+- `POST /api/v1/public/recommendations`
+- `POST /api/v1/public/recommendations/{id}/feedback`
+
+O widget resolve a base da API a partir do proprio `src`. Em producao, chamadas para `/provadorvirtual_v2/api/...` passam por redirect 307 para a entrada Laravel funcional em `/provadorvirtual_v2/public/api/...`.
+
 ## Guias por plataforma
 
 ### BigShop

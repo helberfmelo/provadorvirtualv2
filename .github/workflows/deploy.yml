@@ -343,6 +343,8 @@ jobs:
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/" | grep -q '<div id="app"'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/login" | grep -q '<div id="app"'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/produto-teste" | grep -q '<div id="app"'
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/widget/v1/provador-virtual.js" | grep -q 'data-pv-submit'
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/widget/v1/provador-virtual.css" | grep -q '.pv-trigger'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/api/v1/health" | grep -q '"status":"ok"'
           curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/api/v1/demo/product-test" | grep -q 'Vestido Luna Midi'
           curl --fail --silent --show-error -L \
