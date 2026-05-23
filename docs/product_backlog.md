@@ -67,4 +67,7 @@ Atualizado em: 2026-05-23
 - `DONE` Rate limit nas rotas publicas criticas.
 - `DONE` Status operacional publico.
 - `DONE` Comandos de anonimizacao e limpeza de logs.
-- `TODO` Checklist de go-live.
+- `DONE` Checklist de go-live.
+- `DONE` Tela de prontidao para go-live.
+- `DONE` Script de validacao de producao.
+- `DONE` Plano de cutover para raiz do dominio.

@@ -168,6 +168,17 @@ CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
    - `/provadorvirtual_v2/api/v1/ops/status` com `curl -L`;
    - `/provadorvirtual_v2/up`.
 
+## Validacao de producao
+
+Rodar apos deploy:
+
+```powershell
+.\scripts\validate-production.ps1
+```
+
+O script usa a URL publica, valida paginas, APIs, recomendacao, CORS e o endpoint
+protegido de go-live com o usuario demo.
+
 ## Rollback
 
 O workflow gera backup em:

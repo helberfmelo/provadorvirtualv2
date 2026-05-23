@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BigShopActivationController;
 use App\Http\Controllers\Api\V1\BigShopIntegrationController;
 use App\Http\Controllers\Api\V1\DemoProductController;
+use App\Http\Controllers\Api\V1\GoLiveReadinessController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\ImportController;
 use App\Http\Controllers\Api\V1\IntegrationController;
@@ -84,6 +85,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/ai/measurement-table-suggestions', [AiMeasurementAssistantController::class, 'suggest']);
         Route::get('/analytics/recommendations', [AnalyticsController::class, 'recommendations']);
         Route::get('/audit-logs', [AuditLogController::class, 'index']);
+        Route::get('/go-live/readiness', GoLiveReadinessController::class);
         Route::get('/saas/overview', [SaasAdminController::class, 'overview']);
         Route::get('/saas/merchants', [SaasAdminController::class, 'merchants']);
         Route::apiResource('measurement-tables', MeasurementTableController::class);

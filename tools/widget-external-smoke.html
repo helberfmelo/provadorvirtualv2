@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Provador Virtual - Smoke Externo</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background: #f6f7fb;
+        color: #111827;
+      }
+
+      main {
+        width: min(760px, calc(100% - 32px));
+        margin: 48px auto;
+      }
+
+      .product {
+        display: grid;
+        gap: 14px;
+        padding: 22px;
+        border: 1px solid #e5e7eb;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      h1 {
+        margin: 0;
+        color: #0f172a;
+      }
+
+      .sizes {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .sizes span {
+        display: inline-grid;
+        min-width: 42px;
+        min-height: 38px;
+        place-items: center;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section class="product">
+        <span>Smoke externo via localhost</span>
+        <h1>Vestido Luna Midi</h1>
+        <p>Sirva este arquivo por HTTP local para validar o widget fora do app principal.</p>
+        <div class="sizes">
+          <span>PP</span>
+          <span>P</span>
+          <span>M</span>
+          <span>G</span>
+          <span>GG</span>
+        </div>
+        <div id="provador-virtual-container"></div>
+      </section>
+    </main>
+
+    <script
+      id="provadorVirtualScript"
+      src="https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js"
+      data-merchant-id="1"
+      data-store-id="1"
+      data-product-id="1"
+      data-platform="custom"
+      data-container-id="provador-virtual-container"
+      data-debug="true"
+      defer>
+    </script>
+  </body>
+</html>

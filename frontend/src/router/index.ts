@@ -3,6 +3,7 @@ import AiAssistantView from '../views/AiAssistantView.vue'
 import AnalyticsView from '../views/AnalyticsView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
+import GoLiveView from '../views/GoLiveView.vue'
 import ImportsView from '../views/ImportsView.vue'
 import IntegrationsView from '../views/IntegrationsView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -30,6 +31,7 @@ const router = createRouter({
     { path: '/app/tabelas-de-medidas', component: MeasurementTablesView },
     { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/analytics', component: AnalyticsView },
+    { path: '/app/go-live', component: GoLiveView },
     { path: '/app/importacoes', component: ImportsView },
     { path: '/app/widget', component: WidgetInstallView },
     { path: '/app/integracoes', component: IntegrationsView },

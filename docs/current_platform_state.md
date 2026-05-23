@@ -18,6 +18,7 @@ Atualizado em: 2026-05-23
 - Sprint 9 criou assistente de tabelas com parser local, logs de uso de IA e revisao obrigatoria.
 - Sprint 10 criou analytics do lojista, SaaS admin basico e trilha `audit_logs`.
 - Sprint 11 criou paginas legais, CORS por dominio do widget, rate limits, status operacional e rotinas de privacidade.
+- Sprint 12 criou checklist de go-live, endpoint/tela de prontidao, script de validacao de producao e plano de cutover.
 
 ## Referencias confirmadas
 
@@ -100,6 +101,7 @@ Atualizado em: 2026-05-23
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`.
 - Analytics/auditoria protegidos: `/api/v1/analytics/*`, `/api/v1/audit-logs` e `/api/v1/saas/*`.
+- Go-live protegido: `/api/v1/go-live/readiness` e `/app/go-live`.
 - Observabilidade publica: `/api/v1/ops/status`.
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
 - BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
@@ -108,4 +110,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 12: Go-live Assistido.
+Validar/deployar a Sprint 12 e manter pendencias externas de BigShop/IA documentadas.

@@ -957,6 +957,38 @@ td small {
   background: #d1fae5;
 }
 
+.status-pill.warning {
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.readiness-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.readiness-row {
+  display: grid;
+  grid-template-columns: 110px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 13px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.readiness-row strong,
+.readiness-row small {
+  display: block;
+}
+
+.readiness-row small {
+  color: #6b7280;
+  line-height: 1.5;
+}
+
 .job-list {
   display: grid;
   gap: 8px;
@@ -1017,6 +1049,10 @@ td small {
   .subsection-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .readiness-row {
+    grid-template-columns: 1fr;
   }
 }
 

@@ -83,6 +83,7 @@ npm run dev
 - `/api/v1/ai/measurement-table-suggestions`
 - `/api/v1/analytics/recommendations`
 - `/api/v1/audit-logs`
+- `/api/v1/go-live/readiness`
 - `/api/v1/saas/overview`
 - `/api/v1/saas/merchants`
 - `/api/v1/ops/status`
@@ -170,3 +171,5 @@ Status Sprint 9: painel demo possui `/app/assistente`; texto/CSV gera sugestao d
 Status Sprint 10: painel demo possui `/app/analytics`; `/saas` exige usuario com papel `admin` ou `support`.
 
 Status Sprint 11: paginas `/privacidade` e `/termos` disponiveis; rotas publicas do widget validam origem por dominio; comandos `pv:privacy-anonymize` e `pv:privacy-prune` disponiveis.
+
+Status Sprint 12: painel possui `/app/go-live`; script `scripts/validate-production.ps1` valida producao; `tools/widget-external-smoke.html` testa snippet fora do app quando servido por HTTP local.

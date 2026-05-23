@@ -164,7 +164,18 @@
 - Validado em producao: `/privacidade`, `/termos`, `GET /public/api/v1/ops/status`, bloqueio de origem nao cadastrada com `403` e origem `https://provadorvirtual.online` com CORS correto.
 - Rollback readiness validado pelo backup criado no deploy: `provadorvirtual-v2-backup-20260523-094207-ac1025f2a2469b9876d93764652ce87acd0e7174.tar.gz`.
 
+## 2026-05-23 - Sprint 12 Go-live Assistido
+
+- Criado endpoint protegido `GET /api/v1/go-live/readiness`.
+- Criada tela `/app/go-live` com checklist de prontidao, URLs de producao e credenciais pendentes.
+- Criado script `scripts/validate-production.ps1` para smoke publico/autenticado em producao.
+- Criado `tools/widget-external-smoke.html` para validar widget de producao servido por HTTP local.
+- Criado documento `docs/go_live_cutover.md`.
+- Validacoes locais: `php artisan test --filter=GoLiveReadinessApiTest`, `vendor/bin/pint`, `php artisan test`, `npm run build`, `php artisan route:list --path=api/v1/go-live` e `git diff --check`.
+
 ## Pendencias abertas
 
 - Repositorio esta publico para manter a cota do GitHub Actions disponivel.
 - Cadastrar `OPENAI_API_KEY` ou `GEMINI_API_KEY` e ativar provider externo para OCR real de imagem.
+- Cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV`.
+- Receber loja piloto BigShop, `store_id`, token `x-api` e webhook secret, se existir.

@@ -64,6 +64,7 @@ APIs protegidas ja implementadas:
 - `POST /api/v1/ai/measurement-table-suggestions`
 - `GET /api/v1/analytics/recommendations`
 - `GET /api/v1/audit-logs`
+- `GET /api/v1/go-live/readiness`
 - `GET /api/v1/saas/overview`
 - `GET /api/v1/saas/merchants`
 - `GET /api/v1/ops/status`
@@ -216,3 +217,9 @@ Producao inicial:
 - Rotas publicas do widget usam middleware proprio para validar `Origin` contra dominios ativos do lojista.
 - Rate limit inicial aplicado em login, recomendacao publica, feedback, ativacao BigShop e status operacional.
 - Comandos `pv:privacy-anonymize` e `pv:privacy-prune` fazem retencao operacional sem apagar analytics de recomendacao.
+
+## Go-live Sprint 12
+
+- `/api/v1/go-live/readiness` consolida checks de produto, tabela, widget, recomendacao, BigShop, IA, legal e cutover.
+- `/app/go-live` exibe status operacional para o lojista antes de liberar trafego real.
+- `scripts/validate-production.ps1` roda smokes publicos e autenticados contra producao.

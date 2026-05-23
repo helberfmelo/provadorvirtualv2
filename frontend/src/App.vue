@@ -32,6 +32,7 @@ async function logout() {
         <RouterLink v-if="auth.isAuthenticated" to="/app/tabelas-de-medidas">Tabelas</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/assistente">Assistente</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/analytics">Analytics</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated" to="/app/go-live">Go-live</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/importacoes">Importacoes</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/widget">Widget</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/integracoes">Integracoes</RouterLink>

@@ -112,6 +112,15 @@ Usar SKU fixo ou atualizar dinamicamente com JS proprio da loja.
 - demonstracao comercial;
 - debug de recomendacao sem depender de loja externa.
 
+## Smoke externo Sprint 12
+
+Arquivo:
+
+- `tools/widget-external-smoke.html`
+
+Servir por `localhost` para simular uma loja externa usando o widget de producao.
+Para dominios reais, cadastrar o dominio em `/app/widget` antes do teste.
+
 ## Compatibilidade com v1
 
 Enquanto houver migracao, o widget pode aceitar aliases:

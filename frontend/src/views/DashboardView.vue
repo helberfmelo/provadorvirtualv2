@@ -92,6 +92,13 @@ onMounted(() => {
           <small>{{ summary.recommendations_today }} hoje</small>
         </span>
       </RouterLink>
+      <RouterLink class="onboarding-step" to="/app/go-live">
+        <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+        <span>
+          <strong>Go-live</strong>
+          <small>Checklist final</small>
+        </span>
+      </RouterLink>
       <RouterLink class="onboarding-step" to="/app/importacoes">
         <i class="fa-solid fa-file-import" aria-hidden="true"></i>
         <span>
@@ -124,6 +131,10 @@ onMounted(() => {
       <RouterLink class="btn btn-secondary" to="/app/analytics">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
         Analytics
+      </RouterLink>
+      <RouterLink class="btn btn-secondary" to="/app/go-live">
+        <i class="fa-solid fa-rocket" aria-hidden="true"></i>
+        Go-live
       </RouterLink>
       <RouterLink class="btn btn-secondary" to="/app/widget">
         <i class="fa-solid fa-code" aria-hidden="true"></i>

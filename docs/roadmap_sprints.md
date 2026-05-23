@@ -195,3 +195,5 @@ Entregas:
 - validacao de widget externo;
 - checklist de cutover;
 - plano para raiz `provadorvirtual.online`.
+
+Status: implementado localmente em 2026-05-23; aguardando deploy/validacao final da sprint.
