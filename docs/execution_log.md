@@ -92,6 +92,8 @@
 - Criado documento `docs/imports_data_quality.md`.
 - Criados testes `ImportsApiTest`.
 - Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build` e smoke autenticado em `/api/v1/imports/preview`.
+- Run `26331691701` do GitHub Actions finalizou com sucesso para o commit `2c9279b`.
+- Validado em producao: `/app/importacoes`, `GET /public/api/v1/imports` e `POST /public/api/v1/imports/preview`.
 
 ## Pendencias abertas
 

@@ -106,7 +106,7 @@ Entregas:
 - preview e validacao antes de importar;
 - jobs e logs.
 
-Status: implementado localmente; publicar e validar em producao.
+Status: concluido e publicado em producao no run `26331691701`.
 
 ## Sprint 7 - Integracao BigShop Base
 
