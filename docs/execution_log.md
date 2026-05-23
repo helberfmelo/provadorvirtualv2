@@ -80,6 +80,19 @@
 - Run `26331485173` do GitHub Actions finalizou com sucesso para o commit `2b9d4e9`.
 - Validado em producao: `/app/widget`, `/app/integracoes`, `/public/api/v1/widget-install`, `/public/api/v1/integrations` e resposta `401` controlada sem token.
 
+## 2026-05-23 - Sprint 6 Importacao e Templates Assistidos
+
+- Criadas migrations `import_jobs` e `integration_events`.
+- Criado service de importacao com preview e commit sincronizados.
+- Criados endpoints protegidos `/api/v1/imports`, `/api/v1/imports/preview` e `/api/v1/imports/{importJob}`.
+- CSV de produtos cria/atualiza produtos e variacoes por SKU/ID externo.
+- CSV de tabelas cria/atualiza tabelas e substitui linhas da tabela importada.
+- Parser inicial de Google Shopping XML cria preview/commit de produtos quando o feed informa campos basicos.
+- Criada tela Vue `/app/importacoes` com amostras, leitura de arquivo, preview, commit e historico.
+- Criado documento `docs/imports_data_quality.md`.
+- Criados testes `ImportsApiTest`.
+- Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build` e smoke autenticado em `/api/v1/imports/preview`.
+
 ## Pendencias abertas
 
 - Repositorio esta publico para manter a cota do GitHub Actions disponivel.

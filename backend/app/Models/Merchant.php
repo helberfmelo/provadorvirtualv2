@@ -50,4 +50,14 @@ class Merchant extends Model
     {
         return $this->hasMany(PlatformConnection::class);
     }
+
+    public function importJobs()
+    {
+        return $this->hasMany(ImportJob::class);
+    }
+
+    public function integrationEvents()
+    {
+        return $this->hasMany(IntegrationEvent::class);
+    }
 }

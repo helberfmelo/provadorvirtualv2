@@ -12,6 +12,7 @@ Atualizado em: 2026-05-23
 - Sprint 3 criou motor deterministico, endpoints publicos de recomendacao/config-check/feedback e conectou `/produto-teste` ao backend real.
 - Sprint 4 criou widget publico em `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`, com modal, config-check, recomendacao e feedback.
 - Sprint 5 criou configuracao operacional do widget no painel, catalogo de integracoes e persistencia de conexoes por plataforma.
+- Sprint 6 criou importacao com preview/commit para CSV de produtos, CSV de tabelas e Google XML inicial.
 
 ## Referencias confirmadas
 
@@ -83,9 +84,10 @@ Atualizado em: 2026-05-23
 
 - Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/widget`, `/app/integracoes`.
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
+- Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
 - APIs publicas: health, produto demo e recomendacoes do widget.
 - Widget publico: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 6: Importacao e Templates Assistidos.
+Publicar a Sprint 6 e iniciar a Sprint 7: Integracao BigShop Base.

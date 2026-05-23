@@ -54,6 +54,9 @@ APIs protegidas ja implementadas:
 - `GET|PATCH /api/v1/widget-install`
 - `GET /api/v1/integrations`
 - `PATCH /api/v1/integrations/{platform}`
+- `GET|POST /api/v1/imports`
+- `POST /api/v1/imports/preview`
+- `GET /api/v1/imports/{importJob}`
 
 ## Frontend
 

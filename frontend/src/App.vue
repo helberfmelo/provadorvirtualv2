@@ -25,6 +25,7 @@ async function logout() {
         <RouterLink to="/produto-teste">Produto teste</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/produtos">Produtos</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/tabelas-de-medidas">Tabelas</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated" to="/app/importacoes">Importacoes</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/widget">Widget</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app/integracoes">Integracoes</RouterLink>
         <RouterLink v-if="!auth.isAuthenticated" to="/login">Entrar</RouterLink>

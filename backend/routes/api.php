@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DemoProductController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\ImportController;
 use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\MeasurementTableController;
 use App\Http\Controllers\Api\V1\MeasurementTemplateController;
@@ -57,6 +58,10 @@ Route::prefix('v1')->group(function (): void {
         Route::patch('/widget-install', [WidgetInstallController::class, 'update']);
         Route::get('/integrations', [IntegrationController::class, 'index']);
         Route::patch('/integrations/{platform}', [IntegrationController::class, 'update']);
+        Route::get('/imports', [ImportController::class, 'index']);
+        Route::post('/imports/preview', [ImportController::class, 'preview']);
+        Route::post('/imports', [ImportController::class, 'store']);
+        Route::get('/imports/{importJob}', [ImportController::class, 'show']);
         Route::apiResource('measurement-tables', MeasurementTableController::class);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('products.variants', ProductVariantController::class)

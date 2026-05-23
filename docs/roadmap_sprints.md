@@ -106,6 +106,8 @@ Entregas:
 - preview e validacao antes de importar;
 - jobs e logs.
 
+Status: implementado localmente; publicar e validar em producao.
+
 ## Sprint 7 - Integracao BigShop Base
 
 Objetivo: conectar BigShop por API e sincronizar dados reais.

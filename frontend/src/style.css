@@ -618,7 +618,8 @@ textarea {
 }
 
 .install-grid,
-.integrations-grid {
+.integrations-grid,
+.import-grid {
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(360px, 1.1fr);
   gap: 18px;
@@ -783,6 +784,79 @@ textarea {
   display: block;
 }
 
+.import-preview-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.summary-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.summary-strip span {
+  display: grid;
+  min-width: 110px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.summary-strip strong {
+  color: #0f172a;
+  font-size: 1.25rem;
+}
+
+.summary-strip small {
+  color: #6b7280;
+}
+
+.status-pill {
+  display: inline-flex;
+  max-width: 220px;
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: #991b1b;
+  background: #fee2e2;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.status-pill.ok {
+  color: #065f46;
+  background: #d1fae5;
+}
+
+.job-list {
+  display: grid;
+  gap: 8px;
+}
+
+.job-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 11px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.job-row i {
+  color: #ff4d5e;
+}
+
+.job-row strong,
+.job-row small {
+  display: block;
+}
+
+.job-row small {
+  color: #6b7280;
+}
+
 @media (max-width: 860px) {
   .hero-section,
   .product-page,
@@ -792,6 +866,7 @@ textarea {
   .inline-form,
   .install-grid,
   .integrations-grid,
+  .import-grid,
   .color-grid {
     grid-template-columns: 1fr;
   }

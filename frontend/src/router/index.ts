@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
+import ImportsView from '../views/ImportsView.vue'
 import IntegrationsView from '../views/IntegrationsView.vue'
 import LoginView from '../views/LoginView.vue'
 import MeasurementTablesView from '../views/MeasurementTablesView.vue'
@@ -20,6 +21,7 @@ const router = createRouter({
     { path: '/app', component: DashboardView },
     { path: '/app/produtos', component: ProductsView },
     { path: '/app/tabelas-de-medidas', component: MeasurementTablesView },
+    { path: '/app/importacoes', component: ImportsView },
     { path: '/app/widget', component: WidgetInstallView },
     { path: '/app/integracoes', component: IntegrationsView },
     { path: '/:pathMatch(.*)*', redirect: '/' },

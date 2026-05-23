@@ -26,6 +26,9 @@ Atualizado em: 2026-05-23
 - `DONE` Feedback de recomendacao.
 - `DONE` Tela de instalacao do widget.
 - `DONE` Catalogo inicial de integracoes.
+- `DONE` Importacao CSV de produtos.
+- `DONE` Importacao CSV de tabelas.
+- `DONE` Parser inicial Google XML.
 - `TODO` Analytics.
 - `TODO` SaaS admin.
 
@@ -36,6 +39,7 @@ Atualizado em: 2026-05-23
 - `TODO` BigShop sync produtos/grades.
 - `TODO` BigShop um clique.
 - `DONE` Base do guia/snippet custom no painel.
+- `DONE` Tabelas `import_jobs` e `integration_events`.
 - `TODO` Guias Shopify.
 - `TODO` Guias WooCommerce.
 - `TODO` Guias Nuvemshop.
