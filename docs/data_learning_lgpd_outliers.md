@@ -4,7 +4,7 @@ Atualizado em: 2026-05-23
 
 Objetivo: definir como o v2 deve usar dados de consumidores e lojistas para ficar mais inteligente sem transformar excecoes em regra e sem violar privacidade.
 
-Status Sprint 36: implementada a primeira base operacional com `shopper_profiles`, `recommendation_learning_events`, consentimento no widget, esquecimento por token local, sinais de feedback/compra/devolucao/troca e `outlier_score` antes de qualquer uso estatistico.
+Status Sprint 36: implementada e publicada no run `26339824157` a primeira base operacional com `shopper_profiles`, `recommendation_learning_events`, consentimento no widget, esquecimento por token local, sinais de feedback/compra/devolucao/troca e `outlier_score` antes de qualquer uso estatistico.
 
 ## Principios
 

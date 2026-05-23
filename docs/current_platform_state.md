@@ -32,7 +32,7 @@ Atualizado em: 2026-05-23
 - Sprint 33 completou login multiempresa, seletor de empresa no painel, escopo por empresa nas APIs do portal, enforcement de permissoes por rota e auditoria com empresa/modulo/acao; publicado em producao no run `26338888072`.
 - Sprint 34 criou guias de integracao por plataforma, snippets, checklist visual, matriz de dados suportados e validacao protegida de instalacao por URL publica; publicado em producao no run `26339199751`.
 - Sprint 35 preparou o contrato BigShop um clique com snippet/contract na resposta da ativacao e monitor protegido de ativacoes no painel; publicado em producao no run `26339426665`.
-- Sprint 36 criou perfis anonimos com consentimento, token local, esquecimento, eventos de aprendizado, sinais comerciais, outlier score e analytics de qualidade.
+- Sprint 36 criou perfis anonimos com consentimento, token local, esquecimento, eventos de aprendizado, sinais comerciais, outlier score e analytics de qualidade; publicado em producao no run `26339824157`.
 
 ## Referencias confirmadas
 
@@ -103,6 +103,7 @@ Atualizado em: 2026-05-23
 - Sprint 33 publicada em producao pelo GitHub Actions no run `26338888072`.
 - Sprint 34 publicada em producao pelo GitHub Actions no run `26339199751`.
 - Sprint 35 publicada em producao pelo GitHub Actions no run `26339426665`.
+- Sprint 36 publicada em producao pelo GitHub Actions no run `26339824157`; o run `26339739429` falhou por limite de tamanho de nome de foreign key MySQL e foi corrigido no commit `5d5b5dc`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em producao usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que nao preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site publico comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

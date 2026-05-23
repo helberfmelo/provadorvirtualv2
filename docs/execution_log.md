@@ -278,3 +278,15 @@
 - Run `26338411089` do GitHub Actions finalizou com sucesso para o commit `116fcf6`.
 - Primeira tentativa de validacao de producao teve timeout transitorio de conexao logo apos deploy; nova tentativa 15 segundos depois retornou `PRODUCTION VALIDATION OK`.
 - Validacoes adicionais em producao: OG tags da raiz, `/favicon.svg`, imagens demo por API e precos `R$ 189,90`/`R$ 129,90`.
+
+## 2026-05-23 - Sprint 36 Perfis, aprendizado e outliers
+
+- Criadas tabelas `shopper_profiles` e `recommendation_learning_events`.
+- Sessao/log de recomendacao passaram a guardar vinculo de perfil, consentimento, snapshot, `outlier_score`, `learning_status` e `learning_reason`.
+- Widget passou a salvar perfil anonimo com consentimento, token local, limpeza de perfil, genero, formato corporal, caimento e barra de precisao.
+- Criados sinais publicos `feedback`, `add_to_cart`, `purchase`, `return` e `exchange` para aprendizado.
+- Analytics passou a exibir perfis, qualidade media, sinais de aprendizado, sinais comerciais e outliers bloqueados.
+- Validacoes locais: `vendor/bin/pint --dirty`, `php artisan test`, `npm run build`, filtros `RecommendationApiTest`, `AnalyticsApiTest` e `HardeningApiTest`.
+- Run `26339739429` falhou no deploy remoto porque o MySQL recusou a foreign key automatica `recommendation_learning_events_recommendation_feedback_id_foreign` por exceder 64 caracteres.
+- Commit `5d5b5dc` tornou a migration idempotente para recuperar a tentativa parcial e usou nomes curtos para foreign key/indices.
+- Run `26339824157` finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

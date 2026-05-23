@@ -443,7 +443,7 @@ Entregas previstas:
 - deteccao de outliers antes de alimentar modelos;
 - dashboards de qualidade da recomendacao.
 
-Status: implementado localmente. A Sprint 36 criou perfis anonimos com token local, consentimento e esquecimento; eventos de aprendizado para recomendacao, feedback e sinais comerciais; `outlier_score`/`learning_status`; e paineis de qualidade no analytics.
+Status: implementado, publicado e validado em producao no run `26339824157`. A Sprint 36 criou perfis anonimos com token local, consentimento e esquecimento; eventos de aprendizado para recomendacao, feedback e sinais comerciais; `outlier_score`/`learning_status`; e paineis de qualidade no analytics. O run anterior `26339739429` falhou por nome automatico de foreign key acima do limite do MySQL e foi corrigido com migration idempotente e identificadores curtos.
 
 ### Sprint 37 - Piloto comercial e qualidade final
 
