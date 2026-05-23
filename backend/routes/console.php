@@ -6,12 +6,47 @@ use App\Models\IntegrationEvent;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
+use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Hash;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
+
+Artisan::command('pv:create-master-admin {--email=} {--name=} {--cpf=} {--password=}', function (): int {
+    $email = mb_strtolower(trim((string) $this->option('email')));
+    $name = trim((string) $this->option('name'));
+    $cpf = preg_replace('/\D+/', '', (string) $this->option('cpf')) ?: null;
+    $password = (string) $this->option('password');
+
+    if ($email === '' || $name === '' || $password === '') {
+        $this->error('Informe --email, --name e --password.');
+
+        return 1;
+    }
+
+    if ($cpf !== null && strlen($cpf) !== 11) {
+        $this->error('CPF deve conter 11 digitos.');
+
+        return 1;
+    }
+
+    $user = User::query()->updateOrCreate(
+        ['email' => $email],
+        [
+            'name' => $name,
+            'cpf' => $cpf,
+            'role' => 'admin',
+            'password' => Hash::make($password),
+        ],
+    );
+
+    $this->info("Master admin pronto: {$user->email}");
+
+    return 0;
+})->purpose('Cria ou atualiza um master admin do SaaS sem expor a senha no banco de versao.');
 
 Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do widget} {--dry-run}', function (): int {
     $days = (int) ($this->option('days') ?: config('privacy.widget_data_retention_days', 30));

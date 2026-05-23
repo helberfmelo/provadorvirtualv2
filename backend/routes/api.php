@@ -39,6 +39,8 @@ Route::prefix('v1')->group(function (): void {
         ->middleware(['widget.origin', 'throttle:60,1']);
     Route::post('/public/recommendations/{recommendationLog}/feedback', [RecommendationController::class, 'feedback'])
         ->middleware(['widget.origin', 'throttle:120,1']);
+    Route::post('/public/company-access', [SaasAdminController::class, 'resolveCompanyAccess'])
+        ->middleware('throttle:30,1');
     Route::post('/public/bigshop/activate', BigShopActivationController::class)
         ->middleware('throttle:20,1');
 
@@ -88,6 +90,9 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/go-live/readiness', GoLiveReadinessController::class);
         Route::get('/saas/overview', [SaasAdminController::class, 'overview']);
         Route::get('/saas/merchants', [SaasAdminController::class, 'merchants']);
+        Route::get('/saas/companies', [SaasAdminController::class, 'companies']);
+        Route::post('/saas/companies', [SaasAdminController::class, 'storeCompany']);
+        Route::patch('/saas/companies/{company}', [SaasAdminController::class, 'updateCompany']);
         Route::apiResource('measurement-tables', MeasurementTableController::class);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('products.variants', ProductVariantController::class)
