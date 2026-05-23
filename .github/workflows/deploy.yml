@@ -1,0 +1,367 @@
+name: Deploy Production
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  PRODUCTION_APP_URL: https://provadorvirtual.online/provadorvirtual_v2
+  PRODUCTION_APP_BASE_PATH: /provadorvirtual_v2/
+  PRODUCTION_REMOTE_DIR: /home1/opents62/public_html/provadorvirtual_v2
+  PRODUCTION_BACKUP_DIR: /home1/opents62/deploy_backups/provadorvirtual_v2
+  PRODUCTION_BACKUP_KEEP: '5'
+
+concurrency:
+  group: provadorvirtual-v2-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Detect application scaffold
+        id: scaffold
+        shell: bash
+        run: |
+          if [ -f backend/composer.json ] && [ -f frontend/package.json ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "backend/ e frontend/ ainda nao existem; deploy real sera pulado ate a Sprint 1."
+          fi
+
+      - name: Setup PHP
+        if: steps.scaffold.outputs.ready == 'true'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          coverage: none
+
+      - name: Setup Node
+        if: steps.scaffold.outputs.ready == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install backend dependencies for validation
+        if: steps.scaffold.outputs.ready == 'true'
+        working-directory: backend
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Prepare CI environment
+        if: steps.scaffold.outputs.ready == 'true'
+        working-directory: backend
+        shell: bash
+        run: |
+          cp .env.example .env
+          mkdir -p database
+          touch database/database.sqlite
+          DB_DATABASE_PATH="$(pwd)/database/database.sqlite"
+          sed -i "s#^APP_ENV=.*#APP_ENV=testing#" .env || true
+          sed -i "s#^APP_URL=.*#APP_URL=http://localhost#" .env || true
+          sed -i "s#^DB_CONNECTION=.*#DB_CONNECTION=sqlite#" .env || true
+          if grep -q '^DB_DATABASE=' .env; then
+            sed -i "s#^DB_DATABASE=.*#DB_DATABASE=${DB_DATABASE_PATH}#" .env
+          else
+            echo "DB_DATABASE=${DB_DATABASE_PATH}" >> .env
+          fi
+          sed -i "s#^DB_USERNAME=.*#DB_USERNAME=#" .env || true
+          sed -i "s#^DB_PASSWORD=.*#DB_PASSWORD=#" .env || true
+          php artisan key:generate --force
+
+      - name: Validate backend
+        if: steps.scaffold.outputs.ready == 'true'
+        working-directory: backend
+        run: |
+          php artisan migrate:fresh --seed --no-interaction
+          php artisan route:list > /dev/null
+          php artisan test
+
+      - name: Prepare production backend dependencies
+        if: steps.scaffold.outputs.ready == 'true'
+        working-directory: backend
+        run: composer install --no-dev --prefer-dist --optimize-autoloader --no-interaction --no-progress
+
+      - name: Install frontend dependencies
+        if: steps.scaffold.outputs.ready == 'true'
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        if: steps.scaffold.outputs.ready == 'true'
+        working-directory: frontend
+        env:
+          VITE_APP_BASE_PATH: ${{ env.PRODUCTION_APP_BASE_PATH }}
+          VITE_API_BASE_URL: ${{ env.PRODUCTION_APP_BASE_PATH }}api/v1
+          VITE_WIDGET_BASE_URL: ${{ env.PRODUCTION_APP_BASE_PATH }}widget/v1
+          VITE_APP_VERSION: ${{ github.sha }}
+        run: npm run build
+
+      - name: Publish frontend into backend public
+        if: steps.scaffold.outputs.ready == 'true'
+        shell: bash
+        run: |
+          rm -rf backend/public/assets
+          cp -r frontend/dist/* backend/public/
+          rm -f backend/bootstrap/cache/*.php
+
+      - name: Create deploy archive
+        if: steps.scaffold.outputs.ready == 'true'
+        shell: bash
+        run: |
+          ARCHIVE_NAME="provadorvirtual-v2-${GITHUB_SHA}.tar.gz"
+          cd backend
+          tar \
+            --exclude='.env' \
+            --exclude='./tests' \
+            --exclude='./node_modules' \
+            --exclude='./storage/logs/*' \
+            --exclude='./storage/framework/cache/*' \
+            --exclude='./storage/framework/sessions/*' \
+            --exclude='./storage/framework/views/*' \
+            -czf "../${ARCHIVE_NAME}" .
+          cd ..
+          echo "ARCHIVE_NAME=${ARCHIVE_NAME}" >> "$GITHUB_ENV"
+
+      - name: Prepare production env file
+        if: steps.scaffold.outputs.ready == 'true'
+        env:
+          PRODUCTION_ENV: ${{ secrets.PRODUCTION_ENV }}
+        shell: bash
+        run: |
+          if [ -n "$PRODUCTION_ENV" ]; then
+            ENV_FILE="$RUNNER_TEMP/provadorvirtual-v2.env"
+            printf '%s\n' "$PRODUCTION_ENV" > "$ENV_FILE"
+            echo "PRODUCTION_ENV_FILE=${ENV_FILE}" >> "$GITHUB_ENV"
+            echo "PRODUCTION_ENV_PRESENT=true" >> "$GITHUB_ENV"
+          else
+            echo "PRODUCTION_ENV_PRESENT=false" >> "$GITHUB_ENV"
+          fi
+
+      - name: Setup SSH
+        if: steps.scaffold.outputs.ready == 'true'
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_PRIVATE_KEY_B64: ${{ secrets.SSH_PRIVATE_KEY_B64 }}
+          SSH_PASSPHRASE: ${{ secrets.SSH_PASSPHRASE }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_USER: ${{ secrets.FTP_USER }}
+        shell: bash
+        run: |
+          REMOTE_HOST="${SSH_HOST}"
+          REMOTE_PORT="${SSH_PORT:-22}"
+          REMOTE_USER="${SSH_USERNAME:-${SSH_USER:-${FTP_USERNAME:-$FTP_USER}}}"
+
+          if [ -z "$REMOTE_HOST" ]; then
+            echo "SSH_HOST precisa estar configurado nos secrets."
+            exit 1
+          fi
+
+          if [ -z "$REMOTE_USER" ]; then
+            echo "SSH_USERNAME, SSH_USER, FTP_USERNAME ou FTP_USER precisa estar configurado nos secrets."
+            exit 1
+          fi
+
+          if [ -z "$SSH_PRIVATE_KEY" ] && [ -z "$SSH_PRIVATE_KEY_B64" ]; then
+            echo "Configure SSH_PRIVATE_KEY ou SSH_PRIVATE_KEY_B64 no GitHub Actions."
+            exit 1
+          fi
+
+          mkdir -p ~/.ssh
+          KEY_PATH="$RUNNER_TEMP/provadorvirtual_v2_deploy_key"
+          SSH_BASE_ARGS=(
+            -o BatchMode=yes
+            -o IdentitiesOnly=yes
+            -o PreferredAuthentications=publickey
+            -o PubkeyAuthentication=yes
+            -o PasswordAuthentication=no
+            -o KbdInteractiveAuthentication=no
+            -o StrictHostKeyChecking=yes
+          )
+
+          if [ -n "$SSH_PRIVATE_KEY_B64" ]; then
+            if echo "$SSH_PRIVATE_KEY_B64" | base64 --decode > "$KEY_PATH" 2>/dev/null; then
+              :
+            elif [ -n "$SSH_PRIVATE_KEY" ]; then
+              printf '%s' "$SSH_PRIVATE_KEY" > "$KEY_PATH"
+            else
+              echo "SSH_PRIVATE_KEY_B64 invalido e SSH_PRIVATE_KEY nao foi informado."
+              exit 1
+            fi
+          else
+            printf '%s' "$SSH_PRIVATE_KEY" > "$KEY_PATH"
+          fi
+
+          chmod 600 "$KEY_PATH"
+
+          if [ -n "$SSH_PASSPHRASE" ]; then
+            ssh-keygen -p -P "$SSH_PASSPHRASE" -N "" -f "$KEY_PATH" > /dev/null
+          fi
+
+          ssh-keygen -lf "$KEY_PATH" > /dev/null
+
+          SELECTED_PORT=""
+          TESTED_PORTS=""
+          for CANDIDATE_PORT in "$REMOTE_PORT" 22 2222; do
+            if [ -n "$SELECTED_PORT" ] || [ -z "$CANDIDATE_PORT" ]; then
+              continue
+            fi
+
+            case " $TESTED_PORTS " in
+              *" $CANDIDATE_PORT "*) continue ;;
+            esac
+            TESTED_PORTS="$TESTED_PORTS $CANDIDATE_PORT"
+
+            ssh-keyscan -p "$CANDIDATE_PORT" -H "$REMOTE_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
+
+            if ssh "${SSH_BASE_ARGS[@]}" -p "$CANDIDATE_PORT" -i "$KEY_PATH" "${REMOTE_USER}@${REMOTE_HOST}" 'echo SSH_CONNECTION_OK' > /dev/null 2>&1; then
+              SELECTED_PORT="$CANDIDATE_PORT"
+            fi
+          done
+
+          if [ -z "$SELECTED_PORT" ]; then
+            echo "Nao foi possivel autenticar via SSH com a chave informada nas portas testadas."
+            exit 1
+          fi
+
+          echo "DEPLOY_HOST=${REMOTE_HOST}" >> "$GITHUB_ENV"
+          echo "DEPLOY_PORT=${SELECTED_PORT}" >> "$GITHUB_ENV"
+          echo "DEPLOY_USER=${REMOTE_USER}" >> "$GITHUB_ENV"
+          echo "DEPLOY_KEY_PATH=${KEY_PATH}" >> "$GITHUB_ENV"
+          echo "DEPLOY_REMOTE_DIR=${PRODUCTION_REMOTE_DIR}" >> "$GITHUB_ENV"
+
+      - name: Upload deploy archive
+        if: steps.scaffold.outputs.ready == 'true'
+        shell: bash
+        run: |
+          REMOTE_ARCHIVE="/home1/${DEPLOY_USER}/${ARCHIVE_NAME}"
+          scp \
+            -P "$DEPLOY_PORT" \
+            -i "$DEPLOY_KEY_PATH" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no \
+            -o StrictHostKeyChecking=yes \
+            "$ARCHIVE_NAME" "${DEPLOY_USER}@${DEPLOY_HOST}:${REMOTE_ARCHIVE}"
+          echo "DEPLOY_REMOTE_ARCHIVE=${REMOTE_ARCHIVE}" >> "$GITHUB_ENV"
+
+          if [ "${PRODUCTION_ENV_PRESENT}" = "true" ]; then
+            REMOTE_ENV="/home1/${DEPLOY_USER}/provadorvirtual-v2-${GITHUB_SHA}.env"
+            scp \
+              -P "$DEPLOY_PORT" \
+              -i "$DEPLOY_KEY_PATH" \
+              -o BatchMode=yes \
+              -o IdentitiesOnly=yes \
+              -o PreferredAuthentications=publickey \
+              -o PubkeyAuthentication=yes \
+              -o PasswordAuthentication=no \
+              -o KbdInteractiveAuthentication=no \
+              -o StrictHostKeyChecking=yes \
+              "$PRODUCTION_ENV_FILE" "${DEPLOY_USER}@${DEPLOY_HOST}:${REMOTE_ENV}"
+            echo "DEPLOY_REMOTE_ENV=${REMOTE_ENV}" >> "$GITHUB_ENV"
+          else
+            echo "DEPLOY_REMOTE_ENV=" >> "$GITHUB_ENV"
+          fi
+
+      - name: Run remote deploy
+        if: steps.scaffold.outputs.ready == 'true'
+        shell: bash
+        run: |
+          REMOTE_SCRIPT="$RUNNER_TEMP/provadorvirtual_v2_remote_deploy.sh"
+          {
+            echo 'set -e'
+            printf 'REMOTE_DIR=%q\n' "$DEPLOY_REMOTE_DIR"
+            printf 'REMOTE_ARCHIVE=%q\n' "$DEPLOY_REMOTE_ARCHIVE"
+            printf 'REMOTE_ENV=%q\n' "${DEPLOY_REMOTE_ENV:-}"
+            printf 'BACKUP_ROOT=%q\n' "${PRODUCTION_BACKUP_DIR}"
+            printf 'BACKUP_KEEP=%q\n' "${PRODUCTION_BACKUP_KEEP}"
+            printf 'RELEASE_SHA=%q\n' "${GITHUB_SHA}"
+            echo 'mkdir -p "$REMOTE_DIR"'
+            echo 'mkdir -p "$BACKUP_ROOT"'
+            echo 'if [ -f "$REMOTE_DIR/artisan" ]; then'
+            echo '  BACKUP_NAME="provadorvirtual-v2-backup-$(date +%Y%m%d-%H%M%S)-${RELEASE_SHA}.tar.gz"'
+            echo '  tar --exclude=".env" --exclude="./storage/logs/*" --exclude="./storage/framework/cache/*" --exclude="./storage/framework/sessions/*" --exclude="./storage/framework/views/*" -czf "$BACKUP_ROOT/$BACKUP_NAME" -C "$REMOTE_DIR" .'
+            echo '  echo "BACKUP_CREATED=$BACKUP_NAME"'
+            echo 'fi'
+            echo 'ls -1dt "$BACKUP_ROOT"/*.tar.gz 2>/dev/null | tail -n +$((BACKUP_KEEP + 1)) | xargs -r rm -f'
+            echo 'tar -xzf "$REMOTE_ARCHIVE" -C "$REMOTE_DIR"'
+            echo 'rm -f "$REMOTE_ARCHIVE"'
+            echo 'if [ -n "$REMOTE_ENV" ] && [ -f "$REMOTE_ENV" ]; then'
+            echo '  cp "$REMOTE_ENV" "$REMOTE_DIR/.env"'
+            echo '  rm -f "$REMOTE_ENV"'
+            echo 'fi'
+            echo 'cd "$REMOTE_DIR"'
+            echo '[ -f .env ] || { echo "ERRO: arquivo .env ausente em $REMOTE_DIR. Crie o .env remoto ou cadastre PRODUCTION_ENV."; exit 1; }'
+            echo 'mkdir -p storage/app/public storage/framework/cache storage/framework/sessions storage/framework/views storage/logs bootstrap/cache'
+            echo 'rm -f public/storage'
+            echo "find bootstrap/cache -maxdepth 1 -type f -name '*.php' -delete || true"
+            echo 'php artisan optimize:clear'
+            echo 'php artisan migrate --force'
+            echo 'if [ -f database/seeders/ProductionSeeder.php ]; then php artisan db:seed --class=ProductionSeeder --force; fi'
+            echo 'php artisan storage:link || true'
+            echo 'php artisan config:cache'
+            echo 'php artisan route:cache'
+            echo 'php artisan view:cache'
+            echo 'find storage -type d -exec chmod 775 {} \; || true'
+            echo 'find storage -type f -exec chmod 664 {} \; || true'
+            echo 'find bootstrap/cache -type f -exec chmod 664 {} \; || true'
+            echo 'chmod 644 .htaccess public/.htaccess 2>/dev/null || true'
+          } > "$REMOTE_SCRIPT"
+
+          ssh \
+            -p "$DEPLOY_PORT" \
+            -i "$DEPLOY_KEY_PATH" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no \
+            -o StrictHostKeyChecking=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" 'bash -se' < "$REMOTE_SCRIPT"
+
+      - name: Smoke test public URLs
+        if: steps.scaffold.outputs.ready == 'true'
+        shell: bash
+        run: |
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/" > /dev/null
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/login" > /dev/null
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/produto-teste" > /dev/null
+          curl --fail --silent --show-error -L "${PRODUCTION_APP_URL}/up" > /dev/null
+
+      - name: Diagnose public failure
+        if: failure() && steps.scaffold.outputs.ready == 'true'
+        shell: bash
+        run: |
+          echo "==== HTTP ${PRODUCTION_APP_URL}/ ===="
+          curl --silent --show-error -L -D - "${PRODUCTION_APP_URL}/" | head -n 120 || true
+          echo "==== HTTP ${PRODUCTION_APP_URL}/produto-teste ===="
+          curl --silent --show-error -L -D - "${PRODUCTION_APP_URL}/produto-teste" | head -n 120 || true
+          echo "==== Remote app diagnostics ===="
+          ssh \
+            -p "$DEPLOY_PORT" \
+            -i "$DEPLOY_KEY_PATH" \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o PasswordAuthentication=no \
+            -o KbdInteractiveAuthentication=no \
+            -o StrictHostKeyChecking=yes \
+            "${DEPLOY_USER}@${DEPLOY_HOST}" "cd '${DEPLOY_REMOTE_DIR}' && pwd && ls -la && test -f .env && echo '.env presente' || echo '.env ausente' && grep -E '^(APP_ENV|APP_URL|DB_CONNECTION|DB_HOST|DB_DATABASE|DB_CHARSET|DB_COLLATION|SESSION_DRIVER|CACHE_STORE)=' .env 2>/dev/null || true && tail -n 120 storage/logs/laravel.log 2>/dev/null || true"
