@@ -13,6 +13,7 @@
 - Workflow `Deploy Production` disparou no GitHub Actions, mas o job nao iniciou por bloqueio de billing/spending limit da conta GitHub.
 - Cadastrados no GitHub Actions: `SSH_PRIVATE_KEY`, `SSH_PRIVATE_KEY_B64` e `PRODUCTION_ENV`.
 - Validado acesso SSH local ao HostGator/opents62 com a chave cadastrada; `/home1/opents62/public_html` existe e `/home1/opents62/public_html/provadorvirtual_v2` ainda nao existe.
+- Reexecutado manualmente o workflow apos cadastrar os secrets; o job continuou bloqueado por billing/spending limit antes de iniciar qualquer etapa.
 
 ## Pendencias abertas
 
