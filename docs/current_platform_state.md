@@ -31,6 +31,7 @@ Atualizado em: 2026-05-23
 - Sprint 32 implementou refinamento da oferta publica, trava de integracao BigShop, favicon/OG, footer, imagens da loja teste e menu mobile em drawer; publicado em producao no run `26338411089`.
 - Sprint 33 completou login multiempresa, seletor de empresa no painel, escopo por empresa nas APIs do portal, enforcement de permissoes por rota e auditoria com empresa/modulo/acao; publicado em producao no run `26338888072`.
 - Sprint 34 criou guias de integracao por plataforma, snippets, checklist visual, matriz de dados suportados e validacao protegida de instalacao por URL publica; publicado em producao no run `26339199751`.
+- Sprint 35 preparou o contrato BigShop um clique com snippet/contract na resposta da ativacao e monitor protegido de ativacoes no painel.
 
 ## Referencias confirmadas
 
@@ -121,6 +122,7 @@ Atualizado em: 2026-05-23
 - Go-live protegido: `/api/v1/go-live/readiness` e `/app/go-live`.
 - Observabilidade publica: `/api/v1/ops/status`.
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
+- Monitor BigShop protegido: `GET /api/v1/integrations/bigshop/activations`.
 - Validacao de instalacao protegida: `POST /api/v1/integrations/{platform}/validate-install`.
 - BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
 - APIs publicas: health, produto demo e recomendacoes do widget.

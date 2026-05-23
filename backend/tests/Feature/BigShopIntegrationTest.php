@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\IntegrationEvent;
 use App\Models\MeasurementTable;
+use App\Models\MerchantCompany;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
@@ -94,6 +95,37 @@ class BigShopIntegrationTest extends TestCase
         $this->assertCount(2, $table->rows);
 
         $this->assertSame(1, IntegrationEvent::query()->where('event_type', 'sync_products')->count());
+    }
+
+    public function test_merchant_can_monitor_bigshop_one_click_activations(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $company = MerchantCompany::query()->where('external_store_id', 'pv-demo-store')->firstOrFail();
+
+        IntegrationEvent::query()->create([
+            'merchant_id' => $company->merchant_id,
+            'merchant_company_id' => $company->id,
+            'platform' => 'bigshop',
+            'event_type' => 'one_click_activation',
+            'direction' => 'inbound',
+            'status' => 'success',
+            'summary' => [
+                'contract_version' => '2026-05-23',
+                'store_id' => 'pv-demo-store',
+                'store_domain' => 'provadorvirtual.online',
+                'has_access_token' => true,
+                'widget_public_key' => 'pv_demo_luna',
+            ],
+            'occurred_at' => now(),
+        ]);
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/integrations/bigshop/activations')
+            ->assertOk()
+            ->assertJsonPath('data.0.store_id', 'pv-demo-store')
+            ->assertJsonPath('data.0.contract_version', '2026-05-23')
+            ->assertJsonPath('data.0.has_access_token', true);
     }
 
     private function configureBigShop(array $headers): void

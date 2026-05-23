@@ -422,12 +422,14 @@ Status: implementado, publicado e validado em producao no run `26339199751`.
 
 Objetivo: preparar o ajuste final do lado BigShop e ativar o fluxo nativo.
 
-Entregas previstas:
+Entregas:
 
 - contrato final de payload BigShop;
 - teste com loja piloto real;
 - ajustes no codigo da BigShop para instalar widget e mapear produto/tabela;
 - monitoramento de ativacoes BigShop.
+
+Status: em implementacao. O contrato, o snippet de instalacao e o monitoramento ficam prontos no SaaS; teste com loja piloto real depende de `BIGSHOP_ACTIVATION_SECRET`, `store_id` e token `x-api` oficiais.
 
 ### Sprint 36 - Inteligencia de perfis e aprendizado
 

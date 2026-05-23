@@ -48,6 +48,18 @@ type ValidationResult = {
   checks: ValidationCheck[]
 }
 
+type BigShopActivation = {
+  id: number
+  status: string
+  store_id: string | null
+  store_domain: string | null
+  has_access_token: boolean
+  widget_public_key: string | null
+  contract_version: string | null
+  company: { name: string; access_code: string; domain: string | null } | null
+  occurred_at: string | null
+}
+
 const auth = useAuthStore()
 const platforms = ref<Platform[]>([])
 const selectedKey = ref('bigshop')
@@ -60,6 +72,7 @@ const notice = ref('')
 const error = ref('')
 const integrationReport = ref<Record<string, number | string> | null>(null)
 const validation = ref<ValidationResult | null>(null)
+const bigShopActivations = ref<BigShopActivation[]>([])
 
 const form = reactive({
   external_store_id: '',
@@ -92,6 +105,7 @@ async function loadPlatforms() {
     }
 
     fillForm()
+    await loadBigShopActivations()
   } finally {
     loading.value = false
   }
@@ -103,6 +117,7 @@ function selectPlatform(platform: Platform) {
   validation.value = null
   error.value = ''
   fillForm(platform)
+  loadBigShopActivations()
 }
 
 function fillForm(platform = selected.value) {
@@ -174,6 +189,16 @@ async function syncBigShop() {
   } finally {
     running.value = false
   }
+}
+
+async function loadBigShopActivations() {
+  if (selected.value?.key !== 'bigshop') {
+    bigShopActivations.value = []
+    return
+  }
+
+  const { data } = await api.get('/integrations/bigshop/activations').catch(() => ({ data: { data: [] } }))
+  bigShopActivations.value = data.data || []
 }
 
 async function validateInstall() {
@@ -439,6 +464,25 @@ function checkIcon(key: string) {
             <strong>{{ value }}</strong>
             <small>{{ key }}</small>
           </span>
+        </div>
+
+        <div v-if="selected?.key === 'bigshop'" class="guide-panel">
+          <div class="subsection-heading">
+            <h2>Ativacoes um clique</h2>
+            <span>{{ bigShopActivations.length }} recentes</span>
+          </div>
+          <div v-if="!bigShopActivations.length" class="empty-inline">Nenhuma ativacao BigShop registrada para esta empresa.</div>
+          <div v-else class="activation-list">
+            <article v-for="activation in bigShopActivations" :key="activation.id">
+              <i class="fa-solid fa-bolt" aria-hidden="true"></i>
+              <span>
+                <strong>{{ activation.company?.name || activation.store_id || 'Loja BigShop' }}</strong>
+                <small>{{ activation.store_domain || activation.company?.domain || 'dominio pendente' }}</small>
+              </span>
+              <em :class="{ ok: activation.status === 'success' }">{{ activation.status }}</em>
+              <small>{{ activation.contract_version || 'contrato atual' }}</small>
+            </article>
+          </div>
         </div>
       </form>
     </div>

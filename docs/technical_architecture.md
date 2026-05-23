@@ -56,6 +56,7 @@ APIs protegidas ja implementadas:
 - `GET /api/v1/integrations`
 - `PATCH /api/v1/integrations/{platform}`
 - `POST /api/v1/integrations/{platform}/validate-install`
+- `GET /api/v1/integrations/bigshop/activations`
 - `POST /api/v1/integrations/bigshop/probe`
 - `POST /api/v1/integrations/bigshop/sync`
 - `GET|POST /api/v1/imports`

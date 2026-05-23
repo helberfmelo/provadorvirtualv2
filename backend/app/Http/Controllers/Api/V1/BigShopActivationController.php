@@ -40,6 +40,10 @@ class BigShopActivationController extends Controller
             'api_base_url' => ['nullable', 'url', 'max:255'],
             'access_token' => ['nullable', 'string', 'max:4000'],
             'webhook_secret' => ['nullable', 'string', 'max:4000'],
+            'install_widget' => ['nullable', 'boolean'],
+            'sync_after_activation' => ['nullable', 'boolean'],
+            'callback_url' => ['nullable', 'url', 'max:255'],
+            'contract_version' => ['nullable', 'string', 'max:20'],
         ]);
 
         try {

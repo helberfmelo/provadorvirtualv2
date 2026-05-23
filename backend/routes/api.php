@@ -112,6 +112,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,integrations,edit');
         Route::post('/integrations/{platform}/validate-install', [IntegrationController::class, 'validateInstall'])
             ->middleware('portal.permission:merchant,integrations,edit');
+        Route::get('/integrations/bigshop/activations', [BigShopIntegrationController::class, 'activations'])
+            ->middleware('portal.permission:merchant,integrations,view');
         Route::post('/integrations/bigshop/probe', [BigShopIntegrationController::class, 'probe'])
             ->middleware('portal.permission:merchant,integrations,edit');
         Route::post('/integrations/bigshop/sync', [BigShopIntegrationController::class, 'sync'])

@@ -45,6 +45,8 @@ Atualizado em: 2026-05-23
 - `DONE` BigShop sync produtos/grades.
 - `DONE` BigShop sync tabela de medidas quando houver payload estruturado.
 - `DONE` BigShop um clique por endpoint assinado.
+- `DONE` Contrato final BigShop um clique com `install_snippet` e `integration_contract`.
+- `DONE` Monitoramento de ativacoes BigShop no portal.
 - `TODO` Cadastrar `BIGSHOP_ACTIVATION_SECRET` para teste real.
 - `DONE` Base do guia/snippet custom no painel.
 - `DONE` Guias e snippets para Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom.

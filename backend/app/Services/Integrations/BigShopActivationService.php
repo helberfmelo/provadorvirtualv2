@@ -112,12 +112,17 @@ class BigShopActivationService
             'direction' => 'inbound',
             'status' => 'success',
             'summary' => [
+                'contract_version' => $this->contractVersion(),
                 'store_id' => $storeId,
+                'store_domain' => $storeDomain,
                 'has_access_token' => filled(data_get($payload, 'access_token')),
                 'widget_public_key' => $widget->public_key,
+                'install_widget' => (bool) data_get($payload, 'install_widget', true),
             ],
             'occurred_at' => now(),
         ]);
+
+        $widgetUrl = url('/widget/v1/provador-virtual.js');
 
         return [
             'merchant_id' => $merchant->id,
@@ -125,7 +130,9 @@ class BigShopActivationService
             'platform_connection_id' => $connection->id,
             'widget_public_key' => $widget->public_key,
             'dashboard_url' => url('/app/integracoes'),
-            'widget_url' => url('/widget/v1/provador-virtual.js'),
+            'widget_url' => $widgetUrl,
+            'install_snippet' => $this->installSnippet($storeId, $widgetUrl),
+            'integration_contract' => $this->contract($storeId, $widget, $widgetUrl),
             'status' => $connection->status,
         ];
     }
@@ -145,5 +152,65 @@ class BigShopActivationService
         }
 
         return parse_url((string) $storeUrl, PHP_URL_HOST) ?: (string) $storeUrl;
+    }
+
+    private function contractVersion(): string
+    {
+        return '2026-05-23';
+    }
+
+    private function contract(string $storeId, WidgetInstall $widget, string $widgetUrl): array
+    {
+        return [
+            'version' => $this->contractVersion(),
+            'signature' => [
+                'headers' => ['X-BigShop-Timestamp', 'X-BigShop-Signature'],
+                'algorithm' => 'hmac_sha256(secret, timestamp + "." + raw_body)',
+                'tolerance_seconds' => 600,
+            ],
+            'required_payload' => [
+                'store_id',
+                'store_name',
+                'merchant.email ou merchant_email',
+            ],
+            'optional_payload' => [
+                'store_domain',
+                'store_url',
+                'api_base_url',
+                'access_token',
+                'webhook_secret',
+                'install_widget',
+                'sync_after_activation',
+                'callback_url',
+            ],
+            'widget' => [
+                'platform' => 'bigshop',
+                'public_key' => $widget->public_key,
+                'script_url' => $widgetUrl,
+                'container_id' => 'provador-virtual-container',
+                'script_id' => 'provadorVirtualScript',
+                'store_id' => $storeId,
+                'product_id_attribute' => 'data-product-id',
+                'variant_id_attribute' => 'data-variant-id',
+                'sku_attribute' => 'data-sku',
+            ],
+        ];
+    }
+
+    private function installSnippet(string $storeId, string $widgetUrl): string
+    {
+        return <<<HTML
+<div id="provador-virtual-container"></div>
+<script
+  id="provadorVirtualScript"
+  src="{$widgetUrl}"
+  data-platform="bigshop"
+  data-store-id="{$storeId}"
+  data-product-id="BIGSHOP_PRODUCT_ID"
+  data-variant-id="BIGSHOP_GRADE_ID"
+  data-sku="BIGSHOP_SKU"
+  data-container-id="provador-virtual-container"
+  defer></script>
+HTML;
     }
 }

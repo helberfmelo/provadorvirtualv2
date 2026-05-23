@@ -202,7 +202,10 @@ Comportamento:
 - cria `widget_public_key` para uso no snippet;
 - registra evento `one_click_activation` em `integration_events`;
 - retorna `dashboard_url`, `widget_url`, `widget_public_key` e status da ativacao.
+- Sprint 35 adicionou `install_snippet`, `integration_contract` versao `2026-05-23` e monitor protegido `GET /api/v1/integrations/bigshop/activations`.
 
 Quando `BIGSHOP_ACTIVATION_SECRET` nao estiver configurado, a rota retorna `503` e nao processa o payload.
 
 Para teste real ainda falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` e receber da BigShop o payload/secret oficial do app interno.
+
+Contrato final detalhado: `docs/bigshop_one_click_contract.md`.

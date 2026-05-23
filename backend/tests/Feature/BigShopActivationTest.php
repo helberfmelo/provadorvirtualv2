@@ -34,7 +34,12 @@ class BigShopActivationTest extends TestCase
         $this->callSignedActivation($payload)
             ->assertOk()
             ->assertJsonPath('data.status', 'configured')
-            ->assertJsonPath('data.widget_url', url('/widget/v1/provador-virtual.js'));
+            ->assertJsonPath('data.widget_url', url('/widget/v1/provador-virtual.js'))
+            ->assertJsonPath('data.integration_contract.version', '2026-05-23')
+            ->assertJsonPath('data.integration_contract.widget.platform', 'bigshop')
+            ->assertJsonPath('data.integration_contract.widget.store_id', 'store-one-click')
+            ->assertJsonPath('data.install_snippet', fn (string $snippet): bool => str_contains($snippet, 'data-platform="bigshop"')
+                && str_contains($snippet, 'data-store-id="store-one-click"'));
 
         $user = User::query()->where('email', 'owner@lojaumclique.com.br')->firstOrFail();
         $this->assertTrue($user->merchants()->where('slug', 'bigshop-store-one-click')->exists());
@@ -49,6 +54,7 @@ class BigShopActivationTest extends TestCase
         $this->assertSame('bigshop', WidgetInstall::query()->where('merchant_company_id', $company->id)->value('platform'));
         $this->assertSame('configured', PlatformConnection::query()->where('merchant_company_id', $company->id)->value('status'));
         $this->assertSame(1, IntegrationEvent::query()->where('event_type', 'one_click_activation')->count());
+        $this->assertSame('2026-05-23', IntegrationEvent::query()->where('event_type', 'one_click_activation')->first()?->summary['contract_version']);
     }
 
     public function test_bigshop_activation_rejects_invalid_signature(): void
