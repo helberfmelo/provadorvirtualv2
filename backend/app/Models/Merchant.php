@@ -30,4 +30,14 @@ class Merchant extends Model
     {
         return $this->hasMany(MerchantCompany::class);
     }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function measurementTables()
+    {
+        return $this->hasMany(MeasurementTable::class);
+    }
 }

@@ -17,10 +17,10 @@ Atualizado em: 2026-05-23
 
 - `TODO` Cadastro/login de lojista.
 - `TODO` Cadastro de empresa/loja.
-- `TODO` CRUD de produtos.
-- `TODO` CRUD de variacoes.
-- `TODO` CRUD de tabelas de medidas.
-- `TODO` Templates por tipo de peca/genero.
+- `DONE` CRUD de produtos.
+- `DONE` CRUD de variacoes.
+- `DONE` CRUD de tabelas de medidas.
+- `DONE` Templates por tipo de peca/genero.
 - `TODO` Motor de recomendacao.
 - `TODO` Widget universal.
 - `TODO` Feedback de recomendacao.

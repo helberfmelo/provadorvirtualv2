@@ -3,6 +3,13 @@
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\DemoProductController;
 use App\Http\Controllers\Api\V1\HealthController;
+use App\Http\Controllers\Api\V1\MeasurementTableController;
+use App\Http\Controllers\Api\V1\MeasurementTemplateController;
+use App\Http\Controllers\Api\V1\ProductController;
+use App\Http\Controllers\Api\V1\ProductVariantController;
+use App\Models\MeasurementTable;
+use App\Models\Product;
+use App\Models\RecommendationLog;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -15,14 +22,24 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
         Route::get('/merchant/overview', function () {
+            $merchant = request()->user()->merchants()->firstOrFail();
+
             return response()->json([
                 'summary' => [
-                    'products' => 1,
-                    'measurement_tables' => 1,
+                    'products' => Product::query()->where('merchant_id', $merchant->id)->count(),
+                    'measurement_tables' => MeasurementTable::query()->where('merchant_id', $merchant->id)->count(),
                     'widget_status' => 'demo-ready',
-                    'recommendations_today' => 0,
+                    'recommendations_today' => RecommendationLog::query()
+                        ->where('merchant_id', $merchant->id)
+                        ->whereDate('created_at', now()->toDateString())
+                        ->count(),
                 ],
             ]);
         });
+        Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index']);
+        Route::apiResource('measurement-tables', MeasurementTableController::class);
+        Route::apiResource('products', ProductController::class);
+        Route::apiResource('products.variants', ProductVariantController::class)
+            ->only(['store', 'update', 'destroy']);
     });
 });

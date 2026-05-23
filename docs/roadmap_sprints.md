@@ -45,6 +45,8 @@ Entregas:
 - vinculo produto/tabela;
 - validacoes e testes.
 
+Status: implementado em API protegida por Sanctum e telas `/app/produtos` e `/app/tabelas-de-medidas`; aguardando deploy verde para encerrar a sprint.
+
 ## Sprint 3 - Motor de Recomendacao
 
 Objetivo: recomendacao real sem depender de IA externa.

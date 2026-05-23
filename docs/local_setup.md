@@ -61,8 +61,13 @@ npm run dev
 - `/login`
 - `/produto-teste`
 - `/app`
+- `/app/produtos`
+- `/app/tabelas-de-medidas`
 - `/api/v1/health`
 - `/api/v1/demo/product-test`
+- `/api/v1/products`
+- `/api/v1/measurement-tables`
+- `/api/v1/measurement-templates`
 
 ## Variaveis frontend
 
@@ -112,3 +117,5 @@ Seeder inicial deve criar:
 - pagina `/produto-teste` funcional.
 
 Status Sprint 1: dados demo criados por `DatabaseSeeder` e publicados em producao por `ProductionSeeder`.
+
+Status Sprint 2: painel demo permite CRUD de produtos, variacoes e tabelas de medidas com os endpoints protegidos por Sanctum.

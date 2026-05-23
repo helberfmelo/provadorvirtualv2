@@ -33,6 +33,15 @@
 - Redirect 307 precisa usar URL-path absoluta (`/provadorvirtual_v2/public/...`) no HostGator; destino relativo virou caminho fisico no header `Location`.
 - Run `26326675713` do GitHub Actions finalizou com sucesso para o commit `97ce033`; smokes validaram frontend e JSON real da API.
 
+## 2026-05-23 - Sprint 2 Produtos, Variacoes e Tabelas
+
+- Criados endpoints protegidos por Sanctum para produtos, variacoes, tabelas de medidas e templates.
+- Criados Form Requests, Resources e controllers com escopo por lojista autenticado.
+- Dashboard passou a consumir `/merchant/overview` com contadores reais.
+- Criadas telas Vue `/app/produtos` e `/app/tabelas-de-medidas` para CRUD operacional da loja demo.
+- Criados testes `ProductsApiTest` e `MeasurementTablesApiTest`.
+- Validacoes locais: `php artisan route:list --path=api/v1`, `php artisan test`, `vendor/bin/pint` e `npm run build`.
+
 ## Pendencias abertas
 
 - Regularizar billing/spending limit do GitHub Actions para repositorio privado.

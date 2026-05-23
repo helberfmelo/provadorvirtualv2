@@ -7,6 +7,10 @@ const route = useRoute()
 const auth = useAuthStore()
 
 const isAppRoute = computed(() => route.path.startsWith('/app'))
+
+async function logout() {
+  await auth.logout()
+}
 </script>
 
 <template>
@@ -19,8 +23,13 @@ const isAppRoute = computed(() => route.path.startsWith('/app'))
 
       <nav class="nav" aria-label="Principal">
         <RouterLink to="/produto-teste">Produto teste</RouterLink>
-        <RouterLink to="/login">Entrar</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated" to="/app/produtos">Produtos</RouterLink>
+        <RouterLink v-if="auth.isAuthenticated" to="/app/tabelas-de-medidas">Tabelas</RouterLink>
+        <RouterLink v-if="!auth.isAuthenticated" to="/login">Entrar</RouterLink>
         <RouterLink v-if="auth.isAuthenticated" to="/app">Painel</RouterLink>
+        <button v-if="auth.isAuthenticated" class="nav-button" type="button" title="Sair" @click="logout">
+          <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+        </button>
       </nav>
     </header>
 

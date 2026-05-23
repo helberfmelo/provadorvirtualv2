@@ -8,6 +8,7 @@ Atualizado em: 2026-05-23
 - Git local foi inicializado em `main` e conectado ao remoto `git@github.com:helberfmelo/provadorvirtualv2.git`.
 - Foram criados documentos iniciais, `.gitignore` e workflow de deploy.
 - Sprint 1 scaffoldou `backend/` Laravel 12 e `frontend/` Vue 3/Vite.
+- Sprint 2 criou CRUD de produtos, variacoes, tabelas de medidas e templates operacionais no painel e na API.
 
 ## Referencias confirmadas
 
@@ -72,4 +73,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Iniciar a Sprint 2: produtos, variacoes e tabelas de medidas.
+Concluir deploy acompanhado da Sprint 2 e iniciar a Sprint 3: motor de recomendacao deterministico.
