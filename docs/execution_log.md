@@ -229,3 +229,7 @@
 - Checkout publico e cadastro interno SaaS reaproveitam usuario existente por e-mail/CPF, permitindo uma pessoa em varias empresas.
 - Tela `/login` agora mostra campo `E-mail ou CPF` e `Codigo da loja ou CNPJ`.
 - Validacoes locais focadas: `php artisan test --filter=AuthTest`, `php artisan test --filter=PublicCheckoutFlowTest` e `npm run build`.
+- Validacoes locais completas: `php artisan test`, `npm run build`, build raiz com `VITE_APP_BASE_PATH=/`, `git diff --check` e `vendor/bin/pint --dirty`.
+- Run `26337158927` aplicou backend/raiz, mas falhou no smoke por falso negativo de `curl | grep -q` com `pipefail` e exit `23`.
+- Workflow ajustado no commit `08547b8` para validar respostas HTTP em variavel antes do `grep`, evitando SIGPIPE falso.
+- Run `26337254520` finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

@@ -338,7 +338,7 @@ Entregas:
 - contexto de lojista/empresa gravado no token de acesso;
 - painel passa a enviar e exibir o campo `Codigo da loja ou CNPJ`.
 
-Status: implementado nesta sprint; publicar e validar no Actions.
+Status: implementado, publicado e validado em producao no run `26337254520`.
 
 ### Sprint 30 - Usuarios e permissoes por modulo
 
