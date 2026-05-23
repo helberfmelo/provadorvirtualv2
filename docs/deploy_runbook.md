@@ -42,31 +42,23 @@ MAIL_FROM_NAME="Provador Virtual"
 
 Senha fica apenas em `docs/credentials.local.md`, `.env` remoto ou secret seguro.
 
-## Secrets ja informados pelo usuario como cadastrados
+## Secrets cadastrados no GitHub Actions
 
 - `FTP_PASSWORD`
 - `FTP_SERVER`
 - `FTP_USERNAME`
 - `SSH_HOST`
 - `SSH_PORT`
-- `SSH_USERNAME`
-
-## Secrets que ainda faltam para deploy SSH
-
-Obrigatorio cadastrar um destes:
-
 - `SSH_PRIVATE_KEY`
-- ou `SSH_PRIVATE_KEY_B64`
+- `SSH_PRIVATE_KEY_B64`
+- `SSH_USERNAME`
+- `PRODUCTION_ENV`
+
+`SSH_PRIVATE_KEY` e `SSH_PRIVATE_KEY_B64` foram cadastrados usando a chave local HostGator/opents62 ja usada no projeto Marca Hora. `PRODUCTION_ENV` foi cadastrado com o `.env` minimo de producao e uma `APP_KEY` propria para este projeto.
 
 Opcional:
 
 - `SSH_PASSPHRASE`, se a chave tiver senha.
-
-Recomendado para primeiro deploy sem criar `.env` manualmente no servidor:
-
-- `PRODUCTION_ENV`, multiline com o conteudo completo do `.env` de producao.
-
-Alternativa ao `PRODUCTION_ENV`: criar manualmente o arquivo `.env` em `/home1/opents62/public_html/provadorvirtual_v2` antes do primeiro deploy. O workflow preserva `.env` remoto quando o secret nao existir.
 
 ## Bloqueios externos antes do primeiro Actions
 
@@ -150,12 +142,11 @@ MAIL_FROM_NAME="Provador Virtual"
 ## Primeira publicacao
 
 1. Confirmar path remoto.
-2. Cadastrar `SSH_PRIVATE_KEY` ou `SSH_PRIVATE_KEY_B64`.
-3. Criar banco e usuario no cPanel.
-4. Criar `.env` remoto ou cadastrar `PRODUCTION_ENV`.
-5. Fazer push para `main`.
-6. Acompanhar Actions.
-7. Validar:
+2. Criar banco e usuario no cPanel, se ainda nao existirem.
+3. Regularizar billing/spending limit do GitHub Actions.
+4. Fazer push para `main`.
+5. Acompanhar Actions.
+6. Validar:
    - `/provadorvirtual_v2/`;
    - `/provadorvirtual_v2/login`;
    - `/provadorvirtual_v2/produto-teste`;

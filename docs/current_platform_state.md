@@ -5,7 +5,7 @@ Atualizado em: 2026-05-23
 ## Estado do workspace
 
 - `D:\Projetos\provadorvirtual_v2` estava vazio no inicio desta documentacao.
-- A pasta ainda nao era um repositorio Git local.
+- Git local foi inicializado em `main` e conectado ao remoto `git@github.com:helberfmelo/provadorvirtualv2.git`.
 - Foram criados documentos iniciais, `.gitignore` e workflow de deploy.
 - O codigo Laravel/Vue ainda precisa ser scaffoldado em `backend/` e `frontend/`.
 
@@ -60,9 +60,9 @@ Atualizado em: 2026-05-23
 
 ## Bloqueios e informacoes faltantes
 
-- Git local nao inicializado/configurado neste diretorio.
-- Falta chave SSH privada do GitHub Actions para deploy por SSH.
+- GitHub Actions esta bloqueado por billing/spending limit da conta GitHub.
 - Falta confirmar se o path remoto de v2 sera `/home1/opents62/public_html/provadorvirtual_v2`.
+- Acesso SSH local ao HostGator/opents62 foi validado; `/home1/opents62/public_html` existe e a pasta `provadorvirtual_v2` ainda nao foi criada.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
 - Falta chave de IA se as primeiras sprints incluirem OCR/geracao assistida.
 - Falta credencial BigShop real para loja de teste.
