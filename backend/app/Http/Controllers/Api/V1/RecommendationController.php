@@ -11,6 +11,7 @@ use App\Models\ProductVariant;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
+use App\Models\WidgetInstall;
 use App\Services\Recommendation\RecommendationEngine;
 use Illuminate\Support\Str;
 
@@ -34,6 +35,26 @@ class RecommendationController extends Controller
             'product_id' => $product->id,
             'measurement_table_id' => $product->measurement_table_id,
             'available_sizes' => $product->measurementTable->rows->pluck('size_label')->values(),
+            'measurement_table' => [
+                'id' => $product->measurementTable->id,
+                'name' => $product->measurementTable->name,
+                'unit' => $product->measurementTable->unit,
+                'rows' => $product->measurementTable->rows->map(fn ($row): array => [
+                    'size_label' => $row->size_label,
+                    'bust' => [$row->bust_min, $row->bust_max],
+                    'waist' => [$row->waist_min, $row->waist_max],
+                    'hip' => [$row->hip_min, $row->hip_max],
+                    'height' => [$row->height_min, $row->height_max],
+                    'weight' => [$row->weight_min, $row->weight_max],
+                    'length' => [$row->length_min, $row->length_max],
+                    'shoulder' => [$row->shoulder_min, $row->shoulder_max],
+                ])->values(),
+            ],
+            'theme' => WidgetInstall::query()
+                ->where('merchant_id', $product->merchant_id)
+                ->when($product->merchant_company_id, fn ($query, $companyId) => $query->where('merchant_company_id', $companyId))
+                ->where('is_active', true)
+                ->first()?->theme ?? [],
         ]);
     }
 

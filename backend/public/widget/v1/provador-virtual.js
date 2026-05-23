@@ -11,8 +11,10 @@
   var state = {
     configured: false,
     recommendation: null,
+    config: null,
     loading: false,
   };
+  var profileStorageKey = 'pv_shopper_profile_v1';
 
   loadCss(config.cssUrl);
   boot();
@@ -30,8 +32,11 @@
     configCheck()
       .then(function (result) {
         state.configured = Boolean(result.configured);
+        state.config = result;
+        config.theme = Object.assign({}, config.theme, result.theme || {});
+
         if (state.configured) {
-          renderButton();
+          renderTriggers();
         } else if (config.debug) {
           root.innerHTML = '<div class="pv-warning">Provador Virtual indisponivel para este produto.</div>';
         }
@@ -143,33 +148,62 @@
     return request('/public/recommendations/config-check', identityPayload());
   }
 
-  function renderButton() {
+  function renderTriggers() {
     root.innerHTML = '';
     applyTheme(root);
 
-    var button = document.createElement('button');
-    button.className = 'pv-trigger';
-    button.type = 'button';
-    button.innerHTML = '<span aria-hidden="true">PV</span><span>Qual meu tamanho?</span>';
-    button.addEventListener('click', openModal);
-    root.appendChild(button);
+    var group = document.createElement('div');
+    group.className = 'pv-trigger-group';
+
+    var discoverButton = document.createElement('button');
+    discoverButton.className = 'pv-trigger pv-trigger-primary';
+    discoverButton.type = 'button';
+    discoverButton.innerHTML = '<span aria-hidden="true">PV</span><span>Descubra seu tamanho</span>';
+    discoverButton.addEventListener('click', openRecommendationModal);
+
+    var tableButton = document.createElement('button');
+    tableButton.className = 'pv-trigger pv-trigger-secondary';
+    tableButton.type = 'button';
+    tableButton.innerHTML = '<span aria-hidden="true">cm</span><span>Tabela de Medidas</span>';
+    tableButton.addEventListener('click', openTableModal);
+
+    group.appendChild(discoverButton);
+    group.appendChild(tableButton);
+    root.appendChild(group);
   }
 
   function applyTheme(element) {
-    if (config.theme.primary) {
-      element.style.setProperty('--pv-primary', config.theme.primary);
+    var theme = config.theme || {};
+    var map = {
+      primary: '--pv-primary',
+      secondary: '--pv-secondary',
+      accent: '--pv-accent',
+      background: '--pv-bg',
+      text: '--pv-text',
+      font_family: '--pv-font-family',
+    };
+
+    Object.keys(map).forEach(function (key) {
+      if (theme[key]) {
+        element.style.setProperty(map[key], theme[key]);
+      }
+    });
+
+    if (theme.font_size) {
+      element.style.setProperty('--pv-font-size', Number(theme.font_size) + 'px');
     }
 
-    if (config.theme.accent) {
-      element.style.setProperty('--pv-accent', config.theme.accent);
+    if (theme.font_weight) {
+      element.style.setProperty('--pv-font-weight', String(theme.font_weight));
+    }
+
+    if (theme.button_radius !== undefined && theme.button_radius !== null && theme.button_radius !== '') {
+      element.style.setProperty('--pv-radius', Number(theme.button_radius) + 'px');
     }
   }
 
-  function openModal() {
-    var backdrop = document.createElement('div');
-    backdrop.className = 'pv-backdrop pv-open';
-    backdrop.innerHTML = modalHtml();
-    root.appendChild(backdrop);
+  function openRecommendationModal() {
+    var backdrop = createBackdrop(recommendationModalHtml());
 
     backdrop.querySelector('[data-pv-close]').addEventListener('click', function () {
       backdrop.remove();
@@ -180,24 +214,48 @@
     });
   }
 
-  function modalHtml() {
+  function openTableModal() {
+    var backdrop = createBackdrop(tableModalHtml());
+
+    backdrop.querySelector('[data-pv-close]').addEventListener('click', function () {
+      backdrop.remove();
+    });
+  }
+
+  function createBackdrop(html) {
+    var backdrop = document.createElement('div');
+    backdrop.className = 'pv-backdrop pv-open';
+    backdrop.innerHTML = html;
+    root.appendChild(backdrop);
+    return backdrop;
+  }
+
+  function recommendationModalHtml() {
+    var profile = readSavedProfile();
+    var note = profile
+      ? '<div class="pv-known">Usamos suas medidas salvas neste navegador. Para mudar, edite os campos abaixo.</div>'
+      : '<div class="pv-known">Quanto mais dados voce informar, melhor fica a precisao da recomendacao.</div>';
+
     return [
       '<div class="pv-modal" role="dialog" aria-modal="true" aria-labelledby="pv-title">',
       '<div class="pv-header">',
-      '<div><span>Provador Virtual</span><h2 id="pv-title">Descubra seu tamanho</h2><span>Use medidas aproximadas em cm.</span></div>',
+      '<div><span>Provador Virtual</span><h2 id="pv-title">Descubra seu tamanho</h2><span>Medidas aproximadas em cm.</span></div>',
       '<button class="pv-close" type="button" data-pv-close title="Fechar">x</button>',
       '</div>',
       '<div class="pv-body">',
+      '<div class="pv-steps"><span class="active">1 medidas</span><span>2 preferencia</span><span>3 resultado</span></div>',
+      note,
       '<div class="pv-grid">',
-      field('bust', 'Busto', 90),
-      field('waist', 'Cintura', 72),
-      field('hip', 'Quadril', 98),
-      field('height', 'Altura', 165),
-      field('weight', 'Peso', 60),
-      '<label>Caimento<select data-pv-input="fit_preference"><option value="regular">Regular</option><option value="tight">Mais justo</option><option value="loose">Mais solto</option></select></label>',
+      field('bust', 'Busto/torax', savedValue(profile, 'bust', 90)),
+      field('waist', 'Cintura', savedValue(profile, 'waist', 72)),
+      field('hip', 'Quadril', savedValue(profile, 'hip', 98)),
+      field('height', 'Altura', savedValue(profile, 'height', 165)),
+      field('weight', 'Peso', savedValue(profile, 'weight', 60)),
+      '<label>Caimento<select data-pv-input="fit_preference">' + fitOptions(savedValue(profile, 'fit_preference', 'regular')) + '</select></label>',
       '</div>',
       '<div class="pv-actions"><button class="pv-button" type="button" data-pv-submit>Calcular tamanho</button></div>',
       '<div data-pv-output></div>',
+      attributionHtml(),
       '</div>',
       '</div>',
     ].join('');
@@ -207,11 +265,24 @@
     return '<label>' + label + '<input data-pv-input="' + name + '" type="number" min="1" value="' + value + '" /></label>';
   }
 
+  function fitOptions(selected) {
+    var options = [
+      ['regular', 'Regular'],
+      ['tight', 'Mais justo'],
+      ['loose', 'Mais solto'],
+    ];
+
+    return options.map(function (option) {
+      return '<option value="' + option[0] + '"' + (selected === option[0] ? ' selected' : '') + '>' + option[1] + '</option>';
+    }).join('');
+  }
+
   function submitRecommendation(backdrop) {
     var button = backdrop.querySelector('[data-pv-submit]');
     var output = backdrop.querySelector('[data-pv-output]');
     var measurements = {};
     var fitPreference = 'regular';
+    var hadSavedProfile = Boolean(readSavedProfile());
 
     backdrop.querySelectorAll('[data-pv-input]').forEach(function (input) {
       if (input.dataset.pvInput === 'fit_preference') {
@@ -222,6 +293,8 @@
       measurements[input.dataset.pvInput] = Number(input.value);
     });
 
+    saveProfile(Object.assign({}, measurements, { fit_preference: fitPreference }));
+
     button.disabled = true;
     button.textContent = 'Calculando...';
     output.innerHTML = '';
@@ -230,6 +303,7 @@
       measurements: measurements,
       shopper_profile: {
         fit_preference: fitPreference,
+        known_profile: hadSavedProfile,
       },
     }))
       .then(function (data) {
@@ -266,6 +340,58 @@
     ].join('');
   }
 
+  function tableModalHtml() {
+    var table = state.config && state.config.measurement_table ? state.config.measurement_table : null;
+    var rows = table && Array.isArray(table.rows) ? table.rows : [];
+
+    return [
+      '<div class="pv-modal pv-table-modal" role="dialog" aria-modal="true" aria-labelledby="pv-table-title">',
+      '<div class="pv-header">',
+      '<div><span>Provador Virtual</span><h2 id="pv-table-title">' + escapeHtml(table ? table.name : 'Tabela de Medidas') + '</h2><span>Medidas em ' + escapeHtml(table ? table.unit : 'cm') + '.</span></div>',
+      '<button class="pv-close" type="button" data-pv-close title="Fechar">x</button>',
+      '</div>',
+      '<div class="pv-body">',
+      '<div class="pv-table-wrap">',
+      '<table class="pv-size-table">',
+      '<thead><tr><th>Tam.</th><th>Busto/torax</th><th>Cintura</th><th>Quadril</th><th>Altura</th><th>Peso</th></tr></thead>',
+      '<tbody>',
+      rows.map(tableRowHtml).join('') || '<tr><td colspan="6">Tabela indisponivel para este produto.</td></tr>',
+      '</tbody>',
+      '</table>',
+      '</div>',
+      attributionHtml(),
+      '</div>',
+      '</div>',
+    ].join('');
+  }
+
+  function tableRowHtml(row) {
+    return [
+      '<tr>',
+      '<td><strong>' + escapeHtml(row.size_label || '-') + '</strong></td>',
+      '<td>' + rangeText(row.bust) + '</td>',
+      '<td>' + rangeText(row.waist) + '</td>',
+      '<td>' + rangeText(row.hip) + '</td>',
+      '<td>' + rangeText(row.height) + '</td>',
+      '<td>' + rangeText(row.weight) + '</td>',
+      '</tr>',
+    ].join('');
+  }
+
+  function rangeText(value) {
+    if (!Array.isArray(value) || (value[0] === null && value[1] === null)) {
+      return '-';
+    }
+
+    return escapeHtml([value[0], value[1]].filter(function (item) {
+      return item !== null && item !== undefined && item !== '';
+    }).join(' - '));
+  }
+
+  function attributionHtml() {
+    return '<a class="pv-attribution" href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>';
+  }
+
   function wireFeedback(output, data) {
     output.querySelectorAll('[data-pv-helpful]').forEach(function (button) {
       button.addEventListener('click', function () {
@@ -280,6 +406,33 @@
         });
       });
     });
+  }
+
+  function readSavedProfile() {
+    try {
+      var raw = window.localStorage.getItem(profileStorageKey);
+      return raw ? JSON.parse(raw) : null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function saveProfile(profile) {
+    try {
+      window.localStorage.setItem(profileStorageKey, JSON.stringify(Object.assign({}, profile, {
+        updated_at: new Date().toISOString(),
+      })));
+    } catch (error) {
+      // localStorage can be blocked by the browser; recommendation still works.
+    }
+  }
+
+  function savedValue(profile, key, fallback) {
+    if (!profile || profile[key] === undefined || profile[key] === null || profile[key] === '') {
+      return fallback;
+    }
+
+    return profile[key];
   }
 
   function escapeHtml(value) {

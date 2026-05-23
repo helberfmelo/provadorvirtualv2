@@ -33,9 +33,9 @@ class DatabaseSeeder extends Seeder
         );
 
         $merchant = Merchant::query()->updateOrCreate(
-            ['slug' => 'loja-luna-demo'],
+            ['slug' => 'provador-virtual-demo'],
             [
-                'name' => 'Loja Luna Demo',
+                'name' => 'Provador Virtual Demo Store',
                 'billing_status' => 'trialing',
                 'trial_ends_at' => now()->addDays(14),
             ]
@@ -48,41 +48,179 @@ class DatabaseSeeder extends Seeder
         $company = MerchantCompany::query()->updateOrCreate(
             [
                 'merchant_id' => $merchant->id,
-                'external_store_id' => 'demo-store',
+                'external_store_id' => 'pv-demo-store',
             ],
             [
-                'name' => 'Luna Moda Online',
-                'legal_name' => 'Luna Moda Online Demo',
+                'name' => 'Provador Virtual Loja Teste',
+                'legal_name' => 'Provador Virtual Loja Teste Ltda',
+                'document' => '12345678000195',
+                'zip_code' => '01001000',
+                'street' => 'Praca da Se',
+                'number' => '100',
+                'district' => 'Se',
+                'city' => 'Sao Paulo',
+                'state' => 'SP',
+                'country' => 'BR',
                 'domain' => 'provadorvirtual.online',
                 'platform' => 'custom',
                 'status' => 'active',
             ]
         );
+        $company->ensureAccessCode();
 
-        $table = MeasurementTable::query()->updateOrCreate(
-            [
-                'merchant_id' => $merchant->id,
-                'merchant_company_id' => $company->id,
-                'name' => 'Vestidos femininos - modelagem regular',
-            ],
-            [
-                'product_type' => 'dress',
-                'gender' => 'female',
-                'fit_profile' => 'regular',
-                'unit' => 'cm',
-                'status' => 'active',
-                'source' => 'demo',
-                'notes' => 'Tabela ficticia para validar o fluxo do produto teste.',
-            ]
-        );
-
-        $rows = [
+        $dressTable = $this->tableWithRows($merchant, $company, [
+            'name' => 'Vestidos femininos - modelagem regular',
+            'product_type' => 'dress',
+            'gender' => 'female',
+            'fit_profile' => 'regular',
+            'notes' => 'Base demo inspirada em faixas universais de moda feminina.',
+        ], [
             ['PP', 0, 80, 84, 62, 66, 88, 92, 150, 160, 45, 52],
             ['P', 1, 84, 90, 66, 72, 92, 98, 155, 168, 50, 60],
             ['M', 2, 90, 96, 72, 78, 98, 104, 160, 174, 58, 68],
             ['G', 3, 96, 104, 78, 86, 104, 112, 164, 180, 66, 78],
             ['GG', 4, 104, 112, 86, 96, 112, 120, 166, 184, 76, 90],
-        ];
+        ]);
+
+        $blouseTable = $this->tableWithRows($merchant, $company, [
+            'name' => 'Blusas femininas - malha canelada',
+            'product_type' => 'blouse',
+            'gender' => 'female',
+            'fit_profile' => 'slim',
+            'notes' => 'Modelagem com elasticidade moderada para blusas e tops.',
+        ], [
+            ['PP', 0, 78, 84, 60, 66, 84, 92, 150, 162, 42, 52],
+            ['P', 1, 84, 90, 66, 72, 90, 98, 155, 168, 50, 60],
+            ['M', 2, 90, 98, 72, 80, 96, 106, 160, 174, 58, 70],
+            ['G', 3, 98, 106, 80, 88, 104, 114, 164, 180, 68, 82],
+            ['GG', 4, 106, 116, 88, 98, 112, 124, 166, 184, 78, 94],
+        ]);
+
+        $shirtTable = $this->tableWithRows($merchant, $company, [
+            'name' => 'Camisetas masculinas - regular',
+            'product_type' => 'shirt',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'notes' => 'Busto representa torax para pecas masculinas.',
+        ], [
+            ['P', 0, 88, 96, 76, 84, 88, 96, 164, 174, 58, 70],
+            ['M', 1, 96, 104, 84, 92, 96, 104, 170, 180, 68, 82],
+            ['G', 2, 104, 112, 92, 100, 104, 112, 176, 186, 80, 94],
+            ['GG', 3, 112, 122, 100, 110, 112, 122, 180, 192, 92, 108],
+            ['XGG', 4, 122, 134, 110, 122, 122, 134, 184, 198, 104, 122],
+        ]);
+
+        $pantsTable = $this->tableWithRows($merchant, $company, [
+            'name' => 'Calcas masculinas - jeans reto',
+            'product_type' => 'pants',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'notes' => 'Faixas de cintura e quadril calibradas para jeans regular.',
+        ], [
+            ['38', 0, null, null, 74, 80, 90, 96, 164, 174, 56, 68],
+            ['40', 1, null, null, 80, 86, 96, 102, 170, 180, 66, 78],
+            ['42', 2, null, null, 86, 92, 102, 108, 174, 184, 76, 88],
+            ['44', 3, null, null, 92, 100, 108, 116, 178, 190, 86, 102],
+            ['46', 4, null, null, 100, 110, 116, 126, 182, 196, 98, 116],
+        ]);
+
+        $this->productWithVariants($merchant, $company, $dressTable, [
+            'slug' => 'vestido-midi-aurora',
+            'external_product_id' => 'pv-demo-vestido-midi-aurora',
+            'sku' => 'PV-AURORA-MIDI',
+            'name' => 'Vestido Midi Aurora',
+            'description' => 'Vestido midi em viscose leve, com cintura marcada e caimento regular.',
+            'category' => 'Vestidos',
+            'gender' => 'female',
+            'fit_profile' => 'regular',
+            'image_url' => '/images/demo-product.jpg',
+            'color' => 'Verde oliva',
+            'price' => 189.90,
+        ], ['PP', 'P', 'M', 'G', 'GG']);
+
+        $this->productWithVariants($merchant, $company, $blouseTable, [
+            'slug' => 'blusa-canelada-solar',
+            'external_product_id' => 'pv-demo-blusa-canelada-solar',
+            'sku' => 'PV-SOLAR-BLUSA',
+            'name' => 'Blusa Canelada Solar',
+            'description' => 'Blusa feminina em malha canelada com elasticidade moderada e gola redonda.',
+            'category' => 'Blusas',
+            'gender' => 'female',
+            'fit_profile' => 'slim',
+            'image_url' => '/images/demo-product.jpg',
+            'color' => 'Off white',
+            'price' => 99.90,
+        ], ['PP', 'P', 'M', 'G', 'GG']);
+
+        $this->productWithVariants($merchant, $company, $shirtTable, [
+            'slug' => 'camiseta-essencial-marinho',
+            'external_product_id' => 'pv-demo-camiseta-essencial-marinho',
+            'sku' => 'PV-ESSENCIAL-CAMISETA',
+            'name' => 'Camiseta Essencial Marinho',
+            'description' => 'Camiseta masculina em algodao penteado, modelagem regular e toque macio.',
+            'category' => 'Camisetas',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'image_url' => '/images/demo-product.jpg',
+            'color' => 'Azul marinho',
+            'price' => 79.90,
+        ], ['P', 'M', 'G', 'GG', 'XGG']);
+
+        $this->productWithVariants($merchant, $company, $pantsTable, [
+            'slug' => 'calca-jeans-reta-masculina',
+            'external_product_id' => 'pv-demo-calca-jeans-reta-masculina',
+            'sku' => 'PV-JEANS-RETA',
+            'name' => 'Calca Jeans Reta Masculina',
+            'description' => 'Calca jeans masculina com cintura media, perna reta e tecido com leve elastano.',
+            'category' => 'Calcas',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'image_url' => '/images/demo-product.jpg',
+            'color' => 'Jeans escuro',
+            'price' => 219.90,
+        ], ['38', '40', '42', '44', '46']);
+
+        WidgetInstall::query()->updateOrCreate(
+            ['public_key' => 'pv_demo_luna'],
+            [
+                'merchant_id' => $merchant->id,
+                'merchant_company_id' => $company->id,
+                'platform' => 'custom',
+                'allowed_domains' => ['localhost', '127.0.0.1', 'provadorvirtual.online'],
+                'theme' => [
+                    'primary' => '#0f172a',
+                    'secondary' => '#ff4d5e',
+                    'accent' => '#ff7a1a',
+                    'background' => '#ffffff',
+                    'text' => '#111827',
+                    'font_family' => 'Manrope, Inter, Arial, sans-serif',
+                    'font_size' => '14',
+                    'font_weight' => '800',
+                    'button_radius' => '8',
+                ],
+                'is_active' => true,
+            ]
+        );
+    }
+
+    private function tableWithRows(Merchant $merchant, MerchantCompany $company, array $tableData, array $rows): MeasurementTable
+    {
+        $table = MeasurementTable::query()->updateOrCreate(
+            [
+                'merchant_id' => $merchant->id,
+                'merchant_company_id' => $company->id,
+                'name' => $tableData['name'],
+            ],
+            [
+                'product_type' => $tableData['product_type'],
+                'gender' => $tableData['gender'],
+                'fit_profile' => $tableData['fit_profile'],
+                'unit' => 'cm',
+                'status' => 'active',
+                'source' => 'demo',
+                'notes' => $tableData['notes'],
+            ]
+        );
 
         foreach ($rows as [$size, $sort, $bustMin, $bustMax, $waistMin, $waistMax, $hipMin, $hipMax, $heightMin, $heightMax, $weightMin, $weightMax]) {
             MeasurementTableRow::query()->updateOrCreate(
@@ -99,62 +237,54 @@ class DatabaseSeeder extends Seeder
                     'height_max' => $heightMax,
                     'weight_min' => $weightMin,
                     'weight_max' => $weightMax,
+                    'metadata' => ['source' => 'seed_demo_universal'],
                 ]
             );
         }
 
+        return $table;
+    }
+
+    private function productWithVariants(Merchant $merchant, MerchantCompany $company, MeasurementTable $table, array $productData, array $sizes): Product
+    {
         $product = Product::query()->updateOrCreate(
             [
                 'merchant_id' => $merchant->id,
-                'slug' => 'vestido-luna-midi',
+                'slug' => $productData['slug'],
             ],
             [
                 'merchant_company_id' => $company->id,
                 'measurement_table_id' => $table->id,
-                'external_product_id' => 'demo-product-vestido-luna',
-                'sku' => 'LUNA-MIDI',
-                'name' => 'Vestido Luna Midi',
-                'description' => 'Vestido midi em viscose leve, com caimento regular e cintura marcada.',
-                'category' => 'Vestidos',
-                'gender' => 'female',
-                'fit_profile' => 'regular',
+                'external_product_id' => $productData['external_product_id'],
+                'sku' => $productData['sku'],
+                'name' => $productData['name'],
+                'description' => $productData['description'],
+                'category' => $productData['category'],
+                'gender' => $productData['gender'],
+                'fit_profile' => $productData['fit_profile'],
                 'status' => 'active',
-                'image_url' => '/images/demo-product.jpg',
-                'metadata' => ['demo' => true],
+                'image_url' => $productData['image_url'],
+                'metadata' => ['demo' => true, 'storefront' => true],
             ]
         );
 
-        foreach (['PP', 'P', 'M', 'G', 'GG'] as $index => $size) {
+        foreach ($sizes as $index => $size) {
             ProductVariant::query()->updateOrCreate(
                 ['product_id' => $product->id, 'size_label' => $size],
                 [
                     'merchant_id' => $merchant->id,
                     'merchant_company_id' => $company->id,
-                    'external_variant_id' => 'demo-variant-'.$size,
-                    'sku' => 'LUNA-MIDI-'.$size,
-                    'color' => 'Verde oliva',
-                    'price' => 189.90,
-                    'stock_quantity' => 12 - $index,
+                    'external_variant_id' => $productData['sku'].'-'.$size,
+                    'sku' => $productData['sku'].'-'.$size,
+                    'color' => $productData['color'],
+                    'price' => $productData['price'],
+                    'stock_quantity' => max(3, 16 - ($index * 2)),
                     'is_active' => true,
                     'metadata' => ['demo' => true],
                 ]
             );
         }
 
-        WidgetInstall::query()->updateOrCreate(
-            ['public_key' => 'pv_demo_luna'],
-            [
-                'merchant_id' => $merchant->id,
-                'merchant_company_id' => $company->id,
-                'platform' => 'custom',
-                'allowed_domains' => ['localhost', '127.0.0.1', 'provadorvirtual.online'],
-                'theme' => [
-                    'primary' => '#0f172a',
-                    'secondary' => '#ff4d5e',
-                    'accent' => '#ff7a1a',
-                ],
-                'is_active' => true,
-            ]
-        );
+        return $product;
     }
 }

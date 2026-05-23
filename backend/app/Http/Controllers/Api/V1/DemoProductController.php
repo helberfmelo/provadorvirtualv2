@@ -8,11 +8,55 @@ use App\Models\WidgetInstall;
 
 class DemoProductController extends Controller
 {
-    public function show()
+    public function index()
+    {
+        $products = Product::query()
+            ->with(['company', 'variants' => fn ($query) => $query->where('is_active', true)->orderBy('id')])
+            ->whereHas('company', fn ($query) => $query->where('external_store_id', 'pv-demo-store'))
+            ->where('status', 'active')
+            ->orderBy('id')
+            ->get();
+
+        $widget = WidgetInstall::query()
+            ->where('merchant_id', $products->first()?->merchant_id)
+            ->where('merchant_company_id', $products->first()?->merchant_company_id)
+            ->where('is_active', true)
+            ->first();
+
+        return response()->json([
+            'store' => [
+                'name' => $products->first()?->company?->name ?? 'Provador Virtual Loja Teste',
+                'platform' => $products->first()?->company?->platform ?? 'custom',
+                'domain' => $products->first()?->company?->domain ?? 'provadorvirtual.online',
+            ],
+            'products' => $products->map(fn (Product $product): array => [
+                'id' => $product->id,
+                'merchant_id' => $product->merchant_id,
+                'store_id' => $product->merchant_company_id,
+                'external_product_id' => $product->external_product_id,
+                'name' => $product->name,
+                'slug' => $product->slug,
+                'description' => $product->description,
+                'category' => $product->category,
+                'gender' => $product->gender,
+                'fit_profile' => $product->fit_profile,
+                'image_url' => asset(ltrim($product->image_url ?? 'images/demo-product.jpg', '/')),
+                'price_from' => $product->variants->min('price'),
+                'sizes' => $product->variants->pluck('size_label')->values(),
+            ])->values(),
+            'widget' => [
+                'public_key' => $widget?->public_key,
+                'platform' => $widget?->platform ?? 'custom',
+                'theme' => $widget?->theme ?? $this->defaultTheme(),
+            ],
+        ]);
+    }
+
+    public function show(?string $slug = null)
     {
         $product = Product::query()
             ->with(['company', 'measurementTable.rows', 'variants' => fn ($query) => $query->orderBy('id')])
-            ->where('slug', 'vestido-luna-midi')
+            ->where('slug', $slug ?: 'vestido-midi-aurora')
             ->firstOrFail();
 
         $widget = WidgetInstall::query()
@@ -67,11 +111,23 @@ class DemoProductController extends Controller
             'widget' => [
                 'public_key' => $widget?->public_key,
                 'platform' => $widget?->platform ?? 'custom',
-                'theme' => $widget?->theme ?? [
-                    'primary' => '#0f172a',
-                    'accent' => '#ff4d5e',
-                ],
+                'theme' => $widget?->theme ?? $this->defaultTheme(),
             ],
         ]);
+    }
+
+    private function defaultTheme(): array
+    {
+        return [
+            'primary' => '#0f172a',
+            'secondary' => '#ff4d5e',
+            'accent' => '#ff7a1a',
+            'background' => '#ffffff',
+            'text' => '#111827',
+            'font_family' => 'Manrope, Inter, Arial, sans-serif',
+            'font_size' => '14',
+            'font_weight' => '800',
+            'button_radius' => '8',
+        ];
     }
 }

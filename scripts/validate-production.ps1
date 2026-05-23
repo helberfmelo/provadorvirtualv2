@@ -45,7 +45,7 @@ Assert-True ($ops.checks.database -eq "ok") "database check fora do esperado"
 "API ops/status OK"
 
 $demo = Invoke-RestMethod -Uri "$ApiBase/demo/product-test" -Headers @{ Accept = "application/json" }
-Assert-True ($demo.product.name -eq "Vestido Luna Midi") "produto demo fora do esperado"
+Assert-True ($demo.product.name -eq "Vestido Midi Aurora") "produto demo fora do esperado"
 "API demo product OK"
 
 $recommendationBody = @{

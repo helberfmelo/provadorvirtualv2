@@ -13,9 +13,15 @@ class DemoProductTest extends TestCase
     {
         $this->seed();
 
+        $this->getJson('/api/v1/demo/storefront')
+            ->assertOk()
+            ->assertJsonPath('store.name', 'Provador Virtual Loja Teste')
+            ->assertJsonCount(4, 'products')
+            ->assertJsonPath('products.0.slug', 'vestido-midi-aurora');
+
         $this->getJson('/api/v1/demo/product-test')
             ->assertOk()
-            ->assertJsonPath('product.name', 'Vestido Luna Midi')
+            ->assertJsonPath('product.name', 'Vestido Midi Aurora')
             ->assertJsonPath('product.company.platform', 'custom')
             ->assertJsonPath('measurement_table.rows.0.size_label', 'PP')
             ->assertJsonPath('widget.public_key', 'pv_demo_luna')

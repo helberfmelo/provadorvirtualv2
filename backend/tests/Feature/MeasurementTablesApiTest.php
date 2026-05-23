@@ -68,7 +68,7 @@ class MeasurementTablesApiTest extends TestCase
         $this->withHeaders($headers)
             ->getJson('/api/v1/measurement-tables')
             ->assertOk()
-            ->assertJsonPath('summary.total', 2);
+            ->assertJsonPath('summary.total', 5);
 
         $this->withHeaders($headers)
             ->deleteJson("/api/v1/measurement-tables/{$tableId}")

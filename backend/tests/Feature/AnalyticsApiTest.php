@@ -16,8 +16,8 @@ class AnalyticsApiTest extends TestCase
     {
         $this->seed();
         $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
-        $merchant = Merchant::query()->where('slug', 'loja-luna-demo')->firstOrFail();
-        $product = Product::query()->where('sku', 'LUNA-MIDI')->firstOrFail();
+        $merchant = Merchant::query()->where('slug', 'provador-virtual-demo')->firstOrFail();
+        $product = Product::query()->where('sku', 'PV-AURORA-MIDI')->firstOrFail();
 
         Product::query()->create([
             'merchant_id' => $merchant->id,

@@ -24,6 +24,7 @@ const router = createRouter({
     { path: '/login', component: LoginView },
     { path: '/cadastro', component: LoginView },
     { path: '/produto-teste', component: ProductTestView },
+    { path: '/produto-teste/:slug', component: ProductTestView },
     { path: '/privacidade', component: PrivacyView },
     { path: '/termos', component: TermsView },
     { path: '/app', component: DashboardView },

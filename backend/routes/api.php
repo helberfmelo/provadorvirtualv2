@@ -29,6 +29,8 @@ use Illuminate\Support\Facades\Route;
 Route::prefix('v1')->group(function (): void {
     Route::get('/health', HealthController::class);
     Route::get('/ops/status', OperationalStatusController::class)->middleware('throttle:60,1');
+    Route::get('/demo/storefront', [DemoProductController::class, 'index']);
+    Route::get('/demo/storefront/{slug}', [DemoProductController::class, 'show']);
     Route::get('/demo/product-test', [DemoProductController::class, 'show']);
     Route::options('/public/recommendations/{path?}', fn () => response()->noContent())
         ->where('path', '.*')
