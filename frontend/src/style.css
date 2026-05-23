@@ -1381,6 +1381,10 @@ th {
   margin-top: 24px;
 }
 
+.form-wide {
+  margin-top: 24px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

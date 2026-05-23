@@ -9,7 +9,9 @@ import GoLiveView from '../views/GoLiveView.vue'
 import ImportsView from '../views/ImportsView.vue'
 import IntegrationsView from '../views/IntegrationsView.vue'
 import LoginView from '../views/LoginView.vue'
+import MeasurementTableFormView from '../views/MeasurementTableFormView.vue'
 import MeasurementTablesView from '../views/MeasurementTablesView.vue'
+import ProductFormView from '../views/ProductFormView.vue'
 import PrivacyView from '../views/PrivacyView.vue'
 import ProductsView from '../views/ProductsView.vue'
 import ProductTestView from '../views/ProductTestView.vue'
@@ -22,6 +24,7 @@ import SaasEmailSettingsView from '../views/SaasEmailSettingsView.vue'
 import SaasUserFormView from '../views/SaasUserFormView.vue'
 import SaasUsersView from '../views/SaasUsersView.vue'
 import TermsView from '../views/TermsView.vue'
+import UserFormView from '../views/UserFormView.vue'
 import UsersView from '../views/UsersView.vue'
 import WidgetInstallView from '../views/WidgetInstallView.vue'
 
@@ -42,7 +45,11 @@ const router = createRouter({
     { path: '/termos', component: TermsView },
     { path: '/app', component: DashboardView },
     { path: '/app/produtos', component: ProductsView },
+    { path: '/app/produtos/novo', component: ProductFormView },
+    { path: '/app/produtos/:id/editar', component: ProductFormView },
     { path: '/app/tabelas-de-medidas', component: MeasurementTablesView },
+    { path: '/app/tabelas-de-medidas/nova', component: MeasurementTableFormView },
+    { path: '/app/tabelas-de-medidas/:id/editar', component: MeasurementTableFormView },
     { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/analytics', component: AnalyticsView },
     { path: '/app/go-live', component: GoLiveView },
@@ -50,6 +57,8 @@ const router = createRouter({
     { path: '/app/widget', component: WidgetInstallView },
     { path: '/app/integracoes', component: IntegrationsView },
     { path: '/app/usuarios', component: UsersView },
+    { path: '/app/usuarios/novo', component: UserFormView },
+    { path: '/app/usuarios/:id/editar', component: UserFormView },
     { path: '/saas', component: SaasAdminView },
     { path: '/saas/empresas', component: SaasCompaniesView },
     { path: '/saas/empresas/nova', component: SaasCompanyFormView },

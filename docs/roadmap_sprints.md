@@ -471,6 +471,8 @@ Entregas previstas:
 - manter menu publico separado de operacao interna;
 - atualizar documentacao de rotas e URLs.
 
+Status: implementado, publicado e validado em producao no run `26342322716`.
+
 ### Sprint 39 - SaaS list-first e subpaginas
 
 Objetivo: transformar o portal SaaS em telas operacionais de listagem, com formularios em paginas proprias.
@@ -484,6 +486,8 @@ Entregas previstas:
 - formularios de credenciais SMTP e templates fora da mesma tela da visao geral;
 - manter acoes de criar, editar e ativar/desativar nas listagens.
 
+Status: implementado, publicado e validado em producao no run `26342542196`.
+
 ### Sprint 40 - Portal da empresa list-first e subpaginas
 
 Objetivo: revisar as telas do lojista para evitar paginas emboladas e padronizar CRUDs.
@@ -494,6 +498,8 @@ Entregas previstas:
 - paginas separadas para novo/editar quando o CRUD exigir muitos campos;
 - revisao de widget, integracoes, assistente, analytics e go-live para reduzir secoes misturadas;
 - submenus claros por operacao: catalogo, configuracao, inteligencia, publicacao e acessos.
+
+Status: em execucao. Produtos, tabelas de medidas e usuarios foram separados em listagens e formularios proprios; widget, integracoes, assistente, analytics e go-live seguem para refinamento visual da Sprint 41.
 
 ### Sprint 41 - Revisao visual, responsiva e QA de telas
 

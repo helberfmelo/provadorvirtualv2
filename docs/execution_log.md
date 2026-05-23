@@ -316,3 +316,11 @@
 - E-mails foram separados em `/saas/emails`, `/saas/emails/configuracoes`, `/saas/emails/novo` e `/saas/emails/:id/editar`.
 - O menu SaaS passou a listar visao geral, empresas, usuarios e e-mails, sem misturar modulos do portal da empresa.
 - Validacoes locais: `npm run build`.
+
+## 2026-05-23 - Sprint 40 Portal da empresa list-first e subpaginas
+
+- Produtos foram separados em `/app/produtos`, `/app/produtos/novo` e `/app/produtos/:id/editar`.
+- Tabelas de medidas foram separadas em `/app/tabelas-de-medidas`, `/app/tabelas-de-medidas/nova` e `/app/tabelas-de-medidas/:id/editar`.
+- Usuarios da empresa foram separados em `/app/usuarios`, `/app/usuarios/novo` e `/app/usuarios/:id/editar`.
+- As listagens agora ocupam a tela e as edicoes abrem em telas proprias.
+- Validacoes locais: `npm run build`.
