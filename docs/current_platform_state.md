@@ -85,6 +85,7 @@ Atualizado em: 2026-05-23
 - Sprint 9 publicada em producao pelo GitHub Actions no run `26332326042`.
 - Sprint 10 publicada em producao pelo GitHub Actions no run `26332544138`.
 - Sprint 11 publicada em producao pelo GitHub Actions no run `26332960822`.
+- Sprint 12 publicada em producao pelo GitHub Actions no run `26333226813`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em producao usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que nao preservam header durante redirect.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
@@ -110,4 +111,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Validar/deployar a Sprint 12 e manter pendencias externas de BigShop/IA documentadas.
+Operar go-live assistido em `/provadorvirtual_v2/` e aguardar credenciais reais de BigShop/IA para os proximos passos.

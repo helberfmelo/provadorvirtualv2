@@ -187,6 +187,8 @@ O workflow gera backup em:
 
 Sprint 11 validou a criacao de backup no run `26332960822` com o arquivo `provadorvirtual-v2-backup-20260523-094207-ac1025f2a2469b9876d93764652ce87acd0e7174.tar.gz`.
 
+Sprint 12 validou a criacao de backup no run `26333226813` com o arquivo `provadorvirtual-v2-backup-20260523-095421-e657a75c92163ab29eae19a8cec5b5d5d1b6cd5c.tar.gz`.
+
 Rollback manual:
 
 1. escolher backup anterior;

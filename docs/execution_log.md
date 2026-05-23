@@ -172,6 +172,10 @@
 - Criado `tools/widget-external-smoke.html` para validar widget de producao servido por HTTP local.
 - Criado documento `docs/go_live_cutover.md`.
 - Validacoes locais: `php artisan test --filter=GoLiveReadinessApiTest`, `vendor/bin/pint`, `php artisan test`, `npm run build`, `php artisan route:list --path=api/v1/go-live` e `git diff --check`.
+- Run `26333179219` do GitHub Actions finalizou com sucesso para o commit `f96bc4f`.
+- Ajustado `scripts/validate-production.ps1` para normalizar header CORS retornado como array no PowerShell.
+- Run `26333226813` do GitHub Actions finalizou com sucesso para o commit `e657a75`.
+- Validado em producao: `/app/go-live`, `scripts/validate-production.ps1` com `PRODUCTION VALIDATION OK` e backup `provadorvirtual-v2-backup-20260523-095421-e657a75c92163ab29eae19a8cec5b5d5d1b6cd5c.tar.gz`.
 
 ## Pendencias abertas
 

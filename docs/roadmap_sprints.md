@@ -196,4 +196,4 @@ Entregas:
 - checklist de cutover;
 - plano para raiz `provadorvirtual.online`.
 
-Status: implementado localmente em 2026-05-23; aguardando deploy/validacao final da sprint.
+Status: concluido e publicado em producao no run `26333226813`. Go-live assistido permanece na subpasta `/provadorvirtual_v2/`; cutover para a raiz depende de aceite comercial e piloto BigShop.

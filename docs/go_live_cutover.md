@@ -21,6 +21,9 @@ Implementado:
 - arquivo `tools/widget-external-smoke.html` para validar o widget fora do app;
 - checklist de cutover e pendencias externas.
 
+Publicado em producao no run `26333226813`. Validacao final com
+`scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
 ## Checklist de go-live
 
 Obrigatorio antes de campanha publica:
