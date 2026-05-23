@@ -275,3 +275,6 @@
 - Menu mobile do Vue passou a abrir em drawer com botao de barras.
 - Validacoes locais focadas: `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=WidgetInstallApiTest` e `npm run build`.
 - Validacoes locais completas: `php artisan test`, `npm run build`, build raiz com `VITE_APP_BASE_PATH=/`, `git diff --check` e `vendor/bin/pint --dirty`.
+- Run `26338411089` do GitHub Actions finalizou com sucesso para o commit `116fcf6`.
+- Primeira tentativa de validacao de producao teve timeout transitorio de conexao logo apos deploy; nova tentativa 15 segundos depois retornou `PRODUCTION VALIDATION OK`.
+- Validacoes adicionais em producao: OG tags da raiz, `/favicon.svg`, imagens demo por API e precos `R$ 189,90`/`R$ 129,90`.

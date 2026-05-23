@@ -28,7 +28,7 @@ Atualizado em: 2026-05-23
 - Sprint 29 preparou login por e-mail/CPF, acesso do portal por codigo/CNPJ e contexto de empresa no token; publicado em producao no run `26337254520`.
 - Sprint 30 criou CRUD de usuarios no SaaS e no portal da empresa, permissoes por modulo/menu, status global/por empresa e acoes de editar/ativar/desativar; publicado em producao no run `26337792120`.
 - Sprint 31 criou automacoes de e-mail transacional, historico de envios e comando/scheduler para pendencias financeiras; publicado em producao no run `26338061259`.
-- Sprint 32 implementou refinamento da oferta publica, trava de integracao BigShop, favicon/OG, footer, imagens da loja teste e menu mobile em drawer.
+- Sprint 32 implementou refinamento da oferta publica, trava de integracao BigShop, favicon/OG, footer, imagens da loja teste e menu mobile em drawer; publicado em producao no run `26338411089`.
 
 ## Referencias confirmadas
 
@@ -128,4 +128,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Publicar e validar a Sprint 32; depois seguir para login multiempresa refinado e enforcement completo de permissoes.
+Seguir para login multiempresa refinado e enforcement completo de permissoes.

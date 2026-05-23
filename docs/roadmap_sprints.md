@@ -388,7 +388,7 @@ Entregas:
 - melhorar footer publico com copyright e credito OTS;
 - incluir CTA para quem ainda nao tem loja online criar loja na BigShop.
 
-Status: implementado e validado localmente. Publicacao em producao pendente do push da sprint.
+Status: implementado, publicado e validado em producao no run `26338411089`.
 
 ### Sprint 33 - Login multiempresa e permissoes refinadas
 
