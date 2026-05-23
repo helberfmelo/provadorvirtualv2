@@ -165,6 +165,12 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:saas,saas_users,edit');
         Route::patch('/saas/users/{user}', [UserAccessController::class, 'saasUpdate'])
             ->middleware('portal.permission:saas,saas_users,edit');
+        Route::get('/saas/company-users', [UserAccessController::class, 'saasCompanyUsersIndex'])
+            ->middleware('portal.permission:saas,saas_company_users,view');
+        Route::post('/saas/company-users', [UserAccessController::class, 'saasCompanyUsersStore'])
+            ->middleware('portal.permission:saas,saas_company_users,edit');
+        Route::patch('/saas/company-users/{user}', [UserAccessController::class, 'saasCompanyUsersUpdate'])
+            ->middleware('portal.permission:saas,saas_company_users,edit');
         Route::get('/saas/email-settings', [SaasEmailController::class, 'showSettings'])
             ->middleware('portal.permission:saas,saas_emails,view');
         Route::patch('/saas/email-settings', [SaasEmailController::class, 'updateSettings'])

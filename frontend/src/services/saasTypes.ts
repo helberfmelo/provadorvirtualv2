@@ -82,6 +82,19 @@ export type Permission = { view: boolean; edit: boolean }
 export type PermissionMap = Record<string, Permission>
 export type Module = { key: string; label: string; description: string }
 export type MerchantOption = { id: number; name: string; slug: string }
+export type CompanyOption = {
+  id: number
+  access_code: string
+  name: string
+  document: string | null
+  platform: string
+  status: string
+  merchant: {
+    id: number
+    name: string
+    slug: string
+  }
+}
 
 export type SaasUser = {
   id: number
@@ -99,6 +112,8 @@ export type SaasUser = {
       role: string
       status: string
       is_owner: boolean
+      merchant_company_id?: number | null
+      company?: CompanyOption | null
       permissions: PermissionMap
     }
   }>

@@ -140,6 +140,9 @@ Rotas iniciais:
 - `/saas/usuarios`
 - `/saas/usuarios/novo`
 - `/saas/usuarios/:id/editar`
+- `/saas/usuarios-empresas`
+- `/saas/usuarios-empresas/novo`
+- `/saas/usuarios-empresas/:id/editar`
 - `/saas/emails`
 - `/saas/emails/configuracoes`
 - `/saas/emails/novo`

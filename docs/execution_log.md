@@ -350,3 +350,13 @@
 - Site publico e assistente IA passaram a destacar base brasileira, IA assistiva, revisao humana e aprendizado seguro.
 - `docs/credentials.local.md` foi limpo localmente para exibir somente as duas URLs de login pedidas.
 - Run `26343538804` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 44 CRUD SaaS de usuarios das empresas
+
+- Criado modulo SaaS `saas_company_users` para separar usuarios internos de usuarios de empresas clientes.
+- `/api/v1/saas/users` passou a listar usuarios internos `admin`/`support`.
+- Criadas APIs `/api/v1/saas/company-users` para listar, criar, editar e ativar/desativar acessos de clientes.
+- Criadas telas `/saas/usuarios-empresas`, `/saas/usuarios-empresas/novo` e `/saas/usuarios-empresas/:id/editar`.
+- Formulario permite selecionar empresa por codigo/nome/CNPJ, definir perfil, status do acesso e permissoes do portal da empresa.
+- `pv:create-master-admin` passou a garantir permissoes SaaS completas.
+- Validacoes locais: `php artisan test --filter=UserAccessApiTest`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.

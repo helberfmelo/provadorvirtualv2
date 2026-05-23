@@ -1557,6 +1557,29 @@ th {
   font-weight: 700;
 }
 
+.detail-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.detail-strip span {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #475569;
+  background: #f9fafb;
+  font-size: 0.88rem;
+}
+
+.detail-strip strong {
+  color: #0f172a;
+}
+
 textarea {
   width: 100%;
   padding: 10px 12px;

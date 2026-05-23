@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\MerchantCompany;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -99,6 +100,56 @@ class UserAccessApiTest extends TestCase
         ])
             ->assertUnprocessable()
             ->assertJsonValidationErrors('company_access');
+    }
+
+    public function test_admin_can_manage_company_users_from_saas_panel(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->adminToken()];
+        $company = MerchantCompany::query()->orderBy('id')->firstOrFail();
+
+        $created = $this->withHeaders($headers)
+            ->postJson('/api/v1/saas/company-users', [
+                'name' => 'Cliente SaaS',
+                'email' => 'cliente-saas@example.com',
+                'cpf' => '22233344455',
+                'password' => 'password123',
+                'status' => 'active',
+                'merchant_company_id' => $company->id,
+                'merchant_role' => 'manager',
+                'merchant_user_status' => 'active',
+                'is_owner' => false,
+                'permissions' => [
+                    'products' => ['view' => false, 'edit' => true],
+                    'analytics' => ['view' => true, 'edit' => false],
+                ],
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.role', 'merchant')
+            ->assertJsonPath('data.merchants.0.access.role', 'manager')
+            ->assertJsonPath('data.merchants.0.access.company.access_code', $company->access_code)
+            ->assertJsonPath('data.merchants.0.access.permissions.products.view', true)
+            ->assertJsonPath('data.merchants.0.access.permissions.products.edit', true)
+            ->json('data');
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/saas/users')
+            ->assertOk()
+            ->assertJsonMissing(['email' => 'cliente-saas@example.com']);
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/saas/company-users')
+            ->assertOk()
+            ->assertJsonFragment(['email' => 'cliente-saas@example.com'])
+            ->assertJsonFragment(['access_code' => $company->access_code]);
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/saas/company-users/'.$created['id'], [
+                'merchant_company_id' => $company->id,
+                'merchant_user_status' => 'inactive',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.merchants.0.access.status', 'inactive');
     }
 
     public function test_merchant_user_without_edit_permission_cannot_manage_users(): void

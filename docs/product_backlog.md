@@ -113,7 +113,7 @@ Atualizado em: 2026-05-23
 - `DONE` Login por e-mail ou CPF no SaaS e no portal da empresa.
 - `DONE` Reuso de usuario por e-mail/CPF em mais de uma empresa.
 - `DONE` CRUD de usuarios e permissoes no SaaS e no portal da empresa.
-- `TODO` CRUD SaaS separado para usuarios das empresas clientes.
+- `DONE` CRUD SaaS separado para usuarios das empresas clientes.
 - `DONE` Pacote comercial/piloto assistido em `/app/go-live`.
 - `DONE` Validacao de producao cobre checkout, widget, perfil consentido, sinal de aprendizado e pacote de piloto.
 - `DONE` Separar completamente a navegacao do SaaS e do portal da empresa.

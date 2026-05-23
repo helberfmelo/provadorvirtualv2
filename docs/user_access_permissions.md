@@ -11,7 +11,8 @@ Permitir que o SaaS e cada empresa cliente gerenciem usuarios com acesso por mod
 Implementado:
 
 - CRUD de usuarios do portal da empresa em `/app/usuarios`;
-- CRUD de usuarios do portal SaaS em `/saas/usuarios`;
+- CRUD de usuarios internos do portal SaaS em `/saas/usuarios`;
+- CRUD SaaS separado para usuarios das empresas clientes em `/saas/usuarios-empresas`;
 - listagem, botao de novo, edicao e ativar/desativar nos CRUDs de usuarios;
 - edicao e ativar/desativar tambem no CRUD de empresas do SaaS;
 - permissao por modulo/menu com `visualizar` e `editar`;
@@ -47,12 +48,14 @@ Implementado:
 - `saas_dashboard`
 - `saas_companies`
 - `saas_users`
+- `saas_company_users`
 - `saas_emails`
 - `saas_audit`
 
 ## Regras
 
 - `admin` e `support` podem acessar o SaaS conforme permissoes SaaS.
+- `saas_users` gerencia somente equipe interna do SaaS; `saas_company_users` gerencia usuarios vinculados a empresas clientes.
 - `owner` da empresa tem acesso total no portal da empresa.
 - Usuarios `merchant` sem permissao `users.edit` podem visualizar a lista se tiverem `users.view`, mas nao podem criar, editar, ativar ou desativar usuarios.
 - Usuario globalmente inativo nao consegue fazer login.
@@ -68,6 +71,9 @@ SaaS:
 - `GET /api/v1/saas/users`
 - `POST /api/v1/saas/users`
 - `PATCH /api/v1/saas/users/{user}`
+- `GET /api/v1/saas/company-users`
+- `POST /api/v1/saas/company-users`
+- `PATCH /api/v1/saas/company-users/{user}`
 
 Portal da empresa:
 

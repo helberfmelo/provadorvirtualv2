@@ -48,6 +48,8 @@ Artisan::command('pv:create-master-admin {--email=} {--name=} {--cpf=} {--passwo
             'name' => $name,
             'cpf' => $cpf,
             'role' => 'admin',
+            'status' => 'active',
+            'permissions' => PermissionCatalog::full('saas'),
             'password' => Hash::make($password),
         ],
     );

@@ -555,4 +555,4 @@ Entregas previstas:
 - manter permissoes por modulo do portal da empresa com regra editar seleciona visualizar;
 - atualizar menu, permissao e documentacao para nao misturar usuarios SaaS com usuarios de clientes.
 
-Status: planejado.
+Status: implementado localmente, aguardando publicacao e validacao de producao.

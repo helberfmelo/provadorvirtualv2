@@ -23,6 +23,7 @@ class UserAccessController extends Controller
 
         $users = User::query()
             ->with(['merchants' => fn ($query) => $query->select('merchants.id', 'merchants.name', 'merchants.slug')])
+            ->whereIn('role', ['admin', 'support'])
             ->orderByDesc('id')
             ->limit(150)
             ->get();
@@ -81,6 +82,74 @@ class UserAccessController extends Controller
         return response()->json([
             'data' => $this->serializeUser($user->fresh(['merchants']) ?? $user),
             'meta' => $this->saasMeta(),
+        ]);
+    }
+
+    public function saasCompanyUsersIndex(Request $request): array
+    {
+        $this->ensureSaasPermission($request, 'view', 'saas_company_users');
+
+        $users = User::query()
+            ->whereHas('merchants')
+            ->with(['merchants' => fn ($query) => $query->select('merchants.id', 'merchants.name', 'merchants.slug')])
+            ->orderByDesc('id')
+            ->limit(200)
+            ->get();
+        $companyMap = $this->companyMapForUsers($users);
+
+        return [
+            'data' => $users->map(fn (User $user): array => $this->serializeUser($user, companiesById: $companyMap)),
+            'meta' => $this->saasCompanyUsersMeta(),
+        ];
+    }
+
+    public function saasCompanyUsersStore(Request $request)
+    {
+        $this->ensureSaasPermission($request, 'edit', 'saas_company_users');
+
+        $data = $this->validateUserPayload($request, allowSaasRole: true);
+
+        if (! filled($data['merchant_company_id'] ?? null)) {
+            throw new HttpException(422, 'Selecione a empresa cliente para vincular o usuario.');
+        }
+
+        $company = MerchantCompany::query()
+            ->with('merchant')
+            ->findOrFail((int) $data['merchant_company_id']);
+        $data['role'] = 'merchant';
+        $data['merchant_id'] = $company->merchant_id;
+
+        $user = $this->saveUser($data, allowRole: false);
+        $this->syncMerchantAccess($user, $company->merchant, $company, $data);
+        $companyMap = [$company->id => $this->serializeCompanyOption($company)];
+
+        return response()->json([
+            'data' => $this->serializeUser($user->fresh(['merchants']) ?? $user, companiesById: $companyMap),
+            'meta' => $this->saasCompanyUsersMeta(),
+        ], 201);
+    }
+
+    public function saasCompanyUsersUpdate(Request $request, User $user)
+    {
+        $this->ensureSaasPermission($request, 'edit', 'saas_company_users');
+
+        $data = $this->validateUserPayload($request, updating: true, allowSaasRole: true);
+
+        if ((int) $request->user()->id === (int) $user->id && ($data['status'] ?? null) === 'inactive') {
+            throw new HttpException(422, 'Nao desative seu proprio usuario SaaS.');
+        }
+
+        $company = $this->companyForCompanyUser($user, $data['merchant_company_id'] ?? null);
+        $data['role'] = 'merchant';
+        $data['merchant_id'] = $company->merchant_id;
+
+        $user = $this->saveUser($data, $user, allowRole: false);
+        $this->syncMerchantAccess($user, $company->merchant, $company, $data);
+        $companyMap = [$company->id => $this->serializeCompanyOption($company)];
+
+        return response()->json([
+            'data' => $this->serializeUser($user->fresh(['merchants']) ?? $user, companiesById: $companyMap),
+            'meta' => $this->saasCompanyUsersMeta(),
         ]);
     }
 
@@ -304,11 +373,36 @@ class UserAccessController extends Controller
         return $merchant->companies()->whereKey((int) $companyId)->firstOrFail();
     }
 
-    private function ensureSaasPermission(Request $request, string $action): void
+    private function companyForCompanyUser(User $user, mixed $companyId): MerchantCompany
+    {
+        if (filled($companyId)) {
+            return MerchantCompany::query()->with('merchant')->findOrFail((int) $companyId);
+        }
+
+        $accessMerchant = $user->merchants()->first();
+
+        if (! $accessMerchant) {
+            throw new HttpException(404, 'Usuario nao encontrado nas empresas clientes.');
+        }
+
+        if ($accessMerchant->pivot?->merchant_company_id) {
+            return MerchantCompany::query()
+                ->with('merchant')
+                ->findOrFail((int) $accessMerchant->pivot->merchant_company_id);
+        }
+
+        return MerchantCompany::query()
+            ->with('merchant')
+            ->where('merchant_id', $accessMerchant->id)
+            ->orderBy('id')
+            ->firstOrFail();
+    }
+
+    private function ensureSaasPermission(Request $request, string $action, string $module = 'saas_users'): void
     {
         $user = $request->user();
 
-        if (! $user || ($user->status ?? 'active') !== 'active' || ! PermissionCatalog::canSaas($user, 'saas_users', $action)) {
+        if (! $user || ($user->status ?? 'active') !== 'active' || ! PermissionCatalog::canSaas($user, $module, $action)) {
             throw new HttpException(403, 'Acesso restrito ao painel SaaS.');
         }
     }
@@ -320,7 +414,7 @@ class UserAccessController extends Controller
         }
     }
 
-    private function serializeUser(User $user, ?Merchant $merchantContext = null): array
+    private function serializeUser(User $user, ?Merchant $merchantContext = null, ?array $companiesById = null): array
     {
         $user->loadMissing('merchants');
 
@@ -337,7 +431,7 @@ class UserAccessController extends Controller
                 'id' => $merchant->id,
                 'name' => $merchant->name,
                 'slug' => $merchant->slug,
-                'access' => $this->serializePivotAccess($merchant->pivot),
+                'access' => $this->serializePivotAccess($merchant->pivot, $companiesById),
             ])->values(),
         ];
     }
@@ -350,13 +444,15 @@ class UserAccessController extends Controller
         return $accessMerchant ? $this->serializePivotAccess($accessMerchant->pivot) : null;
     }
 
-    private function serializePivotAccess(mixed $pivot): array
+    private function serializePivotAccess(mixed $pivot, ?array $companiesById = null): array
     {
         $isOwner = (bool) ($pivot->is_owner ?? false) || ($pivot->role ?? null) === 'owner';
+        $companyId = $pivot->merchant_company_id ? (int) $pivot->merchant_company_id : null;
 
         return [
             'merchant_id' => (int) ($pivot->merchant_id ?? 0),
-            'merchant_company_id' => $pivot->merchant_company_id ? (int) $pivot->merchant_company_id : null,
+            'merchant_company_id' => $companyId,
+            'company' => $companyId && $companiesById ? ($companiesById[$companyId] ?? null) : null,
             'role' => $pivot->role ?? 'staff',
             'status' => $pivot->status ?? 'active',
             'is_owner' => $isOwner,
@@ -364,6 +460,34 @@ class UserAccessController extends Controller
                 ? PermissionCatalog::full('merchant')
                 : PermissionCatalog::normalize(PermissionCatalog::decode($pivot->permissions ?? null), 'merchant'),
         ];
+    }
+
+    private function companyMapForUsers($users): array
+    {
+        $ids = [];
+
+        foreach ($users as $user) {
+            foreach ($user->merchants as $merchant) {
+                if ($merchant->pivot?->merchant_company_id) {
+                    $ids[] = (int) $merchant->pivot->merchant_company_id;
+                }
+            }
+        }
+
+        $ids = array_values(array_unique($ids));
+
+        if ($ids === []) {
+            return [];
+        }
+
+        return MerchantCompany::query()
+            ->with('merchant')
+            ->whereIn('id', $ids)
+            ->get()
+            ->mapWithKeys(fn (MerchantCompany $company): array => [
+                $company->id => $this->serializeCompanyOption($company),
+            ])
+            ->all();
     }
 
     private function saasMeta(): array
@@ -376,6 +500,40 @@ class UserAccessController extends Controller
                 ->orderBy('name')
                 ->limit(120)
                 ->get(),
+        ];
+    }
+
+    private function saasCompanyUsersMeta(): array
+    {
+        return [
+            'saas_modules' => PermissionCatalog::saasModules(),
+            'merchant_modules' => PermissionCatalog::merchantModules(),
+            'companies' => MerchantCompany::query()
+                ->with('merchant')
+                ->orderBy('name')
+                ->limit(300)
+                ->get()
+                ->map(fn (MerchantCompany $company): array => $this->serializeCompanyOption($company))
+                ->values(),
+        ];
+    }
+
+    private function serializeCompanyOption(MerchantCompany $company): array
+    {
+        $company->loadMissing('merchant');
+
+        return [
+            'id' => $company->id,
+            'access_code' => $company->access_code,
+            'name' => $company->name,
+            'document' => $company->document,
+            'platform' => $company->platform,
+            'status' => $company->status,
+            'merchant' => [
+                'id' => $company->merchant?->id,
+                'name' => $company->merchant?->name,
+                'slug' => $company->merchant?->slug,
+            ],
         ];
     }
 }

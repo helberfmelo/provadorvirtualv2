@@ -28,7 +28,8 @@ class PermissionCatalog
         return [
             ['key' => 'saas_dashboard', 'label' => 'Painel SaaS', 'description' => 'Resumo operacional do Provador Virtual.'],
             ['key' => 'saas_companies', 'label' => 'Empresas', 'description' => 'Cadastro e manutencao de empresas clientes.'],
-            ['key' => 'saas_users', 'label' => 'Usuarios SaaS', 'description' => 'Usuarios internos, suporte e acessos de lojistas.'],
+            ['key' => 'saas_users', 'label' => 'Usuarios SaaS', 'description' => 'Usuarios internos e equipe de suporte do SaaS.'],
+            ['key' => 'saas_company_users', 'label' => 'Usuarios das empresas', 'description' => 'Usuarios vinculados a empresas clientes e permissoes do portal da empresa.'],
             ['key' => 'saas_emails', 'label' => 'E-mails', 'description' => 'Credenciais SMTP e e-mails transacionais.'],
             ['key' => 'saas_audit', 'label' => 'Auditoria', 'description' => 'Logs, diagnosticos e rastreabilidade.'],
         ];

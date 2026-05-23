@@ -5,6 +5,7 @@ import { api } from '../services/api'
 import {
   emptyPermissions,
   normalizePermissions,
+  type CompanyOption,
   type Module,
   type PermissionMap,
   type SaasUser,
@@ -15,7 +16,9 @@ const router = useRouter()
 const userId = computed(() => Number(route.params.id || 0))
 const editing = computed(() => Boolean(userId.value))
 
-const saasModules = ref<Module[]>([])
+const merchantModules = ref<Module[]>([])
+const companies = ref<CompanyOption[]>([])
+const users = ref<SaasUser[]>([])
 const loading = ref(false)
 const saving = ref(false)
 const error = ref('')
@@ -27,11 +30,14 @@ const form = reactive({
   email: '',
   cpf: '',
   password: '',
-  role: 'support',
   status: 'active',
+  merchant_company_id: '',
+  merchant_role: 'staff',
+  merchant_user_status: 'active',
+  is_owner: false,
 })
 
-const activeModules = computed(() => saasModules.value)
+const selectedCompany = computed(() => companies.value.find((company) => String(company.id) === String(form.merchant_company_id)) || null)
 
 onMounted(() => {
   loadForm()
@@ -42,11 +48,13 @@ async function loadForm() {
   error.value = ''
 
   try {
-    const { data } = await api.get('/saas/users')
-    saasModules.value = data.meta.saas_modules
+    const { data } = await api.get('/saas/company-users')
+    merchantModules.value = data.meta.merchant_modules
+    companies.value = data.meta.companies
+    users.value = data.data
 
     if (editing.value) {
-      const user = (data.data as SaasUser[]).find((item) => item.id === userId.value)
+      const user = users.value.find((item) => item.id === userId.value)
       if (!user) {
         error.value = 'Usuario nao encontrado.'
         return
@@ -55,30 +63,29 @@ async function loadForm() {
       return
     }
 
-    permissionDraft.value = emptyPermissions(saasModules.value)
+    permissionDraft.value = emptyPermissions(merchantModules.value)
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o usuario.'
+    error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o usuario da empresa.'
   } finally {
     loading.value = false
   }
 }
 
 function editUser(user: SaasUser) {
+  const queryCompanyId = Number(route.query.company || 0)
+  const firstAccess = user.merchants.find((merchant) => merchant.access.merchant_company_id === queryCompanyId) || user.merchants[0]
+
   form.id = user.id
   form.name = user.name
   form.email = user.email
   form.cpf = user.cpf || ''
   form.password = ''
-  form.role = user.role
   form.status = user.status
-  permissionDraft.value = normalizePermissions(
-    user.permissions,
-    saasModules.value,
-  )
-}
-
-function resetPermissionsForRole() {
-  permissionDraft.value = emptyPermissions(activeModules.value)
+  form.merchant_company_id = firstAccess?.access.merchant_company_id ? String(firstAccess.access.merchant_company_id) : ''
+  form.merchant_role = firstAccess?.access.role || 'staff'
+  form.merchant_user_status = firstAccess?.access.status || 'active'
+  form.is_owner = Boolean(firstAccess?.access.is_owner)
+  permissionDraft.value = normalizePermissions(firstAccess?.access.permissions, merchantModules.value)
 }
 
 function togglePermission(moduleKey: string, action: 'view' | 'edit') {
@@ -102,22 +109,30 @@ async function saveUser() {
   error.value = ''
 
   try {
+    if (!form.merchant_company_id) {
+      error.value = 'Selecione a empresa cliente.'
+      return
+    }
+
     const payload = {
       name: form.name.trim(),
       email: form.email.trim(),
       cpf: form.cpf.trim() || null,
       password: form.password || undefined,
-      role: form.role,
       status: form.status,
+      merchant_company_id: Number(form.merchant_company_id),
+      merchant_role: form.is_owner ? 'owner' : form.merchant_role,
+      merchant_user_status: form.merchant_user_status,
+      is_owner: form.is_owner,
       permissions: permissionDraft.value,
     }
 
     form.id
-      ? await api.patch(`/saas/users/${form.id}`, payload)
-      : await api.post('/saas/users', payload)
-    await router.push('/saas/usuarios')
+      ? await api.patch(`/saas/company-users/${form.id}`, payload)
+      : await api.post('/saas/company-users', payload)
+    await router.push('/saas/usuarios-empresas')
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar o usuario.'
+    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar o usuario da empresa.'
   } finally {
     saving.value = false
   }
@@ -129,10 +144,10 @@ async function saveUser() {
     <div class="page-heading">
       <div>
         <span class="eyebrow">SaaS</span>
-        <h1>{{ editing ? 'Editar usuario' : 'Novo usuario' }}</h1>
-        <p>Controle de papel, status e permissoes por modulo.</p>
+        <h1>{{ editing ? 'Editar usuario da empresa' : 'Novo usuario da empresa' }}</h1>
+        <p>Vincule o usuario a uma empresa cliente e defina os modulos do portal da empresa.</p>
       </div>
-      <RouterLink class="btn btn-secondary" to="/saas/usuarios">
+      <RouterLink class="btn btn-secondary" to="/saas/usuarios-empresas">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
         Voltar
       </RouterLink>
@@ -141,6 +156,39 @@ async function saveUser() {
     <p v-if="error" class="form-error">{{ error }}</p>
 
     <form class="panel-main admin-form form-page" @submit.prevent="saveUser">
+      <div class="form-grid">
+        <label>
+          Empresa cliente
+          <select v-model="form.merchant_company_id" required>
+            <option value="">Selecione</option>
+            <option v-for="company in companies" :key="company.id" :value="company.id">
+              {{ company.access_code || company.id }} - {{ company.name }} - {{ company.document || company.merchant.name }}
+            </option>
+          </select>
+        </label>
+        <label>
+          Perfil na empresa
+          <select v-model="form.merchant_role" :disabled="form.is_owner">
+            <option value="staff">Equipe</option>
+            <option value="manager">Gerente</option>
+            <option value="owner">Dono</option>
+          </select>
+        </label>
+        <label>
+          Status do acesso
+          <select v-model="form.merchant_user_status">
+            <option value="active">Ativo</option>
+            <option value="inactive">Inativo</option>
+          </select>
+        </label>
+      </div>
+
+      <div v-if="selectedCompany" class="detail-strip">
+        <span><strong>Codigo</strong>{{ selectedCompany.access_code || selectedCompany.id }}</span>
+        <span><strong>Plataforma</strong>{{ selectedCompany.platform }}</span>
+        <span><strong>Lojista</strong>{{ selectedCompany.merchant.name }}</span>
+      </div>
+
       <div class="form-grid">
         <label>
           Nome
@@ -162,14 +210,7 @@ async function saveUser() {
           <input v-model="form.password" type="password" autocomplete="new-password" :placeholder="editing ? 'Manter senha atual' : 'Senha inicial'" />
         </label>
         <label>
-          Tipo de usuario
-          <select v-model="form.role" @change="resetPermissionsForRole">
-            <option value="admin">Master admin</option>
-            <option value="support">Suporte SaaS</option>
-          </select>
-        </label>
-        <label>
-          Status
+          Status global
           <select v-model="form.status">
             <option value="active">Ativo</option>
             <option value="inactive">Inativo</option>
@@ -177,8 +218,13 @@ async function saveUser() {
         </label>
       </div>
 
-      <div class="permission-grid">
-        <div v-for="module in activeModules" :key="module.key" class="permission-row">
+      <label class="check-line">
+        <input v-model="form.is_owner" type="checkbox" />
+        <span>Dono da empresa com acesso total</span>
+      </label>
+
+      <div class="permission-grid" :class="{ disabled: form.is_owner }">
+        <div v-for="module in merchantModules" :key="module.key" class="permission-row">
           <span>
             <strong>{{ module.label }}</strong>
             <small>{{ module.description }}</small>
@@ -187,6 +233,7 @@ async function saveUser() {
             <input
               v-model="permissionDraft[module.key].view"
               type="checkbox"
+              :disabled="form.is_owner"
               @change="togglePermission(module.key, 'view')"
             />
             Ver
@@ -195,6 +242,7 @@ async function saveUser() {
             <input
               v-model="permissionDraft[module.key].edit"
               type="checkbox"
+              :disabled="form.is_owner"
               @change="togglePermission(module.key, 'edit')"
             />
             Editar
