@@ -119,6 +119,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/saas/transactional-emails', [SaasEmailController::class, 'templates']);
         Route::post('/saas/transactional-emails', [SaasEmailController::class, 'storeTemplate']);
         Route::patch('/saas/transactional-emails/{transactionalEmail}', [SaasEmailController::class, 'updateTemplate']);
+        Route::get('/saas/transactional-email-sends', [SaasEmailController::class, 'sendHistory']);
         Route::apiResource('measurement-tables', MeasurementTableController::class);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('products.variants', ProductVariantController::class)

@@ -27,6 +27,7 @@ Atualizado em: 2026-05-23
 - Sprint 28 criou monitor de pagamentos pendentes, agendamento de cron/scheduler e configuracao SaaS de SMTP/templates transacionais; publicado em producao no run `26336899986`.
 - Sprint 29 preparou login por e-mail/CPF, acesso do portal por codigo/CNPJ e contexto de empresa no token; publicado em producao no run `26337254520`.
 - Sprint 30 criou CRUD de usuarios no SaaS e no portal da empresa, permissoes por modulo/menu, status global/por empresa e acoes de editar/ativar/desativar; publicado em producao no run `26337792120`.
+- Sprint 31 criou automacoes de e-mail transacional, historico de envios e comando/scheduler para pendencias financeiras.
 
 ## Referencias confirmadas
 
@@ -120,9 +121,10 @@ Atualizado em: 2026-05-23
 - APIs publicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}` e `/api/v1/webhooks/pagarme`.
 - APIs publicas de empresa: `/api/v1/public/company-access`.
 - APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.
+- Historico SaaS de e-mail: `/api/v1/saas/transactional-email-sends`.
 - APIs de usuarios/permissoes: `/api/v1/merchant/users` e `/api/v1/saas/users`.
 - Widget publico: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
 
 ## Proxima acao recomendada
 
-Seguir para a Sprint 31 de automacoes de e-mail e ciclo financeiro, mantendo pendente cadastrar `PAGARME_*` com URLs da raiz e salvar o cron do scheduler no cPanel.
+Publicar a Sprint 31, validar historico de e-mails em producao e seguir para a Sprint 32 de login multiempresa refinado e enforcement completo de permissoes.

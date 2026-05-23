@@ -131,7 +131,7 @@ Comportamento:
 
 ## Cron no cPanel
 
-Cron principal recomendado: executar o scheduler do Laravel a cada minuto. Ele ja dispara o monitor de pagamentos a cada 5 minutos e as rotinas de privacidade nos horarios programados.
+Cron principal recomendado: executar o scheduler do Laravel a cada minuto. Ele ja dispara o monitor de pagamentos a cada 5 minutos, o dispatcher de e-mails transacionais a cada 10 minutos e as rotinas de privacidade nos horarios programados.
 
 Tempo:
 
@@ -159,6 +159,12 @@ Validacao manual do monitor:
 
 ```bash
 cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:payments-sync --limit=10
+```
+
+Validacao manual dos e-mails transacionais:
+
+```bash
+cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:emails-dispatch --limit=10
 ```
 
 Se `/usr/local/bin/php` nao existir no HostGator, trocar pelo path exibido no cPanel ou por `php`.

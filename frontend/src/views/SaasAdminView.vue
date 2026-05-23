@@ -63,11 +63,25 @@ type TransactionalEmail = {
   is_active: boolean
   updated_at: string | null
 }
+type TransactionalEmailSend = {
+  id: number
+  code: string
+  template_name: string | null
+  company_name: string | null
+  recipient_email: string | null
+  recipient_name: string | null
+  subject: string | null
+  status: string
+  error: string | null
+  sent_at: string | null
+  created_at: string | null
+}
 
 const summary = ref<Summary>({})
 const merchants = ref<MerchantRow[]>([])
 const companies = ref<CompanyRow[]>([])
 const transactionalEmails = ref<TransactionalEmail[]>([])
+const emailSends = ref<TransactionalEmailSend[]>([])
 const loading = ref(false)
 const savingCompany = ref(false)
 const savingEmailSettings = ref(false)
@@ -132,12 +146,13 @@ async function loadSaas() {
   error.value = ''
 
   try {
-    const [overviewResponse, merchantsResponse, companiesResponse, emailSettingsResponse, transactionalEmailsResponse] = await Promise.all([
+    const [overviewResponse, merchantsResponse, companiesResponse, emailSettingsResponse, transactionalEmailsResponse, emailSendsResponse] = await Promise.all([
       api.get('/saas/overview'),
       api.get('/saas/merchants'),
       api.get('/saas/companies'),
       api.get('/saas/email-settings'),
       api.get('/saas/transactional-emails'),
+      api.get('/saas/transactional-email-sends'),
     ])
 
     summary.value = overviewResponse.data.data.summary
@@ -145,6 +160,7 @@ async function loadSaas() {
     companies.value = companiesResponse.data.data
     Object.assign(emailSettings, normalizeEmailSettings(emailSettingsResponse.data.data))
     transactionalEmails.value = transactionalEmailsResponse.data.data
+    emailSends.value = emailSendsResponse.data.data
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o painel SaaS.'
   } finally {
@@ -843,6 +859,49 @@ async function toggleTemplate(template: TransactionalEmail) {
                     <i :class="template.is_active ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off'" aria-hidden="true"></i>
                   </button>
                 </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel-main">
+        <div class="subsection-heading">
+          <h2>Historico de envios</h2>
+          <span>{{ emailSends.length }} recentes</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Template</th>
+                <th>Empresa</th>
+                <th>Destinatario</th>
+                <th>Status</th>
+                <th>Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!emailSends.length">
+                <td colspan="5">Nenhum envio registrado.</td>
+              </tr>
+              <tr v-for="send in emailSends" :key="send.id">
+                <td>
+                  <strong>{{ send.template_name || send.code }}</strong>
+                  <small>{{ send.subject || 'sem assunto' }}</small>
+                </td>
+                <td>{{ send.company_name || '-' }}</td>
+                <td>
+                  <strong>{{ send.recipient_name || '-' }}</strong>
+                  <small>{{ send.recipient_email || '-' }}</small>
+                </td>
+                <td>
+                  <span class="status-pill" :class="{ ok: send.status === 'sent', warning: send.status === 'skipped' }">
+                    {{ send.status }}
+                  </span>
+                  <small v-if="send.error">{{ send.error }}</small>
+                </td>
+                <td>{{ send.sent_at || send.created_at || '-' }}</td>
               </tr>
             </tbody>
           </table>

@@ -361,13 +361,15 @@ Status: implementado, publicado e validado em producao no run `26337792120`.
 
 Objetivo: transformar os templates em disparos transacionais reais.
 
-Entregas previstas:
+Entregas:
 
 - service de envio usando as credenciais SMTP salvas;
 - disparo de cadastro realizado, pagamento confirmado e erro/pendencia de pagamento;
 - reenvio de Pix pendente com controle de frequencia;
 - links de checkout de renovacao;
 - historico de envios por empresa e template.
+
+Status: implementado e validado localmente. Publicacao em producao pendente do push da sprint.
 
 ### Sprint 32 - Login multiempresa e permissoes refinadas
 

@@ -9,6 +9,7 @@ use App\Models\MerchantCompany;
 use App\Models\User;
 use App\Models\WidgetInstall;
 use App\Services\PagarMeCheckoutService;
+use App\Services\TransactionalEmailService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -124,6 +125,8 @@ class PublicCheckoutController extends Controller
         } catch (RuntimeException $exception) {
             return response()->json(['message' => $exception->getMessage()], 422);
         }
+
+        app(TransactionalEmailService::class)->sendForCheckout(TransactionalEmailService::CODE_SIGNUP, $session);
 
         return response()->json([
             'checkout_url' => $this->checkoutService->publicCheckoutUrl($session->public_reference),

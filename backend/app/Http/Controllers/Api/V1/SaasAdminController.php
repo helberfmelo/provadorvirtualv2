@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\RecommendationLog;
 use App\Models\User;
 use App\Models\WidgetInstall;
+use App\Services\TransactionalEmailService;
 use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -135,6 +136,14 @@ class SaasAdminController extends Controller
 
         $owner = $this->upsertOwnerIfRequested($merchant, $data);
         $this->createWidgetInstallForCompany($merchant, $company);
+
+        if ($owner) {
+            app(TransactionalEmailService::class)->sendForCompany(
+                TransactionalEmailService::CODE_SIGNUP,
+                $company->fresh(['merchant']) ?? $company,
+                $owner,
+            );
+        }
 
         return response()->json([
             'data' => [

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\TransactionalEmail;
+use App\Models\TransactionalEmailSend;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -67,6 +68,23 @@ class SaasEmailApiTest extends TestCase
             'code' => 'aviso_operacional',
             'is_active' => false,
         ]);
+
+        TransactionalEmailSend::query()->create([
+            'transactional_email_id' => $created['id'],
+            'code' => 'aviso_operacional',
+            'recipient_email' => 'cliente@example.com',
+            'recipient_name' => 'Cliente',
+            'subject' => 'Aviso',
+            'body' => 'Mensagem',
+            'status' => TransactionalEmailSend::STATUS_SENT,
+            'sent_at' => now(),
+        ]);
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/saas/transactional-email-sends')
+            ->assertOk()
+            ->assertJsonPath('data.0.code', 'aviso_operacional')
+            ->assertJsonPath('data.0.status', TransactionalEmailSend::STATUS_SENT);
     }
 
     public function test_merchant_cannot_manage_saas_email_settings(): void

@@ -247,3 +247,15 @@
 - Validacoes locais: `php artisan test --filter=UserAccessApiTest`, `php artisan test`, `npm run build`.
 - Run `26337792120` do GitHub Actions finalizou com sucesso para o commit `87e9577`.
 - Validado em producao: `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## 2026-05-23 - Sprint 31 Automacoes de e-mail e ciclo financeiro
+
+- Criada tabela `transactional_email_sends` para historico de disparos.
+- Criado `TransactionalEmailService` com renderizacao de templates, configuracao dinamica de mailer e controle de duplicidade.
+- Checkout publico registra `cadastro_realizado` e eventos de status registram `aguardando_pagamento`, `pagamento_confirmado` ou `erro_pagamento`.
+- Cadastro interno de empresa no SaaS envia `cadastro_realizado` quando ha owner.
+- Criado comando `php artisan pv:emails-dispatch --limit=50` para reprocessar pendencias e reenviar Pix pendente apos 6 horas.
+- Scheduler passou a rodar o dispatcher de e-mails a cada 10 minutos.
+- SaaS ganhou historico de envios em `/api/v1/saas/transactional-email-sends` e listagem na tela `/saas`.
+- Criado documento `docs/transactional_email_automation.md`.
+- Validacoes locais focadas: `php artisan test --filter=TransactionalEmailDispatchTest`, `php artisan test --filter=SaasEmailApiTest`, `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=PaymentSyncCommandTest` e `npm run build`.

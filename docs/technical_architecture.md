@@ -72,6 +72,7 @@ APIs protegidas ja implementadas:
 - `GET|PATCH /api/v1/saas/email-settings`
 - `GET|POST /api/v1/saas/transactional-emails`
 - `PATCH /api/v1/saas/transactional-emails/{transactionalEmail}`
+- `GET /api/v1/saas/transactional-email-sends`
 - `GET /api/v1/ops/status`
 
 APIs publicas adicionais:
@@ -164,6 +165,7 @@ Tabelas propostas:
 - `payment_events`
 - `email_settings`
 - `transactional_emails`
+- `transactional_email_sends`
 
 Chaves comuns:
 
@@ -202,7 +204,8 @@ Chaves comuns:
 - `email_settings` guarda as credenciais SMTP do SaaS; senha usa cast `encrypted` e nunca volta em claro pela API.
 - `transactional_emails` guarda templates editaveis para cadastro, pagamento confirmado, aguardando pagamento, erro de pagamento, recuperacao de senha e renovacao.
 - A tela `/saas` possui configuracao SMTP e CRUD de templates com listagem, novo, editar e ativar/desativar.
-- Disparos automaticos por evento ficam na Sprint 31, usando estes templates e as credenciais salvas.
+- Sprint 31 criou `TransactionalEmailService`, historico `transactional_email_sends`, disparos por checkout/pagamento e comando `php artisan pv:emails-dispatch --limit=50`.
+- O scheduler executa o dispatcher de e-mails a cada 10 minutos; Pix pendente pode ser reenviado apos 6 horas sem duplicar confirmacoes/erros ja enviados.
 
 ## Motor de recomendacao
 

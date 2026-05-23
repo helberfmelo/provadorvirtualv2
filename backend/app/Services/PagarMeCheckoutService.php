@@ -285,9 +285,11 @@ class PagarMeCheckoutService
             'last_provider_sync_at' => now(),
         ])->save();
 
-        $this->activateAccessIfPaid($session->fresh(['merchant', 'company']) ?? $session);
+        $freshSession = $session->fresh(['merchant', 'company', 'user']) ?? $session;
+        $this->activateAccessIfPaid($freshSession);
+        $this->dispatchStatusEmail($freshSession);
 
-        return $session->fresh(['merchant', 'company', 'user']) ?? $session;
+        return $freshSession;
     }
 
     private function applyStatus(CheckoutSession $session, string $status, array $payload): void
@@ -308,7 +310,9 @@ class PagarMeCheckoutService
             'last_provider_sync_at' => now(),
         ])->save();
 
-        $this->activateAccessIfPaid($session->fresh(['merchant', 'company']) ?? $session);
+        $freshSession = $session->fresh(['merchant', 'company', 'user']) ?? $session;
+        $this->activateAccessIfPaid($freshSession);
+        $this->dispatchStatusEmail($freshSession);
     }
 
     private function activateAccessIfPaid(CheckoutSession $session): void
@@ -319,6 +323,24 @@ class PagarMeCheckoutService
 
         $session->merchant?->forceFill(['billing_status' => 'active'])->save();
         $session->company?->forceFill(['status' => 'active'])->save();
+    }
+
+    private function dispatchStatusEmail(CheckoutSession $session): void
+    {
+        try {
+            $emailService = app(TransactionalEmailService::class);
+            $code = $emailService->codeForSessionStatus($session);
+
+            if ($code) {
+                $emailService->sendForCheckout($code, $session);
+            }
+        } catch (\Throwable $exception) {
+            Log::warning('Falha ao registrar e-mail transacional de checkout.', [
+                'checkout_session_id' => $session->id,
+                'status' => $session->status,
+                'message' => $exception->getMessage(),
+            ]);
+        }
     }
 
     private function resolveSession(array $payload): ?CheckoutSession

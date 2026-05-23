@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\EmailSetting;
 use App\Models\TransactionalEmail;
+use App\Models\TransactionalEmailSend;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -72,6 +73,20 @@ class SaasEmailController extends Controller
                 ->orderBy('name')
                 ->get()
                 ->map(fn (TransactionalEmail $template): array => $this->serializeTemplate($template)),
+        ];
+    }
+
+    public function sendHistory(Request $request): array
+    {
+        $this->ensureAdmin($request);
+
+        return [
+            'data' => TransactionalEmailSend::query()
+                ->with(['template', 'company'])
+                ->latest('id')
+                ->limit(120)
+                ->get()
+                ->map(fn (TransactionalEmailSend $send): array => $this->serializeSend($send)),
         ];
     }
 
@@ -164,6 +179,23 @@ class SaasEmailController extends Controller
             'variables' => $template->variables ?: [],
             'is_active' => $template->is_active,
             'updated_at' => $template->updated_at?->toISOString(),
+        ];
+    }
+
+    private function serializeSend(TransactionalEmailSend $send): array
+    {
+        return [
+            'id' => $send->id,
+            'code' => $send->code,
+            'template_name' => $send->template?->name,
+            'company_name' => $send->company?->name,
+            'recipient_email' => $send->recipient_email,
+            'recipient_name' => $send->recipient_name,
+            'subject' => $send->subject,
+            'status' => $send->status,
+            'error' => $send->error,
+            'sent_at' => $send->sent_at?->toISOString(),
+            'created_at' => $send->created_at?->toISOString(),
         ];
     }
 

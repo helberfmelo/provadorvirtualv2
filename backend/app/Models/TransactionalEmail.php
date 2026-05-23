@@ -37,7 +37,7 @@ class TransactionalEmail extends Model
 
     public static function defaultTemplates(): array
     {
-        $commonVariables = ['nome', 'empresa', 'codigo_empresa', 'link_login', 'link_checkout', 'link_pix'];
+        $commonVariables = ['nome', 'empresa', 'codigo_empresa', 'email_acesso', 'link_login', 'link_checkout', 'link_pix', 'link_renovacao', 'valor'];
 
         return [
             [
@@ -45,7 +45,7 @@ class TransactionalEmail extends Model
                 'name' => 'Cadastro realizado',
                 'description' => 'Enviado quando uma empresa e seu primeiro acesso sao criados.',
                 'subject' => 'Seu acesso ao Provador Virtual',
-                'body' => "Ola {{nome}},\n\nSeu cadastro da empresa {{empresa}} foi criado.\nCodigo da empresa: {{codigo_empresa}}\nAcesse: {{link_login}}\n\nProvador Virtual",
+                'body' => "Ola {{nome}},\n\nSeu cadastro da empresa {{empresa}} foi criado.\nE-mail de acesso: {{email_acesso}}\nCodigo da empresa: {{codigo_empresa}}\nAcesse: {{link_login}}\n\nProvador Virtual",
                 'variables' => $commonVariables,
                 'is_active' => true,
             ],
@@ -90,7 +90,7 @@ class TransactionalEmail extends Model
                 'name' => 'Renovacao de plano',
                 'description' => 'Enviado antes ou depois do vencimento para renovar o plano anual.',
                 'subject' => 'Renove o Provador Virtual da sua loja',
-                'body' => "Ola {{nome}},\n\nO plano da {{empresa}} precisa de renovacao. Use o link: {{link_checkout}}\n\nCodigo da empresa: {{codigo_empresa}}",
+                'body' => "Ola {{nome}},\n\nO plano da {{empresa}} precisa de renovacao. Use o link: {{link_renovacao}}\n\nCodigo da empresa: {{codigo_empresa}}",
                 'variables' => $commonVariables,
                 'is_active' => true,
             ],

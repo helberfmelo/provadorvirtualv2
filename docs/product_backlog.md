@@ -100,8 +100,8 @@ Atualizado em: 2026-05-23
 - `TODO` Configurar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` em producao junto com as chaves reais.
 - `DONE` Monitorar pagamento pendente por cron alem do webhook.
 - `DONE` CRUD de credenciais SMTP e e-mails transacionais.
-- `TODO` Disparar automaticamente e-mails transacionais por evento.
-- `TODO` Criar historico de envios transacionais.
+- `DONE` Disparar automaticamente e-mails transacionais por evento.
+- `DONE` Criar historico de envios transacionais.
 - `DONE` Login do portal da empresa com codigo/CNPJ.
 - `DONE` Login por e-mail ou CPF no SaaS e no portal da empresa.
 - `DONE` Reuso de usuario por e-mail/CPF em mais de uma empresa.
