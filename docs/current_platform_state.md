@@ -71,8 +71,9 @@ Atualizado em: 2026-05-23
 - Sprint 2 publicada em producao pelo GitHub Actions no run `26326950616`.
 - Sprint 3 publicada em producao pelo GitHub Actions no run `26327119754`.
 - Sprint 4 publicada em producao pelo GitHub Actions no run `26331199145`.
-- Sprint 5 implementada localmente aguardando publicacao pelo GitHub Actions.
+- Sprint 5 publicada em producao pelo GitHub Actions no run `26331485173`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
+- Painel autenticado em producao usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que nao preservam header durante redirect.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
 - Falta chave de IA se as primeiras sprints incluirem OCR/geracao assistida.
 - Falta credencial BigShop real para loja de teste.
@@ -87,4 +88,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Publicar a Sprint 5 e iniciar a Sprint 6: Importacao e Templates Assistidos.
+Iniciar a Sprint 6: Importacao e Templates Assistidos.

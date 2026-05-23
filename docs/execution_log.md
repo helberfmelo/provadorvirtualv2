@@ -75,6 +75,10 @@
 - Criadas telas Vue `/app/widget` e `/app/integracoes` com estados operacionais e controles responsivos.
 - Criados testes `WidgetInstallApiTest` e `IntegrationsApiTest`.
 - Validacoes locais: `php artisan test`, `vendor/bin/pint` e `npm run build`.
+- Run `26331424403` do GitHub Actions publicou a Sprint 5, mas validacao manual mostrou `500` em endpoint protegido quando o cliente perdia `Authorization` no redirect limpo `/api -> /public/api`.
+- Ajustado build de producao para o painel usar `/provadorvirtual_v2/public/api/v1` direto e configurado Laravel para retornar `401` JSON em APIs sem token.
+- Run `26331485173` do GitHub Actions finalizou com sucesso para o commit `2b9d4e9`.
+- Validado em producao: `/app/widget`, `/app/integracoes`, `/public/api/v1/widget-install`, `/public/api/v1/integrations` e resposta `401` controlada sem token.
 
 ## Pendencias abertas
 

@@ -92,7 +92,7 @@ Entregas:
 - estados vazios uteis;
 - ajustes mobile.
 
-Status: implementado localmente; publicar e validar em producao.
+Status: concluido e publicado em producao no run `26331485173`.
 
 ## Sprint 6 - Importacao e Templates Assistidos
 

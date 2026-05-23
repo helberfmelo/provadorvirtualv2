@@ -134,3 +134,5 @@ Status Sprint 3: `/produto-teste` chama a API publica de recomendacao e registra
 Status Sprint 4: widget publico disponivel em `backend/public/widget/v1` e carregado na pagina `/produto-teste`.
 
 Status Sprint 5: painel demo permite configurar widget e conexoes de plataforma com tokens criptografados.
+
+Em producao, o painel usa `VITE_API_BASE_URL=/provadorvirtual_v2/public/api/v1`. Localmente, manter `http://127.0.0.1:8000/api/v1`.
