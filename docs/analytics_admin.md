@@ -30,8 +30,15 @@ Resumo entregue por `/analytics/recommendations`:
 - taxa de feedback positivo;
 - produtos sem tabela de medidas;
 - alertas do widget e integracoes.
+- perfis de comprador ativos/reconhecidos;
+- qualidade media de perfil;
+- eventos de aprendizado por status;
+- outliers bloqueados;
+- sinais comerciais de carrinho, compra, devolucao e troca.
 
-Tambem retorna series diarias, distribuicao por tamanho, produtos com recomendacao e produtos sem tabela.
+Tambem retorna series diarias, distribuicao por tamanho, produtos com recomendacao, produtos sem tabela, status de aprendizado, sinais comerciais e outliers recentes para revisao.
+
+Status Sprint 36: `/app/analytics` mostra os novos cards de perfis, aprendizado e outliers. Sinais `blocked_outlier` sao armazenados para investigacao e nao entram direto em refinamento automatico.
 
 ## SaaS Admin
 

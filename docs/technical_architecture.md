@@ -159,6 +159,8 @@ Tabelas propostas:
 - `recommendation_sessions`
 - `recommendation_logs`
 - `recommendation_feedbacks`
+- `shopper_profiles`
+- `recommendation_learning_events`
 - `import_jobs`
 - `integration_events`
 - `ai_usage_logs`
@@ -188,8 +190,10 @@ Chaves comuns:
 5. Widget reusa medidas salvas localmente, com aviso e edicao livre.
 6. API normaliza entrada e busca tabela.
 7. Motor calcula pontuacao por tamanho.
-8. API salva log anonimo e retorna resultado.
-9. Widget exibe recomendacao e coleta feedback.
+8. API resolve ou cria perfil anonimo com consentimento e token local.
+9. API salva log anonimo, calcula `outlier_score` e cria evento de aprendizado.
+10. Widget exibe recomendacao, permite editar medidas e coleta feedback.
+11. Feedback, compra, devolucao e troca entram como `recommendation_learning_events`.
 
 ## Checkout Pagar.me
 
@@ -228,6 +232,13 @@ Saidas:
 - `warnings`;
 - `score_breakdown`;
 - `needs_more_data`.
+
+Camada de aprendizado Sprint 36:
+
+- `shopper_profiles` guarda medidas/preferencias pseudonimizadas, somente com consentimento;
+- `RecommendationLearningEvent` registra recomendacao, feedback, compra, devolucao e troca;
+- `LearningSignalService` calcula `outlier_score`, `learning_status` e `learning_weight`;
+- sinais `blocked_outlier` ficam disponiveis no analytics, mas nao devem alimentar ajustes automaticos sem revisao.
 
 ## Integracao BigShop
 
@@ -269,6 +280,8 @@ Producao inicial:
 - logs Laravel;
 - tabela `integration_events`;
 - tabela `recommendation_logs`;
+- tabela `recommendation_learning_events`;
+- tabela `shopper_profiles`;
 - tabela `ai_usage_logs`;
 - tabela `audit_logs` para acoes sensiveis.
 
@@ -290,12 +303,12 @@ Novos modulos previstos:
 - `OutlierDetection`
 - `PlatformInstallers`
 
-Tabelas provaveis:
+Tabelas da camada inteligente:
 
-- `shopper_profiles`
+- `shopper_profiles` - implementada na Sprint 36;
 - `shopper_profile_versions`
 - `recommendation_events`
-- `recommendation_learning_signals`
+- `recommendation_learning_events` - implementada na Sprint 36;
 - `merchant_table_quality_checks`
 - `measurement_catalog_sources`
 - `learning_cohorts`

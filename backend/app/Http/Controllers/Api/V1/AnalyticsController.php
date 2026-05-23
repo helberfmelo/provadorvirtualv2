@@ -7,7 +7,9 @@ use App\Http\Controllers\Controller;
 use App\Models\IntegrationEvent;
 use App\Models\Product;
 use App\Models\RecommendationFeedback;
+use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
+use App\Models\ShopperProfile;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 
@@ -53,6 +55,17 @@ class AnalyticsController extends Controller
             ->where('created_at', '>=', now()->subDays(7))
             ->count();
 
+        $learningEvents = RecommendationLearningEvent::query()
+            ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->get();
+
+        $shopperProfiles = ShopperProfile::query()
+            ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->where('status', 'active')
+            ->get();
+
         return [
             'data' => [
                 'summary' => [
@@ -64,6 +77,14 @@ class AnalyticsController extends Controller
                     'positive_feedback_rate' => $feedbackTotal > 0 ? round(($positiveFeedback / $feedbackTotal) * 100, 1) : null,
                     'products_without_measurement_table' => $productsWithoutTable->count(),
                     'widget_attention_items' => $logs->where('status', 'needs_more_data')->count() + $failedIntegrationEvents,
+                    'shopper_profiles_total' => $shopperProfiles->count(),
+                    'shopper_profiles_known' => $shopperProfiles->where('profile_type', 'known')->count(),
+                    'average_profile_quality' => round((float) $shopperProfiles->avg('quality_score'), 1),
+                    'learning_events_total' => $learningEvents->count(),
+                    'learning_accepted' => $learningEvents->where('status', 'accepted')->count(),
+                    'learning_review' => $learningEvents->where('status', 'review')->count(),
+                    'learning_blocked_outliers' => $learningEvents->where('status', 'blocked_outlier')->count(),
+                    'average_outlier_score' => round((float) $learningEvents->avg('outlier_score'), 2),
                 ],
                 'daily' => $this->dailySeries($logs),
                 'sizes' => $logs
@@ -80,6 +101,7 @@ class AnalyticsController extends Controller
                         'name' => $group->first()->product?->name,
                         'recommendations' => $group->count(),
                         'average_confidence' => round((float) $group->avg('confidence'), 2),
+                        'average_outlier_score' => round((float) $group->avg('outlier_score'), 2),
                     ])
                     ->sortByDesc('recommendations')
                     ->values()
@@ -91,6 +113,32 @@ class AnalyticsController extends Controller
                         'name' => $product->name,
                         'sku' => $product->sku,
                         'category' => $product->category,
+                    ])
+                    ->values()
+                    ->all(),
+                'learning_statuses' => $learningEvents
+                    ->groupBy('status')
+                    ->map(fn ($group, string $status): array => ['status' => $status, 'count' => $group->count()])
+                    ->values()
+                    ->all(),
+                'commerce_signals' => $learningEvents
+                    ->whereIn('event_type', ['add_to_cart', 'purchase', 'return', 'exchange'])
+                    ->groupBy('event_type')
+                    ->map(fn ($group, string $signal): array => ['signal' => $signal, 'count' => $group->count()])
+                    ->values()
+                    ->all(),
+                'outliers' => $learningEvents
+                    ->where('status', 'blocked_outlier')
+                    ->sortByDesc('occurred_at')
+                    ->take(8)
+                    ->map(fn (RecommendationLearningEvent $event): array => [
+                        'id' => $event->id,
+                        'event_type' => $event->event_type,
+                        'recommended_size' => $event->recommended_size,
+                        'selected_size' => $event->selected_size,
+                        'outlier_score' => (float) $event->outlier_score,
+                        'reason' => $event->reason,
+                        'occurred_at' => $event->occurred_at?->toISOString(),
                     ])
                     ->values()
                     ->all(),

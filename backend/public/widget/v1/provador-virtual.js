@@ -14,7 +14,7 @@
     config: null,
     loading: false,
   };
-  var profileStorageKey = 'pv_shopper_profile_v1';
+  var profileStorageKey = 'pv_shopper_profile_v2';
 
   loadCss(config.cssUrl);
   boot();
@@ -212,6 +212,15 @@
     backdrop.querySelector('[data-pv-submit]').addEventListener('click', function () {
       submitRecommendation(backdrop);
     });
+
+    var clearButton = backdrop.querySelector('[data-pv-clear-profile]');
+    if (clearButton) {
+      clearButton.addEventListener('click', function () {
+        forgetSavedProfile();
+        backdrop.remove();
+        openRecommendationModal();
+      });
+    }
   }
 
   function openTableModal() {
@@ -233,8 +242,9 @@
   function recommendationModalHtml() {
     var profile = readSavedProfile();
     var note = profile
-      ? '<div class="pv-known">Usamos suas medidas salvas neste navegador. Para mudar, edite os campos abaixo.</div>'
+      ? '<div class="pv-known"><span>Tamanho baseado em medidas fornecidas anteriormente. Para mudar, edite os campos abaixo.</span><button type="button" data-pv-clear-profile>Limpar</button></div>'
       : '<div class="pv-known">Quanto mais dados voce informar, melhor fica a precisao da recomendacao.</div>';
+    var quality = profileQuality(profile);
 
     return [
       '<div class="pv-modal" role="dialog" aria-modal="true" aria-labelledby="pv-title">',
@@ -245,18 +255,32 @@
       '<div class="pv-body">',
       '<div class="pv-steps"><span class="active">1 medidas</span><span>2 preferencia</span><span>3 resultado</span></div>',
       note,
+      precisionHtml(quality),
       '<div class="pv-grid">',
       field('bust', 'Busto/torax', savedValue(profile, 'bust', 90)),
       field('waist', 'Cintura', savedValue(profile, 'waist', 72)),
       field('hip', 'Quadril', savedValue(profile, 'hip', 98)),
       field('height', 'Altura', savedValue(profile, 'height', 165)),
       field('weight', 'Peso', savedValue(profile, 'weight', 60)),
+      '<label>Genero<select data-pv-input="gender">' + genderOptions(savedValue(profile, 'gender', '')) + '</select></label>',
+      '<label>Formato corporal<select data-pv-input="body_shape">' + bodyShapeOptions(savedValue(profile, 'body_shape', '')) + '</select></label>',
       '<label>Caimento<select data-pv-input="fit_preference">' + fitOptions(savedValue(profile, 'fit_preference', 'regular')) + '</select></label>',
       '</div>',
+      '<label class="pv-consent"><input type="checkbox" data-pv-consent checked />Salvar minhas medidas neste navegador para proximas recomendacoes.</label>',
       '<div class="pv-actions"><button class="pv-button" type="button" data-pv-submit>Calcular tamanho</button></div>',
       '<div data-pv-output></div>',
       attributionHtml(),
       '</div>',
+      '</div>',
+    ].join('');
+  }
+
+  function precisionHtml(quality) {
+    return [
+      '<div class="pv-precision">',
+      '<span>Precisao do perfil</span>',
+      '<div><i style="width:' + quality + '%"></i></div>',
+      '<strong>' + quality + '%</strong>',
       '</div>',
     ].join('');
   }
@@ -277,12 +301,44 @@
     }).join('');
   }
 
+  function genderOptions(selected) {
+    var options = [
+      ['', 'Prefiro nao informar'],
+      ['female', 'Feminino'],
+      ['male', 'Masculino'],
+      ['unisex', 'Unissex'],
+    ];
+
+    return options.map(function (option) {
+      return '<option value="' + option[0] + '"' + (selected === option[0] ? ' selected' : '') + '>' + option[1] + '</option>';
+    }).join('');
+  }
+
+  function bodyShapeOptions(selected) {
+    var options = [
+      ['', 'Nao sei / prefiro nao informar'],
+      ['straight', 'Mais reto'],
+      ['hourglass', 'Cintura marcada'],
+      ['triangle', 'Quadril maior'],
+      ['inverted_triangle', 'Torax/ombros maiores'],
+      ['oval', 'Mais arredondado'],
+    ];
+
+    return options.map(function (option) {
+      return '<option value="' + option[0] + '"' + (selected === option[0] ? ' selected' : '') + '>' + option[1] + '</option>';
+    }).join('');
+  }
+
   function submitRecommendation(backdrop) {
     var button = backdrop.querySelector('[data-pv-submit]');
     var output = backdrop.querySelector('[data-pv-output]');
     var measurements = {};
     var fitPreference = 'regular';
-    var hadSavedProfile = Boolean(readSavedProfile());
+    var gender = '';
+    var bodyShape = '';
+    var savedProfile = readSavedProfile();
+    var consentInput = backdrop.querySelector('[data-pv-consent]');
+    var consent = !consentInput || consentInput.checked;
 
     backdrop.querySelectorAll('[data-pv-input]').forEach(function (input) {
       if (input.dataset.pvInput === 'fit_preference') {
@@ -290,10 +346,18 @@
         return;
       }
 
+      if (input.dataset.pvInput === 'gender') {
+        gender = input.value;
+        return;
+      }
+
+      if (input.dataset.pvInput === 'body_shape') {
+        bodyShape = input.value;
+        return;
+      }
+
       measurements[input.dataset.pvInput] = Number(input.value);
     });
-
-    saveProfile(Object.assign({}, measurements, { fit_preference: fitPreference }));
 
     button.disabled = true;
     button.textContent = 'Calculando...';
@@ -302,12 +366,30 @@
     request('/public/recommendations', Object.assign(identityPayload(), {
       measurements: measurements,
       shopper_profile: {
+        profile_id: savedProfile && savedProfile.id ? savedProfile.id : null,
+        profile_token: savedProfile && savedProfile.token ? savedProfile.token : null,
+        consent_measurements: consent,
         fit_preference: fitPreference,
-        known_profile: hadSavedProfile,
+        gender: gender,
+        body_shape: bodyShape,
+        known_profile: Boolean(savedProfile && savedProfile.id),
       },
     }))
       .then(function (data) {
         state.recommendation = data;
+        if (data.shopper_profile && data.shopper_profile.consent) {
+          saveProfile(Object.assign({}, measurements, {
+            id: data.shopper_profile.id,
+            token: data.shopper_profile.token || (savedProfile && savedProfile.token),
+            fit_preference: fitPreference,
+            gender: gender,
+            body_shape: bodyShape,
+            quality_score: data.shopper_profile.quality_score,
+            outlier_score: data.shopper_profile.outlier_score,
+          }));
+        } else {
+          clearSavedProfile();
+        }
         output.innerHTML = resultHtml(data);
         wireFeedback(output, data);
       })
@@ -330,6 +412,7 @@
       '<span>Tamanho recomendado</span>',
       '<strong>' + escapeHtml(data.recommended_size || '-') + '</strong>',
       '<small>' + Math.round(data.confidence || 0) + '% de confianca</small>',
+      data.shopper_profile && data.shopper_profile.message ? '<small>' + escapeHtml(data.shopper_profile.message) + '</small>' : '',
       notes,
       '<div class="pv-feedback" data-pv-feedback>',
       '<span class="pv-help">Ajudou?</span>',
@@ -427,12 +510,47 @@
     }
   }
 
+  function clearSavedProfile() {
+    try {
+      window.localStorage.removeItem(profileStorageKey);
+      window.localStorage.removeItem('pv_shopper_profile_v1');
+    } catch (error) {
+      // localStorage can be blocked by the browser; recommendation still works.
+    }
+  }
+
+  function forgetSavedProfile() {
+    var profile = readSavedProfile();
+    clearSavedProfile();
+
+    if (!profile || !profile.id || !profile.token) {
+      return;
+    }
+
+    request('/public/shopper-profiles/forget', {
+      merchant_id: Number(config.merchantId),
+      store_id: config.storeId ? Number(config.storeId) : null,
+      profile_id: profile.id,
+      profile_token: profile.token,
+    }).catch(function () {
+      // The local profile was already removed; server cleanup can retry in a future interaction.
+    });
+  }
+
   function savedValue(profile, key, fallback) {
     if (!profile || profile[key] === undefined || profile[key] === null || profile[key] === '') {
       return fallback;
     }
 
     return profile[key];
+  }
+
+  function profileQuality(profile) {
+    if (profile && profile.quality_score) {
+      return Math.max(0, Math.min(100, Number(profile.quality_score)));
+    }
+
+    return profile ? 70 : 45;
   }
 
   function escapeHtml(value) {

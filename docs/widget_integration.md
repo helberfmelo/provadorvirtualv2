@@ -44,8 +44,9 @@ Permitir que qualquer e-commerce instale o Provador Virtual com um snippet simpl
 6. `Tabela de Medidas` abre a tabela do produto com as faixas cadastradas.
 7. Coleta dados em etapas e reusa medidas salvas localmente no navegador quando houver.
 8. Retorna recomendacao.
-9. Coleta feedback.
-10. Exibe `desenvolvido por provadorvirtual.online` com link para o site publico.
+9. Coleta consentimento para salvar medidas no perfil anonimo.
+10. Coleta feedback.
+11. Exibe `desenvolvido por provadorvirtual.online` com link para o site publico.
 
 Status Sprint 4: implementado em `/widget/v1/provador-virtual.js` com CSS escopado em `/widget/v1/provador-virtual.css`. A pagina `/produto-teste` carrega o widget real por snippet dinamico.
 
@@ -54,6 +55,8 @@ Status Sprint 5: o painel `/app/widget` gera o snippet a partir de `/api/v1/widg
 Status Sprint 11: as rotas publicas de recomendacao validam `Origin` contra `allowed_domains` da instalacao ativa. Requisicoes sem `Origin` continuam liberadas para smokes e chamadas server-to-server; dominios nao cadastrados recebem `403`.
 
 Status Sprint 24/25: o widget agora segue o padrao comercial de pagina de produto com os botoes `Descubra seu tamanho` e `Tabela de Medidas`, modal de tabela, assinatura do Provador Virtual e tema ampliado. O painel `/app/widget` permite personalizar primaria, secundaria, destaque, fundo, texto, fonte, tamanho, peso e raio, com visualizador em tempo real.
+
+Status Sprint 36: o widget usa `pv_shopper_profile_v2` em `localStorage`, envia `profile_id`/token quando houver consentimento, permite limpar medidas salvas, mostra precisao do perfil e envia genero, formato corporal e preferencia de caimento para melhorar recomendacoes futuras.
 
 ## Evolucao inteligente prevista
 
@@ -75,8 +78,14 @@ Endpoints usados pelo widget:
 - `POST /api/v1/public/recommendations/config-check`
 - `POST /api/v1/public/recommendations`
 - `POST /api/v1/public/recommendations/{id}/feedback`
+- `POST /api/v1/public/recommendations/{id}/signal`
+- `POST /api/v1/public/shopper-profiles/forget`
 
 `config-check` retorna tambem a tabela de medidas normalizada para o modal publico, quando o produto estiver configurado.
+
+`recommendations` retorna `shopper_profile` com `id`, token inicial, qualidade do perfil e mensagem para o consumidor. O token nunca fica em log ou HTML do lojista; fica somente no navegador do comprador.
+
+`signal` registra eventos `add_to_cart`, `purchase`, `return` e `exchange` para aprendizado estatistico. Plataformas que ainda nao tiverem integracao automatica podem enviar esses sinais depois pelo proprio front ou por conector server-to-server.
 
 O widget resolve a base da API a partir do proprio `src`. Em producao, chamadas para `/provadorvirtual_v2/api/...` passam por redirect 307 para a entrada Laravel funcional em `/provadorvirtual_v2/public/api/...`.
 

@@ -15,7 +15,14 @@ class RecommendationSession extends Model
     {
         return [
             'shopper_profile' => 'array',
+            'profile_snapshot' => 'array',
+            'consent_given' => 'boolean',
             'expires_at' => 'datetime',
         ];
+    }
+
+    public function shopperProfile()
+    {
+        return $this->belongsTo(ShopperProfile::class);
     }
 }

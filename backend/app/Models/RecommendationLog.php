@@ -19,6 +19,7 @@ class RecommendationLog extends Model
             'score_breakdown' => 'array',
             'fit_notes' => 'array',
             'warnings' => 'array',
+            'outlier_score' => 'decimal:2',
         ];
     }
 
@@ -30,5 +31,15 @@ class RecommendationLog extends Model
     public function feedbacks()
     {
         return $this->hasMany(RecommendationFeedback::class);
+    }
+
+    public function session()
+    {
+        return $this->belongsTo(RecommendationSession::class, 'recommendation_session_id');
+    }
+
+    public function learningEvents()
+    {
+        return $this->hasMany(RecommendationLearningEvent::class);
     }
 }

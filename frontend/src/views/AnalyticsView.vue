@@ -12,11 +12,36 @@ type AnalyticsPayload = {
     positive_feedback_rate: number | null
     products_without_measurement_table: number
     widget_attention_items: number
+    shopper_profiles_total: number
+    shopper_profiles_known: number
+    average_profile_quality: number
+    learning_events_total: number
+    learning_accepted: number
+    learning_review: number
+    learning_blocked_outliers: number
+    average_outlier_score: number
   }
   daily: { date: string; count: number }[]
   sizes: { size: string; count: number }[]
-  products: { product_id: number; name: string | null; recommendations: number; average_confidence: number }[]
+  products: {
+    product_id: number
+    name: string | null
+    recommendations: number
+    average_confidence: number
+    average_outlier_score: number
+  }[]
   products_without_measurement_table: { id: number; name: string; sku: string | null; category: string | null }[]
+  learning_statuses: { status: string; count: number }[]
+  commerce_signals: { signal: string; count: number }[]
+  outliers: {
+    id: number
+    event_type: string
+    recommended_size: string | null
+    selected_size: string | null
+    outlier_score: number
+    reason: string | null
+    occurred_at: string | null
+  }[]
 }
 
 type AuditLog = {
@@ -66,6 +91,16 @@ function percent(value: number | null) {
 function eventLabel(event: string) {
   return event.replaceAll('_', ' ').replaceAll('.', ' / ')
 }
+
+function statusLabel(status: string) {
+  const labels: Record<string, string> = {
+    accepted: 'Aproveitado',
+    review: 'Revisao',
+    blocked_outlier: 'Bloqueado',
+  }
+
+  return labels[status] || eventLabel(status)
+}
 </script>
 
 <template>
@@ -104,6 +139,26 @@ function eventLabel(event: string) {
           <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
           <strong>{{ analytics.summary.widget_attention_items }}</strong>
           <span>{{ analytics.summary.products_without_measurement_table }} produtos sem tabela</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-user-check" aria-hidden="true"></i>
+          <strong>{{ analytics.summary.shopper_profiles_total }}</strong>
+          <span>{{ analytics.summary.shopper_profiles_known }} reconhecidos</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-brain" aria-hidden="true"></i>
+          <strong>{{ analytics.summary.average_profile_quality }}</strong>
+          <span>qualidade media do perfil</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
+          <strong>{{ analytics.summary.learning_blocked_outliers }}</strong>
+          <span>{{ analytics.summary.average_outlier_score }} score medio outlier</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-database" aria-hidden="true"></i>
+          <strong>{{ analytics.summary.learning_events_total }}</strong>
+          <span>{{ analytics.summary.learning_accepted }} sinais aproveitados</span>
         </article>
       </div>
 
@@ -150,16 +205,18 @@ function eventLabel(event: string) {
                   <th>Produto</th>
                   <th>Recomendacoes</th>
                   <th>Confianca</th>
+                  <th>Outlier</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="!analytics.products.length">
-                  <td colspan="3">Sem dados.</td>
+                  <td colspan="4">Sem dados.</td>
                 </tr>
                 <tr v-for="product in analytics.products" :key="product.product_id">
                   <td>{{ product.name || product.product_id }}</td>
                   <td>{{ product.recommendations }}</td>
                   <td>{{ product.average_confidence }}</td>
+                  <td>{{ product.average_outlier_score }}</td>
                 </tr>
               </tbody>
             </table>
@@ -183,6 +240,68 @@ function eventLabel(event: string) {
           </div>
         </section>
       </div>
+
+      <div class="analytics-grid">
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Aprendizado</h2>
+            <span>{{ analytics.summary.learning_review }} para revisar</span>
+          </div>
+          <div v-if="!analytics.learning_statuses.length" class="empty-state">Sem sinais de aprendizado.</div>
+          <div v-else class="summary-strip">
+            <span v-for="status in analytics.learning_statuses" :key="status.status">
+              <strong>{{ status.count }}</strong>
+              <small>{{ statusLabel(status.status) }}</small>
+            </span>
+          </div>
+        </section>
+
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Sinais comerciais</h2>
+            <span>{{ analytics.commerce_signals.length }} tipos</span>
+          </div>
+          <div v-if="!analytics.commerce_signals.length" class="empty-state">Nenhum sinal comercial registrado.</div>
+          <div v-else class="summary-strip">
+            <span v-for="signal in analytics.commerce_signals" :key="signal.signal">
+              <strong>{{ signal.count }}</strong>
+              <small>{{ eventLabel(signal.signal) }}</small>
+            </span>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel-main">
+        <div class="subsection-heading">
+          <h2>Outliers bloqueados</h2>
+          <span>{{ analytics.outliers.length }} recentes</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sinal</th>
+                <th>Recomendado</th>
+                <th>Escolhido</th>
+                <th>Score</th>
+                <th>Motivo</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!analytics.outliers.length">
+                <td colspan="5">Sem outliers recentes.</td>
+              </tr>
+              <tr v-for="outlier in analytics.outliers" :key="outlier.id">
+                <td>{{ eventLabel(outlier.event_type) }}</td>
+                <td>{{ outlier.recommended_size || '-' }}</td>
+                <td>{{ outlier.selected_size || '-' }}</td>
+                <td>{{ outlier.outlier_score }}</td>
+                <td>{{ outlier.reason || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <section class="panel-main">
         <div class="subsection-heading">

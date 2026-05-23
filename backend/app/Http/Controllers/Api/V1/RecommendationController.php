@@ -3,16 +3,20 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ForgetShopperProfileRequest;
 use App\Http\Requests\RecommendationConfigCheckRequest;
 use App\Http\Requests\StoreRecommendationFeedbackRequest;
 use App\Http\Requests\StoreRecommendationRequest;
+use App\Http\Requests\StoreRecommendationSignalRequest;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
 use App\Models\WidgetInstall;
+use App\Services\Recommendation\LearningSignalService;
 use App\Services\Recommendation\RecommendationEngine;
+use App\Services\Recommendation\ShopperProfileService;
 use Illuminate\Support\Str;
 
 class RecommendationController extends Controller
@@ -58,8 +62,12 @@ class RecommendationController extends Controller
         ]);
     }
 
-    public function store(StoreRecommendationRequest $request, RecommendationEngine $engine)
-    {
+    public function store(
+        StoreRecommendationRequest $request,
+        RecommendationEngine $engine,
+        ShopperProfileService $profiles,
+        LearningSignalService $learning,
+    ) {
         $data = $request->validated();
         $product = $this->resolveProduct($data);
 
@@ -73,6 +81,7 @@ class RecommendationController extends Controller
         $product->load(['measurementTable.rows', 'variants']);
         $result = $engine->recommend($product->measurementTable, $data['measurements']);
         $recommendedVariant = $this->variantForRecommendation($product, $result->recommendedSize);
+        $profileState = $profiles->resolve($product, $data['measurements'], $data['shopper_profile'] ?? []);
 
         $session = RecommendationSession::query()->create([
             'uuid' => (string) Str::uuid(),
@@ -80,7 +89,11 @@ class RecommendationController extends Controller
             'merchant_company_id' => $product->merchant_company_id,
             'product_id' => $product->id,
             'product_variant_id' => $recommendedVariant?->id,
+            'shopper_profile_id' => $profileState['profile']?->id,
+            'shopper_profile_uuid' => $profileState['profile']?->uuid,
+            'consent_given' => $profileState['consent_given'],
             'shopper_profile' => $data['shopper_profile'] ?? null,
+            'profile_snapshot' => $profileState['snapshot'],
             'user_agent_hash' => $this->hashValue($request->userAgent()),
             'ip_hash' => $this->hashValue($request->ip()),
             'expires_at' => now()->addDays(30),
@@ -101,27 +114,77 @@ class RecommendationController extends Controller
             'status' => $result->needsMoreData ? 'needs_more_data' : 'recommended',
         ]);
 
+        $learningEvent = $learning->recordRecommendation(
+            $log,
+            $product->measurementTable,
+            $data['measurements'],
+            $profileState['profile'],
+        );
+
         return response()->json([
             'configured' => true,
             'recommendation_id' => $log->id,
             'session_id' => $session->uuid,
             'product_id' => $product->id,
             'variant_id' => $recommendedVariant?->id,
+            'shopper_profile' => $profileState['response'],
+            'learning' => [
+                'status' => $learningEvent->status,
+                'outlier_score' => (float) $learningEvent->outlier_score,
+                'weight' => (float) $learningEvent->learning_weight,
+            ],
             ...$result->toArray(),
         ], 201);
     }
 
-    public function feedback(StoreRecommendationFeedbackRequest $request, RecommendationLog $recommendationLog)
-    {
+    public function feedback(
+        StoreRecommendationFeedbackRequest $request,
+        RecommendationLog $recommendationLog,
+        LearningSignalService $learning,
+    ) {
         $feedback = RecommendationFeedback::query()->create([
             'recommendation_log_id' => $recommendationLog->id,
             ...$request->validated(),
         ]);
 
+        $learningEvent = $learning->recordFeedback($feedback);
+
         return response()->json([
             'message' => 'Feedback registrado com sucesso.',
             'feedback_id' => $feedback->id,
+            'learning_status' => $learningEvent?->status,
         ], 201);
+    }
+
+    public function signal(
+        StoreRecommendationSignalRequest $request,
+        RecommendationLog $recommendationLog,
+        LearningSignalService $learning,
+    ) {
+        $event = $learning->recordCommerceSignal($recommendationLog, $request->validated());
+
+        if (! $event) {
+            return response()->json([
+                'message' => 'Nao foi possivel registrar este sinal para aprendizado.',
+            ], 422);
+        }
+
+        return response()->json([
+            'message' => 'Sinal registrado com sucesso.',
+            'learning_event_id' => $event->id,
+            'learning_status' => $event->status,
+            'outlier_score' => (float) $event->outlier_score,
+        ], 201);
+    }
+
+    public function forgetProfile(ForgetShopperProfileRequest $request, ShopperProfileService $profiles)
+    {
+        $forgotten = $profiles->forget($request->validated());
+
+        return response()->json([
+            'forgotten' => $forgotten,
+            'message' => $forgotten ? 'Perfil removido deste provador.' : 'Perfil nao encontrado.',
+        ], $forgotten ? 200 : 404);
     }
 
     private function resolveProduct(array $data): ?Product

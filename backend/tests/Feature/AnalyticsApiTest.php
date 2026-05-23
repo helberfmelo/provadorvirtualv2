@@ -39,6 +39,10 @@ class AnalyticsApiTest extends TestCase
                 'height' => 168,
                 'weight' => 62,
             ],
+            'shopper_profile' => [
+                'consent_measurements' => true,
+                'fit_preference' => 'regular',
+            ],
         ])->assertCreated()->json('recommendation_id');
 
         $this->postJson("/api/v1/public/recommendations/{$recommendationId}/feedback", [
@@ -60,7 +64,10 @@ class AnalyticsApiTest extends TestCase
             ->assertJsonPath('data.summary.recommendations_total', 1)
             ->assertJsonPath('data.summary.positive_feedback_rate', 100)
             ->assertJsonPath('data.summary.products_without_measurement_table', 1)
-            ->assertJsonPath('data.sizes.0.size', 'M');
+            ->assertJsonPath('data.summary.shopper_profiles_total', 1)
+            ->assertJsonPath('data.summary.learning_events_total', 2)
+            ->assertJsonPath('data.sizes.0.size', 'M')
+            ->assertJsonPath('data.learning_statuses.0.status', 'accepted');
 
         $this->withHeaders($headers)
             ->getJson('/api/v1/audit-logs')

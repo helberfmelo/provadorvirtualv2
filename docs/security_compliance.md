@@ -21,6 +21,8 @@ Dados do widget podem ser pessoais. Regras:
 - permitir exclusao/anomizacao;
 - termos e politica devem explicar finalidade.
 
+Status Sprint 36: `shopper_profiles` salva medidas somente com consentimento operacional no widget. O navegador guarda `profile_id` e token local; o banco guarda apenas hash do token. O comprador pode limpar o perfil pelo widget, e `pv:privacy-anonymize` tambem remove medidas/preferencias antigas.
+
 ## Segredos
 
 Nunca commitar:

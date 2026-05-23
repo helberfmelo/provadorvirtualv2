@@ -4,8 +4,10 @@ use App\Models\AiUsageLog;
 use App\Models\AuditLog;
 use App\Models\IntegrationEvent;
 use App\Models\RecommendationFeedback;
+use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
+use App\Models\ShopperProfile;
 use App\Models\User;
 use App\Services\PagarMeCheckoutService;
 use App\Services\TransactionalEmailService;
@@ -75,12 +77,26 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
         ->where('created_at', '<', $cutoff)
         ->whereNotNull('comment');
 
+    $profiles = ShopperProfile::query()
+        ->where('updated_at', '<', $cutoff)
+        ->where(function ($query): void {
+            $query->whereNotNull('measurements')
+                ->orWhereNotNull('preferences')
+                ->orWhereNotNull('write_token_hash');
+        });
+
+    $learningEvents = RecommendationLearningEvent::query()
+        ->where('created_at', '<', $cutoff)
+        ->whereNotNull('payload');
+
     $summary = [
         'cutoff' => $cutoff->toISOString(),
         'dry_run' => $dryRun,
         'recommendation_sessions' => $sessions->count(),
         'recommendation_logs' => $logs->count(),
         'recommendation_feedbacks' => $feedbacks->count(),
+        'shopper_profiles' => $profiles->count(),
+        'recommendation_learning_events' => $learningEvents->count(),
     ];
 
     if (! $dryRun) {
@@ -98,6 +114,18 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
 
         $feedbacks->update([
             'comment' => null,
+        ]);
+
+        $profiles->update([
+            'status' => 'anonymized',
+            'write_token_hash' => null,
+            'measurements' => null,
+            'preferences' => null,
+            'expires_at' => null,
+        ]);
+
+        $learningEvents->update([
+            'payload' => null,
         ]);
     }
 

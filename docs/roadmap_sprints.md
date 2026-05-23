@@ -443,6 +443,8 @@ Entregas previstas:
 - deteccao de outliers antes de alimentar modelos;
 - dashboards de qualidade da recomendacao.
 
+Status: implementado localmente. A Sprint 36 criou perfis anonimos com token local, consentimento e esquecimento; eventos de aprendizado para recomendacao, feedback e sinais comerciais; `outlier_score`/`learning_status`; e paineis de qualidade no analytics.
+
 ### Sprint 37 - Piloto comercial e qualidade final
 
 Objetivo: preparar venda assistida e piloto com clientes reais.

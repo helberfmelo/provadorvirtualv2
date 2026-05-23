@@ -32,6 +32,7 @@ Atualizado em: 2026-05-23
 - Sprint 33 completou login multiempresa, seletor de empresa no painel, escopo por empresa nas APIs do portal, enforcement de permissoes por rota e auditoria com empresa/modulo/acao; publicado em producao no run `26338888072`.
 - Sprint 34 criou guias de integracao por plataforma, snippets, checklist visual, matriz de dados suportados e validacao protegida de instalacao por URL publica; publicado em producao no run `26339199751`.
 - Sprint 35 preparou o contrato BigShop um clique com snippet/contract na resposta da ativacao e monitor protegido de ativacoes no painel; publicado em producao no run `26339426665`.
+- Sprint 36 criou perfis anonimos com consentimento, token local, esquecimento, eventos de aprendizado, sinais comerciais, outlier score e analytics de qualidade.
 
 ## Referencias confirmadas
 
@@ -127,6 +128,7 @@ Atualizado em: 2026-05-23
 - Validacao de instalacao protegida: `POST /api/v1/integrations/{platform}/validate-install`.
 - BigShop publico assinado: ativacao em `/api/v1/public/bigshop/activate`.
 - APIs publicas: health, produto demo e recomendacoes do widget.
+- APIs publicas inteligentes: `/api/v1/public/recommendations/{id}/signal` e `/api/v1/public/shopper-profiles/forget`.
 - APIs publicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}` e `/api/v1/webhooks/pagarme`.
 - APIs publicas de empresa: `/api/v1/public/company-access`.
 - APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.
@@ -136,4 +138,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Seguir para inteligencia de perfis, consentimento e aprendizado estatistico com controle de outliers.
+Seguir para piloto comercial, qualidade final, revisao responsiva/acessibilidade e testes reais de pagamento/BigShop quando as credenciais estiverem disponiveis.

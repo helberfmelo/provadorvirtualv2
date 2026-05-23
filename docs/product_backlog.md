@@ -71,14 +71,14 @@ Atualizado em: 2026-05-23
 
 ## Inteligencia de tamanho
 
-- `TODO` Criar perfis anonimos de consumidor.
-- `TODO` Criar perfis conhecidos/editaveis.
-- `TODO` Persistir medidas anteriores com consentimento.
-- `TODO` Reusar medidas no widget com aviso claro.
-- `TODO` Implementar formato corporal e barra de precisao no widget v2.
+- `DONE` Criar perfis anonimos de consumidor.
+- `DONE` Criar perfis conhecidos/editaveis no fluxo do widget por token local.
+- `DONE` Persistir medidas anteriores com consentimento.
+- `DONE` Reusar medidas no widget com aviso claro.
+- `DONE` Implementar formato corporal e barra de precisao no widget v2.
 - `TODO` Criar score de qualidade de tabela.
-- `TODO` Criar deteccao de outliers.
-- `TODO` Criar pipeline de aprendizado com compra/devolucao/feedback.
+- `DONE` Criar deteccao de outliers.
+- `DONE` Criar pipeline inicial de aprendizado com compra/devolucao/feedback.
 - `TODO` Criar base inicial Zak como benchmark operacional revisado.
 
 ## Operacao

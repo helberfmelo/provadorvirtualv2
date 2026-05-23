@@ -4,6 +4,8 @@ Atualizado em: 2026-05-23
 
 Objetivo: definir como o v2 deve usar dados de consumidores e lojistas para ficar mais inteligente sem transformar excecoes em regra e sem violar privacidade.
 
+Status Sprint 36: implementada a primeira base operacional com `shopper_profiles`, `recommendation_learning_events`, consentimento no widget, esquecimento por token local, sinais de feedback/compra/devolucao/troca e `outlier_score` antes de qualquer uso estatistico.
+
 ## Principios
 
 - O consumidor deve entender quando seus dados anteriores estao sendo usados.
@@ -33,13 +35,13 @@ Dados que podem existir no perfil anonimo ou conhecido:
 
 ## Perfil anonimo
 
-O widget deve criar um identificador anonimo proprio, armazenado em cookie/localStorage.
+O widget cria um identificador anonimo proprio em `localStorage` somente quando o consumidor consente salvar medidas neste navegador.
 
 Regras:
 
 - nao salvar nome, email, telefone ou documento no perfil anonimo;
 - manter data de criacao e ultimo uso;
-- permitir reset no widget;
+- permitir reset no widget, invalidando o perfil remoto por `profile_id` + token local;
 - expirar ou anonimizar conforme politica de retencao;
 - associar ao usuario cadastrado somente com login/consentimento.
 
@@ -98,7 +100,7 @@ Nao usar diretamente como aprendizado quando:
 - houve devolucao por motivo desconhecido;
 - usuario informou feedback negativo mas nao comprou nem devolveu.
 
-Esses casos entram como `learning_status=needs_review` ou `learning_status=anomaly`.
+Esses casos entram como `learning_status=review` ou `learning_status=blocked_outlier`.
 
 ### Tabelas do lojista
 
@@ -138,10 +140,10 @@ Capar contribuicao por usuario/perfil para evitar que uma pessoa distorca a base
 
 Tabelas novas ou evolucao de tabelas atuais:
 
-- `shopper_profiles`
+- `shopper_profiles` - implementada na Sprint 36;
 - `shopper_profile_versions`
 - `recommendation_events`
-- `recommendation_learning_signals`
+- `recommendation_learning_events` - implementada na Sprint 36;
 - `merchant_table_quality_checks`
 - `measurement_catalog_sources`
 - `learning_cohorts`
@@ -180,9 +182,8 @@ Quando nao houver dados:
 
 ## Pendencias
 
-- Definir texto final de consentimento no widget.
-- Definir prazo de retencao de perfil anonimo.
-- Implementar comando de exclusao/anonimizacao de perfis.
+- Revisar texto final de consentimento no widget com juridico/comercial.
+- Confirmar se retencao de perfil anonimo deve ficar em 180 dias ou ter prazo por contrato.
 - Criar score de qualidade de tabela.
-- Criar relatorio de outliers para o lojista.
-- Integrar pedidos/devolucoes por plataforma.
+- Evoluir relatorio de outliers para drill-down por coorte/produto.
+- Integrar pedidos/devolucoes automaticamente por plataforma.

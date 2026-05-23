@@ -40,12 +40,19 @@ Route::prefix('v1')->group(function (): void {
     Route::options('/public/recommendations/{path?}', fn () => response()->noContent())
         ->where('path', '.*')
         ->middleware('widget.origin');
+    Route::options('/public/shopper-profiles/{path?}', fn () => response()->noContent())
+        ->where('path', '.*')
+        ->middleware('widget.origin');
     Route::post('/public/recommendations/config-check', [RecommendationController::class, 'configCheck'])
         ->middleware(['widget.origin', 'throttle:60,1']);
     Route::post('/public/recommendations', [RecommendationController::class, 'store'])
         ->middleware(['widget.origin', 'throttle:60,1']);
     Route::post('/public/recommendations/{recommendationLog}/feedback', [RecommendationController::class, 'feedback'])
         ->middleware(['widget.origin', 'throttle:120,1']);
+    Route::post('/public/recommendations/{recommendationLog}/signal', [RecommendationController::class, 'signal'])
+        ->middleware(['widget.origin', 'throttle:120,1']);
+    Route::post('/public/shopper-profiles/forget', [RecommendationController::class, 'forgetProfile'])
+        ->middleware(['widget.origin', 'throttle:30,1']);
     Route::post('/public/company-access', [SaasAdminController::class, 'resolveCompanyAccess'])
         ->middleware('throttle:30,1');
     Route::get('/public/checkout/config', [PublicCheckoutController::class, 'config'])
