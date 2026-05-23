@@ -204,3 +204,14 @@
 - Validacoes locais: `php artisan test`, `npm run build`, `npx vite build --outDir dist-root` e `git diff --check`.
 - Run `26336510709` publicou app e raiz, mas falhou no passo `Ensure master admin` por `ssh: connect ... Connection refused` logo apos os deploys remotos.
 - Workflow ajustado para retry no passo de master admin e diagnostico SSH tolerante a indisponibilidade transitoria.
+- Run `26336554760` finalizou com sucesso apos retry SSH; `scripts/validate-production.ps1` validou raiz, v2, APIs, CORS, recomendacao e go-live.
+
+## 2026-05-23 - Sprint 28 Monitor de pagamentos e e-mails
+
+- Criadas tabelas `email_settings` e `transactional_emails`.
+- Criado painel SaaS para configurar SMTP com senha criptografada e templates transacionais.
+- Criados templates iniciais: cadastro realizado, pagamento confirmado, aguardando pagamento, erro no pagamento, recuperacao de senha e renovacao de plano.
+- Criado comando `php artisan pv:payments-sync --limit=50` para consultar pedidos pendentes na Pagar.me e ativar empresas pagas.
+- Scheduler configurado para rodar monitor de pagamentos a cada 5 minutos, anonimizacao diaria e limpeza operacional semanal.
+- Documentado cron cPanel com log em `docs/deploy_runbook.md`.
+- Validacoes locais focadas: `php artisan test --filter=SaasEmailApiTest`, `php artisan test --filter=PaymentSyncCommandTest` e `npm run build`.

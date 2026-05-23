@@ -24,6 +24,7 @@ Atualizado em: 2026-05-23
 - Sprint 25 criou personalizador visual do widget/tabela com preview em tempo real no painel do lojista.
 - Sprint 26 criou landing publica, checkout transparente Pagar.me, sessoes/eventos de pagamento e webhook de ativacao.
 - Sprint 27 ajustou a landing para estrutura inspirada no v1, publicou build prevista para a raiz e simplificou o checkout para plano anual unico sem boleto.
+- Sprint 28 criou monitor de pagamentos pendentes, agendamento de cron/scheduler e configuracao SaaS de SMTP/templates transacionais.
 
 ## Referencias confirmadas
 
@@ -97,7 +98,7 @@ Atualizado em: 2026-05-23
 - Falta chave de IA externa (`OPENAI_API_KEY` ou `GEMINI_API_KEY`) para OCR real de imagem.
 - Falta credencial BigShop real para loja de teste.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativacao um clique real.
-- Falta cadastrar as chaves Pagar.me em `PRODUCTION_ENV`, com URLs de retorno na raiz, e validar uma transacao real de baixo valor.
+- Falta cadastrar as chaves Pagar.me em `PRODUCTION_ENV`, com URLs de retorno na raiz, configurar cron no cPanel e validar uma transacao real de baixo valor.
 
 ## Superficie atual
 
@@ -115,8 +116,9 @@ Atualizado em: 2026-05-23
 - APIs publicas: health, produto demo e recomendacoes do widget.
 - APIs publicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}` e `/api/v1/webhooks/pagarme`.
 - APIs publicas de empresa: `/api/v1/public/company-access`.
+- APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.
 - Widget publico: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
 
 ## Proxima acao recomendada
 
-Publicar a evolucao na raiz e em `/provadorvirtual_v2/`, cadastrar `PAGARME_*` em producao com URLs da raiz, validar checkout + widget e seguir para a Sprint 28 de cron/e-mails transacionais.
+Publicar a Sprint 28, cadastrar `PAGARME_*` em producao com URLs da raiz, salvar o cron do scheduler no cPanel, validar checkout + widget e seguir para a Sprint 29 de login contextual por e-mail/CPF e empresa por codigo/CNPJ.

@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\ProductVariantController;
 use App\Http\Controllers\Api\V1\PublicCheckoutController;
 use App\Http\Controllers\Api\V1\RecommendationController;
 use App\Http\Controllers\Api\V1\SaasAdminController;
+use App\Http\Controllers\Api\V1\SaasEmailController;
 use App\Http\Controllers\Api\V1\WidgetInstallController;
 use App\Models\MeasurementTable;
 use App\Models\PlatformConnection;
@@ -104,6 +105,11 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/saas/companies', [SaasAdminController::class, 'companies']);
         Route::post('/saas/companies', [SaasAdminController::class, 'storeCompany']);
         Route::patch('/saas/companies/{company}', [SaasAdminController::class, 'updateCompany']);
+        Route::get('/saas/email-settings', [SaasEmailController::class, 'showSettings']);
+        Route::patch('/saas/email-settings', [SaasEmailController::class, 'updateSettings']);
+        Route::get('/saas/transactional-emails', [SaasEmailController::class, 'templates']);
+        Route::post('/saas/transactional-emails', [SaasEmailController::class, 'storeTemplate']);
+        Route::patch('/saas/transactional-emails/{transactionalEmail}', [SaasEmailController::class, 'updateTemplate']);
         Route::apiResource('measurement-tables', MeasurementTableController::class);
         Route::apiResource('products', ProductController::class);
         Route::apiResource('products.variants', ProductVariantController::class)

@@ -8,6 +8,7 @@ use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Models\TransactionalEmail;
 use App\Models\User;
 use App\Models\WidgetInstall;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
@@ -201,6 +202,8 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]
         );
+
+        TransactionalEmail::ensureDefaults();
     }
 
     private function tableWithRows(Merchant $merchant, MerchantCompany $company, array $tableData, array $rows): MeasurementTable

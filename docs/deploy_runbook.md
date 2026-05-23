@@ -129,6 +129,40 @@ Comportamento:
 - publica a landing/app frontend tambem na raiz do dominio, preservando `/provadorvirtual_v1/` e `/provadorvirtual_v2/`;
 - faz smoke publico.
 
+## Cron no cPanel
+
+Cron principal recomendado: executar o scheduler do Laravel a cada minuto. Ele ja dispara o monitor de pagamentos a cada 5 minutos e as rotinas de privacidade nos horarios programados.
+
+Tempo:
+
+```cron
+* * * * *
+```
+
+Comando com log:
+
+```bash
+cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan schedule:run >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-schedule.log 2>&1
+```
+
+Se o cPanel nao aceitar scheduler a cada minuto, cadastrar temporariamente o monitor direto a cada 5 minutos:
+
+```cron
+*/5 * * * *
+```
+
+```bash
+cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:payments-sync --limit=50 >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-payments-sync.log 2>&1
+```
+
+Validacao manual do monitor:
+
+```bash
+cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:payments-sync --limit=10
+```
+
+Se `/usr/local/bin/php` nao existir no HostGator, trocar pelo path exibido no cPanel ou por `php`.
+
 ## `.env` de producao minimo
 
 ```env

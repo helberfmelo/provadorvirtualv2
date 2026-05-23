@@ -606,6 +606,7 @@ a {
 .measure-grid input,
 .admin-form input,
 .admin-form select,
+.admin-form textarea,
 .inline-form input {
   width: 100%;
   min-height: 42px;
@@ -613,6 +614,11 @@ a {
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: #fff;
+}
+
+.admin-form textarea {
+  min-height: 150px;
+  resize: vertical;
 }
 
 .form-error {
@@ -1201,6 +1207,10 @@ textarea {
   gap: 18px;
   margin-top: 24px;
   margin-bottom: 18px;
+  align-items: start;
+}
+
+.email-grid {
   align-items: start;
 }
 

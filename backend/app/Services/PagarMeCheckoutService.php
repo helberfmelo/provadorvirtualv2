@@ -98,6 +98,93 @@ class PagarMeCheckoutService
         });
     }
 
+    public function syncPendingCheckouts(int $limit = 50): array
+    {
+        $limit = max(1, min(200, $limit));
+        $syncBefore = now()->subMinutes(2);
+        $summary = [
+            'checked' => 0,
+            'updated' => 0,
+            'paid' => 0,
+            'failed' => 0,
+            'errors' => 0,
+        ];
+
+        $sessions = CheckoutSession::query()
+            ->whereIn('status', [CheckoutSession::STATUS_PENDING, CheckoutSession::STATUS_CHECKOUT_CREATED])
+            ->whereNotNull('provider_order_id')
+            ->where(function ($query) use ($syncBefore): void {
+                $query->whereNull('last_provider_sync_at')
+                    ->orWhere('last_provider_sync_at', '<=', $syncBefore);
+            })
+            ->orderBy('id')
+            ->limit($limit)
+            ->get();
+
+        foreach ($sessions as $session) {
+            $summary['checked']++;
+
+            try {
+                $before = $session->status;
+                $synced = $this->syncCheckoutSession($session);
+
+                if ($synced->status !== $before) {
+                    $summary['updated']++;
+                }
+
+                if ($synced->status === CheckoutSession::STATUS_PAID) {
+                    $summary['paid']++;
+                }
+
+                if (in_array($synced->status, [CheckoutSession::STATUS_FAILED, CheckoutSession::STATUS_CANCELLED, CheckoutSession::STATUS_EXPIRED], true)) {
+                    $summary['failed']++;
+                }
+            } catch (\Throwable $exception) {
+                $summary['errors']++;
+                Log::warning('Falha ao sincronizar checkout pendente na Pagar.me.', [
+                    'checkout_session_id' => $session->id,
+                    'provider_order_id' => $session->provider_order_id,
+                    'message' => $exception->getMessage(),
+                ]);
+            }
+        }
+
+        return [
+            ...$summary,
+            'limit' => $limit,
+            'synced_at' => now()->toISOString(),
+        ];
+    }
+
+    public function syncCheckoutSession(CheckoutSession $session): CheckoutSession
+    {
+        if (! $session->provider_order_id) {
+            throw new RuntimeException('Checkout sem order_id da Pagar.me.');
+        }
+
+        try {
+            $payload = $this->providerClient($this->requiredSecretKey())
+                ->get('/orders/'.$session->provider_order_id)
+                ->throw()
+                ->json();
+        } catch (ConnectionException $exception) {
+            throw new RuntimeException('Nao foi possivel conectar a Pagar.me para sincronizar o checkout.', 0, $exception);
+        } catch (RequestException $exception) {
+            throw new RuntimeException(
+                $this->providerErrorMessage($exception, 'Nao foi possivel consultar o pedido na Pagar.me.'),
+                0,
+                $exception,
+            );
+        }
+
+        return $this->applyProviderPayload(
+            $session,
+            is_array($payload) ? $payload : [],
+            $session->payment_method ?: 'pix',
+            $session->provider_order_code ?: ('PV-'.$session->public_reference),
+        );
+    }
+
     public function publicCheckoutUrl(string $reference): string
     {
         $base = trim((string) config('services.pagarme.checkout_success_url')) ?: url('/checkout/sucesso');
@@ -297,6 +384,22 @@ class PagarMeCheckoutService
 
         if (in_array($status, ['paid', 'overpaid'], true)) {
             return CheckoutSession::STATUS_PAID;
+        }
+
+        if (in_array($status, ['failed', 'declined', 'refused', 'not_authorized'], true)) {
+            return CheckoutSession::STATUS_FAILED;
+        }
+
+        if (in_array($status, ['canceled', 'cancelled'], true)) {
+            return CheckoutSession::STATUS_CANCELLED;
+        }
+
+        if ($status === 'expired') {
+            return CheckoutSession::STATUS_EXPIRED;
+        }
+
+        if (in_array($status, ['refunded', 'chargedback'], true)) {
+            return CheckoutSession::STATUS_REFUNDED;
         }
 
         $chargeStatuses = collect(Arr::wrap($payload['charges'] ?? []))

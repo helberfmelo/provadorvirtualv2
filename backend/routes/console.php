@@ -7,9 +7,11 @@ use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
 use App\Models\User;
+use App\Services\PagarMeCheckoutService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Schedule;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
@@ -103,6 +105,15 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
     return 0;
 })->purpose('Anonimiza dados corporais e identificadores tecnicos antigos do widget.');
 
+Artisan::command('pv:payments-sync {--limit=50 : Quantidade maxima de checkouts pendentes por execucao}', function (): int {
+    $limit = max(1, min(200, (int) ($this->option('limit') ?: 50)));
+    $summary = app(PagarMeCheckoutService::class)->syncPendingCheckouts($limit);
+
+    $this->line(json_encode($summary, JSON_PRETTY_PRINT));
+
+    return ((int) $summary['errors']) > 0 ? 2 : 0;
+})->purpose('Consulta a Pagar.me e libera acessos de checkouts pendentes aprovados.');
+
 Artisan::command('pv:privacy-prune {--days= : Dias de retencao de logs operacionais} {--dry-run}', function (): int {
     $days = (int) ($this->option('days') ?: config('privacy.operational_log_retention_days', 180));
     $cutoff = now()->subDays(max(30, $days));
@@ -130,3 +141,7 @@ Artisan::command('pv:privacy-prune {--days= : Dias de retencao de logs operacion
 
     return 0;
 })->purpose('Remove logs operacionais antigos mantendo analytics de recomendacao.');
+
+Schedule::command('pv:payments-sync --limit=50')->everyFiveMinutes()->withoutOverlapping();
+Schedule::command('pv:privacy-anonymize')->dailyAt('03:17')->withoutOverlapping();
+Schedule::command('pv:privacy-prune')->weeklyOn(0, '03:37')->withoutOverlapping();

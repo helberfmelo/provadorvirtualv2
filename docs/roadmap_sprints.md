@@ -306,20 +306,23 @@ Entregas:
 - plataforma salva na empresa e no widget;
 - testes de preco por plataforma e bloqueio de boleto.
 
-Status: implementado nesta sprint; publicar e validar no Actions.
+Status: implementado, publicado e validado em producao no run `26336554760`.
 
 ### Sprint 28 - Monitor de pagamentos e e-mails transacionais
 
 Objetivo: reduzir dependencia exclusiva do webhook e criar operacao de comunicacao transacional.
 
-Entregas previstas:
+Entregas:
 
 - comando Artisan para sincronizar pagamentos pendentes com a Pagar.me;
+- agendamento Laravel do monitor de pagamentos a cada 5 minutos;
 - documentacao de cron cPanel com log;
-- configuracao SaaS de credenciais SMTP por ambiente;
-- CRUD SaaS de e-mails transacionais;
+- configuracao SaaS de credenciais SMTP, com senha criptografada e sem retorno em claro na API;
+- CRUD SaaS de e-mails transacionais com listagem, novo, editar e ativar/desativar;
 - templates iniciais: cadastro realizado, pagamento confirmado, aguardando pagamento com Pix, erro no pagamento, recuperacao de senha e renovacao de plano;
-- disparos baseados em eventos de checkout e plano.
+- testes para API de e-mails e comando de sincronizacao de pagamentos.
+
+Status: implementado nesta sprint; publicar e validar no Actions.
 
 ### Sprint 29 - Login contextual e acesso de empresa
 
@@ -345,3 +348,74 @@ Entregas previstas:
 - permissoes por modulo/menu com visualizar e editar;
 - ao marcar editar, visualizar fica automaticamente ativo;
 - enforcement inicial no backend para modulos criticos.
+
+## Sprints 31 a 36 - Refinamento operacional e escala
+
+### Sprint 31 - Automacoes de e-mail e ciclo financeiro
+
+Objetivo: transformar os templates em disparos transacionais reais.
+
+Entregas previstas:
+
+- service de envio usando as credenciais SMTP salvas;
+- disparo de cadastro realizado, pagamento confirmado e erro/pendencia de pagamento;
+- reenvio de Pix pendente com controle de frequencia;
+- links de checkout de renovacao;
+- historico de envios por empresa e template.
+
+### Sprint 32 - Login multiempresa e permissoes refinadas
+
+Objetivo: completar a experiencia de usuarios que participam de mais de uma empresa.
+
+Entregas previstas:
+
+- seletor de empresa apos login quando houver multiplas empresas;
+- escopo por empresa em todas as telas do portal;
+- enforcement completo das permissoes de visualizar/editar;
+- auditoria por usuario/empresa/modulo.
+
+### Sprint 33 - Guias de integracao por plataforma
+
+Objetivo: deixar a implantacao default para o maximo de plataformas.
+
+Entregas previstas:
+
+- guias e snippets para Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom;
+- checklist visual por plataforma no portal;
+- validacao de dominio/snippet instalado;
+- matriz de dados suportados por plataforma.
+
+### Sprint 34 - BigShop um clique em producao
+
+Objetivo: preparar o ajuste final do lado BigShop e ativar o fluxo nativo.
+
+Entregas previstas:
+
+- contrato final de payload BigShop;
+- teste com loja piloto real;
+- ajustes no codigo da BigShop para instalar widget e mapear produto/tabela;
+- monitoramento de ativacoes BigShop.
+
+### Sprint 35 - Inteligencia de perfis e aprendizado
+
+Objetivo: evoluir a recomendacao sem comprometer LGPD e qualidade estatistica.
+
+Entregas previstas:
+
+- perfis anonimos e conhecidos com consentimento;
+- edicao fluida de medidas salvas no widget;
+- sinais de compra/devolucao/feedback;
+- deteccao de outliers antes de alimentar modelos;
+- dashboards de qualidade da recomendacao.
+
+### Sprint 36 - Piloto comercial e qualidade final
+
+Objetivo: preparar venda assistida e piloto com clientes reais.
+
+Entregas previstas:
+
+- teste real de checkout/Pagar.me em producao;
+- teste ponta a ponta em loja BigShop;
+- performance do widget em paginas de produto reais;
+- revisao responsiva/acessibilidade;
+- pacote comercial e checklist de onboarding.

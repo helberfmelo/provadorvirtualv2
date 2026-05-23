@@ -98,8 +98,10 @@ Atualizado em: 2026-05-23
 - `DONE` Landing publica v2 inspirada no v1 e preparada para rodar na raiz.
 - `DONE` Checkout anual unico sem boleto, com desconto BigShop e Pix.
 - `TODO` Configurar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` em producao junto com as chaves reais.
-- `TODO` Monitorar pagamento pendente por cron alem do webhook.
-- `TODO` CRUD de credenciais SMTP e e-mails transacionais.
+- `DONE` Monitorar pagamento pendente por cron alem do webhook.
+- `DONE` CRUD de credenciais SMTP e e-mails transacionais.
+- `TODO` Disparar automaticamente e-mails transacionais por evento.
+- `TODO` Criar historico de envios transacionais.
 - `TODO` Login do portal da empresa com codigo/CNPJ.
 - `TODO` CRUD de usuarios e permissoes no SaaS e no portal da empresa.
 

@@ -35,15 +35,43 @@ type CompanyRow = {
     billing_status: string
   }
 }
+type EmailSettings = {
+  id: number | null
+  mailer: string
+  host: string
+  port: number | null
+  username: string
+  has_smtp_password: boolean
+  encryption: string | null
+  from_address: string
+  from_name: string
+  is_active: boolean
+}
+type TransactionalEmail = {
+  id: number
+  code: string
+  name: string
+  description: string | null
+  subject: string
+  body: string
+  variables: string[]
+  is_active: boolean
+  updated_at: string | null
+}
 
 const summary = ref<Summary>({})
 const merchants = ref<MerchantRow[]>([])
 const companies = ref<CompanyRow[]>([])
+const transactionalEmails = ref<TransactionalEmail[]>([])
 const loading = ref(false)
 const savingCompany = ref(false)
+const savingEmailSettings = ref(false)
+const savingTemplate = ref(false)
 const cepLoading = ref(false)
 const error = ref('')
 const notice = ref('')
+const smtpPassword = ref('')
+const editingTemplateId = ref<number | null>(null)
 
 const companyForm = reactive({
   merchant_id: '',
@@ -67,6 +95,27 @@ const companyForm = reactive({
   owner_cpf: '',
   owner_password: '',
 })
+const emailSettings = reactive<EmailSettings>({
+  id: null,
+  mailer: 'smtp',
+  host: '',
+  port: 587,
+  username: '',
+  has_smtp_password: false,
+  encryption: 'tls',
+  from_address: 'noreply@provadorvirtual.online',
+  from_name: 'Provador Virtual',
+  is_active: false,
+})
+const templateForm = reactive({
+  code: '',
+  name: '',
+  description: '',
+  subject: '',
+  body: '',
+  variables: 'nome, empresa, codigo_empresa, link_login',
+  is_active: true,
+})
 
 onMounted(() => {
   loadSaas()
@@ -77,19 +126,38 @@ async function loadSaas() {
   error.value = ''
 
   try {
-    const [overviewResponse, merchantsResponse, companiesResponse] = await Promise.all([
+    const [overviewResponse, merchantsResponse, companiesResponse, emailSettingsResponse, transactionalEmailsResponse] = await Promise.all([
       api.get('/saas/overview'),
       api.get('/saas/merchants'),
       api.get('/saas/companies'),
+      api.get('/saas/email-settings'),
+      api.get('/saas/transactional-emails'),
     ])
 
     summary.value = overviewResponse.data.data.summary
     merchants.value = merchantsResponse.data.data
     companies.value = companiesResponse.data.data
+    Object.assign(emailSettings, normalizeEmailSettings(emailSettingsResponse.data.data))
+    transactionalEmails.value = transactionalEmailsResponse.data.data
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Nao foi possivel carregar o painel SaaS.'
   } finally {
     loading.value = false
+  }
+}
+
+function normalizeEmailSettings(data: Partial<EmailSettings>): EmailSettings {
+  return {
+    id: data.id ?? null,
+    mailer: data.mailer || 'smtp',
+    host: data.host || '',
+    port: data.port || 587,
+    username: data.username || '',
+    has_smtp_password: Boolean(data.has_smtp_password),
+    encryption: data.encryption || 'tls',
+    from_address: data.from_address || 'noreply@provadorvirtual.online',
+    from_name: data.from_name || 'Provador Virtual',
+    is_active: Boolean(data.is_active),
   }
 }
 
@@ -136,6 +204,111 @@ async function createCompany() {
     error.value = requestError.response?.data?.message || 'Nao foi possivel criar a empresa.'
   } finally {
     savingCompany.value = false
+  }
+}
+
+async function saveEmailSettings() {
+  savingEmailSettings.value = true
+  notice.value = ''
+  error.value = ''
+
+  try {
+    const payload: Record<string, unknown> = {
+      mailer: emailSettings.mailer,
+      host: emailSettings.host.trim(),
+      port: emailSettings.port,
+      username: emailSettings.username.trim(),
+      encryption: emailSettings.encryption || null,
+      from_address: emailSettings.from_address.trim(),
+      from_name: emailSettings.from_name.trim(),
+      is_active: emailSettings.is_active,
+    }
+
+    if (smtpPassword.value.trim()) {
+      payload.smtp_password = smtpPassword.value.trim()
+    }
+
+    const { data } = await api.patch('/saas/email-settings', payload)
+    Object.assign(emailSettings, normalizeEmailSettings(data.data))
+    smtpPassword.value = ''
+    notice.value = 'Credenciais de e-mail salvas.'
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar as credenciais de e-mail.'
+  } finally {
+    savingEmailSettings.value = false
+  }
+}
+
+function resetTemplateForm() {
+  editingTemplateId.value = null
+  Object.assign(templateForm, {
+    code: '',
+    name: '',
+    description: '',
+    subject: '',
+    body: '',
+    variables: 'nome, empresa, codigo_empresa, link_login',
+    is_active: true,
+  })
+}
+
+function editTemplate(template: TransactionalEmail) {
+  editingTemplateId.value = template.id
+  Object.assign(templateForm, {
+    code: template.code,
+    name: template.name,
+    description: template.description || '',
+    subject: template.subject,
+    body: template.body,
+    variables: (template.variables || []).join(', '),
+    is_active: template.is_active,
+  })
+}
+
+async function saveTemplate() {
+  savingTemplate.value = true
+  notice.value = ''
+  error.value = ''
+
+  try {
+    const payload = {
+      code: templateForm.code.trim(),
+      name: templateForm.name.trim(),
+      description: templateForm.description.trim(),
+      subject: templateForm.subject.trim(),
+      body: templateForm.body.trim(),
+      variables: templateForm.variables
+        .split(/[,\n]+/)
+        .map((variable) => variable.trim())
+        .filter(Boolean),
+      is_active: templateForm.is_active,
+    }
+    const request = editingTemplateId.value
+      ? api.patch(`/saas/transactional-emails/${editingTemplateId.value}`, payload)
+      : api.post('/saas/transactional-emails', payload)
+    await request
+    await loadSaas()
+    resetTemplateForm()
+    notice.value = 'E-mail transacional salvo.'
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar o e-mail transacional.'
+  } finally {
+    savingTemplate.value = false
+  }
+}
+
+async function toggleTemplate(template: TransactionalEmail) {
+  notice.value = ''
+  error.value = ''
+
+  try {
+    await api.patch(`/saas/transactional-emails/${template.id}`, {
+      is_active: !template.is_active,
+    })
+    await loadSaas()
+    notice.value = template.is_active ? 'Template desativado.' : 'Template ativado.'
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Nao foi possivel alterar o status do template.'
   }
 }
 </script>
@@ -372,6 +545,174 @@ async function createCompany() {
                 <td>{{ merchant.measurement_tables_count }}</td>
                 <td>{{ merchant.platform_connections_count }}</td>
                 <td>{{ merchant.recommendations_7d }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="saas-grid email-grid">
+        <form class="panel-main admin-form" @submit.prevent="saveEmailSettings">
+          <div class="subsection-heading">
+            <h2>Credenciais de e-mail</h2>
+            <span>{{ emailSettings.is_active ? 'envio ativo' : 'envio inativo' }}</span>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Mailer
+              <select v-model="emailSettings.mailer">
+                <option value="smtp">SMTP</option>
+              </select>
+            </label>
+            <label>
+              Host SMTP
+              <input v-model="emailSettings.host" placeholder="mail.provadorvirtual.online" />
+            </label>
+            <label>
+              Porta
+              <input v-model.number="emailSettings.port" type="number" min="1" max="65535" />
+            </label>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Usuario
+              <input v-model="emailSettings.username" autocomplete="username" />
+            </label>
+            <label>
+              Senha SMTP
+              <input v-model="smtpPassword" type="password" autocomplete="new-password" placeholder="Manter senha atual" />
+              <small>{{ emailSettings.has_smtp_password ? 'Senha ja salva no cofre criptografado.' : 'Nenhuma senha salva ainda.' }}</small>
+            </label>
+            <label>
+              Criptografia
+              <select v-model="emailSettings.encryption">
+                <option value="tls">TLS</option>
+                <option value="ssl">SSL</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              E-mail remetente
+              <input v-model="emailSettings.from_address" type="email" />
+            </label>
+            <label>
+              Nome remetente
+              <input v-model="emailSettings.from_name" />
+            </label>
+            <label>
+              Status
+              <select v-model="emailSettings.is_active">
+                <option :value="true">Ativo</option>
+                <option :value="false">Inativo</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="action-row compact">
+            <button class="btn btn-primary" type="submit" :disabled="savingEmailSettings">
+              <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+              Salvar credenciais
+            </button>
+          </div>
+        </form>
+
+        <form class="panel-main admin-form" @submit.prevent="saveTemplate">
+          <div class="subsection-heading">
+            <h2>{{ editingTemplateId ? 'Editar e-mail' : 'Novo e-mail' }}</h2>
+            <button class="btn btn-secondary" type="button" @click="resetTemplateForm">
+              <i class="fa-solid fa-plus" aria-hidden="true"></i>
+              Novo
+            </button>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Codigo
+              <input v-model="templateForm.code" placeholder="cadastro_realizado" />
+            </label>
+            <label>
+              Nome
+              <input v-model="templateForm.name" required />
+            </label>
+            <label>
+              Status
+              <select v-model="templateForm.is_active">
+                <option :value="true">Ativo</option>
+                <option :value="false">Inativo</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Assunto
+            <input v-model="templateForm.subject" required />
+          </label>
+          <label>
+            Descricao interna
+            <input v-model="templateForm.description" />
+          </label>
+          <label>
+            Variaveis
+            <input v-model="templateForm.variables" placeholder="nome, empresa, link_checkout" />
+          </label>
+          <label>
+            Corpo do e-mail
+            <textarea v-model="templateForm.body" rows="8" required></textarea>
+          </label>
+
+          <div class="action-row compact">
+            <button class="btn btn-primary" type="submit" :disabled="savingTemplate">
+              <i class="fa-solid fa-envelope-circle-check" aria-hidden="true"></i>
+              Salvar e-mail
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <section class="panel-main">
+        <div class="subsection-heading">
+          <h2>E-mails transacionais</h2>
+          <span>{{ transactionalEmails.length }} templates</span>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Codigo</th>
+                <th>Nome</th>
+                <th>Assunto</th>
+                <th>Status</th>
+                <th>Acoes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!transactionalEmails.length">
+                <td colspan="5">Sem e-mails transacionais.</td>
+              </tr>
+              <tr v-for="template in transactionalEmails" :key="template.id">
+                <td><strong>{{ template.code }}</strong></td>
+                <td>
+                  <strong>{{ template.name }}</strong>
+                  <small>{{ template.description || 'sem descricao' }}</small>
+                </td>
+                <td>{{ template.subject }}</td>
+                <td>
+                  <span class="status-pill" :class="{ ok: template.is_active, warning: !template.is_active }">
+                    {{ template.is_active ? 'Ativo' : 'Inativo' }}
+                  </span>
+                </td>
+                <td class="row-actions">
+                  <button type="button" title="Editar" @click="editTemplate(template)">
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                  </button>
+                  <button type="button" :title="template.is_active ? 'Desativar' : 'Ativar'" @click="toggleTemplate(template)">
+                    <i :class="template.is_active ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off'" aria-hidden="true"></i>
+                  </button>
+                </td>
               </tr>
             </tbody>
           </table>
