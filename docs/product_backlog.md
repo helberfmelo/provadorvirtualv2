@@ -102,7 +102,9 @@ Atualizado em: 2026-05-23
 - `DONE` CRUD de credenciais SMTP e e-mails transacionais.
 - `TODO` Disparar automaticamente e-mails transacionais por evento.
 - `TODO` Criar historico de envios transacionais.
-- `TODO` Login do portal da empresa com codigo/CNPJ.
+- `DONE` Login do portal da empresa com codigo/CNPJ.
+- `DONE` Login por e-mail ou CPF no SaaS e no portal da empresa.
+- `DONE` Reuso de usuario por e-mail/CPF em mais de uma empresa.
 - `TODO` CRUD de usuarios e permissoes no SaaS e no portal da empresa.
 
 ## Pagamentos

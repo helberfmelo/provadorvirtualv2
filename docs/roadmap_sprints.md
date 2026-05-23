@@ -328,13 +328,17 @@ Status: implementado, publicado e validado em producao no run `26336899986`.
 
 Objetivo: permitir acesso por e-mail ou CPF e selecionar empresa por codigo/CNPJ quando for portal do lojista.
 
-Entregas previstas:
+Entregas:
 
 - login por e-mail ou CPF no SaaS;
 - login do portal da empresa exigindo codigo da loja ou CNPJ;
 - reuso seguro de usuario com mesmo e-mail/CPF em mais de uma empresa;
 - ajuste de checkout/cadastro para vincular usuario existente quando aplicavel;
 - mensagens claras quando o usuario nao pertence a empresa informada.
+- contexto de lojista/empresa gravado no token de acesso;
+- painel passa a enviar e exibir o campo `Codigo da loja ou CNPJ`.
+
+Status: implementado nesta sprint; publicar e validar no Actions.
 
 ### Sprint 30 - Usuarios e permissoes por modulo
 

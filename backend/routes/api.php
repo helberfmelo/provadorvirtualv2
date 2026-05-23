@@ -26,6 +26,8 @@ use App\Models\PlatformConnection;
 use App\Models\Product;
 use App\Models\RecommendationLog;
 use App\Models\WidgetInstall;
+use App\Support\ActiveTenant;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -61,8 +63,8 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware('auth:sanctum')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/me', [AuthController::class, 'me']);
-        Route::get('/merchant/overview', function () {
-            $merchant = request()->user()->merchants()->firstOrFail();
+        Route::get('/merchant/overview', function (Request $request) {
+            $merchant = app(ActiveTenant::class)->merchant($request);
 
             return response()->json([
                 'summary' => [

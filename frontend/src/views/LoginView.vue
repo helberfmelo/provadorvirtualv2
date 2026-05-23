@@ -5,7 +5,8 @@ import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
 const auth = useAuthStore()
-const email = ref('demo@provadorvirtual.online')
+const identifier = ref('demo@provadorvirtual.online')
+const companyAccess = ref('')
 const password = ref('provador123')
 const error = ref('')
 const loading = ref(false)
@@ -15,10 +16,13 @@ async function submit() {
   loading.value = true
 
   try {
-    await auth.login(email.value, password.value)
-    await router.push('/app')
-  } catch {
-    error.value = 'Nao foi possivel entrar com esses dados.'
+    await auth.login(identifier.value, password.value, companyAccess.value)
+    await router.push(['admin', 'support'].includes(auth.user?.role || '') && !companyAccess.value ? '/saas' : '/app')
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message
+      || requestError.response?.data?.errors?.company_access?.[0]
+      || requestError.response?.data?.errors?.login?.[0]
+      || 'Nao foi possivel entrar com esses dados.'
   } finally {
     loading.value = false
   }
@@ -32,8 +36,13 @@ async function submit() {
       <h1>Entrar no painel</h1>
       <form class="form" @submit.prevent="submit">
         <label>
-          E-mail
-          <input v-model="email" type="email" autocomplete="email" required />
+          E-mail ou CPF
+          <input v-model="identifier" autocomplete="username" required />
+        </label>
+        <label>
+          Codigo da loja ou CNPJ
+          <input v-model="companyAccess" inputmode="numeric" autocomplete="organization" />
+          <small>Obrigatorio para o portal da empresa. Admin SaaS pode deixar vazio.</small>
         </label>
         <label>
           Senha

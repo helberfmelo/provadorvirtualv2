@@ -7,6 +7,7 @@ use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\Product;
 use App\Models\ProductVariant;
+use App\Support\ActiveTenant;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -14,13 +15,7 @@ trait ResolvesMerchant
 {
     protected function currentMerchant(Request $request): Merchant
     {
-        $merchant = $request->user()?->merchants()->first();
-
-        if (! $merchant) {
-            throw new NotFoundHttpException('Lojista nao encontrado para o usuario autenticado.');
-        }
-
-        return $merchant;
+        return app(ActiveTenant::class)->merchant($request);
     }
 
     protected function merchantCompany(Merchant $merchant, ?int $companyId): ?MerchantCompany

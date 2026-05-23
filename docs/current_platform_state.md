@@ -25,6 +25,7 @@ Atualizado em: 2026-05-23
 - Sprint 26 criou landing publica, checkout transparente Pagar.me, sessoes/eventos de pagamento e webhook de ativacao.
 - Sprint 27 ajustou a landing para estrutura inspirada no v1, publicou build prevista para a raiz e simplificou o checkout para plano anual unico sem boleto.
 - Sprint 28 criou monitor de pagamentos pendentes, agendamento de cron/scheduler e configuracao SaaS de SMTP/templates transacionais; publicado em producao no run `26336899986`.
+- Sprint 29 preparou login por e-mail/CPF, acesso do portal por codigo/CNPJ e contexto de empresa no token.
 
 ## Referencias confirmadas
 
@@ -104,6 +105,7 @@ Atualizado em: 2026-05-23
 
 - Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`.
 - Painel SaaS protegido por papel: `/saas`.
+- Login do portal: `/login`, aceitando e-mail ou CPF e campo de codigo/CNPJ para empresa.
 - Checkout publico: `/checkout` e `/checkout/sucesso`.
 - APIs protegidas: produtos, variacoes, tabelas, templates, widget-install e integracoes.
 - Importacoes protegidas: preview, commit e historico em `/api/v1/imports`.
@@ -121,4 +123,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Publicar a Sprint 28, cadastrar `PAGARME_*` em producao com URLs da raiz, salvar o cron do scheduler no cPanel, validar checkout + widget e seguir para a Sprint 29 de login contextual por e-mail/CPF e empresa por codigo/CNPJ.
+Publicar a Sprint 29, cadastrar `PAGARME_*` em producao com URLs da raiz, salvar o cron do scheduler no cPanel, validar checkout + widget e seguir para a Sprint 30 de usuarios e permissoes por modulo.

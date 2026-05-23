@@ -278,7 +278,28 @@ class SaasAdminController extends Controller
             $payload['password'] = Hash::make((string) $data['owner_password']);
         }
 
-        $owner = User::query()->firstOrNew(['email' => $data['owner_email']]);
+        $emailUser = User::query()->where('email', $data['owner_email'])->first();
+        $cpfUser = filled($data['owner_cpf'] ?? null)
+            ? User::query()->where('cpf', $data['owner_cpf'])->first()
+            : null;
+
+        if ($emailUser && $cpfUser && (int) $emailUser->id !== (int) $cpfUser->id) {
+            throw new HttpException(422, 'E-mail e CPF ja pertencem a usuarios diferentes.');
+        }
+
+        $owner = $emailUser ?: $cpfUser ?: new User;
+        $payload['email'] = $owner->exists ? $owner->email : $data['owner_email'];
+
+        if ($owner->exists && $owner->email !== $data['owner_email']) {
+            $emailInUse = User::query()
+                ->where('email', $data['owner_email'])
+                ->whereKeyNot($owner->id)
+                ->exists();
+
+            if (! $emailInUse) {
+                $payload['email'] = $data['owner_email'];
+            }
+        }
 
         if (! $owner->exists && blank($payload['password'] ?? null)) {
             $payload['password'] = Hash::make(Str::random(18));

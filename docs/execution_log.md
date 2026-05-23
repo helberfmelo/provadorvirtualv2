@@ -218,3 +218,14 @@
 - Validacoes locais completas: `php artisan test`, `npm run build`, build raiz com `VITE_APP_BASE_PATH=/`, `git diff --check` e `vendor/bin/pint --dirty`.
 - Run `26336899986` do GitHub Actions finalizou com sucesso para o commit `ce65f82`.
 - Validado em producao: raiz, paginas publicas, API health/ops/demo/recommendation, CORS, login demo e go-live com `scripts/validate-production.ps1`.
+
+## 2026-05-23 - Sprint 29 Login contextual e multiempresa
+
+- Login passou a aceitar `login` por e-mail ou CPF, mantendo alias legado `email`.
+- Portal da empresa passou a receber `company_access` por codigo da loja ou CNPJ.
+- Usuarios multiempresa precisam informar empresa; usuarios de uma unica empresa seguem com fallback automatico para compatibilidade.
+- Token Sanctum passa a carregar contexto `merchant:{id}` e `company:{id}`.
+- APIs do portal usam `ActiveTenant` para resolver o lojista ativo pelo token.
+- Checkout publico e cadastro interno SaaS reaproveitam usuario existente por e-mail/CPF, permitindo uma pessoa em varias empresas.
+- Tela `/login` agora mostra campo `E-mail ou CPF` e `Codigo da loja ou CNPJ`.
+- Validacoes locais focadas: `php artisan test --filter=AuthTest`, `php artisan test --filter=PublicCheckoutFlowTest` e `npm run build`.

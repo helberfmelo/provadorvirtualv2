@@ -46,15 +46,7 @@ class PublicCheckoutController extends Controller
                     'trial_ends_at' => null,
                 ]);
 
-                $user = User::query()->updateOrCreate(
-                    ['email' => $data['admin_email']],
-                    [
-                        'name' => $data['admin_name'],
-                        'cpf' => $data['admin_cpf'],
-                        'role' => 'merchant',
-                        'password' => Hash::make($data['password']),
-                    ],
-                );
+                $user = $this->resolveCheckoutUser($data);
                 $merchant->users()->syncWithoutDetaching([
                     $user->id => ['role' => 'owner', 'is_owner' => true],
                 ]);
@@ -277,6 +269,40 @@ class PublicCheckoutController extends Controller
             'pix_discount_percent' => 5,
             'max_installments' => 12,
         ];
+    }
+
+    private function resolveCheckoutUser(array $data): User
+    {
+        $emailUser = User::query()->where('email', $data['admin_email'])->first();
+        $cpfUser = User::query()->where('cpf', $data['admin_cpf'])->first();
+
+        if ($emailUser && $cpfUser && (int) $emailUser->id !== (int) $cpfUser->id) {
+            throw new RuntimeException('E-mail e CPF ja pertencem a usuarios diferentes. Use os dados do mesmo usuario ou fale com o suporte.');
+        }
+
+        $user = $emailUser ?: $cpfUser ?: new User;
+        $payload = [
+            'name' => $data['admin_name'],
+            'email' => $user->exists ? $user->email : $data['admin_email'],
+            'cpf' => $user->cpf ?: $data['admin_cpf'],
+            'role' => in_array($user->role, ['admin', 'support'], true) ? $user->role : 'merchant',
+            'password' => Hash::make($data['password']),
+        ];
+
+        if ($user->exists && $user->email !== $data['admin_email']) {
+            $emailInUse = User::query()
+                ->where('email', $data['admin_email'])
+                ->whereKeyNot($user->id)
+                ->exists();
+
+            if (! $emailInUse) {
+                $payload['email'] = $data['admin_email'];
+            }
+        }
+
+        $user->forceFill($payload)->save();
+
+        return $user;
     }
 
     private function uniqueMerchantSlug(string $name): string

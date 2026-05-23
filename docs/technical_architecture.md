@@ -82,6 +82,16 @@ APIs publicas adicionais:
 - `GET /api/v1/public/checkout/{reference}`
 - `POST /api/v1/webhooks/pagarme`
 
+## Autenticacao e multiempresa
+
+- `POST /api/v1/auth/login` aceita `login` com e-mail ou CPF, alem do alias legado `email`.
+- O portal da empresa deve enviar `company_access` com codigo da loja ou CNPJ.
+- Usuarios admin/suporte podem entrar sem empresa para operar o SaaS.
+- Usuarios lojistas com mais de uma empresa precisam informar `company_access`; usuario de uma unica empresa segue com fallback automatico para compatibilidade.
+- O token Sanctum recebe abilities `merchant:{id}` e `company:{id}` quando a empresa e resolvida.
+- APIs do portal usam `ActiveTenant` para respeitar o lojista ativo do token, em vez de assumir o primeiro vinculo do usuario.
+- Checkout e cadastro interno reaproveitam usuario por e-mail ou CPF, permitindo que a mesma pessoa participe de varias empresas sem duplicar cadastro.
+
 ## Frontend
 
 Stack:

@@ -3,7 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\MerchantCompany;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
@@ -106,6 +108,65 @@ class PublicCheckoutFlowTest extends TestCase
             'payment_method' => 'boleto',
         ])->assertUnprocessable()
             ->assertJsonValidationErrors('payment_method');
+    }
+
+    public function test_same_user_can_contract_more_than_one_company(): void
+    {
+        $this->configurePagarme();
+
+        Http::fake([
+            'https://api.pagar.me/core/v5/orders' => Http::response([
+                'id' => 'or_pv_multi',
+                'status' => 'pending',
+                'charges' => [
+                    ['id' => 'ch_pv_multi', 'status' => 'pending', 'payment_method' => 'pix'],
+                ],
+            ]),
+        ]);
+
+        $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'company_name' => 'Loja Multi A',
+            'company_document' => '11222333000181',
+        ])->assertCreated();
+
+        $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'company_name' => 'Loja Multi B',
+            'company_document' => '22333444000191',
+        ])->assertCreated();
+
+        $this->assertDatabaseCount('users', 1);
+        $this->assertDatabaseCount('merchants', 2);
+        $this->assertSame(2, DB::table('merchant_user')->count());
+    }
+
+    public function test_checkout_rejects_when_email_and_cpf_belong_to_different_users(): void
+    {
+        $this->configurePagarme();
+
+        User::query()->create([
+            'name' => 'Email Owner',
+            'email' => 'admin.checkout@example.com',
+            'cpf' => '11122233344',
+            'role' => 'merchant',
+            'password' => bcrypt('password123'),
+        ]);
+        User::query()->create([
+            'name' => 'CPF Owner',
+            'email' => 'outro@example.com',
+            'cpf' => '05521345620',
+            'role' => 'merchant',
+            'password' => bcrypt('password123'),
+        ]);
+
+        Http::fake([
+            'https://api.pagar.me/core/v5/orders' => Http::response(['id' => 'or_should_not_run']),
+        ]);
+
+        $this->postJson('/api/v1/public/checkout', $this->payload())
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'E-mail e CPF ja pertencem a usuarios diferentes. Use os dados do mesmo usuario ou fale com o suporte.');
     }
 
     public function test_pagarme_webhook_activates_paid_company(): void
