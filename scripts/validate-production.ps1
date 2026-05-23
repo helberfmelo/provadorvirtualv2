@@ -85,8 +85,9 @@ try {
 }
 
 $allowed = Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$ApiBase/public/recommendations/config-check" -Headers @{ Accept = "application/json"; Origin = "https://provadorvirtual.online" } -ContentType "application/json" -Body $identityBody
+$allowedOrigin = @($allowed.Headers["Access-Control-Allow-Origin"])[0]
 Assert-True ($allowed.StatusCode -eq 200) "origem permitida nao retornou 200"
-Assert-True ($allowed.Headers["Access-Control-Allow-Origin"] -eq "https://provadorvirtual.online") "header CORS permitido incorreto"
+Assert-True ($allowedOrigin -eq "https://provadorvirtual.online") "header CORS permitido incorreto"
 "CORS allowed origin OK"
 
 $loginBody = @{ email = $Email; password = $Password } | ConvertTo-Json
