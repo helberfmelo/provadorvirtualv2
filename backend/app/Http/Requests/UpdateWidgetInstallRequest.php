@@ -24,6 +24,12 @@ class UpdateWidgetInstallRequest extends FormRequest
             'theme.primary' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'theme.secondary' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'theme.accent' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.background' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.text' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.font_family' => ['nullable', 'string', 'max:120'],
+            'theme.font_size' => ['nullable', 'numeric', 'min:11', 'max:22'],
+            'theme.font_weight' => ['nullable', 'integer', 'min:400', 'max:900'],
+            'theme.button_radius' => ['nullable', 'numeric', 'min:0', 'max:24'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

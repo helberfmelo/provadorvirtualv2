@@ -13,6 +13,12 @@ type WidgetInstall = {
     primary?: string
     secondary?: string
     accent?: string
+    background?: string
+    text?: string
+    font_family?: string
+    font_size?: string
+    font_weight?: string
+    button_radius?: string
   }
   is_active: boolean
   script_url: string
@@ -40,6 +46,12 @@ const form = reactive({
     primary: '#0f172a',
     secondary: '#ff4d5e',
     accent: '#ff7a1a',
+    background: '#ffffff',
+    text: '#111827',
+    font_family: 'Manrope, Inter, Arial, sans-serif',
+    font_size: '14',
+    font_weight: '800',
+    button_radius: '8',
   },
 })
 
@@ -47,6 +59,17 @@ const domains = computed(() => form.allowed_domains
   .split('\n')
   .map((domain) => domain.trim())
   .filter(Boolean))
+
+const previewStyle = computed(() => ({
+  '--pv-preview-primary': form.theme.primary,
+  '--pv-preview-secondary': form.theme.secondary,
+  '--pv-preview-accent': form.theme.accent,
+  '--pv-preview-bg': form.theme.background,
+  '--pv-preview-text': form.theme.text,
+  '--pv-preview-radius': `${form.theme.button_radius}px`,
+  fontFamily: form.theme.font_family,
+  fontSize: `${form.theme.font_size}px`,
+}))
 
 onMounted(() => {
   loadInstall()
@@ -71,6 +94,12 @@ function fillForm(data: WidgetInstall) {
   form.theme.primary = data.theme?.primary || '#0f172a'
   form.theme.secondary = data.theme?.secondary || '#ff4d5e'
   form.theme.accent = data.theme?.accent || '#ff7a1a'
+  form.theme.background = data.theme?.background || '#ffffff'
+  form.theme.text = data.theme?.text || '#111827'
+  form.theme.font_family = data.theme?.font_family || 'Manrope, Inter, Arial, sans-serif'
+  form.theme.font_size = data.theme?.font_size || '14'
+  form.theme.font_weight = data.theme?.font_weight || '800'
+  form.theme.button_radius = data.theme?.button_radius || '8'
 }
 
 async function saveInstall() {
@@ -175,6 +204,49 @@ async function copySnippet() {
               <input v-model="form.theme.accent" maxlength="7" />
             </span>
           </label>
+          <label>
+            Fundo
+            <span class="swatch-field">
+              <input v-model="form.theme.background" type="color" />
+              <input v-model="form.theme.background" maxlength="7" />
+            </span>
+          </label>
+          <label>
+            Texto
+            <span class="swatch-field">
+              <input v-model="form.theme.text" type="color" />
+              <input v-model="form.theme.text" maxlength="7" />
+            </span>
+          </label>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            Fonte
+            <select v-model="form.theme.font_family">
+              <option value="Manrope, Inter, Arial, sans-serif">Manrope</option>
+              <option value="Inter, Arial, sans-serif">Inter</option>
+              <option value="Arial, sans-serif">Arial</option>
+              <option value="Georgia, serif">Georgia</option>
+            </select>
+          </label>
+          <label>
+            Tamanho da fonte
+            <input v-model="form.theme.font_size" type="number" min="11" max="22" />
+          </label>
+          <label>
+            Peso
+            <select v-model="form.theme.font_weight">
+              <option value="400">Regular</option>
+              <option value="600">Semibold</option>
+              <option value="700">Bold</option>
+              <option value="800">Extra bold</option>
+            </select>
+          </label>
+          <label>
+            Raio dos botoes
+            <input v-model="form.theme.button_radius" type="number" min="0" max="24" />
+          </label>
         </div>
 
         <div class="action-row compact">
@@ -186,6 +258,27 @@ async function copySnippet() {
       </form>
 
       <aside class="install-preview">
+        <div class="subsection-heading">
+          <h2>Visualizador</h2>
+          <span>Widget e tabela</span>
+        </div>
+        <div class="widget-style-preview" :style="previewStyle">
+          <div class="preview-product-line">
+            <strong>Vestido Midi Aurora</strong>
+            <span>Selecione seu tamanho</span>
+          </div>
+          <div class="preview-widget-buttons">
+            <button type="button">Descubra seu tamanho</button>
+            <button type="button">Tabela de Medidas</button>
+          </div>
+          <div class="preview-size-table">
+            <div><strong>P</strong><span>84 - 90</span><span>66 - 72</span></div>
+            <div><strong>M</strong><span>90 - 96</span><span>72 - 78</span></div>
+            <div><strong>G</strong><span>96 - 104</span><span>78 - 86</span></div>
+          </div>
+          <a href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>
+        </div>
+
         <div class="subsection-heading">
           <h2>Codigo</h2>
           <span>{{ install?.sample_product?.sku || 'produto' }}</span>

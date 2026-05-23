@@ -83,6 +83,12 @@ class WidgetInstallController extends Controller
                     'primary' => '#0f172a',
                     'secondary' => '#ff4d5e',
                     'accent' => '#ff7a1a',
+                    'background' => '#ffffff',
+                    'text' => '#111827',
+                    'font_family' => 'Manrope, Inter, Arial, sans-serif',
+                    'font_size' => '14',
+                    'font_weight' => '800',
+                    'button_radius' => '8',
                 ],
                 'is_active' => true,
             ]
