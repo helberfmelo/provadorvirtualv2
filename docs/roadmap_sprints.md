@@ -613,3 +613,17 @@ Entregas:
 - reforçar que controles de formulário devem usar estilo global do portal.
 
 Status: implementado e testado localmente com `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=UserAccessApiTest` e `git diff --check`.
+
+### Sprint 49 - Padronização visual dos controles
+
+Objetivo: garantir que selects, inputs, textareas, checkboxes e botões dos portais SaaS e empresa usem estilos consistentes.
+
+Entregas:
+
+- ampliar o estilo global de `.form`, `.admin-form`, `.inline-form` e áreas equivalentes para textareas e selects;
+- padronizar estados de foco e desabilitado dos controles;
+- corrigir checkboxes herdando largura/altura de input comum;
+- estilizar textarea de Pix copia e cola fora de formulário administrativo;
+- manter botões operacionais dentro dos padrões `.btn`, `.icon-link`, `.row-actions`, `payment-tabs`, `size-picker` e previews do widget.
+
+Status: implementado e testado localmente com `npm run build` e `git diff --check`.

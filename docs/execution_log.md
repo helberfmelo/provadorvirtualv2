@@ -398,3 +398,11 @@
 - Aliases técnicos de API/importação foram preservados sem acento quando fazem parte do contrato de dados.
 - Corrigidos textos de e-mails transacionais padrão, páginas legais, checkout, landing, integrações, instalação, usuários e mensagens operacionais.
 - Validações locais: `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=UserAccessApiTest` e `git diff --check`.
+
+## 2026-05-23 - Sprint 49 Padronização visual dos controles
+
+- Revisados inputs, selects, textareas, botões, checkboxes e ações das telas SaaS e portal da empresa.
+- Estilos globais passaram a cobrir `.form`, `.admin-form`, `.inline-form`, `measure-grid` e textarea de Pix fora de formulário.
+- Estados de foco e desabilitado foram padronizados para evitar controles com aparência crua.
+- Checkboxes deixam de herdar largura e altura de input comum, preservando o visual compacto em permissões, widget e variações de produto.
+- Validações locais: `npm run build` e `git diff --check`.

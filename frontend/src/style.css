@@ -20,7 +20,8 @@ body {
 
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 
@@ -881,22 +882,84 @@ a {
 
 .form input,
 .form select,
+.form textarea,
 .measure-grid input,
+.measure-grid select,
+.measure-grid textarea,
 .admin-form input,
 .admin-form select,
 .admin-form textarea,
-.inline-form input {
+.inline-form input,
+.inline-form select,
+.inline-form textarea,
+.payment-box textarea {
   width: 100%;
   min-height: 42px;
   padding: 10px 12px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: #fff;
+  color: #0f172a;
 }
 
-.admin-form textarea {
+.form textarea,
+.admin-form textarea,
+.inline-form textarea,
+.payment-box textarea {
   min-height: 150px;
   resize: vertical;
+}
+
+.payment-box textarea {
+  min-height: 104px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.86rem;
+  line-height: 1.45;
+}
+
+.form input:focus,
+.form select:focus,
+.form textarea:focus,
+.measure-grid input:focus,
+.measure-grid select:focus,
+.measure-grid textarea:focus,
+.admin-form input:focus,
+.admin-form select:focus,
+.admin-form textarea:focus,
+.inline-form input:focus,
+.inline-form select:focus,
+.inline-form textarea:focus,
+.payment-box textarea:focus {
+  outline: 2px solid #bfdbfe;
+  outline-offset: 2px;
+  border-color: #1d4ed8;
+}
+
+.form input:disabled,
+.form select:disabled,
+.form textarea:disabled,
+.admin-form input:disabled,
+.admin-form select:disabled,
+.admin-form textarea:disabled,
+.inline-form input:disabled,
+.inline-form select:disabled,
+.inline-form textarea:disabled {
+  color: #6b7280;
+  background: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.form input[type="checkbox"],
+.admin-form input[type="checkbox"],
+.inline-form input[type="checkbox"],
+.table-wrap input[type="checkbox"] {
+  width: 18px;
+  min-width: 18px;
+  min-height: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 4px;
+  accent-color: #ff4d5e;
 }
 
 .form-error {
