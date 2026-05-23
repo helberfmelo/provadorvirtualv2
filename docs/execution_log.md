@@ -338,3 +338,4 @@
 - `Nova empresa` deixou de abrir preenchida com `Loja teste`.
 - Cadastro interno de empresa agora inicia com BigShop como plataforma padrao.
 - `Novo produto` deixou de abrir com categoria e tabela incompatibilizadas por padrao.
+- Run `26343135605` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.

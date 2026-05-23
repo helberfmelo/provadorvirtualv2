@@ -526,4 +526,4 @@ Entregas:
 - formulario `Novo produto` sem categoria/tabela incompatibilizadas por padrao;
 - nova validacao visual dos formularios em producao.
 
-Status: implementado localmente e pendente de publicacao pelo push desta sprint.
+Status: implementado, publicado e validado em producao no run `26343135605`.
