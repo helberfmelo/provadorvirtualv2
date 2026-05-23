@@ -68,6 +68,16 @@ Recomendado para primeiro deploy sem criar `.env` manualmente no servidor:
 
 Alternativa ao `PRODUCTION_ENV`: criar manualmente o arquivo `.env` em `/home1/opents62/public_html/provadorvirtual_v2` antes do primeiro deploy. O workflow preserva `.env` remoto quando o secret nao existir.
 
+## Bloqueios externos antes do primeiro Actions
+
+Em 2026-05-23, o workflow foi disparado no GitHub, mas o job nao iniciou porque a conta/repositorio estava bloqueado por billing/spending limit do GitHub Actions.
+
+Antes de validar deploy real, confirmar em GitHub:
+
+- Billing & plans sem pendencia de pagamento;
+- spending limit do GitHub Actions suficiente;
+- Actions habilitado para o repositorio privado.
+
 ## Secrets futuros conforme sprint
 
 IA:
