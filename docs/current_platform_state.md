@@ -30,7 +30,7 @@ Atualizado em: 2026-05-23
 - Sprint 31 criou automacoes de e-mail transacional, historico de envios e comando/scheduler para pendencias financeiras; publicado em producao no run `26338061259`.
 - Sprint 32 implementou refinamento da oferta publica, trava de integracao BigShop, favicon/OG, footer, imagens da loja teste e menu mobile em drawer; publicado em producao no run `26338411089`.
 - Sprint 33 completou login multiempresa, seletor de empresa no painel, escopo por empresa nas APIs do portal, enforcement de permissoes por rota e auditoria com empresa/modulo/acao; publicado em producao no run `26338888072`.
-- Sprint 34 criou guias de integracao por plataforma, snippets, checklist visual, matriz de dados suportados e validacao protegida de instalacao por URL publica.
+- Sprint 34 criou guias de integracao por plataforma, snippets, checklist visual, matriz de dados suportados e validacao protegida de instalacao por URL publica; publicado em producao no run `26339199751`.
 
 ## Referencias confirmadas
 
@@ -99,6 +99,7 @@ Atualizado em: 2026-05-23
 - Sprint 11 publicada em producao pelo GitHub Actions no run `26332960822`.
 - Sprint 12 publicada em producao pelo GitHub Actions no run `26333226813`.
 - Sprint 33 publicada em producao pelo GitHub Actions no run `26338888072`.
+- Sprint 34 publicada em producao pelo GitHub Actions no run `26339199751`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em producao usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que nao preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site publico comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

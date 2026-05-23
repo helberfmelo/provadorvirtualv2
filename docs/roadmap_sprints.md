@@ -416,7 +416,7 @@ Entregas:
 - validacao de dominio/snippet instalado;
 - matriz de dados suportados por plataforma.
 
-Status: implementado e testado localmente; aguardando publicacao da Sprint 34.
+Status: implementado, publicado e validado em producao no run `26339199751`.
 
 ### Sprint 35 - BigShop um clique em producao
 

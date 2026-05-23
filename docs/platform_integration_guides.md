@@ -19,6 +19,8 @@ Implementado:
 - auditoria `integration.install_validated`;
 - bloqueio mantido: contrato BigShop ve e valida apenas BigShop.
 
+Publicado e validado em producao no run `26339199751`.
+
 ## Checklist padrao
 
 Todo guia usa os mesmos pontos de validacao:
