@@ -35,8 +35,9 @@ Atualizado em: 2026-05-23
 ## Integracoes
 
 - `DONE` Cadastro manual de conexao por plataforma.
-- `TODO` BigShop probe.
-- `TODO` BigShop sync produtos/grades.
+- `DONE` BigShop probe.
+- `DONE` BigShop sync produtos/grades.
+- `DONE` BigShop sync tabela de medidas quando houver payload estruturado.
 - `TODO` BigShop um clique.
 - `DONE` Base do guia/snippet custom no painel.
 - `DONE` Tabelas `import_jobs` e `integration_events`.

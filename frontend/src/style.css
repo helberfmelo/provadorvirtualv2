@@ -795,7 +795,8 @@ textarea {
   gap: 10px;
 }
 
-.summary-strip span {
+.summary-strip span,
+.integration-report span {
   display: grid;
   min-width: 110px;
   padding: 12px;
@@ -804,13 +805,22 @@ textarea {
   background: #f9fafb;
 }
 
-.summary-strip strong {
+.summary-strip strong,
+.integration-report strong {
   color: #0f172a;
   font-size: 1.25rem;
 }
 
-.summary-strip small {
+.summary-strip small,
+.integration-report small {
   color: #6b7280;
+}
+
+.integration-report {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
 }
 
 .status-pill {

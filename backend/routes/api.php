@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\BigShopIntegrationController;
 use App\Http\Controllers\Api\V1\DemoProductController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\ImportController;
@@ -58,6 +59,8 @@ Route::prefix('v1')->group(function (): void {
         Route::patch('/widget-install', [WidgetInstallController::class, 'update']);
         Route::get('/integrations', [IntegrationController::class, 'index']);
         Route::patch('/integrations/{platform}', [IntegrationController::class, 'update']);
+        Route::post('/integrations/bigshop/probe', [BigShopIntegrationController::class, 'probe']);
+        Route::post('/integrations/bigshop/sync', [BigShopIntegrationController::class, 'sync']);
         Route::get('/imports', [ImportController::class, 'index']);
         Route::post('/imports/preview', [ImportController::class, 'preview']);
         Route::post('/imports', [ImportController::class, 'store']);

@@ -28,7 +28,10 @@ const platforms = ref<Platform[]>([])
 const selectedKey = ref('bigshop')
 const loading = ref(false)
 const saving = ref(false)
+const running = ref(false)
 const notice = ref('')
+const error = ref('')
+const integrationReport = ref<Record<string, number | string> | null>(null)
 
 const form = reactive({
   external_store_id: '',
@@ -63,6 +66,8 @@ async function loadPlatforms() {
 
 function selectPlatform(platform: Platform) {
   selectedKey.value = platform.key
+  integrationReport.value = null
+  error.value = ''
   fillForm(platform)
 }
 
@@ -81,6 +86,7 @@ async function savePlatform() {
 
   saving.value = true
   notice.value = ''
+  error.value = ''
 
   try {
     await api.patch(`/integrations/${selected.value.key}`, {
@@ -93,8 +99,46 @@ async function savePlatform() {
 
     notice.value = 'Integracao atualizada.'
     await loadPlatforms()
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Nao foi possivel salvar.'
   } finally {
     saving.value = false
+  }
+}
+
+async function probeBigShop() {
+  running.value = true
+  notice.value = ''
+  error.value = ''
+  integrationReport.value = null
+
+  try {
+    const { data } = await api.post('/integrations/bigshop/probe')
+    integrationReport.value = data.data
+    notice.value = 'Conexao BigShop validada.'
+    await loadPlatforms()
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Nao foi possivel validar a BigShop.'
+  } finally {
+    running.value = false
+  }
+}
+
+async function syncBigShop() {
+  running.value = true
+  notice.value = ''
+  error.value = ''
+  integrationReport.value = null
+
+  try {
+    const { data } = await api.post('/integrations/bigshop/sync')
+    integrationReport.value = data.data
+    notice.value = 'Produtos BigShop sincronizados.'
+    await loadPlatforms()
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Nao foi possivel sincronizar a BigShop.'
+  } finally {
+    running.value = false
   }
 }
 
@@ -119,6 +163,7 @@ function statusLabel(status: string) {
     </div>
 
     <p v-if="notice" class="success-message">{{ notice }}</p>
+    <p v-if="error" class="form-error">{{ error }}</p>
 
     <div v-if="loading" class="empty-state">Carregando integracoes...</div>
 
@@ -197,6 +242,33 @@ function statusLabel(status: string) {
             <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
             Salvar integracao
           </button>
+          <button
+            v-if="selected?.key === 'bigshop'"
+            class="btn btn-secondary"
+            type="button"
+            :disabled="running"
+            @click="probeBigShop"
+          >
+            <i class="fa-solid fa-signal" aria-hidden="true"></i>
+            Testar
+          </button>
+          <button
+            v-if="selected?.key === 'bigshop'"
+            class="btn btn-secondary"
+            type="button"
+            :disabled="running"
+            @click="syncBigShop"
+          >
+            <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+            Sincronizar
+          </button>
+        </div>
+
+        <div v-if="integrationReport" class="integration-report">
+          <span v-for="(value, key) in integrationReport" :key="key">
+            <strong>{{ value }}</strong>
+            <small>{{ key }}</small>
+          </span>
         </div>
       </form>
     </div>

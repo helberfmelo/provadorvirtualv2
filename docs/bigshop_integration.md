@@ -139,3 +139,22 @@ Usar uma loja BigShop controlada, com um produto de moda e pelo menos tres varia
 - pagina `/produto-teste` usando dados sincronizados;
 - widget no front BigShop por snippet;
 - depois planejar um clique.
+
+## Sprint 7 implementada
+
+Rotas protegidas:
+
+- `POST /api/v1/integrations/bigshop/probe`
+- `POST /api/v1/integrations/bigshop/sync`
+
+Comportamento:
+
+- probe chama `GET /v3/getEndPoints` com headers `x-api` e `store-id`;
+- sync chama `GET /v3/products`;
+- produtos BigShop sao upsertados em `products`;
+- grades sao upsertadas em `product_variants`;
+- quando o payload traz `measurement_table`, `tabela_de_medidas` ou `medidas` estruturado, o sistema cria/atualiza `measurement_tables`;
+- cada probe/sync registra `integration_events`;
+- relatorio retorna produtos, variacoes, tabelas sincronizadas e lacunas.
+
+Sem credencial real, validacao automatizada usa `Http::fake`. Para teste real ainda falta loja controlada, `store_id` e token `x-api`.

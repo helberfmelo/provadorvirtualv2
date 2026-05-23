@@ -121,6 +121,8 @@ Entregas:
 - mapeamento tabela de medidas quando disponivel;
 - relatorio de lacunas por loja.
 
+Status: implementado localmente; publicar e validar em producao.
+
 ## Sprint 8 - BigShop Um Clique
 
 Objetivo: definir e implementar primeiro caminho nativo.

@@ -73,6 +73,8 @@ npm run dev
 - `/api/v1/measurement-templates`
 - `/api/v1/widget-install`
 - `/api/v1/integrations`
+- `/api/v1/integrations/bigshop/probe`
+- `/api/v1/integrations/bigshop/sync`
 - `/api/v1/imports`
 - `/api/v1/imports/preview`
 - `/api/v1/public/recommendations/config-check`
@@ -141,3 +143,5 @@ Status Sprint 5: painel demo permite configurar widget e conexoes de plataforma 
 Em producao, o painel usa `VITE_API_BASE_URL=/provadorvirtual_v2/public/api/v1`. Localmente, manter `http://127.0.0.1:8000/api/v1`.
 
 Status Sprint 6: painel demo permite analisar e importar CSV de produtos, CSV de tabelas e feed Google XML inicial.
+
+Status Sprint 7: backend possui conector BigShop com probe/sync testados via `Http::fake`; tela de integracoes mostra acoes BigShop.

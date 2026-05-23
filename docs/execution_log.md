@@ -95,6 +95,16 @@
 - Run `26331691701` do GitHub Actions finalizou com sucesso para o commit `2c9279b`.
 - Validado em producao: `/app/importacoes`, `GET /public/api/v1/imports` e `POST /public/api/v1/imports/preview`.
 
+## 2026-05-23 - Sprint 7 Integracao BigShop Base
+
+- Criado `BigShopClient` para chamadas `GET /v3/getEndPoints` e `GET /v3/products`.
+- Criado `BigShopSyncService` para probe, sync de produtos, grades e tabelas de medidas estruturadas.
+- Criados endpoints protegidos `/api/v1/integrations/bigshop/probe` e `/api/v1/integrations/bigshop/sync`.
+- Sync cria/atualiza `products`, `product_variants`, `measurement_tables` e registra `integration_events`.
+- Tela `/app/integracoes` passou a mostrar acoes de testar e sincronizar para BigShop.
+- Criados testes `BigShopIntegrationTest` com `Http::fake`.
+- Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build` e smoke de erro controlado `422` sem conexao BigShop.
+
 ## Pendencias abertas
 
 - Repositorio esta publico para manter a cota do GitHub Actions disponivel.
