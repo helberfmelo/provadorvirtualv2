@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\V1\Concerns\ResolvesMerchant;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePlatformConnectionRequest;
+use App\Http\Resources\ImportJobResource;
 use App\Http\Resources\PlatformConnectionResource;
 use App\Models\IntegrationEvent;
 use App\Models\Merchant;
@@ -12,6 +13,7 @@ use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Models\WidgetInstall;
 use App\Services\Audit\AuditLogger;
+use App\Services\Imports\ImportService;
 use App\Support\ActiveTenant;
 use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
@@ -20,6 +22,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Throwable;
 
 class IntegrationController extends Controller
 {
@@ -72,6 +75,8 @@ class IntegrationController extends Controller
             'merchant_company_id' => $company?->id,
             'external_store_id' => $data['external_store_id'] ?? $connection->external_store_id,
             'api_base_url' => $data['api_base_url'] ?? $connection->api_base_url,
+            'feed_url' => $data['feed_url'] ?? $connection->feed_url,
+            'feed_format' => $data['feed_format'] ?? $connection->feed_format ?? 'google_xml',
             'status' => $data['status'] ?? $this->statusFor($data, $connection->status),
             'last_error' => null,
         ]);
@@ -98,11 +103,125 @@ class IntegrationController extends Controller
             'status' => $connection->status,
             'has_access_token' => filled($connection->access_token_encrypted),
             'has_webhook_secret' => filled($connection->webhook_secret_encrypted),
+            'has_feed_url' => filled($connection->feed_url),
         ], $connection);
 
         return (new PlatformConnectionResource($connection->refresh()))
             ->response()
             ->setStatusCode(200);
+    }
+
+    public function syncXml(Request $request, string $platform, ImportService $imports)
+    {
+        if (! PlatformCatalog::find($platform)) {
+            throw new NotFoundHttpException('Integracao nao encontrada.');
+        }
+
+        $merchant = $this->currentMerchant($request);
+        $company = $this->activeCompany($request, $merchant);
+        $this->guardPlatformAllowed($company, $platform);
+
+        $connection = PlatformConnection::query()
+            ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->where('platform', $platform)
+            ->orderByRaw('merchant_company_id is null')
+            ->first();
+
+        if (! $connection) {
+            throw ValidationException::withMessages([
+                'feed_url' => ['Salve a integracao com uma URL de XML/feed antes de sincronizar.'],
+            ]);
+        }
+
+        $feedUrl = $this->publicUrl($connection->feed_url, 'feed_url', 'Informe a URL publica do XML/feed antes de sincronizar.');
+        $host = (string) parse_url($feedUrl, PHP_URL_HOST);
+        $httpStatus = null;
+        $job = null;
+        $error = null;
+        $status = 'failed';
+
+        try {
+            $response = Http::timeout(30)->retry(1, 200)->get($feedUrl);
+            $httpStatus = $response->status();
+
+            if (! $response->successful()) {
+                throw new \RuntimeException('O XML/feed respondeu HTTP '.$httpStatus.'.');
+            }
+
+            $job = $imports->commit($merchant, $connection->merchant_company_id
+                ? $this->merchantCompany($merchant, $connection->merchant_company_id)
+                : $company, [
+                    'type' => 'products',
+                    'source_format' => $connection->feed_format ?: 'google_xml',
+                    'filename' => $feedUrl,
+                    'content' => (string) $response->body(),
+                ]);
+
+            $status = in_array($job->status, ['completed', 'completed_with_warnings'], true)
+                ? ($job->status === 'completed' ? 'success' : 'warning')
+                : 'failed';
+
+            $connection->update([
+                'status' => $status === 'failed' ? 'error' : 'connected',
+                'last_sync_at' => now(),
+                'last_error' => $status === 'failed' ? 'Importacao XML finalizada com erro.' : null,
+            ]);
+
+            if ($status === 'failed') {
+                $error = data_get($job->errors, '0.errors.0') ?: 'Importacao XML finalizada com erro.';
+            }
+        } catch (Throwable $exception) {
+            $error = $exception->getMessage();
+            $connection->update([
+                'status' => 'error',
+                'last_error' => $error,
+            ]);
+        }
+
+        IntegrationEvent::query()->create([
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $connection->merchant_company_id ?: $company?->id,
+            'platform_connection_id' => $connection->id,
+            'platform' => $platform,
+            'event_type' => 'xml_feed_sync',
+            'direction' => 'outbound',
+            'status' => $status,
+            'summary' => [
+                'feed_host' => $host,
+                'feed_url' => $feedUrl,
+                'http_status' => $httpStatus,
+                'import_job_id' => $job?->id,
+                'import_status' => $job?->status,
+                'total_rows' => $job?->total_rows,
+                'imported_rows' => $job?->imported_rows,
+                'failed_rows' => $job?->failed_rows,
+                'summary' => $job?->summary ?? [],
+            ],
+            'error' => $error,
+            'occurred_at' => now(),
+        ]);
+
+        app(AuditLogger::class)->log($request, $merchant, 'integration.xml_synced', 'integrations', 'info', [
+            'platform' => $platform,
+            'merchant_company_id' => $connection->merchant_company_id ?: $company?->id,
+            'module' => 'integrations',
+            'action' => 'sync_xml',
+            'status' => $status,
+            'feed_host' => $host,
+        ], $connection);
+
+        if ($error) {
+            throw ValidationException::withMessages([
+                'feed_url' => [$error],
+            ]);
+        }
+
+        return response()->json([
+            'data' => array_merge((new ImportJobResource($job))->resolve(), [
+                'connection_status' => $connection->refresh()->status,
+            ]),
+        ]);
     }
 
     public function validateInstall(Request $request, string $platform)
@@ -192,7 +311,12 @@ class IntegrationController extends Controller
 
     private function statusFor(array $data, ?string $fallback): string
     {
-        if (! empty($data['external_store_id']) || ! empty($data['api_base_url']) || ! empty($data['access_token'])) {
+        if (
+            ! empty($data['external_store_id'])
+            || ! empty($data['api_base_url'])
+            || ! empty($data['access_token'])
+            || ! empty($data['feed_url'])
+        ) {
             return 'configured';
         }
 
@@ -232,6 +356,19 @@ class IntegrationController extends Controller
             ]);
         }
 
+        return $this->publicUrl($value, 'url', 'Informe uma URL publica valida.');
+    }
+
+    private function publicUrl(?string $url, string $field, string $message): string
+    {
+        $value = trim((string) $url);
+
+        if ($value === '') {
+            throw ValidationException::withMessages([
+                $field => [$message],
+            ]);
+        }
+
         if (! Str::startsWith($value, ['http://', 'https://'])) {
             $value = 'https://'.$value;
         }
@@ -240,7 +377,7 @@ class IntegrationController extends Controller
 
         if (! filter_var($value, FILTER_VALIDATE_URL) || ! is_string($host) || $host === '') {
             throw ValidationException::withMessages([
-                'url' => ['Informe uma URL publica valida.'],
+                $field => ['Informe uma URL publica valida.'],
             ]);
         }
 
@@ -251,7 +388,7 @@ class IntegrationController extends Controller
 
         if (in_array($host, $blockedHosts, true) || str_ends_with($host, '.local') || ! $isPublicIp) {
             throw ValidationException::withMessages([
-                'url' => ['Use uma URL publica da loja para validar a instalacao.'],
+                $field => ['Use uma URL publica da loja.'],
             ]);
         }
 

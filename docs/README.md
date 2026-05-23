@@ -14,27 +14,28 @@ Antes de desenvolver qualquer sprint, ajuste, correcao ou deploy, reler nesta or
 5. `docs/technical_architecture.md`
 6. `docs/widget_integration.md`
 7. `docs/platform_integration_guides.md`
-8. `docs/imports_data_quality.md`
-9. `docs/ai_assistant.md`
-10. `docs/v1_intelligence_migration.md`
-11. `docs/sizebay_benchmark.md`
-12. `docs/data_learning_lgpd_outliers.md`
-13. `docs/analytics_admin.md`
-14. `docs/user_access_permissions.md`
-15. `docs/portal_ui_guidelines.md`
-16. `docs/transactional_email_automation.md`
-17. `docs/hardening_lgpd_observability.md`
-18. `docs/go_live_cutover.md`
-19. `docs/bigshop_integration.md`
-20. `docs/bigshop_one_click_contract.md`
-21. `docs/commercial_pilot_package.md`
-22. `docs/deploy_runbook.md`
-23. `docs/sprint_governance.md`
-24. `docs/roadmap_sprints.md`
-25. `docs/intelligent_sizing_roadmap.md`
-26. `docs/product_backlog.md`
-27. `docs/security_compliance.md`
-28. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
+8. `docs/platform_integration_research_roadmap.md`
+9. `docs/imports_data_quality.md`
+10. `docs/ai_assistant.md`
+11. `docs/v1_intelligence_migration.md`
+12. `docs/sizebay_benchmark.md`
+13. `docs/data_learning_lgpd_outliers.md`
+14. `docs/analytics_admin.md`
+15. `docs/user_access_permissions.md`
+16. `docs/portal_ui_guidelines.md`
+17. `docs/transactional_email_automation.md`
+18. `docs/hardening_lgpd_observability.md`
+19. `docs/go_live_cutover.md`
+20. `docs/bigshop_integration.md`
+21. `docs/bigshop_one_click_contract.md`
+22. `docs/commercial_pilot_package.md`
+23. `docs/deploy_runbook.md`
+24. `docs/sprint_governance.md`
+25. `docs/roadmap_sprints.md`
+26. `docs/intelligent_sizing_roadmap.md`
+27. `docs/product_backlog.md`
+28. `docs/security_compliance.md`
+29. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
 
 Nenhuma sprint deve comecar sem essa releitura.
 

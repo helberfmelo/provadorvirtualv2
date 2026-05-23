@@ -139,14 +139,31 @@ class ImportService
 
         foreach ($items as $index => $item) {
             $google = isset($namespaces['g']) ? $item->children($namespaces['g']) : null;
+            $itemId = $this->xmlText($google?->id) ?: $this->xmlText($item->id);
+            $groupId = $this->xmlText($google?->item_group_id);
+            $parentId = $groupId ?: $itemId;
+            $variantSku = $this->xmlText($google?->mpn) ?: $itemId;
+
             $rows[] = [
                 '_line' => $index + 1,
-                'external_product_id' => $this->xmlText($google?->id) ?: $this->xmlText($item->id),
-                'sku' => $this->xmlText($google?->mpn) ?: $this->xmlText($google?->id) ?: $this->xmlText($item->id),
+                'external_product_id' => $parentId,
+                'external_variant_id' => $itemId,
+                'sku' => $parentId,
+                'variant_sku' => $variantSku,
                 'name' => $this->xmlText($item->title) ?: $this->xmlText($google?->title),
                 'description' => $this->xmlText($item->description),
                 'category' => $this->xmlText($google?->product_type) ?: $this->xmlText($google?->google_product_category),
-                'image_url' => $this->xmlText($google?->image_link) ?: $this->xmlText($item->link),
+                'gender' => $this->normalizeGender($this->xmlText($google?->gender)),
+                'age_group' => $this->xmlText($google?->age_group),
+                'brand' => $this->xmlText($google?->brand),
+                'size_label' => $this->xmlText($google?->size),
+                'color' => $this->xmlText($google?->color),
+                'image_url' => $this->xmlText($google?->image_link),
+                'public_url' => $this->xmlText($item->link),
+                'availability' => $this->xmlText($google?->availability),
+                'stock_quantity' => $this->xmlText($google?->quantity)
+                    ?: $this->xmlText($google?->stock_quantity)
+                    ?: $this->xmlText($google?->stock),
                 'price' => preg_replace('/[^0-9.,]/', '', $this->xmlText($google?->price)),
             ];
         }
@@ -195,10 +212,19 @@ class ImportService
                     'gender' => $this->value($row, ['gender', 'genero']),
                     'fit_profile' => $this->value($row, ['fit_profile', 'modelagem']),
                     'size_label' => $size,
+                    'external_variant_id' => $this->value($row, ['external_variant_id', 'variant_id', 'id_variacao']),
                     'variant_sku' => $this->value($row, ['variant_sku', 'grade_sku']) ?: ($size ? trim($sku.'-'.$size, '-') : null),
+                    'color' => $this->value($row, ['color', 'cor']),
                     'price' => $this->decimal($this->value($row, ['price', 'preco'])),
                     'stock_quantity' => $this->integer($this->value($row, ['stock_quantity', 'stock', 'estoque'])),
+                    'availability' => $this->value($row, ['availability', 'disponibilidade']),
+                    'is_active' => $this->availabilityIsActive($this->value($row, ['availability', 'disponibilidade'])),
                     'measurement_table' => $this->value($row, ['measurement_table', 'table_name', 'tabela']),
+                    'description' => $this->value($row, ['description', 'descricao']),
+                    'image_url' => $this->value($row, ['image_url', 'imagem']),
+                    'public_url' => $this->value($row, ['public_url', 'link', 'url']),
+                    'age_group' => $this->value($row, ['age_group', 'faixa_etaria']),
+                    'brand' => $this->value($row, ['brand', 'marca']),
                 ],
             ];
         }
@@ -300,25 +326,42 @@ class ImportService
                 'external_product_id' => $data['external_product_id'] ?? $product->external_product_id,
                 'sku' => $data['sku'] ?? $product->sku,
                 'name' => $data['name'],
+                'description' => $data['description'] ?? $product->description,
                 'category' => $data['category'] ?? $product->category,
                 'gender' => $data['gender'] ?? $product->gender ?? 'unisex',
                 'fit_profile' => $data['fit_profile'] ?? $product->fit_profile ?? 'regular',
                 'status' => 'active',
-                'metadata' => array_merge($product->metadata ?? [], ['last_imported_at' => now()->toISOString()]),
+                'image_url' => $data['image_url'] ?? $product->image_url,
+                'metadata' => array_merge($product->metadata ?? [], array_filter([
+                    'last_imported_at' => now()->toISOString(),
+                    'public_url' => $data['public_url'] ?? null,
+                    'brand' => $data['brand'] ?? null,
+                    'age_group' => $data['age_group'] ?? null,
+                ], fn ($value): bool => $value !== null && $value !== '')),
             ]);
             $product->save();
             $imported++;
 
             if ($data['size_label'] ?? null) {
+                $variantMatch = $this->variantMatch($data);
+
                 $product->variants()->updateOrCreate(
-                    ['size_label' => $data['size_label']],
+                    $variantMatch,
                     [
                         'merchant_id' => $merchant->id,
                         'merchant_company_id' => $company?->id,
+                        'external_variant_id' => $data['external_variant_id'] ?? null,
                         'sku' => $data['variant_sku'] ?? null,
+                        'size_label' => $data['size_label'],
+                        'color' => $data['color'] ?? null,
                         'price' => $data['price'] ?? null,
                         'stock_quantity' => $data['stock_quantity'] ?? null,
-                        'is_active' => true,
+                        'is_active' => $data['is_active'] ?? true,
+                        'metadata' => array_filter([
+                            'last_imported_at' => now()->toISOString(),
+                            'public_url' => $data['public_url'] ?? null,
+                            'availability' => $data['availability'] ?? null,
+                        ], fn ($value): bool => $value !== null && $value !== ''),
                     ]
                 );
             }
@@ -418,11 +461,61 @@ class ImportService
         return (int) preg_replace('/[^0-9-]/', '', $value);
     }
 
+    private function availabilityIsActive(?string $value): ?bool
+    {
+        if (! $value) {
+            return null;
+        }
+
+        $availability = Str::of($value)->trim()->lower()->ascii()->replace(['_', '-'], ' ')->toString();
+
+        return match ($availability) {
+            'out of stock', 'unavailable', 'indisponivel', 'sem estoque' => false,
+            'in stock', 'available', 'em estoque', 'disponivel', 'preorder', 'pre order' => true,
+            default => null,
+        };
+    }
+
     private function xmlText(mixed $value): ?string
     {
         $text = trim((string) $value);
 
         return $text === '' ? null : $text;
+    }
+
+    private function normalizeGender(?string $value): ?string
+    {
+        if (! $value) {
+            return null;
+        }
+
+        $gender = Str::of($value)->trim()->lower()->ascii()->toString();
+
+        return match ($gender) {
+            'f', 'feminino', 'female' => 'female',
+            'm', 'masculino', 'male' => 'male',
+            'unissex', 'unisex' => 'unisex',
+            default => $gender,
+        };
+    }
+
+    private function variantMatch(array $data): array
+    {
+        if (! empty($data['external_variant_id'])) {
+            return ['external_variant_id' => $data['external_variant_id']];
+        }
+
+        if (! empty($data['variant_sku'])) {
+            return ['sku' => $data['variant_sku']];
+        }
+
+        $match = ['size_label' => $data['size_label']];
+
+        if (! empty($data['color'])) {
+            $match['color'] = $data['color'];
+        }
+
+        return $match;
     }
 
     private function productExists(Merchant $merchant, ?string $sku): bool

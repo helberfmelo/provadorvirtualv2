@@ -1755,6 +1755,63 @@ textarea {
   font-weight: 600;
 }
 
+.field-label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  width: fit-content;
+  color: #374151;
+  font-weight: 800;
+}
+
+.info-tooltip {
+  position: relative;
+  display: inline-grid;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  place-items: center;
+  border: 1px solid #bfdbfe;
+  border-radius: 999px;
+  color: #0f172a;
+  background: #dbeafe;
+  font-size: 0.72rem;
+  font-weight: 900;
+  line-height: 1;
+  cursor: help;
+}
+
+.info-tooltip::after {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 8px);
+  z-index: 30;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 42px));
+  padding: 9px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  color: #f8fafc;
+  background: #0f172a;
+  box-shadow: 0 14px 34px rgba(15, 23, 42, 0.18);
+  content: attr(data-tooltip);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.45;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(4px);
+  transition: opacity 140ms ease, transform 140ms ease;
+  white-space: normal;
+}
+
+.info-tooltip:hover::after,
+.info-tooltip:focus::after {
+  opacity: 1;
+  transform: translateY(0);
+}
+
 .install-preview,
 .platform-list {
   border: 1px solid #e5e7eb;

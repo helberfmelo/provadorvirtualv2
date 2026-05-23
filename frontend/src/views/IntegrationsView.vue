@@ -8,6 +8,8 @@ type PlatformConnection = {
   platform: string
   external_store_id: string | null
   api_base_url: string | null
+  feed_url: string | null
+  feed_format: string | null
   status: string
   has_access_token: boolean
   has_webhook_secret: boolean
@@ -77,6 +79,8 @@ const bigShopActivations = ref<BigShopActivation[]>([])
 const form = reactive({
   external_store_id: '',
   api_base_url: '',
+  feed_url: '',
+  feed_format: 'google_xml',
   status: 'draft',
   access_token: '',
   webhook_secret: '',
@@ -84,10 +88,23 @@ const form = reactive({
 })
 
 const selected = computed(() => platforms.value.find((platform) => platform.key === selectedKey.value) || platforms.value[0] || null)
+const feedPlaceholder = computed(() => selected.value?.key === 'bigshop'
+  ? 'https://dominio-da-loja.com.br/feed.xml'
+  : 'https://loja.com.br/feed.xml')
 const isBigShopContract = computed(() => {
   return auth.activeCompany?.platform === 'bigshop'
     || (platforms.value.length === 1 && platforms.value[0]?.key === 'bigshop')
 })
+const fieldHelp = {
+  external_store_id: 'Informe o identificador da loja na plataforma. Na BigShop, use o store_id da loja.',
+  api_base_url: 'Informe a URL base da API quando a plataforma tiver API autenticada. Na BigShop, use a API V3.',
+  feed_url: 'Informe a URL publica do catalogo XML/Google Merchant. Na BigShop, normalmente e o dominio da loja seguido de /feed.xml.',
+  status: 'Controle o estado operacional desta integracao no Provador Virtual.',
+  access_token: 'Cole o token ou chave de API da plataforma. O valor fica criptografado e nao volta a aparecer no formulario.',
+  webhook_secret: 'Informe o segredo usado para validar webhooks assinados, quando a plataforma enviar eventos ao Provador Virtual.',
+  validation_url: 'Informe uma pagina publica de produto para confirmar se o container, script e identificadores do widget foram instalados.',
+  validation_action: 'Rode a validacao da pagina informada e veja o checklist tecnico de instalacao.',
+}
 
 onMounted(() => {
   loadPlatforms()
@@ -123,6 +140,8 @@ function selectPlatform(platform: Platform) {
 function fillForm(platform = selected.value) {
   form.external_store_id = platform?.connection?.external_store_id || ''
   form.api_base_url = platform?.connection?.api_base_url || ''
+  form.feed_url = platform?.connection?.feed_url || ''
+  form.feed_format = platform?.connection?.feed_format || 'google_xml'
   form.status = platform?.connection?.status || platform?.status || 'draft'
   form.access_token = ''
   form.webhook_secret = ''
@@ -141,6 +160,8 @@ async function savePlatform() {
     await api.patch(`/integrations/${selected.value.key}`, {
       external_store_id: form.external_store_id || null,
       api_base_url: form.api_base_url || null,
+      feed_url: form.feed_url || null,
+      feed_format: form.feed_format || 'google_xml',
       status: form.status,
       access_token: form.access_token || undefined,
       webhook_secret: form.webhook_secret || undefined,
@@ -186,6 +207,40 @@ async function syncBigShop() {
     await loadPlatforms()
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Nao foi possivel sincronizar a BigShop.'
+  } finally {
+    running.value = false
+  }
+}
+
+async function syncXmlFeed() {
+  if (!selected.value) {
+    return
+  }
+
+  running.value = true
+  notice.value = ''
+  error.value = ''
+  integrationReport.value = null
+
+  try {
+    const { data } = await api.post(`/integrations/${selected.value.key}/sync-xml`)
+    const job = data.data
+    integrationReport.value = {
+      status: job.status,
+      total_rows: job.total_rows,
+      imported_rows: job.imported_rows,
+      failed_rows: job.failed_rows,
+      products: job.summary?.products || 0,
+      variants: job.summary?.variants || 0,
+    }
+    notice.value = job.status === 'completed'
+      ? 'XML sincronizado.'
+      : 'XML sincronizado com avisos.'
+    await loadPlatforms()
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message
+      || requestError.response?.data?.errors?.feed_url?.[0]
+      || 'Nao foi possivel sincronizar o XML.'
   } finally {
     running.value = false
   }
@@ -319,15 +374,31 @@ function checkIcon(key: string) {
 
         <div class="form-grid">
           <label>
-            Loja
+            <span class="field-label">
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.external_store_id" :title="fieldHelp.external_store_id" :data-tooltip="fieldHelp.external_store_id">i</span>
+              Loja
+            </span>
             <input v-model="form.external_store_id" maxlength="120" />
           </label>
           <label>
-            URL da API
+            <span class="field-label">
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.api_base_url" :title="fieldHelp.api_base_url" :data-tooltip="fieldHelp.api_base_url">i</span>
+              URL da API
+            </span>
             <input v-model="form.api_base_url" type="url" maxlength="255" />
           </label>
           <label>
-            Status
+            <span class="field-label">
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.feed_url" :title="fieldHelp.feed_url" :data-tooltip="fieldHelp.feed_url">i</span>
+              URL do XML/feed
+            </span>
+            <input v-model="form.feed_url" type="text" inputmode="url" maxlength="255" :placeholder="feedPlaceholder" />
+          </label>
+          <label>
+            <span class="field-label">
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.status" :title="fieldHelp.status" :data-tooltip="fieldHelp.status">i</span>
+              Status
+            </span>
             <select v-model="form.status">
               <option value="draft">Rascunho</option>
               <option value="configured">Configurada</option>
@@ -336,11 +407,17 @@ function checkIcon(key: string) {
             </select>
           </label>
           <label>
-            Token
+            <span class="field-label">
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.access_token" :title="fieldHelp.access_token" :data-tooltip="fieldHelp.access_token">i</span>
+              Token
+            </span>
             <input v-model="form.access_token" autocomplete="off" />
           </label>
           <label>
-            Webhook secret
+            <span class="field-label">
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.webhook_secret" :title="fieldHelp.webhook_secret" :data-tooltip="fieldHelp.webhook_secret">i</span>
+              Webhook secret
+            </span>
             <input v-model="form.webhook_secret" autocomplete="off" />
           </label>
         </div>
@@ -387,11 +464,17 @@ function checkIcon(key: string) {
 
         <div class="form-grid">
           <label>
-            URL para validar
+            <span class="field-label">
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_url" :title="fieldHelp.validation_url" :data-tooltip="fieldHelp.validation_url">i</span>
+              URL para validar
+            </span>
             <input v-model="form.validation_url" type="url" placeholder="https://loja.com.br/produto" />
           </label>
           <label class="inline-action-label">
-            Validacao
+            <span class="field-label">
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_action" :title="fieldHelp.validation_action" :data-tooltip="fieldHelp.validation_action">i</span>
+              Validacao
+            </span>
             <button class="btn btn-secondary" type="button" :disabled="validating" @click="validateInstall">
               <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
               {{ validating ? 'Validando...' : 'Validar instalacao' }}
@@ -436,6 +519,15 @@ function checkIcon(key: string) {
           <button class="btn btn-primary" type="submit" :disabled="saving">
             <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
             Salvar integracao
+          </button>
+          <button
+            class="btn btn-secondary"
+            type="button"
+            :disabled="running || !selected?.connection?.feed_url"
+            @click="syncXmlFeed"
+          >
+            <i class="fa-solid fa-file-code" aria-hidden="true"></i>
+            Sincronizar XML
           </button>
           <button
             v-if="selected?.key === 'bigshop'"

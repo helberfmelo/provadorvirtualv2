@@ -14,6 +14,7 @@ Rotas protegidas por Sanctum:
 - `GET /api/v1/imports/{importJob}`
 - `POST /api/v1/imports/preview`
 - `POST /api/v1/imports`
+- `POST /api/v1/integrations/{platform}/sync-xml`, busca `feed_url` salvo na integracao e cria um import job de produtos
 
 Payload base:
 
@@ -69,18 +70,35 @@ Regras:
 
 ## Google Shopping XML
 
-Parser inicial para produtos le campos comuns:
+Parser de produtos le campos comuns:
 
 - `g:id`
+- `g:item_group_id`
 - `g:mpn`
 - `title`
 - `description`
 - `g:product_type`
 - `g:google_product_category`
 - `g:image_link`
+- `link`
+- `g:gender`
+- `g:age_group`
+- `g:brand`
+- `g:size`
+- `g:color`
+- `g:availability`
 - `g:price`
 
-Nao cria grade completa quando o feed nao informa tamanho. O objetivo inicial e acelerar cadastro e permitir completar grade/tabela no painel.
+Mapeamento:
+
+- `g:item_group_id` vira o produto pai quando existir.
+- `g:id` vira a variacao.
+- `g:size` cria ou atualiza `product_variants.size_label`.
+- `g:color` cria ou atualiza `product_variants.color`.
+- `g:availability` controla `product_variants.is_active` quando vier como `in stock` ou `out of stock`.
+- `link`, `g:brand` e `g:age_group` ficam em metadata.
+
+Nao cria grade completa quando o feed nao informa tamanho. Nesse caso, o catalogo entra como produto e a grade/tabela deve ser completada no painel ou por API.
 
 ## Jobs e logs
 

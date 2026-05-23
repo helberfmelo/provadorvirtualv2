@@ -52,6 +52,8 @@ Campos em `platform_connections`:
 - `platform = bigshop`;
 - `external_store_id`;
 - `api_base_url`;
+- `feed_url`, fallback recomendado `https://dominio-da-loja/feed.xml`;
+- `feed_format`, inicialmente `google_xml`;
 - `access_token_encrypted`;
 - `webhook_secret_encrypted`;
 - `status`;
@@ -61,6 +63,13 @@ Campos em `platform_connections`:
 O token deve ser write-only: salvar criptografado, nunca retornar em texto.
 
 ## Mapeamento canonico
+
+Premissas BigShop confirmadas pelo dono da plataforma em 2026-05-23:
+
+- no XML, `g:id` e sempre o ID da grade/variacao;
+- no XML, `g:item_group_id` e sempre o ID do produto pai;
+- a BigShop consegue garantir `g:size`, `g:color`, `g:gender`, `g:product_type`, estoque/disponibilidade e `link` em 100% dos feeds de moda;
+- o ponto oficial para instalacao automatica sera `produto.vue` da model3 plano pro, em sprint futura no repositorio BigShop correto.
 
 BigShop produto:
 
@@ -79,6 +88,27 @@ BigShop grade:
 - `cor`/`cornome` -> cor;
 - `estoque` -> estoque informativo;
 - `preco` -> preco informativo.
+
+BigShop XML Google Merchant:
+
+- `g:item_group_id` -> `external_product_id` e SKU pai quando existir;
+- `g:id` -> `external_variant_id` e SKU da variante quando `g:mpn` nao existir;
+- `g:size` -> `size_label`;
+- `g:color` -> cor;
+- `g:gender` -> genero;
+- `g:product_type` ou `g:google_product_category` -> categoria;
+- `g:availability` ou campo de estoque BigShop -> disponibilidade da variacao;
+- `g:image_link` -> imagem;
+- `link` -> URL publica do produto em metadata.
+
+## Validacao Luna Moda Festa
+
+Em 2026-05-23, a loja Luna Moda Festa foi usada como piloto controlado sem registrar credenciais neste documento:
+
+- feed publico `https://www.lunamodafesta.com.br/feed.xml` respondeu HTTP 200;
+- o XML veio como RSS Google Merchant com namespace `g`;
+- os itens continham `g:id`, `g:item_group_id`, `g:gender`, `g:product_type`, `g:color`, `g:size`, `g:image_link` e `link`;
+- a API V3 respondeu para `getEndPoints`, `products` e `product_grids` com store_id/token informados fora da documentacao.
 
 ## Integracao de um clique
 
@@ -124,10 +154,30 @@ Enquanto o um clique nao existir, gerar snippet no painel Provador Virtual com:
 - paginacao e filtros oficiais;
 - endpoint claro para grades por produto;
 - payload estruturado de tabela de medidas;
-- webhook de produto/grade alterados;
+- webhook de produto/grade alterados, se quisermos sync quase em tempo real;
 - sandbox;
 - limites/rate limit;
 - formato padrao de erros.
+
+## Pedidos, trocas e devolucoes
+
+Pedidos, trocas e devolucoes nao sao obrigatorios para o Provador Virtual funcionar no PDP. O fluxo essencial e:
+
+1. catalogo de produto/grade;
+2. tabela de medidas;
+3. widget na pagina de produto com produto, variacao e SKU corretos.
+
+A integracao de pedidos/trocas/devolucoes entra em uma fase posterior de analytics e aprendizado, parecida com a abordagem da Sizebay. Ela permite medir conversao, add-to-cart, compra, troca/devolucao por tamanho e qualidade da recomendacao. Portanto, para BigShop piloto, isso pode ficar fora do escopo inicial.
+
+## Padrao simples de assinatura
+
+Para ativacao one-click e qualquer webhook futuro, usar o padrao simples ja documentado:
+
+- `X-BigShop-Timestamp`: Unix timestamp;
+- `X-BigShop-Signature`: `sha256=<hmac>`;
+- base da assinatura: `timestamp + "." + raw_body`;
+- algoritmo: HMAC-SHA256;
+- segredo: um unico secret configurado no SaaS e na BigShop.
 
 ## Primeiro teste recomendado
 

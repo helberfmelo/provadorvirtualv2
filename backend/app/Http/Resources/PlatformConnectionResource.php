@@ -15,6 +15,8 @@ class PlatformConnectionResource extends JsonResource
             'platform' => $this->platform,
             'external_store_id' => $this->external_store_id,
             'api_base_url' => $this->api_base_url,
+            'feed_url' => $this->feed_url,
+            'feed_format' => $this->feed_format ?: 'google_xml',
             'status' => $this->status,
             'has_access_token' => filled($this->access_token_encrypted),
             'has_webhook_secret' => filled($this->webhook_secret_encrypted),
