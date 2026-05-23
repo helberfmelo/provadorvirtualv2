@@ -77,7 +77,7 @@ Entregas:
 - pagina `/produto-teste` usando widget real;
 - guia custom/Shopify/WooCommerce/Nuvemshop.
 
-Status: implementado com asset publico versionado e `/produto-teste` usando o widget real; aguardando deploy verde para encerrar a sprint.
+Status: concluido e publicado em producao no run `26331199145`.
 
 ## Sprint 5 - Painel do Lojista
 

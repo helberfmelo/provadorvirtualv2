@@ -62,6 +62,8 @@
 - Pagina `/produto-teste` passou a carregar o mesmo snippet publico usado por lojas externas.
 - Smoke do GitHub Actions passou a validar entrega do JS/CSS do widget.
 - Validacoes locais: `php artisan test`, `npm run build`, YAML do workflow e asset test `WidgetAssetTest`.
+- Run `26331199145` do GitHub Actions finalizou com sucesso para o commit `06144cf`.
+- Validado em producao: JS/CSS do widget e `/produto-teste`.
 
 ## Pendencias abertas
 
