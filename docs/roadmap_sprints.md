@@ -165,7 +165,7 @@ Entregas:
 - painel SaaS para lojistas;
 - audit logs.
 
-Status: implementado localmente; publicar e validar em producao.
+Status: concluido e publicado em producao no run `26332544138`.
 
 ## Sprint 11 - Hardening, LGPD e Observabilidade
 

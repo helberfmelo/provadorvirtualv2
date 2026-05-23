@@ -146,6 +146,8 @@
 - Criado documento `docs/analytics_admin.md`.
 - Criados testes `AnalyticsApiTest` e `SaasAdminApiTest`.
 - Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build`, `php artisan route:list --path=api/v1/analytics`, `php artisan route:list --path=api/v1/saas`, `git diff --check` e smoke local com analytics 200 e SaaS 403 para lojista comum.
+- Run `26332544138` do GitHub Actions finalizou com sucesso para o commit `4f93032`.
+- Validado em producao: `/app/analytics`, `/saas`, `GET /public/api/v1/analytics/recommendations` e `GET /public/api/v1/saas/overview` retornando `403` para lojista comum.
 
 ## Pendencias abertas
 
