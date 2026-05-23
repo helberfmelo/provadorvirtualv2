@@ -135,7 +135,7 @@ Entregas:
 - teste em loja controlada;
 - documentacao para time BigShop.
 
-Status: implementado localmente; publicar e validar em producao.
+Status: concluido e publicado em producao no run `26332055677`.
 
 ## Sprint 9 - IA para OCR e Tabelas
 

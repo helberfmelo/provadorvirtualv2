@@ -117,6 +117,8 @@
 - Resposta retorna `dashboard_url`, `widget_url`, `widget_public_key` e status operacional.
 - Criados testes `BigShopActivationTest`.
 - Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build`, `git diff --check` e smoke local retornando `503` quando o secret nao esta configurado.
+- Run `26332055677` do GitHub Actions finalizou com sucesso para o commit `729e1c3`.
+- Validado em producao: `POST /public/api/v1/public/bigshop/activate` retorna `503` controlado enquanto `BIGSHOP_ACTIVATION_SECRET` nao esta configurado.
 
 ## Pendencias abertas
 
