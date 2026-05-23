@@ -52,6 +52,8 @@
 - Pagina `/produto-teste` passou a chamar a API real e registrar feedback.
 - Smoke do GitHub Actions passou a postar uma recomendacao real e validar `recommended_size = M`.
 - Validacoes locais: `php artisan test`, `vendor/bin/pint`, `npm run build`, YAML do workflow e smoke integrado em `php artisan serve`.
+- Run `26327119754` do GitHub Actions finalizou com sucesso para o commit `1c31542`.
+- Validado em producao: `/produto-teste` e POST em `/api/v1/public/recommendations`, retornando `recommended_size = M`.
 
 ## Pendencias abertas
 

@@ -61,7 +61,7 @@ Entregas:
 - endpoints publicos;
 - testes de casos comuns e extremos.
 
-Status: implementado com `RecommendationEngine`, logs anonimos, feedback e `/produto-teste` usando API real; aguardando deploy verde para encerrar a sprint.
+Status: concluido e publicado em producao no run `26327119754`.
 
 ## Sprint 4 - Widget Universal v1
 

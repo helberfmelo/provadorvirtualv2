@@ -67,6 +67,7 @@ Atualizado em: 2026-05-23
 - Acesso SSH local ao HostGator/opents62 foi validado; `https://provadorvirtual.online/provadorvirtual_v1/` responde a partir de `/home1/opents62/provadorvirtual.online/provadorvirtual_v1`.
 - Sprint 1 publicada em producao pelo GitHub Actions no run `26326675713`.
 - Sprint 2 publicada em producao pelo GitHub Actions no run `26326950616`.
+- Sprint 3 publicada em producao pelo GitHub Actions no run `26327119754`.
 - API limpa em producao usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Falta definir se o go-live final sera na raiz `https://provadorvirtual.online/` ou manter subpasta.
 - Falta chave de IA se as primeiras sprints incluirem OCR/geracao assistida.
@@ -75,4 +76,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Concluir deploy acompanhado da Sprint 3 e iniciar a Sprint 4: Widget Universal v1.
+Iniciar a Sprint 4: Widget Universal v1.
