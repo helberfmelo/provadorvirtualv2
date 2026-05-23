@@ -21,6 +21,13 @@ type ReadinessPayload = {
   checks: ReadinessCheck[]
   production_urls: Record<string, string>
   missing_credentials: Record<string, boolean>
+  pilot_package: {
+    status: 'commercial_ready' | 'assisted_demo_ready'
+    sales_assets: { label: string; url: string }[]
+    onboarding_steps: string[]
+    automation_commands: Record<string, string>
+    pending_real_world_tests: string[]
+  }
 }
 
 const loading = ref(true)
@@ -36,6 +43,13 @@ const readiness = reactive<ReadinessPayload>({
   checks: [],
   production_urls: {},
   missing_credentials: {},
+  pilot_package: {
+    status: 'assisted_demo_ready',
+    sales_assets: [],
+    onboarding_steps: [],
+    automation_commands: {},
+    pending_real_world_tests: [],
+  },
 })
 
 const statusLabel = computed(() => {
@@ -62,6 +76,7 @@ async function loadReadiness() {
     readiness.checks = data.checks
     readiness.production_urls = data.production_urls
     readiness.missing_credentials = data.missing_credentials
+    readiness.pilot_package = data.pilot_package
   } catch {
     error.value = 'Nao foi possivel carregar o checklist de go-live.'
   } finally {
@@ -75,6 +90,10 @@ function pillClass(status: ReadinessCheck['status']) {
     ok: status === 'passed',
     warning: status === 'warning',
   }
+}
+
+function packageStatusLabel(status: ReadinessPayload['pilot_package']['status']) {
+  return status === 'commercial_ready' ? 'Comercial pronto' : 'Demo assistida pronta'
 }
 </script>
 
@@ -181,6 +200,74 @@ function pillClass(status: ReadinessCheck['status']) {
                 {{ key }}
               </span>
             </div>
+          </div>
+        </section>
+      </div>
+
+      <div class="analytics-grid">
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Pacote de piloto</h2>
+            <span>{{ packageStatusLabel(readiness.pilot_package.status) }}</span>
+          </div>
+
+          <div class="job-list">
+            <a
+              v-for="asset in readiness.pilot_package.sales_assets"
+              :key="asset.label"
+              class="job-row"
+              :href="asset.url"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+              <span>
+                <strong>{{ asset.label }}</strong>
+                <small>{{ asset.url }}</small>
+              </span>
+            </a>
+          </div>
+        </section>
+
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Onboarding</h2>
+            <span>{{ readiness.pilot_package.onboarding_steps.length }} passos</span>
+          </div>
+
+          <div class="check-list stacked">
+            <span v-for="step in readiness.pilot_package.onboarding_steps" :key="step">
+              <i class="fa-solid fa-check" aria-hidden="true"></i>
+              {{ step }}
+            </span>
+          </div>
+        </section>
+      </div>
+
+      <div class="analytics-grid">
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Automacoes</h2>
+            <span>cPanel</span>
+          </div>
+          <div class="command-list">
+            <article v-for="(command, key) in readiness.pilot_package.automation_commands" :key="key">
+              <strong>{{ key }}</strong>
+              <code>{{ command }}</code>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Pendencias reais</h2>
+            <span>{{ readiness.pilot_package.pending_real_world_tests.length }} testes</span>
+          </div>
+          <div class="check-list stacked">
+            <span v-for="test in readiness.pilot_package.pending_real_world_tests" :key="test">
+              <i class="fa-solid fa-clock" aria-hidden="true"></i>
+              {{ test }}
+            </span>
           </div>
         </section>
       </div>

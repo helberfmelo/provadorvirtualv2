@@ -118,3 +118,15 @@ OCR real de imagem depende de:
 - `GEMINI_API_KEY`.
 
 Sem chave externa, o assistente continua operando com parser local para texto/CSV.
+
+## Status Sprint 37
+
+`/app/go-live`, `GET /api/v1/go-live/readiness` e `scripts/validate-production.ps1` passaram a incluir:
+
+- checks de Pagar.me e transacao real;
+- check de cron/scheduler recente;
+- check de peso do widget;
+- check basico de acessibilidade/mobile do widget;
+- pacote de piloto com links comerciais, onboarding, comandos e pendencias reais.
+
+Roteiro completo em `docs/commercial_pilot_package.md`.

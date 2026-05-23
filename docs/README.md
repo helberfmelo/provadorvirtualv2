@@ -26,13 +26,14 @@ Antes de desenvolver qualquer sprint, ajuste, correcao ou deploy, reler nesta or
 17. `docs/go_live_cutover.md`
 18. `docs/bigshop_integration.md`
 19. `docs/bigshop_one_click_contract.md`
-20. `docs/deploy_runbook.md`
-21. `docs/sprint_governance.md`
-22. `docs/roadmap_sprints.md`
-23. `docs/intelligent_sizing_roadmap.md`
-24. `docs/product_backlog.md`
-25. `docs/security_compliance.md`
-26. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
+20. `docs/commercial_pilot_package.md`
+21. `docs/deploy_runbook.md`
+22. `docs/sprint_governance.md`
+23. `docs/roadmap_sprints.md`
+24. `docs/intelligent_sizing_roadmap.md`
+25. `docs/product_backlog.md`
+26. `docs/security_compliance.md`
+27. `docs/credentials.local.md`, somente quando a sprint envolver producao, banco, SMTP, deploy, IA ou integracoes.
 
 Nenhuma sprint deve comecar sem essa releitura.
 

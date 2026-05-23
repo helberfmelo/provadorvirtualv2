@@ -33,6 +33,7 @@ Atualizado em: 2026-05-23
 - Sprint 34 criou guias de integracao por plataforma, snippets, checklist visual, matriz de dados suportados e validacao protegida de instalacao por URL publica; publicado em producao no run `26339199751`.
 - Sprint 35 preparou o contrato BigShop um clique com snippet/contract na resposta da ativacao e monitor protegido de ativacoes no painel; publicado em producao no run `26339426665`.
 - Sprint 36 criou perfis anonimos com consentimento, token local, esquecimento, eventos de aprendizado, sinais comerciais, outlier score e analytics de qualidade; publicado em producao no run `26339824157`.
+- Sprint 37 ampliou o pacote de piloto/go-live com checks de Pagar.me, transacao real, cron, performance do widget, acessibilidade/mobile, comandos de automacao e onboarding comercial.
 
 ## Referencias confirmadas
 
@@ -111,6 +112,7 @@ Atualizado em: 2026-05-23
 - Falta credencial BigShop real para loja de teste.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativacao um clique real.
 - Falta cadastrar as chaves Pagar.me em `PRODUCTION_ENV`, com URLs de retorno na raiz, configurar cron no cPanel e validar uma transacao real de baixo valor.
+- Sprint 37 deixa essas pendencias visiveis em `/app/go-live`; teste real de Pagar.me e BigShop continua bloqueado ate receber/cadastrar as credenciais oficiais.
 
 ## Superficie atual
 
@@ -123,6 +125,7 @@ Atualizado em: 2026-05-23
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`.
 - Analytics/auditoria protegidos: `/api/v1/analytics/*`, `/api/v1/audit-logs` e `/api/v1/saas/*`.
 - Go-live protegido: `/api/v1/go-live/readiness` e `/app/go-live`.
+- Pacote comercial protegido: `/app/go-live` mostra links de venda, onboarding, automacoes e pendencias reais.
 - Observabilidade publica: `/api/v1/ops/status`.
 - BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
 - Monitor BigShop protegido: `GET /api/v1/integrations/bigshop/activations`.
@@ -139,4 +142,4 @@ Atualizado em: 2026-05-23
 
 ## Proxima acao recomendada
 
-Seguir para piloto comercial, qualidade final, revisao responsiva/acessibilidade e testes reais de pagamento/BigShop quando as credenciais estiverem disponiveis.
+Aguardar credenciais oficiais de Pagar.me e BigShop para executar transacao real, ativacao BigShop assinada e piloto em loja real; enquanto isso, usar `/app/go-live` como roteiro de demo assistida.

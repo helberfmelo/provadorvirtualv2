@@ -1545,6 +1545,17 @@ textarea {
   color: #047857;
 }
 
+.check-list.stacked {
+  display: grid;
+  gap: 9px;
+}
+
+.check-list.stacked span {
+  justify-content: flex-start;
+  width: 100%;
+  line-height: 1.35;
+}
+
 .guide-summary {
   margin: -4px 0 4px;
   color: #4b5563;
@@ -1973,6 +1984,28 @@ td small {
 .readiness-row small {
   color: #6b7280;
   line-height: 1.5;
+}
+
+.command-list {
+  display: grid;
+  gap: 10px;
+}
+
+.command-list article {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.command-list code {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  color: #334155;
+  font-size: 0.82rem;
 }
 
 .job-list {

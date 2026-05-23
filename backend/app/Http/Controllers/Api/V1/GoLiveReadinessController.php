@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\V1\Concerns\ResolvesMerchant;
 use App\Http\Controllers\Controller;
+use App\Models\CheckoutSession;
 use App\Models\MeasurementTable;
 use App\Models\PlatformConnection;
 use App\Models\Product;
 use App\Models\RecommendationLog;
 use App\Models\WidgetInstall;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\File;
 
 class GoLiveReadinessController extends Controller
 {
@@ -25,9 +27,14 @@ class GoLiveReadinessController extends Controller
             $this->productTestCheck($merchant->id, $company?->id),
             $this->widgetCheck($merchant->id, $company?->id),
             $this->recommendationSmokeCheck($merchant->id, $company?->id),
+            $this->paymentProviderCheck(),
+            $this->paymentRealTransactionCheck(),
+            $this->schedulerCheck(),
             $this->bigShopPilotCheck($merchant->id, $company?->id),
             $this->oneClickSecretCheck(),
             $this->aiProviderCheck(),
+            $this->widgetPerformanceCheck(),
+            $this->accessibilityCheck(),
             $this->legalPagesCheck(),
             $this->cutoverPlanCheck(),
         ]);
@@ -47,16 +54,24 @@ class GoLiveReadinessController extends Controller
             'checks' => $checks->values(),
             'production_urls' => [
                 'app' => config('app.url'),
+                'root' => config('app.frontend_url', config('app.url')),
+                'checkout' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/checkout',
                 'product_test' => rtrim((string) config('app.url'), '/').'/produto-teste',
                 'widget_js' => rtrim((string) config('app.url'), '/').'/widget/v1/provador-virtual.js',
                 'api_health' => rtrim((string) config('app.url'), '/').'/api/v1/health',
                 'ops_status' => rtrim((string) config('app.url'), '/').'/api/v1/ops/status',
+                'privacy' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/privacidade',
+                'terms' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/termos',
             ],
             'missing_credentials' => [
                 'bigshop_activation_secret' => ! filled(config('services.bigshop.activation_secret')),
                 'bigshop_test_store' => ! $this->hasConfiguredBigShop($merchant->id, $company?->id),
                 'external_ai_key' => ! $this->hasExternalAiKey(),
+                'pagarme_keys' => ! $this->hasPagarMeKeys(),
+                'pagarme_real_transaction' => ! $this->hasPaidCheckout(),
+                'cron_scheduler_recent' => ! $this->hasRecentSchedulerLog(),
             ],
+            'pilot_package' => $this->pilotPackage(),
         ]);
     }
 
@@ -160,6 +175,45 @@ class GoLiveReadinessController extends Controller
         );
     }
 
+    private function paymentProviderCheck(): array
+    {
+        $configured = $this->hasPagarMeKeys();
+
+        return $this->check(
+            key: 'pagarme_provider',
+            label: 'Checkout Pagar.me',
+            status: $configured ? 'passed' : 'warning',
+            detail: $configured ? 'Chaves Pagar.me e URLs de retorno configuradas.' : 'Chaves reais Pagar.me ainda nao estao completas em producao.',
+            action: $configured ? 'Executar compra real de baixo valor antes da campanha.' : 'Cadastrar PAGARME_SECRET_KEY, PAGARME_PUBLIC_KEY, PAGARME_WEBHOOK_SECRET e URLs na raiz.'
+        );
+    }
+
+    private function paymentRealTransactionCheck(): array
+    {
+        $paid = $this->hasPaidCheckout();
+
+        return $this->check(
+            key: 'pagarme_real_transaction',
+            label: 'Transacao real de pagamento',
+            status: $paid ? 'passed' : 'warning',
+            detail: $paid ? 'Existe checkout aprovado registrado.' : 'Nenhuma transacao real aprovada registrada ainda.',
+            action: $paid ? 'Manter webhook e cron monitorados.' : 'Depois das chaves Pagar.me, executar uma compra Pix/cartao de baixo valor.'
+        );
+    }
+
+    private function schedulerCheck(): array
+    {
+        $recent = $this->hasRecentSchedulerLog();
+
+        return $this->check(
+            key: 'scheduler_cron',
+            label: 'Cron e automacoes',
+            status: $recent ? 'passed' : 'warning',
+            detail: $recent ? 'Log do scheduler atualizado recentemente.' : 'Nao ha log recente do scheduler do Laravel.',
+            action: $recent ? 'Continuar acompanhando pagamentos e e-mails.' : 'Cadastrar no cPanel: php artisan schedule:run a cada minuto com log em storage/logs/cron-schedule.log.'
+        );
+    }
+
     private function oneClickSecretCheck(): array
     {
         $configured = filled(config('services.bigshop.activation_secret'));
@@ -208,6 +262,44 @@ class GoLiveReadinessController extends Controller
         );
     }
 
+    private function widgetPerformanceCheck(): array
+    {
+        $jsPath = public_path('widget/v1/provador-virtual.js');
+        $cssPath = public_path('widget/v1/provador-virtual.css');
+        $jsKb = File::exists($jsPath) ? round(File::size($jsPath) / 1024, 1) : 0;
+        $cssKb = File::exists($cssPath) ? round(File::size($cssPath) / 1024, 1) : 0;
+        $passed = $jsKb > 0 && $cssKb > 0 && $jsKb <= 90 && $cssKb <= 40;
+
+        return $this->check(
+            key: 'widget_performance',
+            label: 'Peso do widget',
+            status: $passed ? 'passed' : 'warning',
+            detail: "JS {$jsKb} KB, CSS {$cssKb} KB.",
+            action: $passed ? 'Validar em produto real com cache frio e 4G.' : 'Revisar peso do JS/CSS antes de piloto com trafego pago.'
+        );
+    }
+
+    private function accessibilityCheck(): array
+    {
+        $script = File::exists(public_path('widget/v1/provador-virtual.js'))
+            ? File::get(public_path('widget/v1/provador-virtual.js'))
+            : '';
+        $css = File::exists(public_path('widget/v1/provador-virtual.css'))
+            ? File::get(public_path('widget/v1/provador-virtual.css'))
+            : '';
+        $passed = str_contains($script, 'role="dialog"')
+            && str_contains($script, 'aria-modal="true"')
+            && str_contains($css, '@media (max-width: 560px)');
+
+        return $this->check(
+            key: 'accessibility_mobile',
+            label: 'Acessibilidade e mobile do widget',
+            status: $passed ? 'passed' : 'warning',
+            detail: $passed ? 'Modal com roles ARIA e regra mobile revisada.' : 'Widget precisa revisar ARIA/mobile.',
+            action: 'Validar manualmente no produto teste em desktop, tablet e celular antes do piloto.'
+        );
+    }
+
     private function hasConfiguredBigShop(int $merchantId, ?int $companyId): bool
     {
         return PlatformConnection::query()
@@ -221,6 +313,64 @@ class GoLiveReadinessController extends Controller
     private function hasExternalAiKey(): bool
     {
         return filled(config('services.ai.openai_api_key')) || filled(config('services.ai.gemini_api_key'));
+    }
+
+    private function hasPagarMeKeys(): bool
+    {
+        return filled(config('services.pagarme.secret_key'))
+            && filled(config('services.pagarme.public_key'))
+            && filled(config('services.pagarme.webhook_secret'))
+            && filled(config('services.pagarme.checkout_success_url'))
+            && filled(config('services.pagarme.checkout_cancel_url'));
+    }
+
+    private function hasPaidCheckout(): bool
+    {
+        return CheckoutSession::query()
+            ->where('status', CheckoutSession::STATUS_PAID)
+            ->exists();
+    }
+
+    private function hasRecentSchedulerLog(): bool
+    {
+        $path = storage_path('logs/cron-schedule.log');
+
+        return File::exists($path) && File::lastModified($path) >= now()->subMinutes(15)->getTimestamp();
+    }
+
+    private function pilotPackage(): array
+    {
+        return [
+            'status' => $this->hasPagarMeKeys() && $this->hasPaidCheckout() ? 'commercial_ready' : 'assisted_demo_ready',
+            'sales_assets' => [
+                ['label' => 'Site publico', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/'],
+                ['label' => 'Produto teste', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/produto-teste'],
+                ['label' => 'Checkout', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/checkout'],
+                ['label' => 'WhatsApp especialista', 'url' => 'https://wa.me/5531993157573'],
+            ],
+            'onboarding_steps' => [
+                'Cadastrar empresa no SaaS ou pelo checkout.',
+                'Conferir plataforma contratada e codigo/CNPJ de acesso.',
+                'Cadastrar ou importar produtos, variacoes e tabelas de medidas.',
+                'Configurar dominio permitido do widget.',
+                'Instalar snippet ou usar integracao BigShop.',
+                'Executar recomendacao real e feedback no produto piloto.',
+                'Acompanhar analytics, outliers e prontidao de go-live.',
+            ],
+            'automation_commands' => [
+                'cron' => 'cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan schedule:run >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-schedule.log 2>&1',
+                'payments' => 'php artisan pv:payments-sync --limit=50',
+                'emails' => 'php artisan pv:emails-dispatch --limit=50',
+                'privacy' => 'php artisan pv:privacy-anonymize',
+                'validation' => '.\\scripts\\validate-production.ps1',
+            ],
+            'pending_real_world_tests' => [
+                'Transacao Pagar.me Pix/cartao de baixo valor com webhook e cron.',
+                'Ativacao BigShop um clique com payload assinado real.',
+                'Probe e sync em loja BigShop piloto com produto, grade e tabela.',
+                'Teste de widget em pagina real de cliente com cache frio e mobile.',
+            ],
+        ];
     }
 
     private function check(string $key, string $label, string $status, string $detail, string $action): array

@@ -456,3 +456,5 @@ Entregas previstas:
 - performance do widget em paginas de produto reais;
 - revisao responsiva/acessibilidade;
 - pacote comercial e checklist de onboarding.
+
+Status: implementado localmente. A Sprint 37 ampliou go-live/readiness com Pagar.me, transacao real, cron, performance do widget, acessibilidade/mobile e pacote de piloto; tambem criou `docs/commercial_pilot_package.md` e ampliou `scripts/validate-production.ps1`. Testes reais Pagar.me/BigShop seguem pendentes das credenciais oficiais.

@@ -113,6 +113,8 @@ Atualizado em: 2026-05-23
 - `DONE` Login por e-mail ou CPF no SaaS e no portal da empresa.
 - `DONE` Reuso de usuario por e-mail/CPF em mais de uma empresa.
 - `DONE` CRUD de usuarios e permissoes no SaaS e no portal da empresa.
+- `DONE` Pacote comercial/piloto assistido em `/app/go-live`.
+- `DONE` Validacao de producao cobre checkout, widget, perfil consentido, sinal de aprendizado e pacote de piloto.
 
 ## Pagamentos
 
@@ -122,6 +124,7 @@ Atualizado em: 2026-05-23
 - `DONE` Preco padrao `R$ 189,90/mes` e preco BigShop `R$ 129,90/mes`.
 - `TODO` Cadastrar `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY` e `PAGARME_WEBHOOK_SECRET` em producao.
 - `TODO` Cadastrar URLs Pagar.me de sucesso/cancelamento apontando para a raiz do dominio.
+- `TODO` Executar transacao real Pagar.me de baixo valor e confirmar webhook/cron.
 
 ## Benchmark e mercado
 
