@@ -443,17 +443,28 @@ jobs:
             echo 'php artisan pv:create-master-admin --email="$MASTER_EMAIL" --name="$MASTER_NAME" --cpf="$MASTER_CPF" --password="$MASTER_PASSWORD"'
           } > "$REMOTE_ADMIN_SCRIPT"
 
-          ssh \
-            -p "$DEPLOY_PORT" \
-            -i "$DEPLOY_KEY_PATH" \
-            -o BatchMode=yes \
-            -o IdentitiesOnly=yes \
-            -o PreferredAuthentications=publickey \
-            -o PubkeyAuthentication=yes \
-            -o PasswordAuthentication=no \
-            -o KbdInteractiveAuthentication=no \
-            -o StrictHostKeyChecking=yes \
-            "${DEPLOY_USER}@${DEPLOY_HOST}" 'bash -se' < "$REMOTE_ADMIN_SCRIPT"
+          ADMIN_EXIT=1
+          for ATTEMPT in 1 2 3 4 5; do
+            if ssh \
+              -p "$DEPLOY_PORT" \
+              -i "$DEPLOY_KEY_PATH" \
+              -o BatchMode=yes \
+              -o IdentitiesOnly=yes \
+              -o PreferredAuthentications=publickey \
+              -o PubkeyAuthentication=yes \
+              -o PasswordAuthentication=no \
+              -o KbdInteractiveAuthentication=no \
+              -o StrictHostKeyChecking=yes \
+              "${DEPLOY_USER}@${DEPLOY_HOST}" 'bash -se' < "$REMOTE_ADMIN_SCRIPT"; then
+              ADMIN_EXIT=0
+              break
+            fi
+
+            echo "Master admin SSH attempt ${ATTEMPT} failed; retrying..."
+            sleep $((ATTEMPT * 8))
+          done
+
+          exit "$ADMIN_EXIT"
 
       - name: Smoke test public URLs
         if: steps.scaffold.outputs.ready == 'true'
@@ -501,7 +512,8 @@ jobs:
               -o PasswordAuthentication=no \
               -o KbdInteractiveAuthentication=no \
               -o StrictHostKeyChecking=yes \
-              "${DEPLOY_USER}@${DEPLOY_HOST}" "cd '${DEPLOY_REMOTE_DIR}' && pwd && ls -la && test -f .env && echo '.env presente' || echo '.env ausente' && grep -E '^(APP_ENV|APP_URL|DB_CONNECTION|DB_HOST|DB_DATABASE|DB_CHARSET|DB_COLLATION|SESSION_DRIVER|CACHE_STORE)=' .env 2>/dev/null || true && tail -n 120 storage/logs/laravel.log 2>/dev/null || true"
+              "${DEPLOY_USER}@${DEPLOY_HOST}" "cd '${DEPLOY_REMOTE_DIR}' && pwd && ls -la && test -f .env && echo '.env presente' || echo '.env ausente' && grep -E '^(APP_ENV|APP_URL|DB_CONNECTION|DB_HOST|DB_DATABASE|DB_CHARSET|DB_COLLATION|SESSION_DRIVER|CACHE_STORE)=' .env 2>/dev/null || true && tail -n 120 storage/logs/laravel.log 2>/dev/null || true" \
+              || echo "Remote diagnostics SSH unavailable."
           else
             echo "SSH diagnostics skipped because deploy credentials were not initialized before failure."
           fi

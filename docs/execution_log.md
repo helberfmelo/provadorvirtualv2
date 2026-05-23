@@ -193,3 +193,14 @@
 - Capturado fluxo publico Zak/Sizebay em camisa e calca: tenant `1235`, botoes `DESCUBRA SEU TAMANHO`/`TABELA DE MEDIDAS`, cookies `SIZEBAY_SESSION_ID_V4` e recomendacoes por perfis de teste.
 - Criados documentos `docs/v1_intelligence_migration.md`, `docs/sizebay_benchmark.md`, `docs/data_learning_lgpd_outliers.md` e `docs/intelligent_sizing_roadmap.md`.
 - Atualizados docs obrigatorios, backlog, arquitetura, widget e IA.
+
+## 2026-05-23 - Sprint 27 Raiz e checkout anual
+
+- Criada landing publica v2 com estrutura inspirada no v1 e cores do v2.
+- Checkout publico passou para plano anual unico, sem boleto, com BigShop como primeira plataforma.
+- Preco padrao: `R$ 189,90/mes`; preco BigShop: `R$ 129,90/mes`.
+- Cartao em ate 12x; Pix a vista com 5% de desconto.
+- Workflow passou a publicar build estatica na raiz e manter backend/app em `/provadorvirtual_v2/`.
+- Validacoes locais: `php artisan test`, `npm run build`, `npx vite build --outDir dist-root` e `git diff --check`.
+- Run `26336510709` publicou app e raiz, mas falhou no passo `Ensure master admin` por `ssh: connect ... Connection refused` logo apos os deploys remotos.
+- Workflow ajustado para retry no passo de master admin e diagnostico SSH tolerante a indisponibilidade transitoria.
