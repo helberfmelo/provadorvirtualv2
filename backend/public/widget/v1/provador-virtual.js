@@ -346,7 +346,7 @@
     state.recommendation = null;
     state.loading = false;
     state.form = formFromSavedProfile();
-    state.precision = calculatePrecision(state.form);
+    state.precision = calculatePrecision(state.form, state.step);
     state.celebrated = false;
     state.feedback = {
       wasHelpful: null,
@@ -456,7 +456,6 @@
       '<label class="pv-field pv-field-full">Caimento desejado<select data-pv-input="fit_preference">' + fitOptions(state.form.fit_preference || 'regular') + '</select></label>',
       '<div class="pv-step-actions">',
       '<button type="button" class="pv-button pv-button-secondary" data-pv-next>Aumentar precis&atilde;o</button>',
-      '<button type="button" class="pv-link-button" data-pv-recommend>Ver com dados atuais</button>',
       '</div>',
       '</section>',
     ].join('');
@@ -659,7 +658,7 @@
   }
 
   function updateFooter(backdrop) {
-    state.precision = calculatePrecision(state.form);
+    state.precision = calculatePrecision(state.form, state.step);
 
     var footer = backdrop.querySelector('[data-pv-footer]');
     if (!footer) {
@@ -676,19 +675,19 @@
 
     footer.innerHTML = [
       precisionHtml(state.precision),
-      '<button type="button" class="pv-button pv-main-button" data-pv-recommend' + (disabled ? ' disabled' : '') + '>' + label + '</button>',
+      '<button type="button" class="pv-button pv-main-button" data-pv-footer-action' + (disabled ? ' disabled' : '') + '>' + label + '</button>',
       attributionHtml(),
     ].join('');
 
-    var footerButton = footer.querySelector('[data-pv-recommend]');
+    var footerButton = footer.querySelector('[data-pv-footer-action]');
     if (footerButton) {
       footerButton.addEventListener('click', function () {
         collectCurrentInputs(backdrop);
-        submitRecommendation(backdrop);
+        handleFooterAction(backdrop);
       });
     }
 
-    if (state.precision >= 100 && !state.celebrated) {
+    if (state.step >= 3 && state.precision >= 100 && !state.celebrated) {
       state.celebrated = true;
       triggerCelebration(backdrop);
     }
@@ -713,6 +712,14 @@
       return 'Digite medidas';
     }
 
+    if (state.step === 1) {
+      return 'Continuar para corpo';
+    }
+
+    if (state.step === 2) {
+      return 'Continuar para detalhes';
+    }
+
     if (state.precision >= 95) {
       return 'Ver recomenda&ccedil;&atilde;o m&aacute;xima';
     }
@@ -724,12 +731,44 @@
     return 'Ver recomenda&ccedil;&atilde;o b&aacute;sica';
   }
 
+  function handleFooterAction(backdrop) {
+    if (state.step === 1) {
+      if (!hasStarterMeasures()) {
+        renderDrawer(backdrop, '<div class="pv-warning">Informe pelo menos altura e peso para continuar.</div>');
+        focusFirstMissing(backdrop);
+        return;
+      }
+
+      state.step = 2;
+      renderDrawer(backdrop);
+      return;
+    }
+
+    if (state.step === 2) {
+      state.step = 3;
+      renderDrawer(backdrop);
+      return;
+    }
+
+    if (state.step === 3) {
+      submitRecommendation(backdrop);
+    }
+  }
+
   function wireDrawer(backdrop) {
     if (!backdrop.dataset.pvDelegated) {
       backdrop.dataset.pvDelegated = 'true';
       backdrop.addEventListener('click', function (event) {
         var target = event.target && event.target.nodeType === 1 ? event.target : event.target.parentElement;
+        var footerActionButton = target && target.closest ? target.closest('[data-pv-footer-action]') : null;
         var recommendButton = target && target.closest ? target.closest('[data-pv-recommend]') : null;
+
+        if (footerActionButton && backdrop.contains(footerActionButton)) {
+          event.preventDefault();
+          collectCurrentInputs(backdrop);
+          handleFooterAction(backdrop);
+          return;
+        }
 
         if (recommendButton && backdrop.contains(recommendButton)) {
           event.preventDefault();
@@ -756,7 +795,9 @@
       });
       input.addEventListener('change', function () {
         collectCurrentInputs(backdrop);
-        updateFooter(backdrop);
+        if (input.type === 'checkbox' || input.tagName === 'SELECT') {
+          updateFooter(backdrop);
+        }
       });
     });
 
@@ -797,7 +838,7 @@
       clearProfile.addEventListener('click', function () {
         forgetSavedProfile();
         state.form = formFromSavedProfile();
-        state.precision = calculatePrecision(state.form);
+        state.precision = calculatePrecision(state.form, state.step);
         renderDrawer(backdrop);
       });
     }
@@ -929,7 +970,10 @@
         }
 
         renderDrawer(backdrop);
-        triggerCelebration(backdrop);
+        if (state.precision >= 100 && !state.celebrated) {
+          state.celebrated = true;
+          triggerCelebration(backdrop);
+        }
       })
       .catch(function () {
         state.loading = false;
@@ -939,7 +983,7 @@
 
   function rawWidgetData(measurements) {
     return {
-      version: 'v2_sprint_66',
+      version: 'v2_sprint_67',
       source: 'widget_v2_staged',
       precision: state.precision,
       steps_completed: completedSteps(),
@@ -968,11 +1012,11 @@
   function completedSteps() {
     var steps = ['step_1'];
 
-    if (state.form.gender || state.form.body_shape || state.form.fit_preference) {
+    if (state.step >= 2 || state.form.gender || state.form.body_shape || state.form.fit_preference) {
       steps.push('step_2');
     }
 
-    if (detailedFields().some(function (fieldMeta) {
+    if (state.step >= 3 || detailedFields().some(function (fieldMeta) {
       return Boolean(valueOrNull(state.form[fieldMeta.key]));
     })) {
       steps.push('step_3');
@@ -1007,9 +1051,10 @@
     return normalized;
   }
 
-  function calculatePrecision(form) {
+  function calculatePrecision(form, maxStep) {
     var score = 0;
     var detailFields = detailedFields();
+    var visibleStep = maxStep || 4;
 
     if (numberValue(form.height) !== null) {
       score += 20;
@@ -1023,12 +1068,20 @@
       score += 5;
     }
 
+    if (visibleStep < 2) {
+      return Math.max(0, Math.min(45, score));
+    }
+
     if (form.gender) {
       score += 10;
     }
 
     if (form.body_shape) {
       score += 10;
+    }
+
+    if (visibleStep < 3) {
+      return Math.max(0, Math.min(65, score));
     }
 
     if (detailFields.length > 0) {

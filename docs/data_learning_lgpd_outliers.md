@@ -186,7 +186,7 @@ Status Sprint 66: além das medidas normalizadas usadas pelo motor, o widget v2 
 
 O payload permitido inclui:
 
-- versão e origem do widget, por exemplo `v2_sprint_66` e `widget_v2_staged`;
+- versão e origem do widget, por exemplo `v2_sprint_67` e `widget_v2_staged`;
 - etapas concluídas;
 - precisão calculada no front;
 - identidade técnica do produto/loja/plataforma;

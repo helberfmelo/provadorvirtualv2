@@ -865,3 +865,19 @@ Entregas:
 - validar desktop, mobile, console, rede, recomendação, feedback e tabela de medidas.
 
 Status: implementado no commit `f52b228`; o primeiro deploy remoto (`26356327237`) falhou apenas no smoke público por validar o marcador antigo `data-pv-submit`. Corrigido no commit `f1d2dbf`, publicado com sucesso no run `26356510237`, com deploy remoto, deploy da raiz pública, master admin e smoke público concluídos.
+
+### Sprint 67 - Corrigir avanço sequencial do widget
+
+Objetivo: impedir que o widget v2 pule etapas ou exiba 100% antes do usuário passar por `Medidas`, `Corpo` e `Detalhes`.
+
+Entregas:
+
+- limitar a precisão exibida por etapa, mesmo quando houver perfil completo salvo no navegador;
+- alterar o rodapé para avançar entre etapas e chamar recomendação somente na etapa 3;
+- remover atalho de recomendação da etapa 2;
+- disparar confete somente quando a precisão real chegar a 100%;
+- corrigir perda de clique no rodapé quando o usuário preenche inputs numéricos e clica direto para avançar;
+- validar por teste visual temporário o caso de perfil completo salvo e o caso de recomendação básica sem confete;
+- atualizar documentação do contrato sequencial do widget.
+
+Status: implementado localmente; aguardando commit, push e verificação remota da sprint.

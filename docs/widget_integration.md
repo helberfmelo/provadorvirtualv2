@@ -91,6 +91,8 @@ A barra `Nível de precisão da IA` usa pesos progressivos semelhantes ao v1: al
 
 O feedback final fica visível no próprio resultado e salva `was_helpful`, `rating`, `selected_size` e `comment` no endpoint público atual. Além das medidas normalizadas usadas pelo motor, o widget envia `shopper_profile.raw_widget_data` com versão, origem, etapas concluídas, identidade técnica do produto, precisão, tabela e medidas brutas da jornada. Esse payload é persistido em `recommendation_logs.raw_widget_payload` e entra na rotina `pv:privacy-anonymize`.
 
+Regra Sprint 67: o fluxo do drawer é obrigatoriamente sequencial. A etapa 1 pode pré-preencher dados salvos do navegador, mas a barra de precisão deve considerar somente altura, peso e idade nessa tela. O rodapé avança para `Corpo` e depois para `Detalhes`; ele só chama a API de recomendação na etapa 3. O confete só pode disparar quando a precisão real chegar a 100%, nunca em recomendação básica ou por dados ocultos de etapas futuras.
+
 ## Evolucao inteligente prevista
 
 Benchmark Sizebay/Zak em `docs/sizebay_benchmark.md` confirmou que o widget deve evoluir para:

@@ -588,3 +588,15 @@
 - Commit `f52b228` enviado para `main`, porém o run `26356327237` falhou no smoke público porque o workflow ainda verificava o marcador antigo `data-pv-submit`, removido na refatoração em etapas.
 - Smoke público atualizado para validar o marcador atual `data-pv-recommend` do novo fluxo gamificado do widget v2.
 - Run `26356510237` do GitHub Actions finalizou com sucesso para o commit `f1d2dbf`, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+
+## 2026-05-24 - Sprint 67 Corrigir avanço sequencial do widget
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint corretiva.
+- Reproduzido o problema relatado: dados salvos do navegador podiam fazer a etapa 1 exibir 100% e o botão do rodapé podia enviar recomendação sem passar por `Corpo` e `Detalhes`.
+- Corrigido o rodapé do widget para usar ação sequencial própria: etapa 1 avança para `Corpo`, etapa 2 avança para `Detalhes` e somente a etapa 3 chama a recomendação.
+- A barra de precisão agora é limitada pela etapa visível: até 45% em `Medidas`, até 65% em `Corpo` e até 100% apenas em `Detalhes`.
+- Removido o atalho de recomendação da etapa 2 para preservar a ordem do fluxo v1.
+- Confete limitado a recomendações com 100% real de precisão; recomendações básicas não disparam celebração.
+- Corrigido o clique perdido no rodapé após editar inputs numéricos: `change` passa a re-renderizar apenas select/checkbox, evitando trocar o botão no blur antes do clique.
+- Teste visual temporário Playwright em `.tmp/sprint67-widget-flow.spec.js` validou perfil salvo completo e recomendação básica sem confete.
+- Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, Playwright temporário da Sprint 67, `php artisan test`, `npm run build` e `git diff --check`.
