@@ -666,3 +666,14 @@
 - Pós-deploy confirmou `200` e `Content-Length` atualizado para os três assets públicos: logo `530990`, ícone `31679` e favicon `31682`.
 - Pós-deploy confirmou tags OG em produção apontando para `logo_provador_virtual.png` com `og:image:width=3054` e `og:image:height=261`.
 - `scripts/validate-production.ps1` passou completo após o deploy.
+
+## 2026-05-24 - Sprint 72 Alinhar degrade do cabeçalho do widget
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` sem expor valores sensíveis.
+- Cabeçalho do drawer do widget ajustado para usar o mesmo gradiente dos botões principais e da barra de precisão: `var(--pv-secondary)` para `var(--pv-warm)`.
+- Variável `--pv-warm` passou a derivar de `--pv-accent`, mantendo a personalização da loja aplicada de forma consistente ao cabeçalho, CTAs e precisão.
+- Alteração limitada ao CSS público do widget, sem mudança no JavaScript, contratos de API ou fluxo de etapas.
+- Validações locais: `php artisan test --filter=WidgetAssetTest`, `git diff --check`, `npm run build` em `frontend` e `npm run build` em `backend`.
+- Observação local: `npm run build` na raiz não se aplica porque o projeto não possui `package.json` na raiz; os builds corretos ficam em `frontend` e `backend`.
+- Observação local: o build Vite do backend concluiu com sucesso, mas avisou que recomenda Node `20.19+`; a máquina local está em Node `20.18.1`.
+- Commit, push, GitHub Actions/deploy e validação de produção pendentes neste registro até o run remoto finalizar.

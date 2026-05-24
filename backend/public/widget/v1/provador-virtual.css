@@ -1,8 +1,8 @@
 .pv-widget-root {
   --pv-primary: #0f172a;
   --pv-secondary: #ff4d5e;
-  --pv-accent: #ff4d5e;
-  --pv-warm: #ff7a1a;
+  --pv-accent: #ff7a1a;
+  --pv-warm: var(--pv-accent);
   --pv-muted: #6b7280;
   --pv-border: #e5e7eb;
   --pv-soft: #f8fafc;
@@ -131,7 +131,7 @@
   z-index: 2;
   border-bottom: 0;
   color: #fff;
-  background: linear-gradient(135deg, var(--pv-primary), var(--pv-secondary));
+  background: linear-gradient(135deg, var(--pv-secondary), var(--pv-warm));
   box-shadow: 0 1px 0 rgba(17, 24, 39, 0.08);
 }
 

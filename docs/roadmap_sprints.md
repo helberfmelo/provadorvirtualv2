@@ -946,3 +946,16 @@ Entregas:
 - validar build, assets públicos e smoke de produção após deploy.
 
 Status: implementado no commit `d17d412` e publicado com sucesso no run `26370907476`, com deploy remoto, deploy da raiz pública, master admin, smoke público, assets de marca públicos, tags OG atualizadas e `validate-production.ps1`.
+
+### Sprint 72 - Alinhar degrade do cabeçalho do widget
+
+Objetivo: deixar o cabeçalho do drawer do widget com o mesmo degradê visual usado nos botões principais e na barra de precisão.
+
+Entregas:
+
+- alterar o cabeçalho `.pv-drawer-header` para usar o gradiente `secondary -> warm`, igual aos CTAs e à barra de precisão;
+- fazer `--pv-warm` derivar de `--pv-accent`, garantindo que a cor de destaque configurada pela loja seja refletida no cabeçalho, botões e precisão;
+- preservar o fluxo, textos e hierarquia do widget, sem alterar JavaScript nem contratos públicos;
+- validar o asset público do widget, builds do frontend/backend e checagem de diff.
+
+Status: implementação local validada; commit, push, deploy e validação de produção serão registrados após o GitHub Actions finalizar.
