@@ -501,3 +501,13 @@
 - Serviço `saveFeedback` passa a respeitar fechamento manual durante o estado de salvamento, evitando reabrir sucesso automático da mesma operação após o usuário fechar o modal.
 - Diretriz de UX dos portais atualizada para exigir fechamento manual visível nos modais de feedback.
 - Validações locais: `npm run build`, `php artisan test --filter=HealthTest` e `git diff --check`.
+
+## 2026-05-24 - Sprint 60 Catálogo global do app BigShop
+
+- Releitura obrigatória dos documentos principais e de `docs/bigshop_model3_pro_widget.md` concluída antes de iniciar a correção.
+- Investigado o motivo do app `Provador Virtual` não aparecer no select de Apps adicionais do painel BigShop.
+- Confirmado que a lista vem de `/get_apps`, que consulta a tabela global `apps`; sem o registro `app_code='provador_virtual'`, o front não recebe a opção.
+- Cópia local `D:\Projetos\bigshop\172.16.151.5\bigshop\sistema\context\get_apps.php` ajustada para criar o app global com `INSERT ... WHERE NOT EXISTS` antes do select.
+- Painel BigShop em `D:\Projetos\bigbangshop2.0` ajustado para priorizar `Provador Virtual` no topo da lista quando a API retornar o app e para comparar `id/value` de forma tolerante.
+- Validações locais BigShop: `php -l` no `get_apps.php`, `npx eslint src/pages/configurations/additionalAppsEdit.vue` e `git diff --check` no painel.
+- Painel BigShop commitado e enviado para GitLab no commit `4c2c92b3e`, branch `hotfix/couto-integration-support`; `git ls-remote` confirmou o mesmo hash no remoto.

@@ -54,6 +54,10 @@ WHERE NOT EXISTS (
 );
 ```
 
+Observação operacional: o select `Configurações > Apps adicionais > Tipo` é alimentado pelo endpoint BigShop `/get_apps`, que consulta a tabela global `apps`. Se o registro `app_code='provador_virtual'` não existir em `apps`, o app não aparece no select mesmo que o front já tenha tratamento para ele.
+
+Na cópia local estudada, o arquivo `D:\Projetos\bigshop\172.16.151.5\bigshop\sistema\context\get_apps.php` deve executar o `INSERT ... WHERE NOT EXISTS` acima antes do `select *, name as label, id as value from apps`. Se o ambiente local estiver apontando para outra cópia do backend, aplicar o SQL diretamente no banco usado pelo `localhost`.
+
 Em `Configurações > Apps adicionais`, cada loja deve cadastrar:
 
 - `Nome`: `Provador Virtual`;

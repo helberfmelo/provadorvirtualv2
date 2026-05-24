@@ -762,3 +762,16 @@ Entregas:
 - registrar a regra em `docs/portal_ui_guidelines.md`.
 
 Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.
+
+### Sprint 60 - Catálogo global do app BigShop
+
+Objetivo: garantir que o app `Provador Virtual` apareça no select `Configurações > Apps adicionais > Tipo` do painel BigShop.
+
+Entregas:
+
+- identificar que o select é alimentado pelo endpoint BigShop `/get_apps`, baseado na tabela global `apps`;
+- ajustar a cópia local de `sistema/context/get_apps.php` para criar `app_code='provador_virtual'` com `INSERT ... WHERE NOT EXISTS` antes de retornar a lista;
+- deixar o painel BigShop priorizando `Provador Virtual` no topo quando a API retornar esse app;
+- documentar que, se o ambiente local apontar para outra cópia do backend, o SQL precisa ser aplicado no banco usado por esse backend.
+
+Status: painel BigShop implementado no commit `4c2c92b3e` e enviado para `hotfix/couto-integration-support`; documentação do Provador preparada para commit e verificação remota.
