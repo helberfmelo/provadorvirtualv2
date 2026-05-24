@@ -545,3 +545,5 @@
 - Middleware de origem do widget e resolução pública de produto passaram a aceitar fallback por `platform_connections.platform='bigshop'` + `external_store_id`, usando a empresa vinculada à conexão.
 - Testes adicionados para `config-check` e CORS BigShop resolvendo pela integração.
 - Validações locais: `php artisan test --filter=RecommendationApiTest`, `php artisan test --filter=HardeningApiTest`, `vendor/bin/pint --dirty`, `npm run build` e `git diff --check`.
+- Run `26353804637` do GitHub Actions finalizou com sucesso para o commit `a575777`, incluindo deploy remoto e smoke público.
+- Após o deploy, `config-check` em produção para a Luna Moda Festa com `Origin: https://www.lunamodafesta.com.br` e `Origin: https://lunamodafesta.com.br` retornou `configured=true`, `product_id=6`, `measurement_table_id=1` e `Access-Control-Allow-Origin` correto.

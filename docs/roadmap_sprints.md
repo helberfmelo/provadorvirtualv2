@@ -817,4 +817,4 @@ Entregas:
 - cobrir CORS/origem BigShop por conexão de plataforma nos testes de hardening;
 - documentar as duas fontes aceitas para resolução pública BigShop.
 
-Status: implementado e validado localmente; aguardando commit, push e verificação remota.
+Status: implementado no commit `a575777` e publicado com sucesso no run `26353804637`, com deploy remoto, smoke público e `config-check` da Luna Moda Festa retornando `configured=true`.

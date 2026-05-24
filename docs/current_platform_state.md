@@ -57,6 +57,7 @@ Atualizado em: 2026-05-23
 - Sprint 58 prepara a instalação nativa BigShop model3 pro: widget resolve loja por `platform=bigshop` + `external_store_id`, emite evento de configuração e a cópia local do `produto.vue` passa a carregar o widget sem IDs internos fixos.
 - Sprint 59 adiciona fechamento manual com `x` no canto superior direito do modal central de feedback, preservando o fechamento automático para sucessos e avisos.
 - Sprint 62 corrige o formulário de produto para mostrar tabela somente quando `measurement_table_id` existe, registra o ajuste local do editor BigShop sem hardcoding e confirma os bloqueios atuais da Luna: domínio do widget não liberado e produto `716076` sem tabela vinculada.
+- Sprint 63 corrige a resolução pública BigShop para usar `platform_connections.external_store_id` como fallback; a Luna Moda Festa passou a retornar `configured=true` no `config-check` com os domínios públicos.
 
 ## Referências confirmadas
 
@@ -150,6 +151,7 @@ Atualizado em: 2026-05-23
 - Sprint 57 enviada ao GitHub no commit `7f4a142`; o run `26348869694` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - Sprint 58 enviada ao GitHub no commit `98c13a7`; o run `26349330161` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - Sprint 62 enviada ao GitHub no commit `3f242ac`; o run `26353363931` finalizou com sucesso, incluindo deploy remoto e smoke público.
+- Sprint 63 enviada ao GitHub no commit `a575777`; o run `26353804637` finalizou com sucesso, incluindo deploy remoto, smoke público e validação do `config-check` da Luna Moda Festa.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
