@@ -159,7 +159,7 @@ Atualizado em: 2026-05-24
 - Sprint 62 enviada ao GitHub no commit `3f242ac`; o run `26353363931` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - Sprint 63 enviada ao GitHub no commit `a575777`; o run `26353804637` finalizou com sucesso, incluindo deploy remoto, smoke público e validação do `config-check` da Luna Moda Festa.
 - Sprint 68 enviada ao GitHub no commit `790d875`; o run `26366746266` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin, smoke público e validação Playwright pós-deploy do widget no produto teste.
-- Sprint 69 implementada localmente; aguardando commit, push e verificação do GitHub Actions/deploy.
+- Sprint 69 enviada ao GitHub no commit `a53613a`; o run `26368265436` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin, smoke público, verificação dos assets públicos de silhueta e endpoint público de recomendação.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

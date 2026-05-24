@@ -761,7 +761,7 @@ Entregas:
 - evitar que um modal de sucesso reabra automaticamente quando o usuário fechou manualmente o estado de salvamento da mesma operação;
 - registrar a regra em `docs/portal_ui_guidelines.md`.
 
-Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.
+Status: implementado no commit `a53613a` e publicado com sucesso no run `26368265436`, com deploy remoto, deploy da raiz pública, master admin, smoke público, assets públicos do widget e endpoint de recomendação conferidos após o deploy.
 
 ### Sprint 60 - Catálogo global do app BigShop
 

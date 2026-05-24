@@ -634,3 +634,7 @@
 - Feedback final ganhou texto explicando a escala de nota: `1 = não ajudou, 5 = perfeita`.
 - Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, Playwright mockado em `.tmp/sprint69-widget-visual-check.mjs`, `php artisan test`, `npm run build` e `git diff --check`.
 - Observação local: `npm run build` concluiu com sucesso, mas o Vite avisou que recomenda Node `20.19+`; a máquina local está em Node `20.18.1`.
+- Commit `a53613a` enviado para `main`; o run `26368265436` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou que o JS público contém `assetBaseUrl`, `pv-main-button-subtle`, `pv-shape-image` e o texto `Nota da recomendação`.
+- Pós-deploy confirmou que o CSS público contém `.pv-shape-image`, `-webkit-mask`, `.pv-main-button-subtle` e o gradiente do cabeçalho.
+- Pós-deploy confirmou `200` para os 9 assets públicos de silhueta e recomendação pública com altura + peso retornando `recommended_size=M`.
