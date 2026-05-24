@@ -37,7 +37,7 @@ Antes de desenvolver qualquer sprint, ajuste, correção ou deploy, reler nesta 
 28. `docs/security_compliance.md`
 29. `docs/credentials.local.md`, somente quando a sprint envolver produção, banco, SMTP, deploy, IA ou integrações.
 
-Nenhuma sprint deve comecar sem essa releitura. Depois de executar uma sprint, e obrigatório fazer commit, push, acompanhar GitHub Actions/deploy até o status final e somente então passar para a próxima sprint.
+Nenhuma sprint deve começar sem essa releitura. Depois de executar uma sprint, é obrigatório fazer commit, push, acompanhar GitHub Actions/deploy até o status final e somente então passar para a próxima sprint.
 
 ## Fontes estudadas
 

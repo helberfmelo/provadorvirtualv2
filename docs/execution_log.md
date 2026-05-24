@@ -460,3 +460,11 @@
 - Removida a classe CSS `.success-message`, que deixou de ser usada no frontend.
 - Varredura de textos visíveis corrigiu acentos remanescentes em importações, gênero, opções de produto e destinatário.
 - Validações locais: `npm run build`, busca `rg` por padrões antigos de mensagem/texto e `git diff --check`.
+- Run `26348653353` do GitHub Actions finalizou com sucesso para o commit `01d0461`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 56 Registro do deploy verificado
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` com conteúdo mascarado.
+- Registrado no estado atual, roadmap e log que a Sprint 55 teve push, GitHub Actions e deploy remoto verificados com sucesso.
+- Corrigida a frase de governança no índice obrigatório para usar PT-BR com acentos.
+- Validação local: `git diff --check`.
