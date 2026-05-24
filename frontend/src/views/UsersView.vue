@@ -3,11 +3,11 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { PortalUser } from '../services/merchantTypes'
+import { showFeedback } from '../services/saveFeedback'
 
 const users = ref<PortalUser[]>([])
 const loading = ref(false)
 const error = ref('')
-const notice = ref('')
 
 onMounted(() => {
   loadUsers()
@@ -29,14 +29,19 @@ async function loadUsers() {
 
 async function toggleUser(user: PortalUser) {
   error.value = ''
-  notice.value = ''
   const nextStatus = user.access?.status === 'active' ? 'inactive' : 'active'
 
   try {
     await api.patch(`/merchant/users/${user.id}`, {
       merchant_user_status: nextStatus,
     })
-    notice.value = nextStatus === 'active' ? 'Usuário ativado.' : 'Usuário desativado.'
+    showFeedback({
+      status: 'success',
+      title: nextStatus === 'active' ? 'Usuário ativado' : 'Usuário desativado',
+      message: nextStatus === 'active'
+        ? 'O usuário voltou a acessar o portal da empresa.'
+        : 'O usuário foi pausado no portal da empresa.',
+    })
     await loadUsers()
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível alterar o status.'
@@ -65,7 +70,6 @@ async function toggleUser(user: PortalUser) {
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
-    <p v-if="notice" class="success-message">{{ notice }}</p>
 
     <section class="panel-main subsection">
       <div class="subsection-heading">

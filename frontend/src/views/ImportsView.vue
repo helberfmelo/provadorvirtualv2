@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
+import { showFeedback } from '../services/saveFeedback'
 
 type PreviewRow = {
   line: number | null
@@ -37,7 +38,6 @@ const preview = ref<Preview | null>(null)
 const jobs = ref<ImportJob[]>([])
 const loading = ref(false)
 const saving = ref(false)
-const notice = ref('')
 const error = ref('')
 
 const form = reactive({
@@ -65,7 +65,6 @@ async function loadJobs() {
 
 async function runPreview() {
   loading.value = true
-  notice.value = ''
   error.value = ''
 
   try {
@@ -81,12 +80,20 @@ async function runPreview() {
 
 async function commitImport() {
   saving.value = true
-  notice.value = ''
   error.value = ''
 
   try {
     const { data } = await api.post('/imports', payload())
-    notice.value = `Importacao ${statusLabel(data.data.status).toLowerCase()}.`
+    const label = statusLabel(data.data.status).toLowerCase()
+    const destination = form.type === 'measurement_tables' ? '/app/tabelas-de-medidas' : '/app/produtos'
+    showFeedback({
+      status: data.data.status === 'failed' ? 'error' : 'success',
+      title: 'Importação processada',
+      message: `Importação ${label}. Acesse a página correspondente para revisar os dados importados.`,
+      actionLabel: form.type === 'measurement_tables' ? 'Ver tabelas' : 'Ver produtos',
+      actionTo: destination,
+      duration: 0,
+    })
     preview.value = null
     await loadJobs()
   } catch (requestError: any) {
@@ -173,7 +180,7 @@ function statusLabel(status: string) {
   <section class="dashboard app-workspace">
     <div class="page-heading">
       <div>
-        <span class="eyebrow">Importacoes</span>
+        <span class="eyebrow">Importações</span>
         <h1>Dados da loja</h1>
       </div>
       <div class="action-row compact">
@@ -192,7 +199,6 @@ function statusLabel(status: string) {
       </div>
     </div>
 
-    <p v-if="notice" class="success-message">{{ notice }}</p>
     <p v-if="error" class="form-error">{{ error }}</p>
 
     <div class="import-grid">
@@ -238,7 +244,7 @@ function statusLabel(status: string) {
       <aside class="panel-main import-preview-panel">
         <div class="subsection-heading">
           <h2>Preview</h2>
-          <span v-if="preview">{{ preview.valid_rows }} de {{ preview.total_rows }} validas</span>
+          <span v-if="preview">{{ preview.valid_rows }} de {{ preview.total_rows }} válidas</span>
         </div>
 
         <div v-if="!preview" class="empty-state">Nenhum preview carregado.</div>

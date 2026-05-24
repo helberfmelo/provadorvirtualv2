@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { SaasUser } from '../services/saasTypes'
+import { showFeedback } from '../services/saveFeedback'
 
 type CompanyUserRow = {
   key: string
@@ -13,7 +14,6 @@ type CompanyUserRow = {
 const users = ref<SaasUser[]>([])
 const loading = ref(false)
 const error = ref('')
-const notice = ref('')
 
 const rows = computed<CompanyUserRow[]>(() => users.value.flatMap((user) => (
   user.merchants.map((merchant) => ({
@@ -43,7 +43,6 @@ async function loadUsers() {
 
 async function toggleAccess(row: CompanyUserRow) {
   error.value = ''
-  notice.value = ''
   const nextStatus = row.merchant.access.status === 'active' ? 'inactive' : 'active'
 
   try {
@@ -51,7 +50,13 @@ async function toggleAccess(row: CompanyUserRow) {
       merchant_company_id: row.merchant.access.merchant_company_id,
       merchant_user_status: nextStatus,
     })
-    notice.value = nextStatus === 'active' ? 'Acesso ativado.' : 'Acesso desativado.'
+    showFeedback({
+      status: 'success',
+      title: nextStatus === 'active' ? 'Acesso ativado' : 'Acesso desativado',
+      message: nextStatus === 'active'
+        ? 'O usuário voltou a acessar esta empresa.'
+        : 'O acesso do usuário foi pausado nesta empresa.',
+    })
     await loadUsers()
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível alterar o acesso.'
@@ -94,7 +99,6 @@ function companyDocument(row: CompanyUserRow) {
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
-    <p v-if="notice" class="success-message">{{ notice }}</p>
 
     <section class="panel-main subsection">
       <div class="subsection-heading">

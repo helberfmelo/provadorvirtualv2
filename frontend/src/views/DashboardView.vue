@@ -102,7 +102,7 @@ onMounted(() => {
       <RouterLink class="onboarding-step" to="/app/importacoes">
         <i class="fa-solid fa-file-import" aria-hidden="true"></i>
         <span>
-          <strong>Importacoes</strong>
+          <strong>Importações</strong>
           <small>CSV e XML</small>
         </span>
       </RouterLink>

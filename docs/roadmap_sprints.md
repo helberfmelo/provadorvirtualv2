@@ -694,4 +694,18 @@ Entregas previstas:
 - reforçar a orientação específica da BigShop para `produto.vue` da model3 plano pro em sprint futura no repositório BigShop correto;
 - atualizar docs de widget e integrações por plataforma.
 
-Status: implementado e testado localmente com `npm run build`, `php artisan test --filter=WidgetAssetTest`, `php artisan test --filter=IntegrationsApiTest`, `vendor/bin/pint --dirty` e `git diff --check`.
+Status: implementado no commit `7b06d4d` e publicado com sucesso no run `26348462160`. A Sprint 54 também expôs `window.ProvadorVirtual.reload(...)` para troca dinâmica de variação/SKU sem reload da página.
+
+### Sprint 55 - Feedbacks operacionais por modal
+
+Objetivo: remover os feedbacks de sucesso inline que ainda restavam em telas operacionais e manter retorno de ação pelo modal central.
+
+Entregas:
+
+- trocar avisos `success-message` restantes por `showFeedback`;
+- remover a classe visual de sucesso inline não utilizada;
+- revisar textos visíveis encontrados na varredura para PT-BR com acentos;
+- manter mensagens estáticas informativas somente quando forem contexto permanente da tela;
+- validar build e busca por padrões antigos.
+
+Status: implementado e testado localmente com `npm run build`, `rg` dos padrões antigos e `git diff --check`.

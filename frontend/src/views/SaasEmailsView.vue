@@ -3,13 +3,13 @@ import { onMounted, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import { normalizeEmailSettings, type EmailSettings, type TransactionalEmail, type TransactionalEmailSend } from '../services/saasTypes'
+import { showFeedback } from '../services/saveFeedback'
 
 const emailSettings = reactive<EmailSettings>(normalizeEmailSettings({}))
 const transactionalEmails = ref<TransactionalEmail[]>([])
 const emailSends = ref<TransactionalEmailSend[]>([])
 const loading = ref(false)
 const error = ref('')
-const notice = ref('')
 
 onMounted(() => {
   loadEmails()
@@ -37,14 +37,19 @@ async function loadEmails() {
 }
 
 async function toggleTemplate(template: TransactionalEmail) {
-  notice.value = ''
   error.value = ''
 
   try {
     await api.patch(`/saas/transactional-emails/${template.id}`, {
       is_active: !template.is_active,
     })
-    notice.value = template.is_active ? 'Template desativado.' : 'Template ativado.'
+    showFeedback({
+      status: 'success',
+      title: template.is_active ? 'Template desativado' : 'Template ativado',
+      message: template.is_active
+        ? 'O envio automático deste template foi pausado.'
+        : 'O template voltou a participar dos envios automáticos.',
+    })
     await loadEmails()
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível alterar o status do template.'
@@ -77,7 +82,6 @@ async function toggleTemplate(template: TransactionalEmail) {
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
-    <p v-if="notice" class="success-message">{{ notice }}</p>
 
     <div class="quick-grid">
       <RouterLink to="/saas/emails/configuracoes" class="quick-card">
@@ -154,7 +158,7 @@ async function toggleTemplate(template: TransactionalEmail) {
             <tr>
               <th>Template</th>
               <th>Empresa</th>
-              <th>Destinatario</th>
+              <th>Destinatário</th>
               <th>Status</th>
               <th>Data</th>
             </tr>

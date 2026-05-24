@@ -3,10 +3,10 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { Product } from '../services/merchantTypes'
+import { showFeedback } from '../services/saveFeedback'
 
 const products = ref<Product[]>([])
 const loading = ref(false)
-const notice = ref('')
 const error = ref('')
 
 onMounted(() => {
@@ -29,7 +29,11 @@ async function loadProducts() {
 
 async function removeProduct(product: Product) {
   await api.delete(`/products/${product.id}`)
-  notice.value = 'Produto removido.'
+  showFeedback({
+    status: 'success',
+    title: 'Produto removido',
+    message: 'O produto foi removido da empresa.',
+  })
   await loadProducts()
 }
 </script>
@@ -55,7 +59,6 @@ async function removeProduct(product: Product) {
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
-    <p v-if="notice" class="success-message">{{ notice }}</p>
 
     <section class="panel-main subsection">
       <div class="subsection-heading">

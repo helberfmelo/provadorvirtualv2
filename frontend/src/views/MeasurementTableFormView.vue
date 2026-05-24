@@ -19,16 +19,16 @@ const baseProductTypes = [
   { value: 'dress', label: 'Vestido' },
   { value: 'shirt', label: 'Camisa/Camiseta' },
   { value: 'blouse', label: 'Blusa' },
-  { value: 'pants', label: 'Calca' },
+  { value: 'pants', label: 'Calça' },
   { value: 'skirt', label: 'Saia' },
   { value: 'shorts', label: 'Bermuda/Shorts' },
   { value: 'jacket', label: 'Jaqueta' },
   { value: 'sweatshirt', label: 'Moletom' },
-  { value: 'bra', label: 'Sutia' },
+  { value: 'bra', label: 'Sutiã' },
   { value: 'kids_shirt', label: 'Camiseta infantil' },
-  { value: 'kids_pants', label: 'Calca infantil' },
-  { value: 'baby_body', label: 'Body bebe' },
-  { value: 'shoes', label: 'Calcado' },
+  { value: 'kids_pants', label: 'Calça infantil' },
+  { value: 'baby_body', label: 'Body bebê' },
+  { value: 'shoes', label: 'Calçado' },
   { value: 'custom', label: 'Personalizado' },
 ]
 
@@ -248,7 +248,7 @@ async function saveTable() {
           </select>
         </label>
         <label>
-          Genero
+          Gênero
           <select v-model="form.gender">
             <option value="female">Feminino</option>
             <option value="male">Masculino</option>

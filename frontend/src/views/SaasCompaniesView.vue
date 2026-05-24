@@ -3,11 +3,11 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { CompanyRow } from '../services/saasTypes'
+import { showFeedback } from '../services/saveFeedback'
 
 const companies = ref<CompanyRow[]>([])
 const loading = ref(false)
 const error = ref('')
-const notice = ref('')
 
 onMounted(() => {
   loadCompanies()
@@ -47,13 +47,18 @@ function companyPayload(company: CompanyRow, status: string) {
 }
 
 async function toggleCompany(company: CompanyRow) {
-  notice.value = ''
   error.value = ''
   const nextStatus = company.status === 'active' ? 'inactive' : 'active'
 
   try {
     await api.patch(`/saas/companies/${company.id}`, companyPayload(company, nextStatus))
-    notice.value = nextStatus === 'active' ? 'Empresa ativada.' : 'Empresa desativada.'
+    showFeedback({
+      status: 'success',
+      title: nextStatus === 'active' ? 'Empresa ativada' : 'Empresa desativada',
+      message: nextStatus === 'active'
+        ? 'A empresa voltou a acessar o portal.'
+        : 'A empresa foi pausada no portal.',
+    })
     await loadCompanies()
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível alterar o status da empresa.'
@@ -67,7 +72,7 @@ async function toggleCompany(company: CompanyRow) {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>Empresas</h1>
-        <p>Listagem operacional de empresas clientes. Cadastros e edicoes abrem em tela própria.</p>
+        <p>Listagem operacional de empresas clientes. Cadastros e edições abrem em tela própria.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadCompanies">
@@ -82,7 +87,6 @@ async function toggleCompany(company: CompanyRow) {
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
-    <p v-if="notice" class="success-message">{{ notice }}</p>
 
     <section class="panel-main subsection">
       <div class="subsection-heading">

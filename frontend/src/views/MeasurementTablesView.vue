@@ -3,10 +3,10 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { MeasurementTable } from '../services/merchantTypes'
+import { showFeedback } from '../services/saveFeedback'
 
 const tables = ref<MeasurementTable[]>([])
 const loading = ref(false)
-const notice = ref('')
 const error = ref('')
 
 onMounted(() => {
@@ -29,7 +29,11 @@ async function loadTables() {
 
 async function removeTable(table: MeasurementTable) {
   await api.delete(`/measurement-tables/${table.id}`)
-  notice.value = 'Tabela removida.'
+  showFeedback({
+    status: 'success',
+    title: 'Tabela removida',
+    message: 'A tabela de medidas foi removida da empresa.',
+  })
   await loadTables()
 }
 </script>
@@ -55,7 +59,6 @@ async function removeTable(table: MeasurementTable) {
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
-    <p v-if="notice" class="success-message">{{ notice }}</p>
 
     <section class="panel-main subsection">
       <div class="subsection-heading">
@@ -68,7 +71,7 @@ async function removeTable(table: MeasurementTable) {
             <tr>
               <th>Tabela</th>
               <th>Tipo</th>
-              <th>Genero</th>
+              <th>Gênero</th>
               <th>Linhas</th>
               <th>Produtos</th>
               <th>Status</th>

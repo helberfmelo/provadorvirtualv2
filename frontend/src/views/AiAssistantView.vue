@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
+import { showFeedback } from '../services/saveFeedback'
 
 type MeasurementRow = {
   size_label: string
@@ -38,7 +39,6 @@ const status = ref<Record<string, string | boolean | null>>({})
 const suggestion = ref<Suggestion | null>(null)
 const loading = ref(false)
 const saving = ref(false)
-const notice = ref('')
 const error = ref('')
 const warnings = ref<string[]>([])
 
@@ -57,16 +57,16 @@ const productTypeOptions = [
   { value: 'shirt', label: 'Camisa/Camiseta' },
   { value: 'blouse', label: 'Blusa' },
   { value: 'dress', label: 'Vestido' },
-  { value: 'pants', label: 'Calca' },
+  { value: 'pants', label: 'Calça' },
   { value: 'skirt', label: 'Saia' },
   { value: 'shorts', label: 'Bermuda/Shorts' },
   { value: 'jacket', label: 'Jaqueta' },
   { value: 'sweatshirt', label: 'Moletom' },
-  { value: 'bra', label: 'Sutia' },
+  { value: 'bra', label: 'Sutiã' },
   { value: 'kids_shirt', label: 'Camiseta infantil' },
-  { value: 'kids_pants', label: 'Calca infantil' },
-  { value: 'baby_body', label: 'Body bebe' },
-  { value: 'shoes', label: 'Calcado' },
+  { value: 'kids_pants', label: 'Calça infantil' },
+  { value: 'baby_body', label: 'Body bebê' },
+  { value: 'shoes', label: 'Calçado' },
   { value: 'custom', label: 'Personalizado' },
 ]
 
@@ -84,7 +84,6 @@ async function loadStatus() {
 
 async function suggestTable() {
   loading.value = true
-  notice.value = ''
   error.value = ''
   warnings.value = []
   suggestion.value = null
@@ -116,7 +115,6 @@ async function saveSuggestion() {
   }
 
   saving.value = true
-  notice.value = ''
   error.value = ''
 
   try {
@@ -136,7 +134,14 @@ async function saveSuggestion() {
     }
 
     await api.post('/measurement-tables', payload)
-    notice.value = 'Tabela criada como rascunho.'
+    showFeedback({
+      status: 'success',
+      title: 'Tabela criada',
+      message: 'A tabela foi criada como rascunho. Acesse a página de tabelas para revisar e publicar.',
+      actionLabel: 'Ver tabelas',
+      actionTo: '/app/tabelas-de-medidas',
+      duration: 0,
+    })
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível criar a tabela.'
   } finally {
@@ -216,7 +221,6 @@ function readAsDataUrl(file: File): Promise<string> {
       </button>
     </div>
 
-    <p v-if="notice" class="success-message">{{ notice }}</p>
     <p v-if="error" class="form-error">{{ error }}</p>
 
     <div class="assistant-status">
@@ -269,7 +273,7 @@ function readAsDataUrl(file: File): Promise<string> {
             <input v-model="form.name" maxlength="180" />
           </label>
           <label>
-            Genero
+            Gênero
             <select v-model="form.gender">
               <option value="female">Feminino</option>
               <option value="male">Masculino</option>
@@ -399,7 +403,7 @@ function readAsDataUrl(file: File): Promise<string> {
           </div>
 
           <label>
-            Observacoes
+            Observações
             <textarea v-model="suggestion.notes" rows="3"></textarea>
           </label>
 

@@ -450,3 +450,13 @@
 - Widget público passou a expor `window.ProvadorVirtual.reload(...)` para recarregar o widget quando produto, variação ou SKU mudarem sem reload da página.
 - Documentação de widget, integrações e BigShop foi atualizada com o local de instalação, recarregamento por variação e ponto futuro `produto.vue` da model3 plano pro.
 - Validações locais: `npm run build`, `php artisan test --filter=WidgetAssetTest`, `php artisan test --filter=IntegrationsApiTest`, `vendor/bin/pint --dirty` e `git diff --check`.
+- Run `26348462160` do GitHub Actions finalizou com sucesso para o commit `7b06d4d`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 55 Feedbacks operacionais por modal
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
+- Removidos os avisos inline `success-message` que ainda apareciam em produtos, tabelas, assistente, importações, empresas, usuários e e-mails.
+- Ações operacionais de remover, ativar/desativar, criar rascunho assistido e importar dados passaram a usar `showFeedback` no modal central.
+- Removida a classe CSS `.success-message`, que deixou de ser usada no frontend.
+- Varredura de textos visíveis corrigiu acentos remanescentes em importações, gênero, opções de produto e destinatário.
+- Validações locais: `npm run build`, busca `rg` por padrões antigos de mensagem/texto e `git diff --check`.

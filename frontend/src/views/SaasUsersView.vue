@@ -3,11 +3,11 @@ import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { SaasUser } from '../services/saasTypes'
+import { showFeedback } from '../services/saveFeedback'
 
 const users = ref<SaasUser[]>([])
 const loading = ref(false)
 const error = ref('')
-const notice = ref('')
 
 onMounted(() => {
   loadUsers()
@@ -29,14 +29,19 @@ async function loadUsers() {
 
 async function toggleUser(user: SaasUser) {
   error.value = ''
-  notice.value = ''
   const nextStatus = user.status === 'active' ? 'inactive' : 'active'
 
   try {
     await api.patch(`/saas/users/${user.id}`, {
       status: nextStatus,
     })
-    notice.value = nextStatus === 'active' ? 'Usuário ativado.' : 'Usuário desativado.'
+    showFeedback({
+      status: 'success',
+      title: nextStatus === 'active' ? 'Usuário ativado' : 'Usuário desativado',
+      message: nextStatus === 'active'
+        ? 'O usuário interno voltou a acessar o SaaS.'
+        : 'O usuário interno foi pausado no SaaS.',
+    })
     await loadUsers()
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível alterar o status.'
@@ -65,7 +70,6 @@ async function toggleUser(user: SaasUser) {
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
-    <p v-if="notice" class="success-message">{{ notice }}</p>
 
     <section class="panel-main subsection">
       <div class="subsection-heading">

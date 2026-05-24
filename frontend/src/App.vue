@@ -42,7 +42,7 @@ const companyLinks = computed<NavLink[]>(() => [
   { to: '/app/produtos', label: 'Produtos', icon: 'fa-shirt', show: auth.canView('products') },
   { to: '/app/tabelas-de-medidas', label: 'Tabelas', icon: 'fa-ruler-combined', show: auth.canView('measurement_tables') },
   { to: '/app/assistente', label: 'Assistente IA', icon: 'fa-wand-magic-sparkles', show: auth.canView('ai_assistant') },
-  { to: '/app/importacoes', label: 'Importacoes', icon: 'fa-file-arrow-up', show: auth.canView('imports') },
+  { to: '/app/importacoes', label: 'Importações', icon: 'fa-file-arrow-up', show: auth.canView('imports') },
   { to: '/app/widget', label: 'Widget', icon: 'fa-code', show: auth.canView('widget') },
   { to: '/app/integracoes', label: 'Integrações', icon: 'fa-plug', show: auth.canView('integrations') },
   { to: '/app/analytics', label: 'Analytics', icon: 'fa-chart-line', show: auth.canView('analytics') },

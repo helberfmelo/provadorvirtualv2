@@ -124,6 +124,7 @@ Atualizado em: 2026-05-23
 - `DONE` Revisar responsividade, alinhamento e padrão list-first dos portais autenticados.
 - `DONE` Limpar defaults confusos nos formulários de nova empresa e novo produto.
 - `DONE` Feedback global de salvamento, sucesso e erro nos portais SaaS e empresa.
+- `DONE` Remover feedbacks de sucesso inline restantes e usar modal central nas ações operacionais.
 
 ## Pagamentos
 

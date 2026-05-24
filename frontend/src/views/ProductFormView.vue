@@ -182,7 +182,7 @@ async function removeVariant(variant: ProductVariant) {
           <input v-model="form.category" maxlength="120" />
         </label>
         <label>
-          Genero
+          Gênero
           <select v-model="form.gender">
             <option value="female">Feminino</option>
             <option value="male">Masculino</option>

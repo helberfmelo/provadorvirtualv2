@@ -189,7 +189,7 @@ async function loadOverview() {
             <tr>
               <th>Template</th>
               <th>Empresa</th>
-              <th>Destinatario</th>
+              <th>Destinatário</th>
               <th>Status</th>
               <th>Data</th>
             </tr>
