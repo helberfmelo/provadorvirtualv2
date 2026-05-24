@@ -720,4 +720,17 @@ Entregas:
 - reforçar no índice obrigatório que nenhuma sprint começa sem releitura e nenhuma sprint termina sem deploy verificado;
 - validar a documentação com `git diff --check`.
 
-Status: documentação preparada para commit e verificação remota desta sprint.
+Status: implementado no commit `b90cf10` e publicado com sucesso no run `26348767486`, com deploy remoto e smoke público concluídos.
+
+### Sprint 57 - Atualização dos actions do deploy
+
+Objetivo: remover o alerta de depreciação futura do runtime Node 20 nos actions oficiais do GitHub Actions, mantendo a esteira de deploy compatível com a próxima mudança do GitHub.
+
+Entregas:
+
+- verificar as versões atuais oficiais de `actions/checkout` e `actions/setup-node`;
+- atualizar o workflow de deploy para `actions/checkout@v6` e `actions/setup-node@v6`;
+- registrar a correção preventiva na documentação de estado e execução;
+- validar o YAML e acompanhar o deploy remoto até o status final.
+
+Status: documentação e workflow preparados para commit e verificação remota desta sprint.

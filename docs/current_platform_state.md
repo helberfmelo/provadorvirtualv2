@@ -53,6 +53,7 @@ Atualizado em: 2026-05-23
 - Sprint 54 detalhou no portal e nas docs onde instalar o widget na página de produto e adicionou recarregamento público do widget para troca dinâmica de variação/SKU.
 - Sprint 55 removeu os feedbacks de sucesso inline restantes nas telas operacionais e padronizou essas ações no modal central.
 - Sprint 56 registra a conferência remota da Sprint 55 e reforça o ciclo obrigatório de não avançar sprint sem deploy verificado.
+- Sprint 57 atualiza os actions oficiais do workflow para `actions/checkout@v6` e `actions/setup-node@v6`, removendo o risco da depreciação do runtime Node 20 dos actions.
 
 ## Referências confirmadas
 
@@ -142,6 +143,7 @@ Atualizado em: 2026-05-23
 - Sprint 53 enviada ao GitHub no commit `684ba67`; o run `26348238406` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - Sprint 54 enviada ao GitHub no commit `7b06d4d`; o run `26348462160` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - Sprint 55 enviada ao GitHub no commit `01d0461`; o run `26348653353` finalizou com sucesso, incluindo deploy remoto e smoke público.
+- Sprint 56 enviada ao GitHub no commit `b90cf10`; o run `26348767486` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

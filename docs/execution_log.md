@@ -468,3 +468,12 @@
 - Registrado no estado atual, roadmap e log que a Sprint 55 teve push, GitHub Actions e deploy remoto verificados com sucesso.
 - Corrigida a frase de governança no índice obrigatório para usar PT-BR com acentos.
 - Validação local: `git diff --check`.
+- Run `26348767486` do GitHub Actions finalizou com sucesso para o commit `b90cf10`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 57 Atualização dos actions do deploy
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` com conteúdo mascarado.
+- Conferidas via GitHub API as versões oficiais atuais: `actions/checkout` v6.0.2 e `actions/setup-node` v6.4.0.
+- Workflow `.github/workflows/deploy.yml` atualizado para `actions/checkout@v6` e `actions/setup-node@v6`.
+- Motivo: o run `26348767486` passou, mas emitiu anotação de depreciação futura do runtime Node 20 dos actions oficiais.
+- Validação local: `git diff --check` e conferência de `actions/checkout@v6`/`actions/setup-node@v6` no workflow.
