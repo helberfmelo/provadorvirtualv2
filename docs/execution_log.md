@@ -702,4 +702,6 @@
 - Teste `WidgetAssetTest` atualizado para cobrir `font-style: italic`.
 - Validações locais: `php artisan test --filter=WidgetAssetTest`, `git diff --check`, `npm run build` em `frontend` e `npm run build` em `backend`.
 - Observação local: o build Vite do backend concluiu com sucesso, mas avisou que recomenda Node `20.19+`; a máquina local está em Node `20.18.1`.
-- Commit, push, GitHub Actions/deploy e validação de produção pendentes neste registro até o run remoto finalizar.
+- Commit `0c83622` enviado para `main`; o run `26372649754` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou com cache bust que o CSS público contém `.pv-browser-note`, `font-size: 0.88em` e `font-style: italic`.
+- `scripts/validate-production.ps1` passou completo após o deploy.
