@@ -487,7 +487,7 @@ jobs:
           assert_contains "${PRODUCTION_APP_URL}/saas/empresas" '<div id="app"'
           assert_contains "${PRODUCTION_APP_URL}/saas/usuarios-empresas" '<div id="app"'
           assert_contains "${PRODUCTION_APP_URL}/app/produtos/novo" '<div id="app"'
-          assert_contains "${PRODUCTION_APP_URL}/widget/v1/provador-virtual.js" 'data-pv-submit'
+          assert_contains "${PRODUCTION_APP_URL}/widget/v1/provador-virtual.js" 'data-pv-recommend'
           assert_contains "${PRODUCTION_APP_URL}/widget/v1/provador-virtual.css" '.pv-trigger'
           assert_contains "${PRODUCTION_APP_URL}/api/v1/health" '"status":"ok"'
           assert_contains "${PRODUCTION_APP_URL}/api/v1/ops/status" '"status":"ok"'
@@ -503,7 +503,7 @@ jobs:
           assert_contains "${PRODUCTION_ROOT_URL}/saas/usuarios-empresas" '<div id="app"'
           assert_contains "${PRODUCTION_ROOT_URL}/app/produtos/novo" '<div id="app"'
           assert_contains "${PRODUCTION_ROOT_URL}/api/v1/health" '"status":"ok"'
-          assert_contains "${PRODUCTION_ROOT_URL}/widget/v1/provador-virtual.js" 'data-pv-submit'
+          assert_contains "${PRODUCTION_ROOT_URL}/widget/v1/provador-virtual.js" 'data-pv-recommend'
 
       - name: Diagnose public failure
         if: failure() && steps.scaffold.outputs.ready == 'true'

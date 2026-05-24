@@ -585,3 +585,5 @@
 - Validação visual local com Playwright em página demo virtual na origem `http://127.0.0.1:8012`: botões, etapa 1, etapa 2, etapa 3, recomendação `M`, feedback registrado e tabela de medidas carregada.
 - Validação mobile local em viewport `390x844`: sem rolagem horizontal (`documentElement.scrollWidth = window.innerWidth`).
 - Evidências visuais foram salvas em `.tmp/sprint66-widget/` e não devem ser versionadas.
+- Commit `f52b228` enviado para `main`, porém o run `26356327237` falhou no smoke público porque o workflow ainda verificava o marcador antigo `data-pv-submit`, removido na refatoração em etapas.
+- Smoke público atualizado para validar o marcador atual `data-pv-recommend` do novo fluxo gamificado do widget v2.
