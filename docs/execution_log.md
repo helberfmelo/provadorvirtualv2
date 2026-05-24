@@ -587,3 +587,4 @@
 - Evidências visuais foram salvas em `.tmp/sprint66-widget/` e não devem ser versionadas.
 - Commit `f52b228` enviado para `main`, porém o run `26356327237` falhou no smoke público porque o workflow ainda verificava o marcador antigo `data-pv-submit`, removido na refatoração em etapas.
 - Smoke público atualizado para validar o marcador atual `data-pv-recommend` do novo fluxo gamificado do widget v2.
+- Run `26356510237` do GitHub Actions finalizou com sucesso para o commit `f1d2dbf`, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.

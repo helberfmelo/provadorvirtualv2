@@ -864,4 +864,4 @@ Entregas:
 - incluir `raw_widget_payload` na anonimização LGPD;
 - validar desktop, mobile, console, rede, recomendação, feedback e tabela de medidas.
 
-Status: implementado no commit `f52b228`; o primeiro deploy remoto (`26356327237`) falhou apenas no smoke público por validar o marcador antigo `data-pv-submit`. A correção da sprint atualiza o smoke para o marcador vigente `data-pv-recommend` do widget em etapas.
+Status: implementado no commit `f52b228`; o primeiro deploy remoto (`26356327237`) falhou apenas no smoke público por validar o marcador antigo `data-pv-submit`. Corrigido no commit `f1d2dbf`, publicado com sucesso no run `26356510237`, com deploy remoto, deploy da raiz pública, master admin e smoke público concluídos.
