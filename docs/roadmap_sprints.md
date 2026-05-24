@@ -818,3 +818,18 @@ Entregas:
 - documentar as duas fontes aceitas para resolução pública BigShop.
 
 Status: implementado no commit `a575777` e publicado com sucesso no run `26353804637`, com deploy remoto, smoke público e `config-check` da Luna Moda Festa retornando `configured=true`.
+
+### Sprint 64 - Corrigir preflight CORS do widget
+
+Objetivo: eliminar o `load_error` restante na Luna Moda Festa causado por redirect no preflight CORS do navegador.
+
+Entregas:
+
+- confirmar no console e no HAR que o `OPTIONS` para `/provadorvirtual_v2/api/v1/public/recommendations/config-check` recebe `307` e falha com `net::ERR_INVALID_REDIRECT`;
+- alterar o widget público para calcular a base padrão da API como `/provadorvirtual_v2/public/api/v1` quando o script estiver em subpasta;
+- manter `data-api-base-url` como override explícito para instalações especiais;
+- adicionar `window.ProvadorVirtual.diagnostics()` para depuração controlada;
+- emitir detalhes de falha no evento `provadorvirtual:config`, incluindo `api_base`, `request_url`, nome/mensagem do erro, status HTTP e trecho de resposta quando houver;
+- documentar o diagnóstico e o motivo técnico do redirect em preflight.
+
+Status: em execução.

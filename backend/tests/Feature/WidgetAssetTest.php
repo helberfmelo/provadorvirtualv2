@@ -14,6 +14,9 @@ class WidgetAssetTest extends TestCase
         $this->assertFileExists($script);
         $this->assertFileExists($css);
         $this->assertStringContainsString('data-pv-submit', file_get_contents($script));
+        $this->assertStringContainsString("basePath + '/public/api/v1'", file_get_contents($script));
+        $this->assertStringContainsString('diagnostics', file_get_contents($script));
         $this->assertStringContainsString('.pv-trigger', file_get_contents($css));
+        $this->assertStringContainsString('.pv-debug', file_get_contents($css));
     }
 }

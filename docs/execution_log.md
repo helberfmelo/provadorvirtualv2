@@ -547,3 +547,12 @@
 - Validações locais: `php artisan test --filter=RecommendationApiTest`, `php artisan test --filter=HardeningApiTest`, `vendor/bin/pint --dirty`, `npm run build` e `git diff --check`.
 - Run `26353804637` do GitHub Actions finalizou com sucesso para o commit `a575777`, incluindo deploy remoto e smoke público.
 - Após o deploy, `config-check` em produção para a Luna Moda Festa com `Origin: https://www.lunamodafesta.com.br` e `Origin: https://lunamodafesta.com.br` retornou `configured=true`, `product_id=6`, `measurement_table_id=1` e `Access-Control-Allow-Origin` correto.
+
+## 2026-05-24 - Sprint 64 Corrigir preflight CORS do widget
+
+- Releitura obrigatória dos documentos principais e de `docs/bigshop_model3_pro_widget.md` concluída antes de iniciar a correção.
+- Console da Luna Moda Festa mostrou `Redirect is not allowed for a preflight request` ao chamar `https://provadorvirtual.online/provadorvirtual_v2/api/v1/public/recommendations/config-check`.
+- HAR local `C:\Users\helbe\Downloads\www.lunamodafesta.com.br.json` confirmou `OPTIONS` com status `307` e erro `net::ERR_INVALID_REDIRECT`; o `POST` ficou com status `0`/`net::ERR_FAILED`.
+- Reproduzido por terminal que `OPTIONS /provadorvirtual_v2/api/v1/...` retorna `307`, enquanto `OPTIONS /provadorvirtual_v2/public/api/v1/...` retorna `204` com `Access-Control-Allow-Origin` correto.
+- Widget público ajustado para calcular `api_base` diretamente em `/provadorvirtual_v2/public/api/v1` quando o script estiver em subpasta, evitando redirect no preflight CORS.
+- Adicionado `window.ProvadorVirtual.diagnostics()` e detalhes de falha no evento `provadorvirtual:config` para depuração futura.

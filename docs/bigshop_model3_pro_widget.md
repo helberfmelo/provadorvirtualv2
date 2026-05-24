@@ -128,6 +128,16 @@ Se `vue.generalData.store.apps` vier vazio, conferir em `bbs.template_model3_app
 
 Se o script carregar, mas o widget não renderizar, testar o endpoint público `POST /api/v1/public/recommendations/config-check`. Um retorno `403` com `Origin` da loja indica domínio não liberado no widget; adicionar o domínio com e sem `www` em `/app/widget`. O retorno `measurement_table_missing` indica que o produto resolvido pelo par `platform=bigshop`, `store_id` e `product_id` ainda está sem `measurement_table_id` válido no SaaS.
 
+Se o console mostrar `Redirect is not allowed for a preflight request`, o script está chamando uma base que redireciona antes da API real. O widget público do Provador Virtual deve chamar diretamente `/provadorvirtual_v2/public/api/v1` em produção. Como alternativa temporária no app BigShop, informar `data-api-base-url="https://provadorvirtual.online/provadorvirtual_v2/public/api/v1"` no script gerado dinamicamente, mas a base padrão do widget já deve evitar esse redirect.
+
+Com `?pvdebug=1`, também é possível executar no console:
+
+```js
+window.ProvadorVirtual?.diagnostics()
+```
+
+Esse diagnóstico mostra `api_base`, `request_url`, payload atual, status de configuração e último retorno do `config-check`.
+
 No portal da empresa, o formulário de produto não pode selecionar automaticamente a primeira tabela quando `measurement_table_id` vier `NULL`. A lista de produtos e o editor devem refletir o banco: produto sem vínculo real deve aparecer como `Sem tabela` até o usuário salvar uma tabela explicitamente.
 
 ## Luna Moda Festa

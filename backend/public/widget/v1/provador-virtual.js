@@ -43,11 +43,12 @@
           root.innerHTML = '<div class="pv-warning">Provador Virtual indisponivel para este produto.</div>';
         }
       })
-      .catch(function () {
-        emitConfigEvent({ configured: false, reason: 'load_error' });
+      .catch(function (error) {
+        var failure = failurePayload('load_error', error);
+        emitConfigEvent(failure);
 
         if (config.debug) {
-          root.innerHTML = '<div class="pv-warning">Nao foi possivel carregar o Provador Virtual.</div>';
+          root.innerHTML = debugFailureHtml(failure);
         }
       });
   }
@@ -55,7 +56,7 @@
   function readConfig(scriptEl) {
     var src = new URL(scriptEl.src, window.location.href);
     var basePath = src.pathname.replace(/\/widget\/v1\/provador-virtual\.js$/, '');
-    var apiBase = scriptEl.dataset.apiBaseUrl || src.origin + basePath + '/api/v1';
+    var apiBase = scriptEl.dataset.apiBaseUrl || defaultApiBase(src.origin, basePath);
 
     return {
       apiBase: apiBase.replace(/\/$/, ''),
@@ -70,6 +71,18 @@
       debug: valueFor(scriptEl, 'debug') === 'true',
       theme: parseTheme(valueFor(scriptEl, 'theme')),
     };
+  }
+
+  function defaultApiBase(origin, basePath) {
+    if (/\/public$/.test(basePath)) {
+      return origin + basePath + '/api/v1';
+    }
+
+    if (basePath) {
+      return origin + basePath + '/public/api/v1';
+    }
+
+    return origin + '/api/v1';
   }
 
   function exposePublicApi() {
@@ -90,6 +103,16 @@
       root = null;
       loadCss(config.cssUrl);
       boot();
+    };
+
+    publicApi.diagnostics = function () {
+      return {
+        api_base: config.apiBase,
+        css_url: config.cssUrl,
+        payload: identityPayload(),
+        configured: state.configured,
+        last_config: state.config,
+      };
     };
 
     window.ProvadorVirtual = publicApi;
@@ -169,7 +192,9 @@
   }
 
   function request(path, body) {
-    return fetch(config.apiBase + path, {
+    var url = config.apiBase + path;
+
+    return fetch(url, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -178,10 +203,22 @@
       body: JSON.stringify(body),
     }).then(function (response) {
       if (!response.ok) {
-        throw new Error('HTTP ' + response.status);
+        return response.text().then(function (text) {
+          var httpError = new Error('HTTP ' + response.status);
+          httpError.pvUrl = url;
+          httpError.pvStatus = response.status;
+          httpError.pvResponseBody = text.slice(0, 500);
+          throw httpError;
+        });
       }
 
       return response.json();
+    }).catch(function (error) {
+      if (!error.pvUrl) {
+        error.pvUrl = url;
+      }
+
+      throw error;
     });
   }
 
@@ -210,6 +247,28 @@
 
   function configCheck() {
     return request('/public/recommendations/config-check', identityPayload());
+  }
+
+  function failurePayload(reason, error) {
+    return {
+      configured: false,
+      reason: reason,
+      api_base: config.apiBase,
+      request_url: error && error.pvUrl ? error.pvUrl : config.apiBase + '/public/recommendations/config-check',
+      error_name: error && error.name ? error.name : null,
+      error_message: error && error.message ? String(error.message) : null,
+      http_status: error && error.pvStatus ? error.pvStatus : null,
+      response_body: error && error.pvResponseBody ? error.pvResponseBody : null,
+    };
+  }
+
+  function debugFailureHtml(failure) {
+    return [
+      '<div class="pv-warning">',
+      '<strong>N&atilde;o foi poss&iacute;vel carregar o Provador Virtual.</strong>',
+      '<pre class="pv-debug">' + escapeHtml(JSON.stringify(failure, null, 2)) + '</pre>',
+      '</div>',
+    ].join('');
   }
 
   function renderTriggers() {

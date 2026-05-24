@@ -109,11 +109,13 @@ Endpoints usados pelo widget:
 
 `signal` registra eventos `add_to_cart`, `purchase`, `return` e `exchange` para aprendizado estatístico. Plataformas que ainda não tiverem integração automática podem enviar esses sinais depois pelo próprio front ou por conector server-to-server.
 
-O widget resolve a base da API a partir do próprio `src`. Em produção, chamadas para `/provadorvirtual_v2/api/...` passam por redirect 307 para a entrada Laravel funcional em `/provadorvirtual_v2/public/api/...`.
+O widget resolve a base da API a partir do próprio `src`. Quando o script está em uma subpasta, como `/provadorvirtual_v2/widget/v1/provador-virtual.js`, a base padrão da API é calculada diretamente como `/provadorvirtual_v2/public/api/v1`, evitando redirect no preflight CORS do navegador. Em instalações fora desse padrão, `data-api-base-url` pode sobrescrever a base explicitamente.
 
 Em navegadores, o CORS permitido e calculado por lojista a partir do domínio da página de origem. O painel deve manter `allowed_domains` atualizado antes de instalar o widget em produção.
 
 O widget expõe `window.ProvadorVirtual.reload(...)` para lojas que alteram tamanho/cor/grade sem recarregar a página. Esse método atualiza os identificadores do script, remove a instância anterior e executa novo `config-check` para o produto/variação atual.
+
+O widget também expõe `window.ProvadorVirtual.diagnostics()` para depuração controlada. Em modo debug, falhas de carregamento emitem `provadorvirtual:config` com `api_base`, `request_url`, `error_name`, `error_message`, `http_status` e trecho do `response_body`, quando disponível.
 
 ## Guias por plataforma
 
