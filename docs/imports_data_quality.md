@@ -1,6 +1,6 @@
-# Importacao e Qualidade de Dados
+# Importação e Qualidade de Dados
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-24
 
 ## Objetivo
 
@@ -49,10 +49,11 @@ sku,name,category,gender,fit_profile,size_label,variant_sku,price,stock_quantity
 Regras:
 
 - `sku` ou `external_product_id` identifica produto.
-- `name` e obrigatório.
+- `name` é obrigatório.
 - `size_label` cria ou atualiza variação.
 - `measurement_table` tenta vincular tabela existente pelo nome.
-- importacao atualiza produto por `sku` ou `external_product_id`.
+- importação atualiza produto por `sku` ou `external_product_id`.
+- quando o feed/XML não informar `measurement_table`, a sincronização preserva a tabela já vinculada manualmente ao produto.
 
 ## CSV de tabelas
 
@@ -65,13 +66,13 @@ table_name,product_type,gender,fit_profile,size_label,bust_min,bust_max,waist_mi
 Regras:
 
 - `table_name` e `size_label` são obrigatórios.
-- Linhas com o mesmo `table_name` compoem a mesma tabela.
-- Ao importar uma tabela existente com o mesmo nome, as linhas são substituidas pelo conteúdo importado.
+- Linhas com o mesmo `table_name` compõem a mesma tabela.
+- Ao importar uma tabela existente com o mesmo nome, as linhas são substituídas pelo conteúdo importado.
 - Fonte da tabela fica como `import`.
 
 ## Google Shopping XML
 
-Parser de produtos le campos comuns:
+Parser de produtos lê campos comuns:
 
 - `g:id`
 - `g:item_group_id`

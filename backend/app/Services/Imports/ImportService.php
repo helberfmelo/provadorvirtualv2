@@ -320,9 +320,11 @@ class ImportService
                 ]);
             }
 
+            $measurementTableId = $table?->id ?? $product->measurement_table_id;
+
             $product->fill([
                 'merchant_company_id' => $company?->id,
-                'measurement_table_id' => $table?->id,
+                'measurement_table_id' => $measurementTableId,
                 'external_product_id' => $data['external_product_id'] ?? $product->external_product_id,
                 'sku' => $data['sku'] ?? $product->sku,
                 'name' => $data['name'],

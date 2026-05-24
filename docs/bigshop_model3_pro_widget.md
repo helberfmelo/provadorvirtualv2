@@ -100,6 +100,25 @@ Para uma loja BigShop funcionar:
 
 Para integração apenas via XML/feed, `URL da API` e `Token` BigShop podem ficar vazios. O `store_id`/loja BigShop ainda deve estar correto para o widget resolver a empresa.
 
+## Depuração em produção
+
+Para validar uma página BigShop sem expor mensagem para clientes comuns, acessar o produto com `?pvdebug=1` ou executar no console `localStorage.setItem('provadorVirtualDebug', '1')` e recarregar. O front pro exibe uma faixa de debug no ponto do widget e escreve logs com o prefixo `[Provador Virtual]`.
+
+Checklist rápido no console da página:
+
+```js
+vue.generalData.store.apps
+product.provadorVirtualApp
+product.provadorVirtualEnabled
+product.provadorVirtualPayload()
+document.getElementById('provador-virtual-container')
+document.getElementById('provadorVirtualScript')
+```
+
+Se `vue.generalData.store.apps` vier vazio, conferir em `bbs.template_model3_apps` se o app da loja está com `deleted_at is null`, `cod_4='S'`, `type` apontando para `bbs.apps.id` do `app_code='provador_virtual'` e se o cache da loja foi limpo.
+
+Se o script carregar, mas o widget não renderizar, testar o endpoint público `POST /api/v1/public/recommendations/config-check`. O retorno `measurement_table_missing` indica que o produto resolvido pelo par `platform=bigshop`, `store_id` e `product_id` ainda está sem `measurement_table_id` válido no SaaS.
+
 ## Luna Moda Festa
 
 Para a loja piloto Luna Moda Festa:

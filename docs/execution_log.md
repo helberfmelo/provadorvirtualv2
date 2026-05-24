@@ -511,3 +511,13 @@
 - Painel BigShop em `D:\Projetos\bigbangshop2.0` ajustado para priorizar `Provador Virtual` no topo da lista quando a API retornar o app e para comparar `id/value` de forma tolerante.
 - Validações locais BigShop: `php -l` no `get_apps.php`, `npx eslint src/pages/configurations/additionalAppsEdit.vue` e `git diff --check` no painel.
 - Painel BigShop commitado e enviado para GitLab no commit `4c2c92b3e`, branch `hotfix/couto-integration-support`; `git ls-remote` confirmou o mesmo hash no remoto.
+
+## 2026-05-24 - Sprint 61 Preservar tabela no sync XML
+
+- Investigado o produto BigShop `716076` da Luna Moda Festa, cujo widget público retornava `measurement_table_missing`.
+- Confirmado via página pública que o HTML já contém o debug do `produto.vue`, mas o payload da loja ainda vinha com `store.apps=[]` quando o registro BigShop estava com `deleted_at` preenchido.
+- Confirmado via endpoint público `POST /api/v1/public/recommendations/config-check` que o SaaS ainda resolvia o produto como sem tabela de medidas.
+- Corrigido o importador para preservar `measurement_table_id` existente quando o XML/feed não informa `measurement_table`.
+- Teste de integração XML passou a simular novo sync após vínculo manual e garantir que a tabela não é removida.
+- Documentada a depuração BigShop com `?pvdebug=1` e comandos de console.
+- Validações locais: `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=RecommendationApiTest` e `git diff --check`.

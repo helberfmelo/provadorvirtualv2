@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\IntegrationEvent;
+use App\Models\MeasurementTable;
 use App\Models\MerchantCompany;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -132,6 +133,16 @@ XML, 200),
         $variant = ProductVariant::query()->where('external_variant_id', 'VAR-1')->firstOrFail();
 
         $this->assertSame($product->id, $variant->product_id);
+
+        $tableId = MeasurementTable::query()->value('id');
+        $product->update(['measurement_table_id' => $tableId]);
+
+        $this->withHeaders($headers)
+            ->postJson('/api/v1/integrations/custom/sync-xml')
+            ->assertOk()
+            ->assertJsonPath('data.status', 'completed');
+
+        $this->assertSame($tableId, $product->refresh()->measurement_table_id);
     }
 
     public function test_xml_feed_sync_command_processes_configured_connections(): void

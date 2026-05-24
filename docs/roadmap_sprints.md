@@ -775,3 +775,16 @@ Entregas:
 - documentar que, se o ambiente local apontar para outra cópia do backend, o SQL precisa ser aplicado no banco usado por esse backend.
 
 Status: painel BigShop implementado no commit `4c2c92b3e` e enviado para `hotfix/couto-integration-support`; documentação do Provador preparada para commit e verificação remota.
+
+### Sprint 61 - Preservar tabela no sync XML
+
+Objetivo: impedir que a sincronização XML/feed remova o vínculo manual de tabela de medidas quando o catálogo da plataforma não informa o nome da tabela.
+
+Entregas:
+
+- preservar `measurement_table_id` existente em produtos já sincronizados quando o XML não trouxer `measurement_table`;
+- manter o vínculo automático por nome quando o XML/CSV trouxer tabela explicitamente;
+- cobrir o comportamento no teste de integração XML;
+- documentar a depuração do widget BigShop e o retorno `measurement_table_missing`.
+
+Status: implementado localmente; aguardando commit, push e verificação remota da sprint.
