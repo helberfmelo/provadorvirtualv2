@@ -899,4 +899,4 @@ Entregas:
 - manter créditos, ano, privacidade e termos no rodapé do drawer;
 - validar o fluxo com teste local de widget, suíte backend completa e build frontend.
 
-Status: implementado localmente; aguardando commit, push, deploy remoto e verificação pública da sprint.
+Status: implementado no commit `790d875` e publicado com sucesso no run `26366746266`, com deploy remoto, deploy da raiz pública, master admin, smoke público, verificação dos assets públicos e teste Playwright pós-deploy no produto teste.

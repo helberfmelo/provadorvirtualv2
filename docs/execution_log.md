@@ -617,3 +617,8 @@
 - Fechamento do drawer salva snapshot silencioso quando já existe recomendação e o consumidor alterou dados.
 - Confete ficou configurável por `theme.confetti_enabled`, com padrão ativado nos defaults do widget, demo, checkout, SaaS e ativação BigShop.
 - Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, Playwright temporário com servidor mockado, `php artisan test` e `npm run build`.
+- Run `26366746266` do GitHub Actions finalizou com sucesso para o commit `790d875`, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou que o JS público contém `v2_sprint_68`, `pv_shopper_profile_v2_table_`, `confetti_enabled`, `Seu tamanho &eacute;` e `data-pv-step`.
+- Pós-deploy confirmou que o CSS público contém `.pv-recommendation-inline`, `.pv-stepper button` e `.pv-shape-male`.
+- Pós-deploy validou o endpoint público de recomendação com altura + peso, retornando `recommended_size=M`.
+- Playwright pós-deploy em `https://provadorvirtual.online/produto-teste/blusa-canelada-solar` validou: altura isolada sem recomendação, altura + peso com `Seu tamanho é M`, etapa 2 liberada, 5 silhuetas femininas, etapa 3 liberada, resultado final com confete e perfil salvo em `pv_shopper_profile_v2_table_3`.
