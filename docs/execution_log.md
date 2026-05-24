@@ -653,3 +653,13 @@
 - Pós-deploy confirmou que `/produto-teste/vestido-midi-aurora` contém favicon e tags OG/Twitter apontando para os assets oficiais.
 - `scripts/validate-production.ps1` passou completo após o deploy.
 - Playwright pós-deploy em desktop e mobile confirmou: nenhum tamanho selecionado por padrão, texto `Selecione um tamanho para ver a disponibilidade`, logo carregado e ausência de rolagem horizontal.
+
+## 2026-05-24 - Sprint 71 Atualizar assets oficiais da marca
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` sem expor valores sensíveis.
+- Novas versões de `icon_provador_virtual.png`, `logo_provador_virtual.png` e `favicon_provador_virtual.png` copiadas de `C:\Users\helbe\Downloads\` para `frontend/public/images/brand/`.
+- Hashes dos três arquivos mudaram em relação aos assets publicados na Sprint 70.
+- Dimensões atuais confirmadas: ícone `312x312`, favicon `312x312` e logo `3054x261`.
+- Tags OG atualizadas para refletir as dimensões reais do novo logo.
+- Validações locais: `npm run build` e `git diff --check`.
+- Verificação remota será registrada após commit, push e conclusão do GitHub Actions/deploy.

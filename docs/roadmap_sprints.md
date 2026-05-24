@@ -932,3 +932,17 @@ Entregas:
 - validar que a loja teste, o app e os portais continuam sem rolagem horizontal e sem tamanho pré-selecionado.
 
 Status: implementado no commit `d5d4e69` e publicado com sucesso no run `26370389245`, com deploy remoto, deploy da raiz pública, master admin, smoke público, `validate-production.ps1`, assets de marca públicos e Playwright pós-deploy no produto teste.
+
+### Sprint 71 - Atualizar assets oficiais da marca
+
+Objetivo: substituir logo, ícone e favicon pelos novos arquivos oficiais enviados pelo usuário.
+
+Entregas:
+
+- substituir `frontend/public/images/brand/icon_provador_virtual.png`;
+- substituir `frontend/public/images/brand/logo_provador_virtual.png`;
+- substituir `frontend/public/images/brand/favicon_provador_virtual.png`;
+- atualizar dimensões OG do logo para `3054x261`;
+- validar build, assets públicos e smoke de produção após deploy.
+
+Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.
