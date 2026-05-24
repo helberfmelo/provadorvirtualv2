@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
+import { showFeedback } from '../services/saveFeedback'
 import { useAuthStore } from '../stores/auth'
 
 type PlatformConnection = {
@@ -70,8 +71,6 @@ const saving = ref(false)
 const running = ref(false)
 const validating = ref(false)
 const copied = ref(false)
-const notice = ref('')
-const error = ref('')
 const integrationReport = ref<Record<string, number | string> | null>(null)
 const validation = ref<ValidationResult | null>(null)
 const bigShopActivations = ref<BigShopActivation[]>([])
@@ -132,7 +131,6 @@ function selectPlatform(platform: Platform) {
   selectedKey.value = platform.key
   integrationReport.value = null
   validation.value = null
-  error.value = ''
   fillForm(platform)
   loadBigShopActivations()
 }
@@ -153,8 +151,6 @@ async function savePlatform() {
   }
 
   saving.value = true
-  notice.value = ''
-  error.value = ''
 
   try {
     await api.patch(`/integrations/${selected.value.key}`, {
@@ -166,47 +162,72 @@ async function savePlatform() {
       access_token: form.access_token || undefined,
       webhook_secret: form.webhook_secret || undefined,
     })
-
-    notice.value = 'Integração atualizada.'
     await loadPlatforms()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Não foi possível salvar.'
+    showFeedback({
+      status: 'error',
+      title: 'Não foi possível salvar',
+      message: friendlyRequestMessage(requestError, 'Não foi possível salvar a integração.'),
+    })
   } finally {
     saving.value = false
   }
 }
 
 async function probeBigShop() {
+  if (!canRunBigShopApiAction()) {
+    return
+  }
+
   running.value = true
-  notice.value = ''
-  error.value = ''
   integrationReport.value = null
 
   try {
     const { data } = await api.post('/integrations/bigshop/probe')
     integrationReport.value = data.data
-    notice.value = 'Conexão BigShop validada.'
+    showFeedback({
+      status: 'success',
+      title: 'Conexão validada',
+      message: 'A API da BigShop respondeu com sucesso para esta loja.',
+    })
     await loadPlatforms()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Não foi possível validar a BigShop.'
+    showFeedback({
+      status: 'error',
+      title: 'Falha ao testar a conexão',
+      message: friendlyRequestMessage(requestError, 'Não foi possível validar a API da BigShop.'),
+    })
   } finally {
     running.value = false
   }
 }
 
 async function syncBigShop() {
+  if (!canRunBigShopApiAction()) {
+    return
+  }
+
   running.value = true
-  notice.value = ''
-  error.value = ''
   integrationReport.value = null
 
   try {
     const { data } = await api.post('/integrations/bigshop/sync')
     integrationReport.value = data.data
-    notice.value = 'Produtos BigShop sincronizados.'
+    showFeedback({
+      status: 'success',
+      title: 'API BigShop sincronizada',
+      message: 'Produtos e variações foram sincronizados. Acesse a página de produtos para revisar o catálogo importado.',
+      actionLabel: 'Ver produtos',
+      actionTo: '/app/produtos',
+      duration: 0,
+    })
     await loadPlatforms()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || 'Não foi possível sincronizar a BigShop.'
+    showFeedback({
+      status: 'error',
+      title: 'Falha ao sincronizar API',
+      message: friendlyRequestMessage(requestError, 'Não foi possível sincronizar produtos pela API da BigShop.'),
+    })
   } finally {
     running.value = false
   }
@@ -217,9 +238,18 @@ async function syncXmlFeed() {
     return
   }
 
+  if (!selected.value.connection?.feed_url) {
+    showFeedback({
+      status: 'info',
+      title: 'Salve o XML/feed primeiro',
+      message: form.feed_url
+        ? 'A URL do XML foi preenchida, mas ainda precisa ser salva antes da sincronização.'
+        : 'Informe e salve a URL pública do XML/feed antes de sincronizar o catálogo.',
+    })
+    return
+  }
+
   running.value = true
-  notice.value = ''
-  error.value = ''
   integrationReport.value = null
 
   try {
@@ -233,14 +263,21 @@ async function syncXmlFeed() {
       products: job.summary?.products || 0,
       variants: job.summary?.variants || 0,
     }
-    notice.value = job.status === 'completed'
-      ? 'XML sincronizado.'
-      : 'XML sincronizado com avisos.'
+    showFeedback({
+      status: job.status === 'completed' ? 'success' : 'info',
+      title: job.status === 'completed' ? 'XML/feed sincronizado' : 'XML/feed sincronizado com avisos',
+      message: 'O catálogo foi processado. Acesse a página de produtos para visualizar os produtos sincronizados e conferir as variações.',
+      actionLabel: 'Ver produtos',
+      actionTo: '/app/produtos',
+      duration: 0,
+    })
     await loadPlatforms()
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message
-      || requestError.response?.data?.errors?.feed_url?.[0]
-      || 'Não foi possível sincronizar o XML.'
+    showFeedback({
+      status: 'error',
+      title: 'Falha ao sincronizar XML/feed',
+      message: friendlyRequestMessage(requestError, 'Não foi possível sincronizar o XML/feed.'),
+    })
   } finally {
     running.value = false
   }
@@ -262,8 +299,6 @@ async function validateInstall() {
   }
 
   validating.value = true
-  notice.value = ''
-  error.value = ''
   validation.value = null
 
   try {
@@ -271,13 +306,19 @@ async function validateInstall() {
       url: form.validation_url || undefined,
     })
     validation.value = data.data
-    notice.value = validation.value?.status === 'passed'
-      ? 'Instalação validada.'
-      : 'Validação concluída com pendências.'
+    showFeedback({
+      status: validation.value?.status === 'passed' ? 'success' : 'info',
+      title: validation.value?.status === 'passed' ? 'Instalação validada' : 'Validação concluída com pendências',
+      message: validation.value?.status === 'passed'
+        ? 'Container, script e identificadores do widget foram encontrados na página informada.'
+        : 'Revise o checklist da instalação para corrigir os pontos pendentes.',
+    })
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message
-      || requestError.response?.data?.errors?.url?.[0]
-      || 'Não foi possível validar a instalação.'
+    showFeedback({
+      status: 'error',
+      title: 'Falha ao validar instalação',
+      message: friendlyRequestMessage(requestError, 'Não foi possível validar a instalação.'),
+    })
   } finally {
     validating.value = false
   }
@@ -325,6 +366,46 @@ function checkIcon(key: string) {
 
   return 'fa-circle-exclamation'
 }
+
+function friendlyRequestMessage(requestError: any, fallback: string) {
+  return requestError.response?.data?.message
+    || requestError.response?.data?.errors?.feed_url?.[0]
+    || requestError.response?.data?.errors?.url?.[0]
+    || fallback
+}
+
+function canRunBigShopApiAction() {
+  if (!selected.value?.connection) {
+    showFeedback({
+      status: 'info',
+      title: 'Salve a conexão BigShop primeiro',
+      message: 'Informe store_id, URL da API e token da BigShop, salve a integração e depois execute esta ação.',
+    })
+    return false
+  }
+
+  if (!selected.value.connection.external_store_id) {
+    showFeedback({
+      status: 'info',
+      title: 'Store ID pendente',
+      message: 'Informe e salve o ID da loja BigShop antes de testar ou sincronizar pela API.',
+    })
+    return false
+  }
+
+  if (!selected.value.connection.has_access_token) {
+    showFeedback({
+      status: 'info',
+      title: 'Token pendente',
+      message: form.access_token
+        ? 'O token foi preenchido, mas precisa ser salvo antes de testar ou sincronizar pela API.'
+        : 'Informe e salve o token da API BigShop antes de testar ou sincronizar pela API.',
+    })
+    return false
+  }
+
+  return true
+}
 </script>
 
 <template>
@@ -336,8 +417,6 @@ function checkIcon(key: string) {
       </div>
     </div>
 
-    <p v-if="notice" class="success-message">{{ notice }}</p>
-    <p v-if="error" class="form-error">{{ error }}</p>
     <p v-if="isBigShopContract" class="info-message">
       Plano BigShop ativo: este painel exibe somente a integração BigShop.
     </p>
@@ -375,28 +454,28 @@ function checkIcon(key: string) {
         <div class="form-grid">
           <label>
             <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.external_store_id" :title="fieldHelp.external_store_id" :data-tooltip="fieldHelp.external_store_id">i</span>
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.external_store_id" :data-tooltip="fieldHelp.external_store_id">i</span>
               Loja
             </span>
             <input v-model="form.external_store_id" maxlength="120" />
           </label>
           <label>
             <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.api_base_url" :title="fieldHelp.api_base_url" :data-tooltip="fieldHelp.api_base_url">i</span>
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.api_base_url" :data-tooltip="fieldHelp.api_base_url">i</span>
               URL da API
             </span>
             <input v-model="form.api_base_url" type="url" maxlength="255" />
           </label>
           <label>
             <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.feed_url" :title="fieldHelp.feed_url" :data-tooltip="fieldHelp.feed_url">i</span>
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.feed_url" :data-tooltip="fieldHelp.feed_url">i</span>
               URL do XML/feed
             </span>
             <input v-model="form.feed_url" type="text" inputmode="url" maxlength="255" :placeholder="feedPlaceholder" />
           </label>
           <label>
             <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.status" :title="fieldHelp.status" :data-tooltip="fieldHelp.status">i</span>
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.status" :data-tooltip="fieldHelp.status">i</span>
               Status
             </span>
             <select v-model="form.status">
@@ -408,14 +487,14 @@ function checkIcon(key: string) {
           </label>
           <label>
             <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.access_token" :title="fieldHelp.access_token" :data-tooltip="fieldHelp.access_token">i</span>
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.access_token" :data-tooltip="fieldHelp.access_token">i</span>
               Token
             </span>
             <input v-model="form.access_token" autocomplete="off" />
           </label>
           <label>
             <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.webhook_secret" :title="fieldHelp.webhook_secret" :data-tooltip="fieldHelp.webhook_secret">i</span>
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.webhook_secret" :data-tooltip="fieldHelp.webhook_secret">i</span>
               Webhook secret
             </span>
             <input v-model="form.webhook_secret" autocomplete="off" />
@@ -465,14 +544,14 @@ function checkIcon(key: string) {
         <div class="form-grid">
           <label>
             <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_url" :title="fieldHelp.validation_url" :data-tooltip="fieldHelp.validation_url">i</span>
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_url" :data-tooltip="fieldHelp.validation_url">i</span>
               URL para validar
             </span>
             <input v-model="form.validation_url" type="url" placeholder="https://loja.com.br/produto" />
           </label>
           <label class="inline-action-label">
             <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_action" :title="fieldHelp.validation_action" :data-tooltip="fieldHelp.validation_action">i</span>
+              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_action" :data-tooltip="fieldHelp.validation_action">i</span>
               Validação
             </span>
             <button class="btn btn-secondary" type="button" :disabled="validating" @click="validateInstall">
@@ -515,40 +594,49 @@ function checkIcon(key: string) {
           <pre class="guide-snippet"><code>{{ selected?.guide.snippet }}</code></pre>
         </div>
 
-        <div class="action-row compact">
-          <button class="btn btn-primary" type="submit" :disabled="saving">
-            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-            Salvar integração
-          </button>
-          <button
-            class="btn btn-secondary"
-            type="button"
-            :disabled="running || !selected?.connection?.feed_url"
-            @click="syncXmlFeed"
-          >
-            <i class="fa-solid fa-file-code" aria-hidden="true"></i>
-            Sincronizar XML
-          </button>
-          <button
-            v-if="selected?.key === 'bigshop'"
-            class="btn btn-secondary"
-            type="button"
-            :disabled="running"
-            @click="probeBigShop"
-          >
-            <i class="fa-solid fa-signal" aria-hidden="true"></i>
-            Testar
-          </button>
-          <button
-            v-if="selected?.key === 'bigshop'"
-            class="btn btn-secondary"
-            type="button"
-            :disabled="running"
-            @click="syncBigShop"
-          >
-            <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
-            Sincronizar
-          </button>
+        <div class="integration-actions">
+          <div class="integration-action-card">
+            <strong>Configuração</strong>
+            <button class="btn btn-primary" type="submit" :disabled="saving">
+              <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+              Salvar integração
+            </button>
+          </div>
+          <div class="integration-action-card">
+            <strong>Catálogo XML/feed</strong>
+            <button
+              class="btn btn-secondary"
+              type="button"
+              :disabled="running"
+              @click="syncXmlFeed"
+            >
+              <i class="fa-solid fa-file-code" aria-hidden="true"></i>
+              Sincronizar XML/feed
+            </button>
+          </div>
+          <div v-if="selected?.key === 'bigshop'" class="integration-action-card integration-action-card-wide">
+            <strong>API BigShop</strong>
+            <div class="action-row compact">
+              <button
+                class="btn btn-secondary"
+                type="button"
+                :disabled="running"
+                @click="probeBigShop"
+              >
+                <i class="fa-solid fa-signal" aria-hidden="true"></i>
+                Testar conexão
+              </button>
+              <button
+                class="btn btn-secondary"
+                type="button"
+                :disabled="running"
+                @click="syncBigShop"
+              >
+                <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+                Sincronizar API
+              </button>
+            </div>
+          </div>
         </div>
 
         <div v-if="integrationReport" class="integration-report">

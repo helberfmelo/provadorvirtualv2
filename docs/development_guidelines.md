@@ -112,5 +112,7 @@ Atualizado em: 2026-05-23
 - Antes de qualquer sprint, reler `docs/README.md` e `docs/sprint_governance.md`.
 - Ao fim de cada sprint, atualizar docs, executar validações, fazer commit, push e conferir o resultado remoto do GitHub Actions/deploy.
 - Uma sprint com push feito não é considerada concluída enquanto o workflow remoto não estiver verificado como sucesso ou enquanto a falha não estiver registrada e corrigida em sprint própria.
+- Em telas dos portais, evitar feedback inline para ações operacionais; usar modal central para sucesso, erro e orientação, especialmente em integrações, importações e validações.
+- Tooltips de formulário devem ficar contidos no viewport e não depender de `title` nativo quando o texto puder sair da tela.
 - Deploy com schema exige plano de migration e rollback.
 - Incidente real deve atualizar `docs/incident_runbook.md` e `docs/execution_log.md`.

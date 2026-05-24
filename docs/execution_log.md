@@ -306,7 +306,7 @@
 - Shell autenticado passou a separar portal SaaS e portal da empresa.
 - SaaS deixou de exibir menus de lojista; portal da empresa deixou de misturar atalhos de SaaS no menu principal.
 - Areas autenticadas passaram a usar menu lateral no desktop e drawer no mobile.
-- Validações locais: `npm run build` e `git diff --check`.
+- Validações locais: `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=BigShopIntegrationTest` e `git diff --check`.
 
 ## 2026-05-23 - Sprint 39 SaaS list-first e subpaginas
 
@@ -420,3 +420,13 @@
 - Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
 - Roadmap recebeu as Sprints 52, 53 e 54 para UX de integrações, sincronização automática e guia de instalação do widget.
 - Fonte de verdade passou a explicitar que a próxima sprint só começa após commit, push e GitHub Actions/deploy verificados.
+
+## 2026-05-24 - Sprint 52 UX da tela de integrações
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
+- Tooltips da tela `/app/integracoes` deixaram de usar `title` nativo e passaram a abrir contidos no viewport.
+- Feedbacks de testar conexão, validar instalação, sincronizar API BigShop e sincronizar XML/feed passaram para o modal central.
+- Sincronização XML/feed agora orienta o usuário a acessar `/app/produtos` para visualizar e revisar os produtos sincronizados.
+- Botões foram reorganizados por finalidade: configuração, catálogo XML/feed e API BigShop.
+- CSS global recebeu proteção contra rolagem horizontal indevida na página e preserva rolagem interna para snippets/tabelas.
+- Validações locais: `npm run build` e `git diff --check`.

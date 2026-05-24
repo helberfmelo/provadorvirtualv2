@@ -48,6 +48,7 @@ Atualizado em: 2026-05-23
 - Sprint 49 padronizou estados e estilos globais de inputs, selects, textareas, checkboxes e foco/disabled nos portais.
 - Sprint 50 corrigiu os testes que ainda esperavam mensagens sem acento e reforçou a regra obrigatória de conferir GitHub Actions/deploy após cada push.
 - Sprint 51 iniciou o ciclo corretivo de integrações, registrando roadmap e reforçando a governança de releitura obrigatória, commit, push e Actions/deploy antes de avançar sprint.
+- Sprint 52 corrigiu a UX da tela de integrações: tooltips customizados contidos na tela, mensagens de ações por modal, botões separados por finalidade e proteção contra rolagem horizontal indevida.
 
 ## Referências confirmadas
 
@@ -133,6 +134,7 @@ Atualizado em: 2026-05-23
 - Sprint 48 enviada ao GitHub no commit `59ced6f`; validação local passou com `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=UserAccessApiTest` e `git diff --check`.
 - Runs `26346764503` e `26346828756` falharam porque testes ainda esperavam mensagens sem acentos após a Sprint 48.
 - Sprint 50 enviada ao GitHub no commit `c2826a5`; o run `26347139903` finalizou com sucesso, incluindo deploy remoto e smoke público.
+- Sprint 52 validada localmente com `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=BigShopIntegrationTest` e `git diff --check`.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

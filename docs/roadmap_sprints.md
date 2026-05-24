@@ -666,6 +666,8 @@ Entregas previstas:
 - garantir que botões sem credencial/URL exibam orientação clara em modal;
 - após sincronizar XML, mostrar modal orientando acessar `/app/produtos` para visualizar os produtos sincronizados.
 
+Status: implementado e testado localmente com `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=BigShopIntegrationTest` e `git diff --check`. A tela de integrações passou a usar tooltips customizados sem `title` nativo, feedbacks por modal, ações separadas por configuração, XML/feed e API BigShop, e CSS defensivo contra overflow horizontal.
+
 ### Sprint 53 - Sincronização automática de integrações
 
 Objetivo: sincronizar automaticamente integrações por XML/feed e preparar a mesma base para outros conectores necessários.

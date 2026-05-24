@@ -1,7 +1,16 @@
 import type { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { reactive } from 'vue'
 
-type FeedbackStatus = 'saving' | 'success' | 'error'
+type FeedbackStatus = 'saving' | 'success' | 'error' | 'info'
+
+type FeedbackOptions = {
+  status: FeedbackStatus
+  title: string
+  message: string
+  actionLabel?: string
+  actionTo?: string
+  duration?: number
+}
 
 type TrackedRequest = InternalAxiosRequestConfig & {
   pvTrackSave?: boolean
@@ -12,6 +21,8 @@ export const saveFeedback = reactive({
   status: 'saving' as FeedbackStatus,
   title: 'Salvando',
   message: 'Aguarde um instante.',
+  actionLabel: '',
+  actionTo: '',
   pending: 0,
   timer: 0,
 })
@@ -64,6 +75,8 @@ export function startSaveFeedback(config: InternalAxiosRequestConfig) {
   saveFeedback.status = 'saving'
   saveFeedback.title = 'Salvando'
   saveFeedback.message = 'Aguarde um instante.'
+  saveFeedback.actionLabel = ''
+  saveFeedback.actionTo = ''
 }
 
 export function finishSaveFeedback(config?: InternalAxiosRequestConfig) {
@@ -83,7 +96,9 @@ export function finishSaveFeedback(config?: InternalAxiosRequestConfig) {
   saveFeedback.open = true
   saveFeedback.status = 'success'
   saveFeedback.title = 'Salvo'
-  saveFeedback.message = 'Alteracao salva com sucesso.'
+  saveFeedback.message = 'Alteração salva com sucesso.'
+  saveFeedback.actionLabel = ''
+  saveFeedback.actionTo = ''
   saveFeedback.timer = window.setTimeout(() => {
     closeSaveFeedback()
   }, 4000)
@@ -102,12 +117,33 @@ export function failSaveFeedback(error: AxiosError) {
   saveFeedback.status = 'error'
   saveFeedback.title = 'Não foi possível salvar'
   saveFeedback.message = friendlyErrorMessage(error)
+  saveFeedback.actionLabel = ''
+  saveFeedback.actionTo = ''
 }
 
 export function closeSaveFeedback() {
   window.clearTimeout(saveFeedback.timer)
   saveFeedback.open = false
   saveFeedback.pending = 0
+  saveFeedback.actionLabel = ''
+  saveFeedback.actionTo = ''
+}
+
+export function showFeedback(options: FeedbackOptions) {
+  window.clearTimeout(saveFeedback.timer)
+  saveFeedback.pending = 0
+  saveFeedback.open = true
+  saveFeedback.status = options.status
+  saveFeedback.title = options.title
+  saveFeedback.message = options.message
+  saveFeedback.actionLabel = options.actionLabel || ''
+  saveFeedback.actionTo = options.actionTo || ''
+
+  if (options.status !== 'error' && options.duration !== 0) {
+    saveFeedback.timer = window.setTimeout(() => {
+      closeSaveFeedback()
+    }, options.duration || 5200)
+  }
 }
 
 function friendlyErrorMessage(error: AxiosError) {
@@ -172,7 +208,7 @@ function translateKnownMessage(message: string, status?: number) {
   }
 
   if (normalized.includes('cpf field must be 11')) {
-    return 'Informe um CPF com 11 digitos.'
+    return 'Informe um CPF com 11 dígitos.'
   }
 
   if (normalized.includes('password field must be at least')) {
@@ -180,7 +216,7 @@ function translateKnownMessage(message: string, status?: number) {
   }
 
   if (status === 422 && normalized.includes('already been taken')) {
-    return 'Ja existe um usuário com estes dados. Confira e tente novamente.'
+    return 'Já existe um usuário com estes dados. Confira e tente novamente.'
   }
 
   return normalized
