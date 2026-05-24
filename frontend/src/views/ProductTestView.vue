@@ -72,6 +72,14 @@ const selectedVariant = computed(() => {
 })
 
 const activeSlug = computed(() => String(route.params.slug || ''))
+const displayPrice = computed(() => selectedVariant.value?.price ?? payload.value?.variants[0]?.price ?? 0)
+const stockStatusText = computed(() => {
+  if (!selectedVariant.value) {
+    return 'Selecione um tamanho para ver a disponibilidade'
+  }
+
+  return `${selectedVariant.value.stock_quantity} peças no tamanho selecionado`
+})
 
 onMounted(async () => {
   await loadStorefront()
@@ -109,7 +117,7 @@ async function loadProductForRoute() {
   try {
     const { data } = await api.get<ProductPayload>(`/demo/storefront/${activeSlug.value}`)
     payload.value = data
-    selectedVariantId.value = data.variants[1]?.id ?? data.variants[0]?.id ?? null
+    selectedVariantId.value = null
     await nextTick()
     loadWidget()
   } catch (requestError: any) {
@@ -212,17 +220,19 @@ function price(value: string | number | null | undefined) {
     </div>
 
     <div class="product-info">
-      <RouterLink to="/produto-teste" class="back-link">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        Voltar para a loja teste
-      </RouterLink>
-      <span class="eyebrow">{{ payload.product.company.name }}</span>
+      <div class="product-context-row">
+        <RouterLink to="/produto-teste" class="back-link">
+          <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+          Voltar para loja teste
+        </RouterLink>
+        <span class="store-badge">{{ payload.product.company.name || 'Loja teste' }}</span>
+      </div>
       <h1>{{ payload.product.name }}</h1>
       <p>{{ payload.product.description }}</p>
 
       <div class="price-row">
-        <strong>{{ price(selectedVariant?.price ?? 0) }}</strong>
-        <span>{{ selectedVariant?.stock_quantity ?? 0 }} pecas no tamanho selecionado</span>
+        <strong>{{ price(displayPrice) }}</strong>
+        <span>{{ stockStatusText }}</span>
       </div>
 
       <div class="size-picker" aria-label="Escolha de tamanho">

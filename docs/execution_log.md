@@ -638,3 +638,14 @@
 - Pós-deploy confirmou que o JS público contém `assetBaseUrl`, `pv-main-button-subtle`, `pv-shape-image` e o texto `Nota da recomendação`.
 - Pós-deploy confirmou que o CSS público contém `.pv-shape-image`, `-webkit-mask`, `.pv-main-button-subtle` e o gradiente do cabeçalho.
 - Pós-deploy confirmou `200` para os 9 assets públicos de silhueta e recomendação pública com altura + peso retornando `recommended_size=M`.
+
+## 2026-05-24 - Sprint 70 Produto teste sem tamanho padrão e identidade visual
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` sem expor valores sensíveis.
+- Páginas `/produto-teste/:slug` ajustadas para iniciar sem tamanho selecionado; o preço usa a primeira variação apenas como referência visual e o estoque orienta o usuário a selecionar um tamanho.
+- Link `Voltar para loja teste` separado do nome da loja em um badge de contexto, evitando o texto inline embolado na página de produto teste.
+- Logo, ícone e favicon oficiais copiados para `frontend/public/images/brand/`.
+- Cabeçalho global e rodapé público passaram a usar o logo oficial do Provador Virtual.
+- HTML base atualizado com favicon PNG, apple touch icon, `theme-color` e tags OG/Twitter usando a imagem oficial da marca.
+- Validações locais: `npm run build`, `php artisan test --filter=DemoProductTest`, Playwright local desktop/mobile em `/produto-teste/vestido-midi-aurora` e `git diff --check`.
+- Verificação remota será registrada após commit, push e conclusão do GitHub Actions/deploy.

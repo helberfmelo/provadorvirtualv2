@@ -15,6 +15,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const navOpen = ref(false)
+const brandLogoUrl = `${import.meta.env.BASE_URL}images/brand/logo_provador_virtual.png`
 
 const canSeeSaas = computed(() => ['admin', 'support'].includes(auth.user?.role || ''))
 const isCompanyRoute = computed(() => route.path === '/app' || route.path.startsWith('/app/'))
@@ -96,11 +97,8 @@ async function switchCompany(event: Event) {
   <div class="shell" :class="{ 'shell-work': isWorkRoute, 'shell-company': isCompanyRoute, 'shell-saas': isSaasRoute }">
     <header class="topbar" :class="{ 'topbar-work': isWorkRoute }">
       <RouterLink to="/" class="brand" aria-label="Provador Virtual">
-        <span class="brand-mark">PV</span>
-        <span>
-          Provador Virtual
-          <small v-if="isWorkRoute">{{ contextLabel }}</small>
-        </span>
+        <img class="brand-logo" :src="brandLogoUrl" alt="Provador Virtual" />
+        <small v-if="isWorkRoute" class="brand-context">{{ contextLabel }}</small>
       </RouterLink>
 
       <button

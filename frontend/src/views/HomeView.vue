@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const widgetPreviewUrl = `${import.meta.env.BASE_URL}images/widget-preview.jpg`
 const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
+const brandLogoUrl = `${import.meta.env.BASE_URL}images/brand/logo_provador_virtual.png`
 const whatsappUrl = 'https://wa.me/5531993157573'
 const checkoutDefault = { path: '/checkout', query: { platform: 'custom' } }
 const checkoutBigShop = { path: '/checkout', query: { platform: 'bigshop' } }
@@ -207,7 +208,7 @@ const currentYear = new Date().getFullYear()
   <section class="landing-footer">
     <div class="public-band footer-grid">
       <div class="footer-brand">
-        <span class="brand-mark">PV</span>
+        <img class="footer-logo" :src="brandLogoUrl" alt="Provador Virtual" />
         <div>
           <strong>Provador Virtual</strong>
           <small>Recomendação de tamanho simples para lojas de moda.</small>

@@ -60,6 +60,7 @@ O portal SaaS e o portal da empresa não devem misturar menus:
 - validar rotas públicas e autenticadas pelo `scripts/validate-production.ps1` após deploy;
 - confirmar que nenhuma rota de listagem principal voltou a exibir formulário longo na mesma tela;
 - revisar textos visíveis em PT-BR com acentos, til e cedilha corretos antes de commitar;
+- conferir se cabeçalho, rodapé, favicon e tags OG usam os assets oficiais em `frontend/public/images/brand/`;
 - conferir se inputs, selects, textareas e botões usam as classes globais (`admin-form`, `form`, `inline-form`, `btn`, `icon-link` ou equivalentes) para evitar controles sem CSS.
 - conferir que tooltips customizados não usam `title` nativo quando houver risco de tooltip do navegador sair da tela ou aparecer na barra inferior;
 - conferir que ações de sucesso, erro e orientação operacional aparecem em modal, não como mensagem solta no topo da página;

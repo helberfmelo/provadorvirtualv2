@@ -915,4 +915,20 @@ Entregas:
 - cobrir a existência dos novos assets no teste do widget;
 - validar o fluxo visual com Playwright mockado: cabeçalho tematizado, CTA progressivo, rodapé discreto antes do resultado, silhueta via asset do v1, confete e feedback final.
 
+Status: implementado no commit `a53613a` e publicado com sucesso no run `26368265436`, com deploy remoto, deploy da raiz pública, master admin, smoke público, verificação dos assets públicos de silhueta e endpoint público de recomendação.
+
+### Sprint 70 - Produto teste sem tamanho padrão e identidade visual
+
+Objetivo: refinar as páginas de produto teste e aplicar a identidade visual oficial do Provador Virtual em todas as páginas públicas e autenticadas.
+
+Entregas:
+
+- remover a seleção automática de tamanho nas páginas `/produto-teste/:slug`;
+- manter preço inicial visível sem escolher tamanho e trocar o texto de estoque para orientar o usuário a selecionar um tamanho;
+- separar o link `Voltar para loja teste` do nome da loja em um badge próprio, evitando o texto embolado;
+- copiar logo, ícone e favicon oficiais para `frontend/public/images/brand/`;
+- usar o logo oficial no cabeçalho global e no rodapé público;
+- configurar favicon PNG, apple touch icon, `theme-color` e tags OG/Twitter com imagem oficial da marca;
+- validar que a loja teste, o app e os portais continuam sem rolagem horizontal e sem tamanho pré-selecionado.
+
 Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.

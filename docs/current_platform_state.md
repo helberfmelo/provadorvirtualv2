@@ -196,8 +196,10 @@ Atualizado em: 2026-05-24
 - APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.
 - Histórico SaaS de e-mail: `/api/v1/saas/transactional-email-sends`.
 - APIs de usuários/permissões: `/api/v1/merchant/users` e `/api/v1/saas/users`.
+- Loja teste pública: `/produto-teste` e `/produto-teste/:slug`, usando a identidade oficial do Provador Virtual e carregando produtos sem tamanho selecionado por padrão.
 - Widget público: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
 - O widget público v2 mantém os botões `PV Descubra seu tamanho` e `cm Tabela de Medidas`, mas o fluxo de recomendação agora segue a ordem do v1: medidas básicas, gênero/formato corporal, medidas detalhadas, resultado e feedback. Mesmo com perfil salvo no navegador, a etapa 1 deve limitar a precisão aos campos básicos e nunca pular direto para o resultado; quando houver altura + peso, o rodapé já pode exibir recomendação parcial e incentivar o aumento de precisão.
+- Assets oficiais de marca ficam em `frontend/public/images/brand/` e alimentam o cabeçalho, rodapé, favicon e tags OG/Twitter.
 
 ## Próxima ação recomendada
 

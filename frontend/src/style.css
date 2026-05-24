@@ -61,18 +61,33 @@ a {
 }
 
 .brand {
-  gap: 10px;
+  gap: 12px;
+  min-width: 0;
   font-weight: 800;
   color: #0f172a;
 }
 
-.brand small {
+.brand small,
+.brand-context {
   display: block;
-  margin-top: 2px;
+  margin-top: 0;
   color: #6b7280;
   font-size: 0.72rem;
   font-weight: 800;
   text-transform: uppercase;
+}
+
+.brand-logo {
+  display: block;
+  width: clamp(164px, 18vw, 224px);
+  max-width: 100%;
+  height: auto;
+}
+
+.brand-context {
+  padding: 4px 0 4px 12px;
+  border-left: 1px solid #e5e7eb;
+  white-space: nowrap;
 }
 
 .brand-mark {
@@ -594,7 +609,17 @@ a {
 .footer-brand {
   display: flex;
   gap: 12px;
-  align-items: flex-start;
+  align-items: center;
+}
+
+.footer-logo {
+  display: block;
+  width: min(224px, 100%);
+  height: auto;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.18);
 }
 
 .footer-brand strong,
@@ -1226,9 +1251,34 @@ a {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 18px;
   color: #374151;
   font-weight: 800;
+}
+
+.product-context-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 12px;
+  margin-bottom: 18px;
+}
+
+.store-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  max-width: 100%;
+  padding: 6px 10px;
+  overflow: hidden;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  color: #9a3412;
+  background: #fff7ed;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .product-media {
@@ -1238,6 +1288,7 @@ a {
 }
 
 .price-row {
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 12px;
   margin: 22px 0;
@@ -1250,6 +1301,7 @@ a {
 
 .price-row span {
   color: #6b7280;
+  text-align: right;
 }
 
 .size-picker {
@@ -2599,6 +2651,14 @@ td small {
     max-width: calc(100% - 58px);
   }
 
+  .brand-logo {
+    width: min(178px, calc(100vw - 108px));
+  }
+
+  .brand-context {
+    display: none;
+  }
+
   .menu-toggle {
     position: relative;
     z-index: 42;
@@ -2726,6 +2786,10 @@ td small {
 
   .product-media {
     position: static;
+  }
+
+  .price-row span {
+    text-align: left;
   }
 
   .measure-grid {
