@@ -972,4 +972,4 @@ Entregas:
 - cobrir a nova frase e classe CSS no teste de asset do widget;
 - validar sintaxe do widget, teste de asset, builds do frontend/backend e checagem de diff.
 
-Status: implementação local validada; commit, push, deploy e validação de produção serão registrados após o GitHub Actions finalizar.
+Status: implementado no commit `415e68f` e publicado com sucesso no run `26372104049`, com deploy remoto, deploy da raiz pública, master admin, smoke público, `validate-production.ps1` e verificação dos assets públicos confirmando a nova frase discreta e a remoção do texto antigo.

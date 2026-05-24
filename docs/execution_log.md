@@ -689,4 +689,6 @@
 - Teste `WidgetAssetTest` atualizado para cobrir a nova frase, a nova classe CSS e garantir que o texto antigo não volte.
 - Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, `git diff --check`, `npm run build` em `frontend` e `npm run build` em `backend`.
 - Observação local: o build Vite do backend concluiu com sucesso, mas avisou que recomenda Node `20.19+`; a máquina local está em Node `20.18.1`.
-- Commit, push, GitHub Actions/deploy e validação de produção pendentes neste registro até o run remoto finalizar.
+- Commit `415e68f` enviado para `main`; o run `26372104049` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou com cache bust que o JS público contém `Ao usar o Provador Virtual` e `browserStorageNoticeHtml`, que o CSS público contém `.pv-browser-note` e `font-weight: 400`, e que o texto antigo não aparece mais.
+- `scripts/validate-production.ps1` passou completo após o deploy.
