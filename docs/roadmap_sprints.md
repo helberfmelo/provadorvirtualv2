@@ -880,4 +880,4 @@ Entregas:
 - validar por teste visual temporário o caso de perfil completo salvo e o caso de recomendação básica sem confete;
 - atualizar documentação do contrato sequencial do widget.
 
-Status: implementado localmente; aguardando commit, push e verificação remota da sprint.
+Status: implementado no commit `4284a24` e publicado com sucesso no run `26357843460`, com deploy remoto, deploy da raiz pública, master admin, smoke público e validação pós-deploy nas páginas do produto teste e da Luna Moda Festa.

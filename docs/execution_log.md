@@ -600,3 +600,7 @@
 - Corrigido o clique perdido no rodapé após editar inputs numéricos: `change` passa a re-renderizar apenas select/checkbox, evitando trocar o botão no blur antes do clique.
 - Teste visual temporário Playwright em `.tmp/sprint67-widget-flow.spec.js` validou perfil salvo completo e recomendação básica sem confete.
 - Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, Playwright temporário da Sprint 67, `php artisan test`, `npm run build` e `git diff --check`.
+- Run `26357843460` do GitHub Actions finalizou com sucesso para o commit `4284a24`, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou que `https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js` contém `v2_sprint_67`, `Continuar para corpo`, `Continuar para detalhes` e `data-pv-footer-action`.
+- Playwright pós-deploy validou `https://provadorvirtual.online/produto-teste/blusa-canelada-solar` e `https://www.lunamodafesta.com.br/716076-vestido-longo-luna-2553-fucsia`: com perfil completo salvo, a etapa 1 fica em 45%, o botão do rodapé mostra `Continuar para corpo` e o clique avança para `Corpo`, sem pular para o resultado.
+- Observação da validação Luna: o banner LGPD da loja (`#lgpd_info_bb`) interceptou o clique do teste automatizado; foi ocultado apenas no teste para validar o fluxo do Provador Virtual.
