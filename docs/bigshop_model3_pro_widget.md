@@ -102,6 +102,13 @@ Para uma loja BigShop funcionar:
 
 Para integração apenas via XML/feed, `URL da API` e `Token` BigShop podem ficar vazios. O `store_id`/loja BigShop ainda deve estar correto para o widget resolver a empresa.
 
+O endpoint público BigShop resolve a empresa por `platform=bigshop` e `store_id` usando duas fontes, nesta ordem:
+
+- `merchant_companies.platform='bigshop'` com `external_store_id` igual ao ID da loja BigShop;
+- `platform_connections.platform='bigshop'` com `external_store_id` igual ao ID da loja BigShop e `merchant_company_id` preenchido.
+
+Isso permite que lojas configuradas primeiro pela tela de Integrações via XML/feed funcionem no widget mesmo antes de a empresa estar marcada como BigShop no cadastro administrativo.
+
 ## Depuração em produção
 
 Para validar uma página BigShop sem expor mensagem para clientes comuns, acessar o produto com `?pvdebug=1` ou executar no console `localStorage.setItem('provadorVirtualDebug', '1')` e recarregar. O front pro exibe uma faixa de debug no ponto do widget e escreve logs com o prefixo `[Provador Virtual]`.

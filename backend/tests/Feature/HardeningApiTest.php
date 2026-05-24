@@ -7,6 +7,7 @@ use App\Models\AuditLog;
 use App\Models\IntegrationEvent;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
+use App\Models\PlatformConnection;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
@@ -70,6 +71,29 @@ class HardeningApiTest extends TestCase
                 'platform' => 'bigshop',
                 'external_store_id' => '53',
             ]);
+
+        $this->withHeader('Origin', 'https://provadorvirtual.online')
+            ->postJson('/api/v1/public/recommendations/config-check', [
+                'store_id' => 53,
+                'product_id' => 1,
+                'platform' => 'bigshop',
+            ])
+            ->assertOk()
+            ->assertHeader('Access-Control-Allow-Origin', 'https://provadorvirtual.online')
+            ->assertJsonPath('configured', true);
+    }
+
+    public function test_bigshop_widget_public_api_allows_origin_with_platform_connection_store_id(): void
+    {
+        $this->seed();
+
+        PlatformConnection::query()->create([
+            'merchant_id' => 1,
+            'merchant_company_id' => 1,
+            'platform' => 'bigshop',
+            'external_store_id' => '53',
+            'status' => 'connected',
+        ]);
 
         $this->withHeader('Origin', 'https://provadorvirtual.online')
             ->postJson('/api/v1/public/recommendations/config-check', [

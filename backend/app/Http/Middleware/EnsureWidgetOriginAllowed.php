@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\MerchantCompany;
+use App\Models\PlatformConnection;
 use App\Models\RecommendationLog;
 use App\Models\WidgetInstall;
 use Closure;
@@ -76,10 +77,21 @@ class EnsureWidgetOriginAllowed
             return null;
         }
 
-        return MerchantCompany::query()
+        $company = MerchantCompany::query()
             ->where('platform', 'bigshop')
             ->where('external_store_id', (string) $storeId)
             ->first();
+
+        if ($company) {
+            return $company;
+        }
+
+        return PlatformConnection::query()
+            ->with('company')
+            ->where('platform', 'bigshop')
+            ->where('external_store_id', (string) $storeId)
+            ->whereNotNull('merchant_company_id')
+            ->first()?->company;
     }
 
     private function recommendationLog(Request $request): ?RecommendationLog

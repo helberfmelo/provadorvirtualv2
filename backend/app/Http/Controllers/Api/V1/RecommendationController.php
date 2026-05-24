@@ -9,6 +9,7 @@ use App\Http\Requests\StoreRecommendationFeedbackRequest;
 use App\Http\Requests\StoreRecommendationRequest;
 use App\Http\Requests\StoreRecommendationSignalRequest;
 use App\Models\MerchantCompany;
+use App\Models\PlatformConnection;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\RecommendationFeedback;
@@ -257,6 +258,18 @@ class RecommendationController extends Controller
 
             if ($company) {
                 return $company;
+            }
+
+            $connectionCompany = PlatformConnection::query()
+                ->with('company')
+                ->where('platform', 'bigshop')
+                ->where('external_store_id', (string) $storeId)
+                ->whereNotNull('merchant_company_id')
+                ->when($merchantId, fn ($query) => $query->where('merchant_id', $merchantId))
+                ->first()?->company;
+
+            if ($connectionCompany) {
+                return $connectionCompany;
             }
         }
 

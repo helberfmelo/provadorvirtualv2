@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\MerchantCompany;
+use App\Models\PlatformConnection;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
@@ -121,6 +122,28 @@ class RecommendationApiTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('configured', true)
             ->assertJsonPath('recommended_size', 'M');
+    }
+
+    public function test_bigshop_widget_resolves_company_by_platform_connection_store_id(): void
+    {
+        $this->seed();
+
+        PlatformConnection::query()->create([
+            'merchant_id' => 1,
+            'merchant_company_id' => 1,
+            'platform' => 'bigshop',
+            'external_store_id' => '53',
+            'status' => 'connected',
+        ]);
+
+        $this->postJson('/api/v1/public/recommendations/config-check', [
+            'store_id' => 53,
+            'product_id' => 1,
+            'platform' => 'bigshop',
+        ])
+            ->assertOk()
+            ->assertJsonPath('configured', true)
+            ->assertJsonPath('available_sizes.2', 'M');
     }
 
     public function test_shopper_profile_with_consent_is_reused_and_can_be_forgotten(): void

@@ -535,3 +535,13 @@
 - Confirmado que o `config-check` da Luna Moda Festa retorna `403` com `Origin: https://www.lunamodafesta.com.br`, indicando domínio ainda não liberado no widget, e retorna `measurement_table_missing` sem `Origin`, indicando que o produto `716076` continua sem tabela vinculada no banco.
 - Validações locais: `npm run build`, `php artisan test --filter=ProductsApiTest`, lint de `additionalAppsEdit.vue` na cópia local BigShop e `git diff --check`.
 - Run `26353363931` do GitHub Actions finalizou com sucesso para o commit `3f242ac`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 63 Resolver widget BigShop pela integração
+
+- Releitura obrigatória dos documentos principais e de `docs/bigshop_model3_pro_widget.md` concluída antes de iniciar a correção.
+- Reproduzido contra produção que `config-check` com `Origin: https://www.lunamodafesta.com.br` ainda retornava `403 Origem não autorizada para este widget`.
+- Reproduzido que o mesmo `config-check` sem `Origin` ainda retornava `measurement_table_missing`, embora o produto `716076` já estivesse com `measurement_table_id=1`.
+- Identificada a lacuna: o widget público BigShop resolvia empresa apenas por `merchant_companies.platform='bigshop'` e `external_store_id=53`, mas a loja piloto está configurada pela integração `platform_connections`.
+- Middleware de origem do widget e resolução pública de produto passaram a aceitar fallback por `platform_connections.platform='bigshop'` + `external_store_id`, usando a empresa vinculada à conexão.
+- Testes adicionados para `config-check` e CORS BigShop resolvendo pela integração.
+- Validações locais: `php artisan test --filter=RecommendationApiTest`, `php artisan test --filter=HardeningApiTest`, `vendor/bin/pint --dirty`, `npm run build` e `git diff --check`.

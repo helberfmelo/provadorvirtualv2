@@ -804,3 +804,17 @@ Entregas:
 - manter as alterações do repositório BigShop somente locais, sem commit e sem push, conforme orientação do usuário.
 
 Status: implementado no commit `3f242ac` e publicado com sucesso no run `26353363931`, com deploy remoto e smoke público concluídos.
+
+### Sprint 63 - Resolver widget BigShop pela integração
+
+Objetivo: fazer o endpoint público do widget encontrar lojas BigShop configuradas na tela de Integrações, mesmo quando `merchant_companies.platform` ainda não está marcado como `bigshop`.
+
+Entregas:
+
+- adicionar fallback por `platform_connections.platform='bigshop'` e `external_store_id` no middleware de origem do widget;
+- adicionar o mesmo fallback na resolução de produto do endpoint público de recomendação;
+- cobrir `config-check` BigShop por conexão de plataforma nos testes de recomendação;
+- cobrir CORS/origem BigShop por conexão de plataforma nos testes de hardening;
+- documentar as duas fontes aceitas para resolução pública BigShop.
+
+Status: implementado e validado localmente; aguardando commit, push e verificação remota.
