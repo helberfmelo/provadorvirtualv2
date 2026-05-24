@@ -788,3 +788,19 @@ Entregas:
 - documentar a depuração do widget BigShop e o retorno `measurement_table_missing`.
 
 Status: implementado no commit `2074f03` e publicado com sucesso no run `26352328525`, com deploy remoto e smoke público concluídos.
+
+### Sprint 62 - Depuração BigShop e seleção real de tabela
+
+Objetivo: remover hardcoding remanescente no editor local de Apps adicionais da BigShop, impedir que o portal mostre tabela fantasma em produto sem vínculo real e registrar os próximos bloqueios da Luna Moda Festa.
+
+Entregas:
+
+- ajustar a cópia local `D:\Projetos\bigbangshop2.0\src\pages\configurations\additionalAppsEdit.vue` para depender apenas de `bbs.apps` na opção do app, labels, descrição e `json_fields`;
+- remover fallback local, ID fixo e textos fixos do Provador Virtual no painel BigShop;
+- limpar `deleted_at` e `last_full` antes do save do app ativo para evitar regravar soft delete antigo vindo do editor genérico;
+- corrigir o portal do Provador Virtual para não selecionar automaticamente a primeira tabela quando `products.measurement_table_id` está `NULL`;
+- confirmar que a URL pública do script do widget responde `200`;
+- confirmar que o `config-check` da Luna retorna `403` quando enviado com `Origin: https://www.lunamodafesta.com.br`, indicando domínio não liberado, e `measurement_table_missing` sem `Origin`, indicando ausência de tabela vinculada depois que o domínio for liberado;
+- manter as alterações do repositório BigShop somente locais, sem commit e sem push, conforme orientação do usuário.
+
+Status: implementado e validado localmente; aguardando commit, push e verificação remota.

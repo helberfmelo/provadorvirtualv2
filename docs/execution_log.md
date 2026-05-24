@@ -522,3 +522,14 @@
 - Documentada a depuração BigShop com `?pvdebug=1` e comandos de console.
 - Validações locais: `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=RecommendationApiTest` e `git diff --check`.
 - Run `26352328525` do GitHub Actions finalizou com sucesso para o commit `2074f03`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 62 Depuração BigShop e seleção real de tabela
+
+- Releitura obrigatória dos documentos principais e de `docs/bigshop_model3_pro_widget.md` concluída antes de iniciar a correção.
+- Cópia local `D:\Projetos\bigbangshop2.0\src\pages\configurations\additionalAppsEdit.vue` ajustada sem commit/push para remover fallback local do Provador Virtual, ID fixo e textos fixos.
+- Banner explicativo do editor BigShop passa a usar `description` retornada por `bbs.apps`; labels continuam vindo de `cod_1_name`, `cod_2_name`, `cod_3_name` e `cod_4_name`.
+- Campos adicionais no editor BigShop passam a depender de `json_fields` do app, sem lista fixa de IDs no front.
+- Antes de salvar app ativo no editor BigShop, `deleted_at` e `last_full` são enviados como `null` para não regravar soft delete antigo carregado pelo editor genérico.
+- Portal do Provador Virtual corrigido para não selecionar a primeira tabela disponível quando o produto está com `measurement_table_id=NULL`.
+- Confirmado que `https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js` responde `200`.
+- Confirmado que o `config-check` da Luna Moda Festa retorna `403` com `Origin: https://www.lunamodafesta.com.br`, indicando domínio ainda não liberado no widget, e retorna `measurement_table_missing` sem `Origin`, indicando que o produto `716076` continua sem tabela vinculada no banco.

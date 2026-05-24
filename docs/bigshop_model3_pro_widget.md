@@ -58,6 +58,8 @@ Observação operacional: o select `Configurações > Apps adicionais > Tipo` é
 
 Na cópia local estudada, o arquivo `D:\Projetos\bigshop\172.16.151.5\bigshop\sistema\context\get_apps.php` deve executar o `INSERT ... WHERE NOT EXISTS` acima antes do `select *, name as label, id as value from apps`. Se o ambiente local estiver apontando para outra cópia do backend, aplicar o SQL diretamente no banco usado pelo `localhost`.
 
+O painel BigShop `Configurações > Apps adicionais` não deve criar fallback local, ID fixo ou texto fixo para o Provador Virtual. A opção do select, nomes dos campos e banner explicativo devem vir da tabela global `bbs.apps` (`name`, `cod_1_name`, `cod_2_name`, `cod_3_name`, `cod_4_name`, `description` e `json_fields`). Ao salvar um app ativo, a tela deve limpar `deleted_at` e `last_full` do payload para não regravar um soft delete antigo carregado pelo editor genérico.
+
 Em `Configurações > Apps adicionais`, cada loja deve cadastrar:
 
 - `Nome`: `Provador Virtual`;
@@ -117,7 +119,9 @@ document.getElementById('provadorVirtualScript')
 
 Se `vue.generalData.store.apps` vier vazio, conferir em `bbs.template_model3_apps` se o app da loja está com `deleted_at is null`, `cod_4='S'`, `type` apontando para `bbs.apps.id` do `app_code='provador_virtual'` e se o cache da loja foi limpo.
 
-Se o script carregar, mas o widget não renderizar, testar o endpoint público `POST /api/v1/public/recommendations/config-check`. O retorno `measurement_table_missing` indica que o produto resolvido pelo par `platform=bigshop`, `store_id` e `product_id` ainda está sem `measurement_table_id` válido no SaaS.
+Se o script carregar, mas o widget não renderizar, testar o endpoint público `POST /api/v1/public/recommendations/config-check`. Um retorno `403` com `Origin` da loja indica domínio não liberado no widget; adicionar o domínio com e sem `www` em `/app/widget`. O retorno `measurement_table_missing` indica que o produto resolvido pelo par `platform=bigshop`, `store_id` e `product_id` ainda está sem `measurement_table_id` válido no SaaS.
+
+No portal da empresa, o formulário de produto não pode selecionar automaticamente a primeira tabela quando `measurement_table_id` vier `NULL`. A lista de produtos e o editor devem refletir o banco: produto sem vínculo real deve aparecer como `Sem tabela` até o usuário salvar uma tabela explicitamente.
 
 ## Luna Moda Festa
 

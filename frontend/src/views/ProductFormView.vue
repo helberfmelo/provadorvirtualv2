@@ -67,7 +67,7 @@ function fillForm(product: Product) {
   form.gender = product.gender ?? 'unisex'
   form.fit_profile = product.fit_profile ?? 'regular'
   form.status = product.status ?? 'active'
-  form.measurement_table_id = product.measurement_table_id ?? measurementTables.value[0]?.id ?? null
+  form.measurement_table_id = product.measurement_table_id ?? null
 }
 
 async function saveProduct() {
