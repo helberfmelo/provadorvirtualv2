@@ -639,4 +639,4 @@ Entregas:
 - documentar comandos de conferência remota no runbook de deploy;
 - registrar falhas dos runs `26346764503` e `26346828756` como incidente operacional corrigido.
 
-Status: implementado localmente; validação remota deve ser acompanhada após o push da sprint.
+Status: implementado, enviado ao GitHub no commit `c2826a5` e validado no run `26347139903`, com deploy remoto e smoke público concluídos com sucesso.

@@ -413,3 +413,4 @@
 - Causa: testes esperavam mensagens antigas sem acento enquanto a API passou a retornar PT-BR correto com acentos.
 - Atualizadas expectativas em `HardeningApiTest` e `PublicCheckoutFlowTest`.
 - Governança reforçada: toda sprint precisa conferir GitHub Actions/deploy remoto depois do push antes de ser considerada concluída.
+- Run `26347139903` do GitHub Actions finalizou com sucesso para o commit `c2826a5`, incluindo deploy remoto e smoke público.
