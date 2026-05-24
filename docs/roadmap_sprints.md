@@ -787,4 +787,4 @@ Entregas:
 - cobrir o comportamento no teste de integração XML;
 - documentar a depuração do widget BigShop e o retorno `measurement_table_missing`.
 
-Status: implementado localmente; aguardando commit, push e verificação remota da sprint.
+Status: implementado no commit `2074f03` e publicado com sucesso no run `26352328525`, com deploy remoto e smoke público concluídos.

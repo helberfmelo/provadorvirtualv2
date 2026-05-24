@@ -521,3 +521,4 @@
 - Teste de integração XML passou a simular novo sync após vínculo manual e garantir que a tabela não é removida.
 - Documentada a depuração BigShop com `?pvdebug=1` e comandos de console.
 - Validações locais: `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=RecommendationApiTest` e `git diff --check`.
+- Run `26352328525` do GitHub Actions finalizou com sucesso para o commit `2074f03`, incluindo deploy remoto e smoke público.
