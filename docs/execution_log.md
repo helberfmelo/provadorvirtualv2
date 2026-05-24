@@ -533,3 +533,5 @@
 - Portal do Provador Virtual corrigido para não selecionar a primeira tabela disponível quando o produto está com `measurement_table_id=NULL`.
 - Confirmado que `https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js` responde `200`.
 - Confirmado que o `config-check` da Luna Moda Festa retorna `403` com `Origin: https://www.lunamodafesta.com.br`, indicando domínio ainda não liberado no widget, e retorna `measurement_table_missing` sem `Origin`, indicando que o produto `716076` continua sem tabela vinculada no banco.
+- Validações locais: `npm run build`, `php artisan test --filter=ProductsApiTest`, lint de `additionalAppsEdit.vue` na cópia local BigShop e `git diff --check`.
+- Run `26353363931` do GitHub Actions finalizou com sucesso para o commit `3f242ac`, incluindo deploy remoto e smoke público.

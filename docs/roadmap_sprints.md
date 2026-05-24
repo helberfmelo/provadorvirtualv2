@@ -803,4 +803,4 @@ Entregas:
 - confirmar que o `config-check` da Luna retorna `403` quando enviado com `Origin: https://www.lunamodafesta.com.br`, indicando domínio não liberado, e `measurement_table_missing` sem `Origin`, indicando ausência de tabela vinculada depois que o domínio for liberado;
 - manter as alterações do repositório BigShop somente locais, sem commit e sem push, conforme orientação do usuário.
 
-Status: implementado e validado localmente; aguardando commit, push e verificação remota.
+Status: implementado no commit `3f242ac` e publicado com sucesso no run `26353363931`, com deploy remoto e smoke público concluídos.
