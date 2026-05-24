@@ -692,3 +692,14 @@
 - Commit `415e68f` enviado para `main`; o run `26372104049` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Pós-deploy confirmou com cache bust que o JS público contém `Ao usar o Provador Virtual` e `browserStorageNoticeHtml`, que o CSS público contém `.pv-browser-note` e `font-weight: 400`, e que o texto antigo não aparece mais.
 - `scripts/validate-production.ps1` passou completo após o deploy.
+
+## 2026-05-24 - Sprint 74 Refinar microtexto de salvamento local
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` sem expor valores sensíveis.
+- Aviso `.pv-browser-note` ajustado para `font-size: 0.88em`, igual à linha `.pv-precision`.
+- Aviso `.pv-browser-note` passou a usar `font-style: italic` e `font-weight: 400`.
+- Margem superior reduzida para `2px`, deixando o texto mais próximo de um microtexto auxiliar.
+- Teste `WidgetAssetTest` atualizado para cobrir `font-style: italic`.
+- Validações locais: `php artisan test --filter=WidgetAssetTest`, `git diff --check`, `npm run build` em `frontend` e `npm run build` em `backend`.
+- Observação local: o build Vite do backend concluiu com sucesso, mas avisou que recomenda Node `20.19+`; a máquina local está em Node `20.18.1`.
+- Commit, push, GitHub Actions/deploy e validação de produção pendentes neste registro até o run remoto finalizar.

@@ -973,3 +973,17 @@ Entregas:
 - validar sintaxe do widget, teste de asset, builds do frontend/backend e checagem de diff.
 
 Status: implementado no commit `415e68f` e publicado com sucesso no run `26372104049`, com deploy remoto, deploy da raiz pública, master admin, smoke público, `validate-production.ps1` e verificação dos assets públicos confirmando a nova frase discreta e a remoção do texto antigo.
+
+### Sprint 74 - Refinar microtexto de salvamento local
+
+Objetivo: ajustar a hierarquia visual do aviso de salvamento local para que ele fique ainda mais discreto e alinhado à linha de precisão do widget.
+
+Entregas:
+
+- deixar o aviso `Ao usar o Provador Virtual...` em itálico;
+- usar no aviso a mesma escala de fonte da linha `Nível de precisão da IA:`;
+- reduzir a margem superior do aviso para ele não parecer um bloco principal do formulário;
+- proteger o estilo itálico no teste de asset do widget;
+- validar teste de asset, builds do frontend/backend e checagem de diff.
+
+Status: implementação local validada; commit, push, deploy e validação de produção serão registrados após o GitHub Actions finalizar.

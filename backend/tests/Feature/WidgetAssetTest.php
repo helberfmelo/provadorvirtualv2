@@ -48,6 +48,7 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('-webkit-mask', $cssContents);
         $this->assertStringContainsString('.pv-main-button-subtle', $cssContents);
         $this->assertStringContainsString('.pv-browser-note', $cssContents);
+        $this->assertStringContainsString('font-style: italic;', $cssContents);
 
         foreach ([
             'retangular.png',
