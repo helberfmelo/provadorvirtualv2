@@ -604,3 +604,16 @@
 - Pós-deploy confirmou que `https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js` contém `v2_sprint_67`, `Continuar para corpo`, `Continuar para detalhes` e `data-pv-footer-action`.
 - Playwright pós-deploy validou `https://provadorvirtual.online/produto-teste/blusa-canelada-solar` e `https://www.lunamodafesta.com.br/716076-vestido-longo-luna-2553-fucsia`: com perfil completo salvo, a etapa 1 fica em 45%, o botão do rodapé mostra `Continuar para corpo` e o clique avança para `Corpo`, sem pular para o resultado.
 - Observação da validação Luna: o banner LGPD da loja (`#lgpd_info_bb`) interceptou o clique do teste automatizado; foi ocultado apenas no teste para validar o fluxo do Provador Virtual.
+
+## 2026-05-24 - Sprint 68 Recomendações progressivas do widget
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint corretiva.
+- Reestudada a dinâmica do widget v1 a partir da documentação e dos prints recentes: recomendação parcial com altura + peso, incentivo `Aumentar Precisão`, tamanho recomendado no rodapé, passos progressivos, silhuetas por gênero, confete em 100% e links pequenos de créditos/privacidade.
+- Widget público v2 ajustado para não recomendar com apenas altura ou apenas peso, mas chamar a API automaticamente quando altura + peso existem.
+- Rodapé fixo volta a mostrar o tamanho recomendado quando há retorno da API, enquanto os botões no corpo das etapas continuam guiando o aumento de precisão.
+- Etapas 1, 2, 3 e 4 viraram botões clicáveis, com travas por pré-requisito: altura/peso, gênero/formato corporal e medidas detalhadas completas.
+- Cards de silhueta agora mudam conforme `Feminino` ou `Masculino`.
+- Medidas e progresso passaram a ser persistidos por tabela de medidas no `localStorage`, permitindo reuso entre produtos que usam a mesma tabela.
+- Fechamento do drawer salva snapshot silencioso quando já existe recomendação e o consumidor alterou dados.
+- Confete ficou configurável por `theme.confetti_enabled`, com padrão ativado nos defaults do widget, demo, checkout, SaaS e ativação BigShop.
+- Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, Playwright temporário com servidor mockado, `php artisan test` e `npm run build`.

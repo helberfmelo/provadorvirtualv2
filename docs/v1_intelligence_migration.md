@@ -98,7 +98,7 @@ Status Sprint 66: o v2 recuperou esse fluxo no widget público `/widget/v1/prova
 - etapa 2 com gênero, formato corporal em cards e caimento desejado;
 - etapa 3 com medidas detalhadas derivadas da tabela do produto;
 - barra de precisão persistente no rodapé do drawer;
-- recomendação disponível somente depois que o usuário chega visualmente à etapa de detalhes;
+- recomendação parcial disponível com altura + peso e refinada nas etapas seguintes;
 - confete próprio em CSS/JS ao chegar a 100% de precisão;
 - resultado com tamanho, confiança e notas do motor;
 - feedback final visível com sim/não, nota, tamanho escolhido e comentário.
@@ -106,6 +106,8 @@ Status Sprint 66: o v2 recuperou esse fluxo no widget público `/widget/v1/prova
 O v2 não copiou a dependência externa de confete do v1. A animação agora é isolada no CSS do widget, sem bloquear a loja e sem carregar biblioteca adicional.
 
 Status Sprint 67: reforçada a paridade comportamental com o v1. O usuário precisa passar visualmente por `Medidas`, `Corpo` e `Detalhes` antes de obter o resultado pelo rodapé; dados salvos no navegador não elevam a etapa 1 para 100% e não disparam confete ou recomendação direta.
+
+Status Sprint 68: a dinâmica do v1 foi refinada no v2. O widget volta a recomendar tamanho a partir do mínimo útil, que é altura + peso, sem recomendar com apenas um deles. O corpo das etapas mantém o incentivo `Aumentar precisão`, o rodapé fixo mantém barra de precisão e tamanho recomendado, os passos 1 a 4 são clicáveis com bloqueios por etapa, as silhuetas mudam por gênero, o perfil é salvo por tabela de medidas e o confete passa a depender de `theme.confetti_enabled`, ativado por padrão.
 
 ### Teste minucioso do demo v1
 

@@ -98,6 +98,7 @@ class BigShopActivationService
                     'primary' => '#0f172a',
                     'secondary' => '#ff4d5e',
                     'accent' => '#ff7a1a',
+                    'confetti_enabled' => true,
                 ],
                 'is_active' => true,
             ]

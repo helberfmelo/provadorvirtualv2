@@ -128,6 +128,7 @@ class DemoProductController extends Controller
             'font_size' => '14',
             'font_weight' => '800',
             'button_radius' => '8',
+            'confetti_enabled' => true,
         ];
     }
 }

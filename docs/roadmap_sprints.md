@@ -881,3 +881,22 @@ Entregas:
 - atualizar documentação do contrato sequencial do widget.
 
 Status: implementado no commit `4284a24` e publicado com sucesso no run `26357843460`, com deploy remoto, deploy da raiz pública, master admin, smoke público e validação pós-deploy nas páginas do produto teste e da Luna Moda Festa.
+
+### Sprint 68 - Recomendações progressivas do widget
+
+Objetivo: aproximar novamente o widget v2 da dinâmica prática do v1, mantendo recomendação útil desde altura + peso sem permitir 100% ou confete antes da etapa completa.
+
+Entregas:
+
+- recomendar automaticamente somente quando altura e peso estiverem preenchidos; altura isolada ou peso isolado não recomenda tamanho;
+- manter o botão `Aumentar precisão` no corpo das etapas e o tamanho recomendado no rodapé fixo quando a API já retornou recomendação;
+- exibir banners de dica e recomendação parcial em cada etapa para incentivar o consumidor a continuar preenchendo;
+- permitir clicar nos passos 1, 2, 3 e 4 para avançar ou voltar, respeitando os bloqueios: etapa 2 exige altura/peso, etapa 3 exige gênero/formato corporal e etapa 4 exige todas as medidas detalhadas;
+- trocar as silhuetas exibidas conforme o gênero escolhido, com conjuntos feminino e masculino;
+- persistir medidas e progresso por tabela de medidas no `localStorage`, permitindo reuso em outros produtos com a mesma tabela e atualização quando o consumidor altera dados;
+- enviar snapshots silenciosos ao fechar o widget quando já houver recomendação e o consumidor tiver alterado dados;
+- disparar confete apenas ao chegar ao resultado depois de preencher todas as medidas detalhadas, com configuração `confetti_enabled` no tema do widget e padrão ativado;
+- manter créditos, ano, privacidade e termos no rodapé do drawer;
+- validar o fluxo com teste local de widget, suíte backend completa e build frontend.
+
+Status: implementado localmente; aguardando commit, push, deploy remoto e verificação pública da sprint.

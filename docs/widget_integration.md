@@ -1,6 +1,6 @@
 # Widget e Integração Universal
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-24
 
 ## Objetivo
 
@@ -65,7 +65,7 @@ Na BigShop, a instalação automática será feita futuramente no arquivo `produ
 5. `Descubra seu tamanho` abre modal/drawer de recomendação.
 6. `Tabela de Medidas` abre a tabela do produto com as faixas cadastradas.
 7. Coleta dados em etapas e reusa medidas salvas localmente no navegador quando houver.
-8. Retorna recomendação.
+8. Retorna recomendação inicial assim que houver altura e peso, e refina a precisão conforme as etapas seguintes.
 9. Coleta consentimento para salvar medidas no perfil anônimo.
 10. Coleta feedback.
 11. Exibe `desenvolvido por provadorvirtual.online` com link para o site público.
@@ -91,7 +91,13 @@ A barra `Nível de precisão da IA` usa pesos progressivos semelhantes ao v1: al
 
 O feedback final fica visível no próprio resultado e salva `was_helpful`, `rating`, `selected_size` e `comment` no endpoint público atual. Além das medidas normalizadas usadas pelo motor, o widget envia `shopper_profile.raw_widget_data` com versão, origem, etapas concluídas, identidade técnica do produto, precisão, tabela e medidas brutas da jornada. Esse payload é persistido em `recommendation_logs.raw_widget_payload` e entra na rotina `pv:privacy-anonymize`.
 
-Regra Sprint 67: o fluxo do drawer é obrigatoriamente sequencial. A etapa 1 pode pré-preencher dados salvos do navegador, mas a barra de precisão deve considerar somente altura, peso e idade nessa tela. O rodapé avança para `Corpo` e depois para `Detalhes`; ele só chama a API de recomendação na etapa 3. O confete só pode disparar quando a precisão real chegar a 100%, nunca em recomendação básica ou por dados ocultos de etapas futuras.
+Regra Sprint 67: o fluxo do drawer é obrigatoriamente sequencial. A etapa 1 pode pré-preencher dados salvos do navegador, mas a barra de precisão deve considerar somente altura, peso e idade nessa tela. O confete só pode disparar quando a precisão real chegar a 100%, nunca em recomendação básica ou por dados ocultos de etapas futuras.
+
+Regra Sprint 68: a recomendação parcial volta a ficar disponível ao longo da jornada, como no v1. O widget não recomenda nada com apenas altura ou apenas peso; com altura + peso, já chama a API e mostra o tamanho recomendado no rodapé fixo. O botão dentro do corpo das etapas continua sendo `Aumentar precisão`, enquanto o rodapé mostra a barra `Nível de precisão da IA` e, quando houver retorno da API, `Seu tamanho é X`.
+
+Os passos 1, 2, 3 e 4 são clicáveis para avançar e voltar, mas respeitam bloqueios de dados: `Corpo` exige altura + peso, `Detalhes` exige gênero + formato corporal, e `Resultado` exige todas as medidas detalhadas da tabela. O confete só dispara ao entrar no resultado com 100% depois de preencher as medidas detalhadas. A opção `theme.confetti_enabled` permite desligar a celebração por loja; quando não configurada, o padrão é ativado.
+
+As medidas salvas no navegador passam a usar chave por tabela de medidas (`pv_shopper_profile_v2_table_{id}`), além do fallback legado. Assim, produtos que compartilham a mesma tabela reabrem com dados e progresso preenchidos, mas continuam editáveis. Se o consumidor fechar o widget depois de uma recomendação e alterar algum dado, o widget salva o novo snapshot de forma silenciosa para manter o aprendizado atualizado.
 
 ## Evolucao inteligente prevista
 

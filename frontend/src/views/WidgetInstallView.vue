@@ -20,6 +20,7 @@ type WidgetInstall = {
     font_size?: string
     font_weight?: string
     button_radius?: string
+    confetti_enabled?: boolean | string
   }
   is_active: boolean
   script_url: string
@@ -60,6 +61,7 @@ const form = reactive({
     font_size: '14',
     font_weight: '800',
     button_radius: '8',
+    confetti_enabled: true,
   },
 })
 
@@ -147,6 +149,11 @@ function fillForm(data: WidgetInstall) {
   form.theme.font_size = data.theme?.font_size || '14'
   form.theme.font_weight = data.theme?.font_weight || '800'
   form.theme.button_radius = data.theme?.button_radius || '8'
+  form.theme.confetti_enabled = data.theme?.confetti_enabled === undefined
+    || data.theme?.confetti_enabled === null
+    || data.theme?.confetti_enabled === true
+    || data.theme?.confetti_enabled === 'true'
+    || data.theme?.confetti_enabled === '1'
 }
 
 async function saveInstall() {
@@ -286,6 +293,10 @@ async function copySnippet() {
           <label>
             Raio dos botões
             <input v-model="form.theme.button_radius" type="number" min="0" max="24" />
+          </label>
+          <label class="toggle-line">
+            Confete
+            <input v-model="form.theme.confetti_enabled" type="checkbox" />
           </label>
         </div>
 

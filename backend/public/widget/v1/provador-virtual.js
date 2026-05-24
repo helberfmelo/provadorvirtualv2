@@ -10,6 +10,7 @@
   var root = null;
   var activeBackdrop = null;
   var profileStorageKey = 'pv_shopper_profile_v2';
+  var profileStoragePrefix = 'pv_shopper_profile_v2_table_';
   var state = initialState();
 
   exposePublicApi();
@@ -22,6 +23,9 @@
       recommendation: null,
       config: null,
       loading: false,
+      recommendationTimer: null,
+      recommendationSignature: '',
+      dirty: false,
       step: 1,
       form: {},
       precision: 0,
@@ -342,12 +346,20 @@
   }
 
   function openRecommendationDrawer() {
-    state.step = 1;
+    var savedProfile = readSavedProfile();
+
+    var savedStep = savedProfile && savedProfile.max_step ? Number(savedProfile.max_step) : 1;
+    state.step = Number.isFinite(savedStep) ? Math.max(1, Math.min(3, savedStep)) : 1;
     state.recommendation = null;
     state.loading = false;
     state.form = formFromSavedProfile();
+    if (!canVisitStep(state.step)) {
+      state.step = 1;
+    }
     state.precision = calculatePrecision(state.form, state.step);
     state.celebrated = false;
+    state.dirty = false;
+    state.recommendationSignature = '';
     state.feedback = {
       wasHelpful: null,
       rating: null,
@@ -359,6 +371,7 @@
     activeBackdrop = createBackdrop('', 'pv-drawer-backdrop');
     activeBackdrop.innerHTML = drawerFrameHtml();
     renderDrawer(activeBackdrop);
+    scheduleAutoRecommendation(activeBackdrop);
   }
 
   function drawerFrameHtml() {
@@ -412,8 +425,9 @@
     return [
       '<nav class="pv-stepper" aria-label="Etapas do provador">',
       steps.map(function (item) {
-        var className = item[0] === state.step ? ' class="active"' : '';
-        return '<span' + className + '><strong>' + item[0] + '</strong>' + item[1] + '</span>';
+        var active = item[0] === state.step ? ' active' : '';
+        var disabled = canVisitStep(item[0]) ? '' : ' disabled';
+        return '<button type="button" class="' + active + '" data-pv-step="' + item[0] + '"' + disabled + '><strong>' + item[0] + '</strong>' + item[1] + '</button>';
       }).join(''),
       '</nav>',
     ].join('');
@@ -424,12 +438,14 @@
     var note = profile
       ? '<div class="pv-known"><span>Encontramos medidas salvas neste navegador. Voc&ecirc; pode revisar antes de continuar.</span><button type="button" data-pv-clear-profile>Limpar</button></div>'
       : '<div class="pv-known">Com altura e peso j&aacute; conseguimos uma recomenda&ccedil;&atilde;o inicial. As pr&oacute;ximas etapas aumentam a precis&atilde;o.</div>';
+    var disabled = hasStarterMeasures() ? '' : ' disabled';
 
     return [
       '<section class="pv-step-panel">',
       '<h3>Suas medidas</h3>',
       '<p>Informe medidas aproximadas em cent&iacute;metros e quilos.</p>',
       note,
+      recommendationBannerHtml(),
       '<div class="pv-grid">',
       numberField('height', 'Altura (cm)', 'Ex: 168', true, tooltipText('height')),
       numberField('weight', 'Peso (kg)', 'Ex: 62', true, tooltipText('weight')),
@@ -437,25 +453,29 @@
       '</div>',
       '<label class="pv-consent"><input type="checkbox" data-pv-input="consent"' + (state.form.consent === false ? '' : ' checked') + ' />Salvar minhas medidas neste navegador para pr&oacute;ximas recomenda&ccedil;&otilde;es.</label>',
       '<div class="pv-step-actions">',
-      '<button type="button" class="pv-button pv-button-secondary" data-pv-next>Aumentar precis&atilde;o</button>',
+      '<div><p class="pv-action-hint">Quer uma recomenda&ccedil;&atilde;o ainda mais precisa?</p><button type="button" class="pv-button pv-button-secondary" data-pv-next' + disabled + '>Aumentar precis&atilde;o</button></div>',
       '</div>',
       '</section>',
     ].join('');
   }
 
   function stepTwoHtml() {
+    var disabled = hasStepTwoData() ? '' : ' disabled';
+
     return [
       '<section class="pv-step-panel">',
       '<button type="button" class="pv-back-link" data-pv-back>&larr; Voltar</button>',
       '<h3>G&ecirc;nero e formato do corpo</h3>',
       '<p>Essas informa&ccedil;&otilde;es ajudam a IA a interpretar melhor as faixas da tabela.</p>',
+      recommendationBannerHtml(),
       '<label class="pv-field pv-field-full">G&ecirc;nero<select data-pv-input="gender">' + genderOptions(state.form.gender || '') + '</select></label>',
+      stepTipHtml('Selecione a silhueta que melhor descreve seu corpo. Os desenhos mudam conforme o g&ecirc;nero informado.'),
       '<div class="pv-shape-grid">',
       bodyShapeCards(),
       '</div>',
       '<label class="pv-field pv-field-full">Caimento desejado<select data-pv-input="fit_preference">' + fitOptions(state.form.fit_preference || 'regular') + '</select></label>',
       '<div class="pv-step-actions">',
-      '<button type="button" class="pv-button pv-button-secondary" data-pv-next>Aumentar precis&atilde;o</button>',
+      '<button type="button" class="pv-button pv-button-secondary" data-pv-next' + disabled + '>Aumentar precis&atilde;o</button>',
       '</div>',
       '</section>',
     ].join('');
@@ -468,18 +488,50 @@
       '<section class="pv-step-panel">',
       '<button type="button" class="pv-back-link" data-pv-back>&larr; Voltar</button>',
       '<h3>Medidas detalhadas</h3>',
-      '<p>Preencha o que souber. Campos vazios ser&atilde;o ignorados.</p>',
+      '<p>Preencha todas as medidas para chegar a 100% de precis&atilde;o.</p>',
+      recommendationBannerHtml(),
       '<div class="pv-grid">',
       fields.map(function (meta) {
         return numberField(meta.key, meta.label, meta.placeholder, false, meta.tooltip);
       }).join(''),
       '</div>',
-      '<div class="pv-detail-note">Dica: use uma fita m&eacute;trica sem apertar o corpo. Se estiver em d&uacute;vida, pode pular esta etapa.</div>',
+      '<div class="pv-detail-note">Dica: use uma fita m&eacute;trica sem apertar o corpo. Se estiver em d&uacute;vida, mantenha a recomenda&ccedil;&atilde;o parcial do rodap&eacute; e complete depois.</div>',
       '<div class="pv-step-actions">',
-      '<button type="button" class="pv-link-button" data-pv-recommend>Pular e ver com dados atuais</button>',
+      '<button type="button" class="pv-button pv-button-secondary" data-pv-final' + (hasAllDetailedMeasures() ? '' : ' disabled') + '>Finalizar e ver resultado</button>',
       '</div>',
       '</section>',
     ].join('');
+  }
+
+  function stepTipHtml(text) {
+    return '<div class="pv-detail-note pv-tip-note">' + text + '</div>';
+  }
+
+  function recommendationBannerHtml() {
+    if (!hasStarterMeasures()) {
+      return '<div class="pv-known" data-pv-recommendation-banner>Informe altura e peso para liberar a primeira recomenda&ccedil;&atilde;o de tamanho.</div>';
+    }
+
+    if (state.loading && !state.recommendation) {
+      return '<div class="pv-known" data-pv-recommendation-banner>Calculando uma recomenda&ccedil;&atilde;o inicial. Voc&ecirc; pode continuar preenchendo para aumentar a precis&atilde;o.</div>';
+    }
+
+    if (state.recommendation && state.recommendation.recommended_size) {
+      return [
+        '<div class="pv-recommendation-inline" data-pv-recommendation-banner>',
+        '<span>Recomendamos o tamanho <strong>' + escapeHtml(state.recommendation.recommended_size) + '</strong>.</span>',
+        state.precision < 100 ? '<small>Continue preenchendo para aumentar a precis&atilde;o.</small>' : '<small>Voc&ecirc; chegou &agrave; precis&atilde;o m&aacute;xima.</small>',
+        '</div>',
+      ].join('');
+    }
+
+    return '<div class="pv-known" data-pv-recommendation-banner>J&aacute; temos os dados m&iacute;nimos. A recomenda&ccedil;&atilde;o aparecer&aacute; no rodap&eacute; assim que o c&aacute;lculo terminar.</div>';
+  }
+
+  function updateRecommendationBanner(backdrop) {
+    backdrop.querySelectorAll('[data-pv-recommendation-banner]').forEach(function (banner) {
+      banner.outerHTML = recommendationBannerHtml();
+    });
   }
 
   function resultStepHtml() {
@@ -637,19 +689,31 @@
   }
 
   function bodyShapeCards() {
-    var options = [
-      ['straight', 'Retangular', 'Ombros, cintura e quadril parecidos.'],
-      ['hourglass', 'Ampulheta', 'Cintura mais marcada.'],
-      ['triangle', 'Tri&acirc;ngulo', 'Quadril maior que ombros.'],
-      ['inverted_triangle', 'Tri&acirc;ngulo invertido', 'Ombros ou t&oacute;rax maiores.'],
-      ['oval', 'Oval', 'Regi&atilde;o central mais arredondada.'],
-    ];
+    if (!state.form.gender) {
+      return '<div class="pv-empty-shapes">Escolha o g&ecirc;nero para visualizar as silhuetas.</div>';
+    }
+
+    var isMale = state.form.gender === 'male';
+    var options = isMale
+      ? [
+        ['straight', 'Retangular', 'Ombros, cintura e quadril parecidos.'],
+        ['triangle', 'Tri&acirc;ngulo', 'Quadril proporcionalmente maior.'],
+        ['inverted_triangle', 'Tri&acirc;ngulo invertido', 'Ombros ou t&oacute;rax maiores.'],
+        ['oval', 'Oval', 'Regi&atilde;o central mais arredondada.'],
+      ]
+      : [
+        ['straight', 'Retangular', 'Ombros, cintura e quadril parecidos.'],
+        ['triangle', 'Tri&acirc;ngulo', 'Quadril maior que ombros.'],
+        ['inverted_triangle', 'Tri&acirc;ngulo invertido', 'Ombros ou t&oacute;rax maiores.'],
+        ['oval', 'Oval', 'Regi&atilde;o central mais arredondada.'],
+        ['hourglass', 'Ampulheta', 'Cintura mais marcada.'],
+      ];
 
     return options.map(function (option) {
       var active = state.form.body_shape === option[0] ? ' active' : '';
       return [
-        '<button type="button" class="pv-shape-card' + active + '" data-pv-shape="' + option[0] + '" aria-pressed="' + (active ? 'true' : 'false') + '">',
-        '<span class="pv-shape-figure pv-shape-' + option[0] + '"></span>',
+        '<button type="button" class="pv-shape-card pv-shape-card-' + (isMale ? 'male' : 'female') + active + '" data-pv-shape="' + option[0] + '" aria-pressed="' + (active ? 'true' : 'false') + '">',
+        '<span class="pv-shape-figure pv-shape-' + option[0] + ' pv-shape-' + (isMale ? 'male' : 'female') + '"></span>',
         '<strong>' + option[1] + '</strong>',
         '<small>' + option[2] + '</small>',
         '</button>',
@@ -660,6 +724,11 @@
   function updateFooter(backdrop) {
     state.precision = calculatePrecision(state.form, state.step);
 
+    if (!hasStarterMeasures() && state.recommendation) {
+      state.recommendation = null;
+      state.recommendationSignature = '';
+    }
+
     var footer = backdrop.querySelector('[data-pv-footer]');
     if (!footer) {
       return;
@@ -668,8 +737,8 @@
     var disabled = state.loading || !hasStarterMeasures();
     var label = footerButtonLabel();
 
-    if (state.step === 4 && state.recommendation) {
-      disabled = true;
+    if (state.recommendation && state.recommendation.recommended_size) {
+      disabled = false;
       label = 'Seu tamanho &eacute; ' + escapeHtml(state.recommendation.recommended_size || '-');
     }
 
@@ -687,10 +756,23 @@
       });
     }
 
-    if (state.step >= 3 && state.precision >= 100 && !state.celebrated) {
-      state.celebrated = true;
-      triggerCelebration(backdrop);
-    }
+    updateStepNavigationState(backdrop);
+    maybeCelebrate(backdrop);
+  }
+
+  function updateStepNavigationState(backdrop) {
+    backdrop.querySelectorAll('[data-pv-step]').forEach(function (button) {
+      button.disabled = !canVisitStep(Number(button.dataset.pvStep));
+    });
+
+    backdrop.querySelectorAll('[data-pv-next]').forEach(function (button) {
+      var target = Math.min(4, state.step + 1);
+      button.disabled = !canVisitStep(target);
+    });
+
+    backdrop.querySelectorAll('[data-pv-final]').forEach(function (button) {
+      button.disabled = !canVisitStep(4);
+    });
   }
 
   function precisionHtml(quality) {
@@ -712,47 +794,26 @@
       return 'Digite medidas';
     }
 
-    if (state.step === 1) {
-      return 'Continuar para corpo';
+    if (!state.recommendation) {
+      return 'Calculando tamanho';
     }
 
-    if (state.step === 2) {
-      return 'Continuar para detalhes';
-    }
-
-    if (state.precision >= 95) {
-      return 'Ver recomenda&ccedil;&atilde;o m&aacute;xima';
-    }
-
-    if (state.precision >= 60) {
-      return 'Ver recomenda&ccedil;&atilde;o precisa';
-    }
-
-    return 'Ver recomenda&ccedil;&atilde;o b&aacute;sica';
+    return 'Seu tamanho &eacute; ' + escapeHtml(state.recommendation.recommended_size || '-');
   }
 
   function handleFooterAction(backdrop) {
-    if (state.step === 1) {
-      if (!hasStarterMeasures()) {
-        renderDrawer(backdrop, '<div class="pv-warning">Informe pelo menos altura e peso para continuar.</div>');
-        focusFirstMissing(backdrop);
-        return;
-      }
-
-      state.step = 2;
-      renderDrawer(backdrop);
+    if (!hasStarterMeasures()) {
+      renderDrawer(backdrop, '<div class="pv-warning">Informe pelo menos altura e peso para calcular seu tamanho.</div>');
+      focusFirstMissing(backdrop);
       return;
     }
 
-    if (state.step === 2) {
-      state.step = 3;
-      renderDrawer(backdrop);
+    if (state.recommendation && state.recommendation.recommended_size) {
+      updateRecommendationBanner(backdrop);
       return;
     }
 
-    if (state.step === 3) {
-      submitRecommendation(backdrop);
-    }
+    refreshRecommendation(backdrop, { reason: 'footer' });
   }
 
   function wireDrawer(backdrop) {
@@ -762,6 +823,8 @@
         var target = event.target && event.target.nodeType === 1 ? event.target : event.target.parentElement;
         var footerActionButton = target && target.closest ? target.closest('[data-pv-footer-action]') : null;
         var recommendButton = target && target.closest ? target.closest('[data-pv-recommend]') : null;
+        var stepButton = target && target.closest ? target.closest('[data-pv-step]') : null;
+        var finalButton = target && target.closest ? target.closest('[data-pv-final]') : null;
 
         if (footerActionButton && backdrop.contains(footerActionButton)) {
           event.preventDefault();
@@ -770,16 +833,32 @@
           return;
         }
 
+        if (stepButton && backdrop.contains(stepButton)) {
+          event.preventDefault();
+          collectCurrentInputs(backdrop);
+          goToStep(backdrop, Number(stepButton.dataset.pvStep));
+          return;
+        }
+
+        if (finalButton && backdrop.contains(finalButton)) {
+          event.preventDefault();
+          collectCurrentInputs(backdrop);
+          goToStep(backdrop, 4);
+          return;
+        }
+
         if (recommendButton && backdrop.contains(recommendButton)) {
           event.preventDefault();
           collectCurrentInputs(backdrop);
-          submitRecommendation(backdrop);
+          refreshRecommendation(backdrop, { reason: 'body' });
         }
       });
     }
 
     backdrop.querySelectorAll('[data-pv-close]').forEach(function (button) {
-      button.addEventListener('click', closeActiveBackdrop);
+      button.addEventListener('click', function () {
+        closeActiveBackdrop();
+      });
     });
 
     backdrop.addEventListener('click', function (event) {
@@ -791,13 +870,22 @@
     backdrop.querySelectorAll('[data-pv-input]').forEach(function (input) {
       input.addEventListener('input', function () {
         collectCurrentInputs(backdrop);
+        state.dirty = true;
         updateFooter(backdrop);
+        scheduleAutoRecommendation(backdrop);
       });
       input.addEventListener('change', function () {
         collectCurrentInputs(backdrop);
-        if (input.type === 'checkbox' || input.tagName === 'SELECT') {
-          updateFooter(backdrop);
+        state.dirty = true;
+        if (input.dataset.pvInput === 'gender') {
+          state.form.body_shape = '';
+          renderDrawer(backdrop);
+          scheduleAutoRecommendation(backdrop);
+          return;
         }
+
+        updateFooter(backdrop);
+        scheduleAutoRecommendation(backdrop);
       });
     });
 
@@ -813,8 +901,7 @@
     backdrop.querySelectorAll('[data-pv-next]').forEach(function (button) {
       button.addEventListener('click', function () {
         collectCurrentInputs(backdrop);
-        state.step = Math.min(3, state.step + 1);
-        renderDrawer(backdrop);
+        goToStep(backdrop, Math.min(4, state.step + 1));
       });
     });
 
@@ -822,14 +909,16 @@
       button.addEventListener('click', function () {
         collectCurrentInputs(backdrop);
         state.form.body_shape = button.dataset.pvShape;
+        state.dirty = true;
         renderDrawer(backdrop);
+        scheduleAutoRecommendation(backdrop);
       });
     });
 
     backdrop.querySelectorAll('.pv-drawer-body [data-pv-recommend]').forEach(function (button) {
       button.addEventListener('click', function () {
         collectCurrentInputs(backdrop);
-        submitRecommendation(backdrop);
+        refreshRecommendation(backdrop, { reason: 'body' });
       });
     });
 
@@ -917,7 +1006,30 @@
     }
   }
 
+  function scheduleAutoRecommendation(backdrop) {
+    if (!backdrop || !hasStarterMeasures()) {
+      if (state.recommendationTimer) {
+        window.clearTimeout(state.recommendationTimer);
+      }
+      return;
+    }
+
+    if (state.recommendationTimer) {
+      window.clearTimeout(state.recommendationTimer);
+    }
+
+    state.recommendationTimer = window.setTimeout(function () {
+      refreshRecommendation(backdrop, { reason: 'auto' });
+    }, 500);
+  }
+
   function submitRecommendation(backdrop) {
+    refreshRecommendation(backdrop, { showResult: true, reason: 'result' });
+  }
+
+  function refreshRecommendation(backdrop, options) {
+    options = options || {};
+
     if (state.loading) {
       return;
     }
@@ -928,14 +1040,53 @@
       return;
     }
 
+    var signature = recommendationSignature();
+    if (!options.showResult && state.recommendation && state.recommendationSignature === signature) {
+      updateFooter(backdrop);
+      return;
+    }
+
     state.loading = true;
     updateFooter(backdrop);
+    updateRecommendationBanner(backdrop);
 
     var savedProfile = readSavedProfile();
     var measurements = normalizedMeasurements(state.form);
     var consent = state.form.consent !== false && state.form.consent !== 'false';
 
-    request('/public/recommendations', Object.assign(identityPayload(), {
+    request('/public/recommendations', recommendationPayload(measurements, savedProfile, consent, options.reason || 'manual'))
+      .then(function (data) {
+        state.loading = false;
+        state.recommendation = data;
+        state.recommendationSignature = signature;
+        state.dirty = false;
+        state.feedback.selectedSize = data.recommended_size || '';
+
+        persistProfileFromRecommendation(data, savedProfile, measurements);
+
+        if (options.showResult && canVisitStep(4)) {
+          state.step = 4;
+        }
+
+        if (options.showResult && state.step === 4) {
+          renderDrawer(backdrop);
+        } else {
+          updateFooter(backdrop);
+          updateRecommendationBanner(backdrop);
+        }
+        maybeCelebrate(backdrop);
+      })
+      .catch(function () {
+        state.loading = false;
+        updateFooter(backdrop);
+        if (options.reason !== 'auto') {
+          renderDrawer(backdrop, '<div class="pv-warning">N&atilde;o foi poss&iacute;vel recomendar agora. Tente novamente em instantes.</div>');
+        }
+      });
+  }
+
+  function recommendationPayload(measurements, savedProfile, consent, reason) {
+    return Object.assign(identityPayload(), {
       measurements: measurements,
       shopper_profile: {
         profile_id: savedProfile && savedProfile.id ? savedProfile.id : null,
@@ -945,48 +1096,87 @@
         gender: state.form.gender || null,
         body_shape: state.form.body_shape || null,
         known_profile: Boolean(savedProfile && savedProfile.id),
-        raw_widget_data: rawWidgetData(measurements),
+        raw_widget_data: rawWidgetData(measurements, reason),
       },
-    }))
+    });
+  }
+
+  function persistProfileFromRecommendation(data, savedProfile, measurements) {
+    if (data.shopper_profile && data.shopper_profile.consent) {
+      saveProfile(Object.assign({}, measurements, {
+        id: data.shopper_profile.id,
+        token: data.shopper_profile.token || (savedProfile && savedProfile.token),
+        age: valueOrEmpty(state.form.age),
+        fit_preference: state.form.fit_preference || 'regular',
+        gender: state.form.gender || '',
+        body_shape: state.form.body_shape || '',
+        max_step: maxCompletedStep(),
+        measurement_table_id: state.config ? state.config.measurement_table_id : null,
+        quality_score: data.shopper_profile.quality_score,
+        outlier_score: data.shopper_profile.outlier_score,
+      }));
+    } else {
+      clearSavedProfile();
+    }
+  }
+
+  function persistJourneyOnClose() {
+    if (!hasStarterMeasures()) {
+      return;
+    }
+
+    if (state.form.consent !== false && state.form.consent !== 'false') {
+      saveProfile(Object.assign({}, normalizedMeasurements(state.form), {
+        age: valueOrEmpty(state.form.age),
+        fit_preference: state.form.fit_preference || 'regular',
+        gender: state.form.gender || '',
+        body_shape: state.form.body_shape || '',
+        max_step: maxCompletedStep(),
+        measurement_table_id: state.config ? state.config.measurement_table_id : null,
+      }));
+    }
+
+    if (!state.recommendation || !state.dirty || state.loading || state.recommendationSignature === recommendationSignature()) {
+      return;
+    }
+
+    var savedProfile = readSavedProfile();
+    var measurements = normalizedMeasurements(state.form);
+    var consent = state.form.consent !== false && state.form.consent !== 'false';
+
+    request('/public/recommendations', recommendationPayload(measurements, savedProfile, consent, 'close'))
       .then(function (data) {
-        state.loading = false;
         state.recommendation = data;
-        state.step = 4;
-        state.feedback.selectedSize = data.recommended_size || '';
-
-        if (data.shopper_profile && data.shopper_profile.consent) {
-          saveProfile(Object.assign({}, measurements, {
-            id: data.shopper_profile.id,
-            token: data.shopper_profile.token || (savedProfile && savedProfile.token),
-            age: valueOrEmpty(state.form.age),
-            fit_preference: state.form.fit_preference || 'regular',
-            gender: state.form.gender || '',
-            body_shape: state.form.body_shape || '',
-            quality_score: data.shopper_profile.quality_score,
-            outlier_score: data.shopper_profile.outlier_score,
-          }));
-        } else {
-          clearSavedProfile();
-        }
-
-        renderDrawer(backdrop);
-        if (state.precision >= 100 && !state.celebrated) {
-          state.celebrated = true;
-          triggerCelebration(backdrop);
-        }
+        state.recommendationSignature = recommendationSignature();
+        state.dirty = false;
+        persistProfileFromRecommendation(data, savedProfile, measurements);
       })
       .catch(function () {
-        state.loading = false;
-        renderDrawer(backdrop, '<div class="pv-warning">N&atilde;o foi poss&iacute;vel recomendar agora. Tente novamente em instantes.</div>');
+        // Closing should not block the shopper; a previous recommendation remains logged.
       });
   }
 
-  function rawWidgetData(measurements) {
+  function recommendationSignature() {
+    return JSON.stringify({
+      identity: identityPayload(),
+      measurements: normalizedMeasurements(state.form),
+      age: valueOrEmpty(state.form.age),
+      gender: state.form.gender || '',
+      body_shape: state.form.body_shape || '',
+      fit_preference: state.form.fit_preference || 'regular',
+      step: state.step,
+      table: state.config ? state.config.measurement_table_id : null,
+    });
+  }
+
+  function rawWidgetData(measurements, reason) {
     return {
-      version: 'v2_sprint_67',
+      version: 'v2_sprint_68',
       source: 'widget_v2_staged',
+      event: reason || 'manual',
       precision: state.precision,
       steps_completed: completedSteps(),
+      max_step: maxCompletedStep(),
       identity: identityPayload(),
       measurements: measurements,
       raw_measurements: {
@@ -1012,13 +1202,11 @@
   function completedSteps() {
     var steps = ['step_1'];
 
-    if (state.step >= 2 || state.form.gender || state.form.body_shape || state.form.fit_preference) {
+    if (state.step >= 2 || hasStepTwoData()) {
       steps.push('step_2');
     }
 
-    if (state.step >= 3 || detailedFields().some(function (fieldMeta) {
-      return Boolean(valueOrNull(state.form[fieldMeta.key]));
-    })) {
+    if (state.step >= 3 || hasAnyDetailedMeasure()) {
       steps.push('step_3');
     }
 
@@ -1027,6 +1215,62 @@
     }
 
     return steps;
+  }
+
+  function maxCompletedStep() {
+    if (hasAllDetailedMeasures()) {
+      return 3;
+    }
+
+    if (hasStepTwoData()) {
+      return 2;
+    }
+
+    if (hasStarterMeasures()) {
+      return 1;
+    }
+
+    return 0;
+  }
+
+  function canVisitStep(step) {
+    if (step <= 1) {
+      return true;
+    }
+
+    if (step === 2) {
+      return hasStarterMeasures();
+    }
+
+    if (step === 3) {
+      return hasStarterMeasures() && hasStepTwoData();
+    }
+
+    return hasStarterMeasures() && hasStepTwoData() && hasAllDetailedMeasures();
+  }
+
+  function goToStep(backdrop, step) {
+    if (!canVisitStep(step)) {
+      var message = step === 2
+        ? 'Informe altura e peso para avan&ccedil;ar.'
+        : step === 3
+          ? 'Informe g&ecirc;nero e formato do corpo para avan&ccedil;ar.'
+          : 'Preencha todas as medidas detalhadas para ver o resultado final.';
+      renderDrawer(backdrop, '<div class="pv-warning">' + message + '</div>');
+      if (step === 2) {
+        focusFirstMissing(backdrop);
+      }
+      return;
+    }
+
+    if (step === 4) {
+      refreshRecommendation(backdrop, { showResult: true, reason: 'result' });
+      return;
+    }
+
+    state.step = step;
+    renderDrawer(backdrop);
+    scheduleAutoRecommendation(backdrop);
   }
 
   function normalizedMeasurements(form) {
@@ -1084,6 +1328,10 @@
       return Math.max(0, Math.min(65, score));
     }
 
+    if (hasAllDetailedMeasures()) {
+      return 100;
+    }
+
     if (detailFields.length > 0) {
       var filledDetails = detailFields.filter(function (fieldMeta) {
         return numberValue(form[fieldMeta.key]) !== null;
@@ -1096,6 +1344,28 @@
 
   function hasStarterMeasures() {
     return numberValue(state.form.height) !== null && numberValue(state.form.weight) !== null;
+  }
+
+  function hasStepTwoData() {
+    return Boolean(state.form.gender && state.form.body_shape);
+  }
+
+  function hasAnyDetailedMeasure() {
+    return detailedFields().some(function (fieldMeta) {
+      return numberValue(state.form[fieldMeta.key]) !== null;
+    });
+  }
+
+  function hasAllDetailedMeasures() {
+    var fields = detailedFields();
+
+    if (fields.length === 0) {
+      return hasStarterMeasures() && hasStepTwoData();
+    }
+
+    return hasStarterMeasures() && hasStepTwoData() && fields.every(function (fieldMeta) {
+      return numberValue(state.form[fieldMeta.key]) !== null;
+    });
   }
 
   function focusFirstMissing(backdrop) {
@@ -1127,10 +1397,9 @@
 
   function genderOptions(selected) {
     var options = [
-      ['', 'Prefiro n&atilde;o informar'],
+      ['', 'Selecione...'],
       ['female', 'Feminino'],
       ['male', 'Masculino'],
-      ['unisex', 'Unissex'],
     ];
 
     return options.map(function (option) {
@@ -1174,6 +1443,8 @@
 
   function closeActiveBackdrop() {
     if (activeBackdrop && activeBackdrop.parentNode) {
+      collectCurrentInputs(activeBackdrop);
+      persistJourneyOnClose();
       activeBackdrop.parentNode.removeChild(activeBackdrop);
     }
 
@@ -1231,7 +1502,27 @@
   }
 
   function attributionHtml() {
-    return '<a class="pv-attribution" href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>';
+    return [
+      '<div class="pv-attribution">',
+      '<a href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>',
+      '<span>&copy; 2026</span>',
+      '<a href="https://provadorvirtual.online/privacidade" target="_blank" rel="noopener">Privacidade</a>',
+      '<a href="https://provadorvirtual.online/termos" target="_blank" rel="noopener">Termos</a>',
+      '</div>',
+    ].join('');
+  }
+
+  function maybeCelebrate(backdrop) {
+    if (state.step === 4 && state.precision >= 100 && !state.celebrated && confettiEnabled()) {
+      state.celebrated = true;
+      triggerCelebration(backdrop);
+    }
+  }
+
+  function confettiEnabled() {
+    var setting = config.theme ? config.theme.confetti_enabled : undefined;
+
+    return setting === undefined || setting === null || setting === '' || setting === true || setting === 'true' || setting === '1' || setting === 1;
   }
 
   function triggerCelebration(backdrop) {
@@ -1260,6 +1551,11 @@
 
   function readSavedProfile() {
     try {
+      var scopedRaw = window.localStorage.getItem(scopedProfileStorageKey());
+      if (scopedRaw) {
+        return JSON.parse(scopedRaw);
+      }
+
       var raw = window.localStorage.getItem(profileStorageKey);
       return raw ? JSON.parse(raw) : null;
     } catch (error) {
@@ -1269,9 +1565,12 @@
 
   function saveProfile(profile) {
     try {
-      window.localStorage.setItem(profileStorageKey, JSON.stringify(Object.assign({}, profile, {
+      var payload = JSON.stringify(Object.assign({}, profile, {
         updated_at: new Date().toISOString(),
-      })));
+      }));
+
+      window.localStorage.setItem(scopedProfileStorageKey(), payload);
+      window.localStorage.setItem(profileStorageKey, payload);
     } catch (error) {
       // localStorage can be blocked by the browser; recommendation still works.
     }
@@ -1279,11 +1578,18 @@
 
   function clearSavedProfile() {
     try {
+      window.localStorage.removeItem(scopedProfileStorageKey());
       window.localStorage.removeItem(profileStorageKey);
       window.localStorage.removeItem('pv_shopper_profile_v1');
     } catch (error) {
       // localStorage can be blocked by the browser; recommendation still works.
     }
+  }
+
+  function scopedProfileStorageKey() {
+    var tableId = state.config ? state.config.measurement_table_id : null;
+
+    return tableId ? profileStoragePrefix + tableId : profileStorageKey;
   }
 
   function forgetSavedProfile() {

@@ -50,13 +50,13 @@ type ProductPayload = {
   }
   variants: Variant[]
   measurement_table: { name: string; unit: string; rows: MeasurementRow[] }
-  widget: { public_key: string; platform: string; theme?: Record<string, string> }
+  widget: { public_key: string; platform: string; theme?: Record<string, string | boolean> }
 }
 
 type StorefrontPayload = {
   store: { name: string; platform: string; domain: string }
   products: ProductSummary[]
-  widget: { public_key: string; platform: string; theme?: Record<string, string> }
+  widget: { public_key: string; platform: string; theme?: Record<string, string | boolean> }
 }
 
 const route = useRoute()
