@@ -32,6 +32,24 @@ Todo guia usa os mesmos pontos de validação:
 - plataforma informada no snippet;
 - produto, variação ou SKU informados.
 
+## Local correto de instalação
+
+Em todas as plataformas, o widget deve ser instalado na página de produto. O container deve ficar no local em que os botões do Provador Virtual precisam aparecer, normalmente perto da seleção de tamanho/grade/cor e antes ou próximo ao botão Comprar.
+
+O script pode carregar com `defer`, no `head`, no fim do `body` ou no template da PDP. O requisito é que o container esteja disponível quando o widget inicializar.
+
+Para lojas que mudam a variação sem recarregar a página, a integração precisa atualizar produto, variação e SKU e chamar:
+
+```js
+window.ProvadorVirtual?.reload({
+  productId: 'ID_DO_PRODUTO',
+  variantId: 'ID_DA_GRADE',
+  sku: 'SKU_DA_GRADE'
+})
+```
+
+Na BigShop, o ponto oficial planejado para instalação automática é o `produto.vue` da model3 plano pro. Esse ajuste será feito em sprint futura no repositório BigShop correto; no SaaS, o fallback continua sendo o snippet gerado no painel.
+
 ## Endpoint de validação
 
 Rota:

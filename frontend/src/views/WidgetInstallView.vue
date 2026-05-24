@@ -45,7 +45,6 @@ const install = ref<WidgetInstall | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const copied = ref(false)
-const notice = ref('')
 
 const form = reactive({
   platform: 'custom',
@@ -93,6 +92,21 @@ const isBigShopContract = computed(() => {
     || install.value?.company?.platform === 'bigshop'
 })
 
+const installationSteps = computed(() => {
+  const steps = [
+    'Instale na página de produto, no template que renderiza a vitrine de cada item.',
+    'Coloque o container no ponto exato em que os botões devem aparecer, perto do seletor de tamanho/grade e antes ou próximo ao botão Comprar.',
+    'Carregue o script com defer no template da página, no head ou no fim do body, garantindo que o container exista quando o widget iniciar.',
+    'Preencha produto, variação e SKU com os dados reais do item atual; quando a grade mudar, atualize esses dados e recarregue o widget.',
+  ]
+
+  if (isBigShopContract.value || form.platform === 'bigshop') {
+    steps.push('Na BigShop, a instalação automática será preparada no produto.vue da model3 plano pro, no repositório BigShop correto.')
+  }
+
+  return steps
+})
+
 const previewStyle = computed(() => ({
   '--pv-preview-primary': form.theme.primary,
   '--pv-preview-secondary': form.theme.secondary,
@@ -137,7 +151,6 @@ function fillForm(data: WidgetInstall) {
 
 async function saveInstall() {
   saving.value = true
-  notice.value = ''
 
   try {
     const { data } = await api.patch('/widget-install', {
@@ -149,7 +162,6 @@ async function saveInstall() {
 
     install.value = data.data
     fillForm(data.data)
-    notice.value = 'Widget atualizado.'
   } finally {
     saving.value = false
   }
@@ -180,8 +192,6 @@ async function copySnippet() {
         {{ copied ? 'Copiado' : 'Copiar código' }}
       </button>
     </div>
-
-    <p v-if="notice" class="success-message">{{ notice }}</p>
 
     <div v-if="loading" class="empty-state">Carregando widget...</div>
 
@@ -314,6 +324,19 @@ async function copySnippet() {
           <span>{{ install?.sample_product?.sku || 'produto' }}</span>
         </div>
         <pre><code>{{ install?.snippet }}</code></pre>
+
+        <div class="subsection-heading">
+          <h2>Onde instalar</h2>
+          <span>Página de produto</span>
+        </div>
+        <ul class="placement-steps">
+          <li v-for="step in installationSteps" :key="step">{{ step }}</li>
+        </ul>
+        <pre class="guide-snippet compact-snippet"><code>window.ProvadorVirtual?.reload({
+  productId: 'ID_DO_PRODUTO',
+  variantId: 'ID_DA_GRADE',
+  sku: 'SKU_DA_GRADE'
+})</code></pre>
 
         <div class="check-list">
           <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Produto ativo</span>

@@ -666,7 +666,7 @@ Entregas previstas:
 - garantir que botões sem credencial/URL exibam orientação clara em modal;
 - após sincronizar XML, mostrar modal orientando acessar `/app/produtos` para visualizar os produtos sincronizados.
 
-Status: implementado e testado localmente com `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=BigShopIntegrationTest` e `git diff --check`. A tela de integrações passou a usar tooltips customizados sem `title` nativo, feedbacks por modal, ações separadas por configuração, XML/feed e API BigShop, e CSS defensivo contra overflow horizontal.
+Status: implementado no commit `24520a3` e publicado com sucesso no run `26348028309`. A tela de integrações passou a usar tooltips customizados sem `title` nativo, feedbacks por modal, ações separadas por configuração, XML/feed e API BigShop, e CSS defensivo contra overflow horizontal.
 
 ### Sprint 53 - Sincronização automática de integrações
 
@@ -680,7 +680,7 @@ Entregas previstas:
 - documentar o cron completo para cPanel e comando manual de validação;
 - atualizar go-live/operacional com a rotina de integração.
 
-Status: implementado e testado localmente com `php artisan test --filter=IntegrationsApiTest`, `php artisan list pv`, `php artisan schedule:list` e `git diff --check`. O comando `pv:integrations-sync-feeds` roda pelo scheduler às `00:00`, `06:00`, `12:00` e `18:00` em `America/Sao_Paulo`.
+Status: implementado no commit `684ba67` e publicado com sucesso no run `26348238406`. O comando `pv:integrations-sync-feeds` roda pelo scheduler às `00:00`, `06:00`, `12:00` e `18:00` em `America/Sao_Paulo`.
 
 ### Sprint 54 - Guia detalhado de instalação do widget
 
@@ -693,3 +693,5 @@ Entregas previstas:
 - explicar atualização de produto, variação e SKU em troca de grade;
 - reforçar a orientação específica da BigShop para `produto.vue` da model3 plano pro em sprint futura no repositório BigShop correto;
 - atualizar docs de widget e integrações por plataforma.
+
+Status: implementado e testado localmente com `npm run build`, `php artisan test --filter=WidgetAssetTest`, `php artisan test --filter=IntegrationsApiTest`, `vendor/bin/pint --dirty` e `git diff --check`.

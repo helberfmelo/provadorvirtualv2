@@ -17,7 +17,8 @@ class PlatformCatalog
                 steps: [
                     'No painel da BigShop, autorize o app Provador Virtual ou informe store_id, token x-api e/ou URL do XML domínio/feed.xml.',
                     'Teste a conexão e sincronize produtos, grades e tabelas disponíveis por API ou XML.',
-                    'Revise as tabelas de medidas e publique o widget no tema da loja.',
+                    'Revise as tabelas de medidas e publique o widget na página de produto, perto do seletor de tamanho/grade.',
+                    'Quando o comprador trocar a grade, atualize produto, variação e SKU e recarregue o widget.',
                     'Valide a página de produto com os botões Descubra seu tamanho e Tabela de Medidas.',
                 ],
                 dataSupport: [
@@ -42,6 +43,7 @@ class PlatformCatalog
                     'Abra o tema Shopify e edite o template principal de produto.',
                     'Cole o container perto do seletor de tamanho ou botão Comprar.',
                     'Use product.id, selected_or_first_available_variant.id e SKU da variante no snippet.',
+                    'Quando a variante mudar, atualize os dados do snippet e recarregue o widget.',
                     'Publique o tema e rode a validação nesta tela.',
                 ],
                 dataSupport: [
@@ -77,7 +79,7 @@ HTML
                 steps: [
                     'Adicione o container no hook woocommerce_before_add_to_cart_button.',
                     'Use o ID do produto e SKU do WooCommerce como identificadores.',
-                    'Quando houver variação, atualize data-variant-id e data-sku via evento found_variation.',
+                    'Quando houver variação, atualize data-variant-id e data-sku via evento found_variation e recarregue o widget.',
                     'Cadastre o domínio no Widget e valide a página publicada.',
                 ],
                 dataSupport: [
@@ -113,7 +115,7 @@ HTML
                     'Edite o layout da página de produto no editor de código da loja.',
                     'Insira o container junto do seletor de tamanho.',
                     'Preencha produto, variante e SKU com as variáveis disponíveis no template.',
-                    'Atualize os atributos quando o comprador trocar a variante.',
+                    'Atualize os atributos e recarregue o widget quando o comprador trocar a variante.',
                 ],
                 dataSupport: [
                     'product_id' => 'Template produto',
@@ -136,7 +138,7 @@ HTML
                 steps: [
                     'Adicione o container no bloco de produto da PDP.',
                     'Passe productId, selectedItem.itemId e refId/SKU quando disponíveis.',
-                    'Garanta que a troca de SKU atualize os atributos do script.',
+                    'Garanta que a troca de SKU atualize os atributos do script e recarregue o widget.',
                     'Valide em ambiente de homologação antes da publicação.',
                 ],
                 dataSupport: [
@@ -161,6 +163,7 @@ HTML
                     'Abra o editor de tema Tray e localize o template de produto.',
                     'Cole o container perto das opções de tamanho.',
                     'Mapeie produto, variação e SKU usando as variáveis do tema.',
+                    'Recarregue o widget quando a escolha de tamanho/grade mudar.',
                     'Publique e rode a validação do snippet instalado.',
                 ],
                 dataSupport: [
@@ -184,7 +187,7 @@ HTML
                 steps: [
                     'Adicione o container pelo editor de tema ou campo de scripts da página de produto.',
                     'Mapeie ID do produto e SKU usando as variáveis/atributos disponíveis no tema.',
-                    'Atualize os atributos do widget quando a variação for alterada.',
+                    'Atualize os atributos e recarregue o widget quando a variação for alterada.',
                     'Teste em produto com tabela ativa antes de publicar em todos os produtos.',
                 ],
                 dataSupport: [
@@ -208,7 +211,7 @@ HTML
                 steps: [
                     'Crie um bloco no template catalog_product_view.',
                     'Passe product id, selected configurable option e SKU.',
-                    'Atualize o snippet quando a opção configurável mudar.',
+                    'Atualize o snippet e recarregue o widget quando a opção configurável mudar.',
                     'Valide cache, CSP e domínio liberado no painel do widget.',
                 ],
                 dataSupport: [
@@ -233,6 +236,7 @@ HTML
                     'Edite o template product/product.twig do tema ativo.',
                     'Inclua o container antes do botão de compra.',
                     'Use product_id, SKU/model e opção selecionada como variante.',
+                    'Recarregue o widget quando a opção selecionada mudar.',
                     'Limpe o cache de tema e valide a página publicada.',
                 ],
                 dataSupport: [
@@ -256,7 +260,7 @@ HTML
                 steps: [
                     'Cole o container perto do seletor de tamanho ou botão comprar.',
                     'Preencha data-product-id, data-variant-id e data-sku com dados reais da loja.',
-                    'Atualize os atributos por JS quando a variante mudar.',
+                    'Atualize os atributos por JS e recarregue o widget quando a variante mudar.',
                     'Cadastre o domínio no Widget e rode a validação.',
                 ],
                 dataSupport: [

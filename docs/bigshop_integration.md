@@ -128,6 +128,7 @@ Fluxo desejado:
 O front da loja BigShop possui página de produto em:
 
 - `bigshop/front/stores/pro_store/produto.vue`
+- ponto confirmado para sprint futura: `produto.vue` da model3 plano pro, no repositório BigShop correto.
 
 Pontos relevantes:
 
@@ -135,7 +136,19 @@ Pontos relevantes:
 - produto tem `tabela_de_medidas`;
 - ha area de tabela de medidas perto da compra;
 - o widget pode ser renderizado perto do seletor de tamanho ou antes do botão de compra;
-- para cada troca de grade, atualizar `data-variant-id` e `data-sku`.
+- o container deve ficar exatamente onde os botões "Descubra seu tamanho" e "Tabela de Medidas" devem aparecer;
+- para cada troca de grade, atualizar `data-product-id`, `data-variant-id` e `data-sku`;
+- depois da troca de grade, chamar `window.ProvadorVirtual?.reload(...)` para executar novo `config-check`.
+
+Exemplo de recarregamento no front BigShop:
+
+```js
+window.ProvadorVirtual?.reload({
+  productId: product.id,
+  variantId: selectedGrade.id,
+  sku: selectedGrade.sku
+})
+```
 
 ## Fallback por snippet
 

@@ -68,7 +68,7 @@ Premissas BigShop confirmadas:
 - os feeds de moda conseguem garantir tamanho, cor, gênero, tipo de produto, estoque/disponibilidade e link;
 - a instalação automática do widget será feita futuramente no arquivo `produto.vue` da model3 plano pro, no repositório BigShop correto.
 
-O script do widget deve ser instalado na página de produto. O container precisa ficar exatamente no ponto visual onde os botões "Descubra seu tamanho" e "Tabela de Medidas" devem aparecer, normalmente perto do seletor de tamanho/grade e antes ou perto do botão Comprar. O script pode ser carregado no head ou fim do body, desde que o container exista e os atributos do produto/variação/SKU sejam atualizados quando a grade mudar.
+O script do widget deve ser instalado na página de produto. O container precisa ficar exatamente no ponto visual onde os botões "Descubra seu tamanho" e "Tabela de Medidas" devem aparecer, normalmente perto do seletor de tamanho/grade e antes ou perto do botão Comprar. O script pode ser carregado no head ou fim do body, desde que o container exista. Quando produto, variação ou SKU mudarem sem reload da página, a loja deve atualizar esses dados e chamar `window.ProvadorVirtual?.reload(...)`.
 
 O que falta/vale confirmar ou implementar do lado BigShop:
 

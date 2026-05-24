@@ -92,12 +92,15 @@ A resposta retorna:
 Arquivo de referência:
 
 - `D:\Projetos\bigshop\172.16.151.5\front\stores\pro_store\produto.vue`
+- ponto final informado para a próxima implementação BigShop: `produto.vue` da model3 plano pro, no repositório BigShop correto.
 
 Ponto de encaixe recomendado:
 
 - perto do seletor de tamanho/grade;
 - antes do botão comprar quando a grade já estiver selecionavel;
-- atualizar `data-variant-id` e `data-sku` sempre que `productSizes`/grade ativa mudar.
+- manter o container no local exato em que os botões do Provador Virtual devem aparecer;
+- atualizar `data-product-id`, `data-variant-id` e `data-sku` sempre que `productSizes`/grade ativa mudar;
+- chamar `window.ProvadorVirtual?.reload(...)` após a troca de grade para refazer o `config-check`.
 
 Campos:
 

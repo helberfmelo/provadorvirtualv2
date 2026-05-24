@@ -16,6 +16,7 @@
   };
   var profileStorageKey = 'pv_shopper_profile_v2';
 
+  exposePublicApi();
   loadCss(config.cssUrl);
   boot();
 
@@ -66,6 +67,54 @@
       debug: valueFor(scriptEl, 'debug') === 'true',
       theme: parseTheme(valueFor(scriptEl, 'theme')),
     };
+  }
+
+  function exposePublicApi() {
+    var publicApi = window.ProvadorVirtual || {};
+
+    publicApi.reload = function (nextConfig) {
+      applyConfigToScript(nextConfig || {});
+      config = readConfig(script);
+      state.configured = false;
+      state.recommendation = null;
+      state.config = null;
+      state.loading = false;
+
+      if (root && root.parentNode) {
+        root.parentNode.removeChild(root);
+      }
+
+      root = null;
+      loadCss(config.cssUrl);
+      boot();
+    };
+
+    window.ProvadorVirtual = publicApi;
+  }
+
+  function applyConfigToScript(nextConfig) {
+    setDatasetValue(nextConfig, 'merchantId', 'merchant_id');
+    setDatasetValue(nextConfig, 'storeId', 'store_id');
+    setDatasetValue(nextConfig, 'productId', 'product_id');
+    setDatasetValue(nextConfig, 'variantId', 'variant_id');
+    setDatasetValue(nextConfig, 'sku');
+    setDatasetValue(nextConfig, 'platform');
+    setDatasetValue(nextConfig, 'containerId', 'container_id');
+    setDatasetValue(nextConfig, 'theme');
+  }
+
+  function setDatasetValue(source, camelKey, snakeKey) {
+    var value = source[camelKey];
+
+    if (value === undefined && snakeKey) {
+      value = source[snakeKey];
+    }
+
+    if (value === undefined || value === null || value === '') {
+      return;
+    }
+
+    script.dataset[camelKey] = typeof value === 'object' ? JSON.stringify(value) : String(value);
   }
 
   function valueFor(scriptEl) {

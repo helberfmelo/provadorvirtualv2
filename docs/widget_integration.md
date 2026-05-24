@@ -34,6 +34,28 @@ Permitir que qualquer e-commerce instale o Provador Virtual com um snippet simpl
 - `data-platform`: `bigshop`, `shopify`, `woocommerce`, `nuvemshop`, `vtex`, `tray` ou `custom`.
 - `data-container-id`: container onde o botão inline deve aparecer.
 
+## Onde instalar na página de produto
+
+O script do widget deve ser instalado na página de produto, no template responsável pela PDP da loja.
+
+O `div#provador-virtual-container` precisa ficar no ponto visual em que os botões devem aparecer, normalmente perto do seletor de tamanho/grade e antes ou próximo ao botão Comprar. Esse posicionamento é importante porque o consumidor decide o tamanho nesse trecho da página.
+
+O `<script defer>` pode ficar no `head`, no fim do `body` ou no próprio template do produto, desde que o container exista quando o widget inicializar. Em lojas com SPA ou troca dinâmica de variante, produto, variação e SKU precisam refletir a opção atual do comprador.
+
+Quando a grade/variação mudar depois que o widget já carregou, atualizar os atributos e recarregar:
+
+```html
+<script>
+window.ProvadorVirtual?.reload({
+  productId: 'ID_DO_PRODUTO',
+  variantId: 'ID_DA_GRADE',
+  sku: 'SKU_DA_GRADE'
+})
+</script>
+```
+
+Na BigShop, a instalação automática será feita futuramente no arquivo `produto.vue` da model3 plano pro, no repositório BigShop correto. Até lá, o fallback é usar o snippet no mesmo ponto visual da página de produto.
+
 ## Comportamento esperado
 
 1. Widget carrega sem bloquear a loja.
@@ -90,6 +112,8 @@ Endpoints usados pelo widget:
 O widget resolve a base da API a partir do próprio `src`. Em produção, chamadas para `/provadorvirtual_v2/api/...` passam por redirect 307 para a entrada Laravel funcional em `/provadorvirtual_v2/public/api/...`.
 
 Em navegadores, o CORS permitido e calculado por lojista a partir do domínio da página de origem. O painel deve manter `allowed_domains` atualizado antes de instalar o widget em produção.
+
+O widget expõe `window.ProvadorVirtual.reload(...)` para lojas que alteram tamanho/cor/grade sem recarregar a página. Esse método atualiza os identificadores do script, remove a instância anterior e executa novo `config-check` para o produto/variação atual.
 
 ## Guias por plataforma
 

@@ -90,6 +90,25 @@ const selected = computed(() => platforms.value.find((platform) => platform.key 
 const feedPlaceholder = computed(() => selected.value?.key === 'bigshop'
   ? 'https://domínio-da-loja.com.br/feed.xml'
   : 'https://loja.com.br/feed.xml')
+const installationPlacementSteps = computed(() => {
+  const platformName = selected.value?.name || 'plataforma'
+  const steps = [
+    'Instale o snippet na página de produto, no template que renderiza todos os produtos da loja.',
+    'O container deve ficar onde os botões Descubra seu tamanho e Tabela de Medidas precisam aparecer, normalmente perto da escolha de tamanho/grade e antes ou próximo ao botão Comprar.',
+    'O script pode carregar com defer no head ou no fim do body, desde que o container exista antes da inicialização do widget.',
+    'Produto, variação e SKU precisam refletir a opção atual do comprador. Quando tamanho/cor/grade mudar, atualize os atributos e recarregue o widget com window.ProvadorVirtual.reload(...).',
+  ]
+
+  if (selected.value?.key === 'bigshop') {
+    steps.push('Na BigShop, a instalação automática será feita depois no produto.vue da model3 plano pro, no repositório BigShop correto.')
+  } else if (selected.value?.key === 'custom') {
+    steps.push('Em site próprio, use o template oficial da PDP e mantenha o mesmo contrato de IDs para todos os produtos de moda.')
+  } else {
+    steps.push(`Em ${platformName}, publique primeiro em tema, app ou ambiente de homologação quando a plataforma oferecer esse fluxo.`)
+  }
+
+  return steps
+})
 const isBigShopContract = computed(() => {
   return auth.activeCompany?.platform === 'bigshop'
     || (platforms.value.length === 1 && platforms.value[0]?.key === 'bigshop')
@@ -569,6 +588,21 @@ function canRunBigShopApiAction() {
           <ol class="guide-steps">
             <li v-for="step in selected?.guide.steps" :key="step">{{ step }}</li>
           </ol>
+        </div>
+
+        <div class="guide-panel">
+          <div class="subsection-heading">
+            <h2>Onde instalar o widget</h2>
+            <span>Página de produto</span>
+          </div>
+          <ul class="placement-steps">
+            <li v-for="step in installationPlacementSteps" :key="step">{{ step }}</li>
+          </ul>
+          <pre class="guide-snippet compact-snippet"><code>window.ProvadorVirtual?.reload({
+  productId: 'ID_DO_PRODUTO',
+  variantId: 'ID_DA_GRADE',
+  sku: 'SKU_DA_GRADE'
+})</code></pre>
         </div>
 
         <div class="guide-panel">

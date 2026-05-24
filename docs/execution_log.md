@@ -387,8 +387,8 @@
 - Scheduler configurado para rodar o comando às `00:00`, `06:00`, `12:00` e `18:00` em `America/Sao_Paulo`.
 - Sync automático registra `integration_events` com `summary.trigger=scheduled` e atualiza `last_sync_at`, `status` e `last_error` da conexão.
 - Runbook do cPanel documentado com cron principal via `schedule:run` e fallback direto para feeds.
-- Validações locais: `php artisan test --filter=IntegrationsApiTest`, `php artisan list pv`, `php artisan schedule:list` e `git diff --check`.
-- Run `26344923662` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+- Validações locais: `vendor/bin/pint --dirty`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=GoLiveReadinessApiTest`, `php artisan list pv`, `php artisan schedule:list`, `php artisan test`, `npm run build` e `git diff --check`.
+- Run `26348238406` do GitHub Actions finalizou com sucesso para o commit `684ba67`, incluindo deploy remoto e smoke público.
 
 ## 2026-05-23 - Sprint 47 Integrações BigShop e XML
 
@@ -439,4 +439,14 @@
 - Sincronização XML/feed agora orienta o usuário a acessar `/app/produtos` para visualizar e revisar os produtos sincronizados.
 - Botões foram reorganizados por finalidade: configuração, catálogo XML/feed e API BigShop.
 - CSS global recebeu proteção contra rolagem horizontal indevida na página e preserva rolagem interna para snippets/tabelas.
-- Validações locais: `npm run build` e `git diff --check`.
+- Validações locais: `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=BigShopIntegrationTest` e `git diff --check`.
+- Run `26348028309` do GitHub Actions finalizou com sucesso para o commit `24520a3`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 54 Guia detalhado de instalação do widget
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
+- Tela `/app/widget` recebeu seção "Onde instalar" explicando que o container deve ficar na página de produto, perto do seletor de tamanho/grade e antes ou próximo ao botão Comprar.
+- Tela `/app/integracoes` recebeu seção equivalente por plataforma, com orientação específica para BigShop e plataformas próprias.
+- Widget público passou a expor `window.ProvadorVirtual.reload(...)` para recarregar o widget quando produto, variação ou SKU mudarem sem reload da página.
+- Documentação de widget, integrações e BigShop foi atualizada com o local de instalação, recarregamento por variação e ponto futuro `produto.vue` da model3 plano pro.
+- Validações locais: `npm run build`, `php artisan test --filter=WidgetAssetTest`, `php artisan test --filter=IntegrationsApiTest`, `vendor/bin/pint --dirty` e `git diff --check`.
