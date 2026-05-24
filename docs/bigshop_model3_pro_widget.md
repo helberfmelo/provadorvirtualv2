@@ -151,6 +151,15 @@ Para a loja piloto Luna Moda Festa:
 - os domínios permitidos do widget devem incluir `lunamodafesta.com.br` e `www.lunamodafesta.com.br`;
 - após sincronizar o XML, conferir a página de Produtos no portal da empresa e vincular tabela de medidas nos produtos que devem exibir o Provador Virtual.
 
+Validação em produção em 2026-05-24:
+
+- página validada: `https://www.lunamodafesta.com.br/716076-vestido-longo-luna-2553-fucsia`;
+- produto pai/feed: `716076`;
+- variação BigShop validada: `46125939`;
+- SKU/ref usado pelo front no teste: `2553`;
+- botões renderizados no ponto correto abaixo dos tamanhos: `PV Descubra seu tamanho` e `cm Tabela de Medidas`;
+- a validação confirma o fluxo BigShop model3 pro via XML/feed, com app ativo em `bbs.template_model3_apps`, domínios liberados, produto sincronizado, tabela de medidas vinculada e widget chamando `/provadorvirtual_v2/public/api/v1` sem redirect de preflight.
+
 ## Alterações locais feitas na Sprint 58
 
 - `produto.vue`: container e loader dinâmico do widget no modelo pro; escuta do evento `provadorvirtual:config`; recarregamento por troca de grade; ocultação condicional da tabela BigShop.

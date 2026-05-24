@@ -561,3 +561,12 @@
 - Após o deploy, o JavaScript público em `https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js` continha `/public/api/v1`, `diagnostics` e os detalhes de falha.
 - Após o deploy, `OPTIONS /provadorvirtual_v2/public/api/v1/public/recommendations/config-check` com `Origin: https://www.lunamodafesta.com.br` retornou `204` sem redirect.
 - Após o deploy, `POST /provadorvirtual_v2/public/api/v1/public/recommendations/config-check` para `store_id=53`, `product_id=716076`, `variant_id=46125939`, `sku=2553` e `platform=bigshop` retornou `configured=true`, `product_id=6`, `measurement_table_id=1` e tamanhos disponíveis.
+
+## 2026-05-24 - Sprint 65 Validação visual do piloto Luna Moda Festa
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint documental.
+- Usuário confirmou visualmente em produção que a página `https://www.lunamodafesta.com.br/716076-vestido-longo-luna-2553-fucsia` passou a exibir os botões do Provador Virtual.
+- Evidência visual: os botões `PV Descubra seu tamanho` e `cm Tabela de Medidas` aparecem abaixo dos tamanhos `38`, `40` e `42`, no ponto planejado do `produto.vue` do model3 pro.
+- Fluxo validado: loja BigShop `53`, produto pai/feed `716076`, variação BigShop `46125939`, SKU/ref `2553`, integração via XML/feed e tabela de medidas vinculada no SaaS.
+- A validação confirma que a sequência das Sprints 61 a 64 resolveu preservação de tabela no sync XML, resolução da loja BigShop pela integração, domínio/origem do widget e redirect do preflight CORS.
+- Próxima pendência operacional fora desta sprint: remover qualquer debug temporário que ainda exista no `produto.vue` oficial da BigShop quando a validação assistida terminar, mantendo apenas a depuração condicionada a `?pvdebug=1`.

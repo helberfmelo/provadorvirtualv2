@@ -59,6 +59,7 @@ Atualizado em: 2026-05-24
 - Sprint 62 corrige o formulário de produto para mostrar tabela somente quando `measurement_table_id` existe, registra o ajuste local do editor BigShop sem hardcoding e confirma os bloqueios atuais da Luna: domínio do widget não liberado e produto `716076` sem tabela vinculada.
 - Sprint 63 corrige a resolução pública BigShop para usar `platform_connections.external_store_id` como fallback; a Luna Moda Festa passou a retornar `configured=true` no `config-check` com os domínios públicos.
 - Sprint 64 corrige a base padrão da API usada pelo widget em produção para evitar redirect no preflight CORS, publica a correção no run `26354288938` e confirma `config-check` da Luna Moda Festa com `configured=true`.
+- Sprint 65 registra a confirmação visual do piloto Luna Moda Festa em produção: os botões `PV Descubra seu tamanho` e `cm Tabela de Medidas` aparecem na página BigShop model3 pro do produto `716076`.
 
 ## Referências confirmadas
 

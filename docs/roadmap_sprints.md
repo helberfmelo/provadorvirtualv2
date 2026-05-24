@@ -833,3 +833,17 @@ Entregas:
 - documentar o diagnóstico e o motivo técnico do redirect em preflight.
 
 Status: implementado no commit `445e7bb` e publicado com sucesso no run `26354288938`, com deploy remoto, smoke público, `OPTIONS` direto retornando `204` e `config-check` da Luna Moda Festa retornando `configured=true` sem redirect.
+
+### Sprint 65 - Validação visual do piloto Luna Moda Festa
+
+Objetivo: registrar a confirmação real em loja BigShop model3 pro após a correção do preflight CORS do widget.
+
+Entregas:
+
+- confirmar em produção que a página `https://www.lunamodafesta.com.br/716076-vestido-longo-luna-2553-fucsia` renderiza os botões do Provador Virtual;
+- registrar que a integração da Luna Moda Festa está funcional via XML/feed para o produto `716076`, loja BigShop `53`, variação `46125939` e SKU/ref `2553`;
+- registrar que o botão `PV Descubra seu tamanho` e o botão `cm Tabela de Medidas` aparecem no ponto esperado da página de produto, abaixo da seleção de tamanho;
+- reforçar que o fluxo validado depende de: app BigShop ativo, domínios liberados, feed sincronizado, produto com `measurement_table_id` vinculado e widget usando `/provadorvirtual_v2/public/api/v1` sem redirect;
+- atualizar documentação de BigShop/model3 pro e log de execução.
+
+Status: em execução.
