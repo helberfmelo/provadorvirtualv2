@@ -679,3 +679,14 @@
 - Commit `4204bf1` enviado para `main`; o run `26371467799` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Pós-deploy confirmou com cache bust que `/provadorvirtual_v2/widget/v1/provador-virtual.css`, `/provadorvirtual_v2/public/widget/v1/provador-virtual.css` e `/widget/v1/provador-virtual.css` contêm `--pv-warm: var(--pv-accent);` e o cabeçalho com `linear-gradient(135deg, var(--pv-secondary), var(--pv-warm))`.
 - `scripts/validate-production.ps1` passou completo após o deploy.
+
+## 2026-05-24 - Sprint 73 Aviso discreto de salvamento local no widget
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` sem expor valores sensíveis.
+- Removido do passo 1 o label com checkbox `Salvar minhas medidas neste navegador para próximas recomendações`.
+- Criado aviso discreto no final do corpo rolável do drawer: `Ao usar o Provador Virtual, você concorda em salvar seus dados neste navegador.`
+- Novo aviso usa classe `.pv-browser-note`, fonte menor, peso normal e cor secundária, sem bold.
+- Teste `WidgetAssetTest` atualizado para cobrir a nova frase, a nova classe CSS e garantir que o texto antigo não volte.
+- Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, `git diff --check`, `npm run build` em `frontend` e `npm run build` em `backend`.
+- Observação local: o build Vite do backend concluiu com sucesso, mas avisou que recomenda Node `20.19+`; a máquina local está em Node `20.18.1`.
+- Commit, push, GitHub Actions/deploy e validação de produção pendentes neste registro até o run remoto finalizar.

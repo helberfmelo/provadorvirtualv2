@@ -959,3 +959,17 @@ Entregas:
 - validar o asset público do widget, builds do frontend/backend e checagem de diff.
 
 Status: implementado no commit `4204bf1` e publicado com sucesso no run `26371467799`, com deploy remoto, deploy da raiz pública, master admin, smoke público, `validate-production.ps1` e verificação do CSS público com cache bust confirmando o novo gradiente do cabeçalho.
+
+### Sprint 73 - Aviso discreto de salvamento local no widget
+
+Objetivo: tornar a comunicação sobre salvamento de medidas no navegador mais curta, discreta e posicionada no fim do corpo do widget.
+
+Entregas:
+
+- remover o texto com checkbox `Salvar minhas medidas neste navegador para próximas recomendações` do passo de medidas;
+- adicionar aviso único no fim do corpo rolável do drawer: ao usar o Provador Virtual, o usuário concorda em salvar seus dados neste navegador;
+- aplicar fonte menor e peso normal ao aviso, sem bold;
+- cobrir a nova frase e classe CSS no teste de asset do widget;
+- validar sintaxe do widget, teste de asset, builds do frontend/backend e checagem de diff.
+
+Status: implementação local validada; commit, push, deploy e validação de produção serão registrados após o GitHub Actions finalizar.

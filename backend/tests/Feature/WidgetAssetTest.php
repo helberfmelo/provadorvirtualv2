@@ -35,6 +35,9 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('pv-shape-image', $scriptContents);
         $this->assertStringContainsString("basePath + '/public/api/v1'", $scriptContents);
         $this->assertStringContainsString('diagnostics', $scriptContents);
+        $this->assertStringContainsString('browserStorageNoticeHtml', $scriptContents);
+        $this->assertStringContainsString('Ao usar o Provador Virtual', $scriptContents);
+        $this->assertStringNotContainsString('Salvar minhas medidas neste navegador para pr&oacute;ximas recomenda&ccedil;&otilde;es.', $scriptContents);
         $this->assertStringContainsString('.pv-trigger', $cssContents);
         $this->assertStringContainsString('.pv-drawer', $cssContents);
         $this->assertStringContainsString('.pv-confetti-layer', $cssContents);
@@ -44,6 +47,7 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('.pv-shape-image', $cssContents);
         $this->assertStringContainsString('-webkit-mask', $cssContents);
         $this->assertStringContainsString('.pv-main-button-subtle', $cssContents);
+        $this->assertStringContainsString('.pv-browser-note', $cssContents);
 
         foreach ([
             'retangular.png',

@@ -410,6 +410,8 @@
       html += resultStepHtml();
     }
 
+    html += browserStorageNoticeHtml();
+
     content.innerHTML = html;
     updateFooter(backdrop);
     wireDrawer(backdrop);
@@ -452,12 +454,15 @@
       numberField('weight', 'Peso (kg)', 'Ex: 62', true, tooltipText('weight')),
       numberField('age', 'Idade', 'Opcional', false, tooltipText('age')),
       '</div>',
-      '<label class="pv-consent"><input type="checkbox" data-pv-input="consent"' + (state.form.consent === false ? '' : ' checked') + ' />Salvar minhas medidas neste navegador para pr&oacute;ximas recomenda&ccedil;&otilde;es.</label>',
       '<div class="pv-step-actions">',
       '<div><p class="pv-action-hint">Quer uma recomenda&ccedil;&atilde;o ainda mais precisa?</p><button type="button" class="pv-button pv-action-button" data-pv-next' + disabled + '>Aumentar precis&atilde;o</button></div>',
       '</div>',
       '</section>',
     ].join('');
+  }
+
+  function browserStorageNoticeHtml() {
+    return '<p class="pv-browser-note">Ao usar o Provador Virtual, voc&ecirc; concorda em salvar seus dados neste navegador.</p>';
   }
 
   function stepTwoHtml() {
