@@ -570,3 +570,5 @@
 - Fluxo validado: loja BigShop `53`, produto pai/feed `716076`, variação BigShop `46125939`, SKU/ref `2553`, integração via XML/feed e tabela de medidas vinculada no SaaS.
 - A validação confirma que a sequência das Sprints 61 a 64 resolveu preservação de tabela no sync XML, resolução da loja BigShop pela integração, domínio/origem do widget e redirect do preflight CORS.
 - Próxima pendência operacional fora desta sprint: remover qualquer debug temporário que ainda exista no `produto.vue` oficial da BigShop quando a validação assistida terminar, mantendo apenas a depuração condicionada a `?pvdebug=1`.
+- Validação local documental: `git diff --check`.
+- Run `26354617302` do GitHub Actions finalizou com sucesso para o commit `9895b34`, incluindo deploy remoto e smoke público.

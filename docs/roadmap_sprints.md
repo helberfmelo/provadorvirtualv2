@@ -846,4 +846,4 @@ Entregas:
 - reforçar que o fluxo validado depende de: app BigShop ativo, domínios liberados, feed sincronizado, produto com `measurement_table_id` vinculado e widget usando `/provadorvirtual_v2/public/api/v1` sem redirect;
 - atualizar documentação de BigShop/model3 pro e log de execução.
 
-Status: em execução.
+Status: implementado no commit `9895b34` e publicado com sucesso no run `26354617302`, com deploy remoto e smoke público concluídos.
