@@ -648,4 +648,8 @@
 - Cabeçalho global e rodapé público passaram a usar o logo oficial do Provador Virtual.
 - HTML base atualizado com favicon PNG, apple touch icon, `theme-color` e tags OG/Twitter usando a imagem oficial da marca.
 - Validações locais: `npm run build`, `php artisan test --filter=DemoProductTest`, Playwright local desktop/mobile em `/produto-teste/vestido-midi-aurora` e `git diff --check`.
-- Verificação remota será registrada após commit, push e conclusão do GitHub Actions/deploy.
+- Commit `d5d4e69` enviado para `main`; o run `26370389245` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou `200` para `logo_provador_virtual.png`, `icon_provador_virtual.png` e `favicon_provador_virtual.png` em `/images/brand/`.
+- Pós-deploy confirmou que `/produto-teste/vestido-midi-aurora` contém favicon e tags OG/Twitter apontando para os assets oficiais.
+- `scripts/validate-production.ps1` passou completo após o deploy.
+- Playwright pós-deploy em desktop e mobile confirmou: nenhum tamanho selecionado por padrão, texto `Selecione um tamanho para ver a disponibilidade`, logo carregado e ausência de rolagem horizontal.

@@ -931,4 +931,4 @@ Entregas:
 - configurar favicon PNG, apple touch icon, `theme-color` e tags OG/Twitter com imagem oficial da marca;
 - validar que a loja teste, o app e os portais continuam sem rolagem horizontal e sem tamanho pré-selecionado.
 
-Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.
+Status: implementado no commit `d5d4e69` e publicado com sucesso no run `26370389245`, com deploy remoto, deploy da raiz pública, master admin, smoke público, `validate-production.ps1`, assets de marca públicos e Playwright pós-deploy no produto teste.
