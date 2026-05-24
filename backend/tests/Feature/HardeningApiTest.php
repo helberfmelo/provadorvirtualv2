@@ -163,6 +163,14 @@ class HardeningApiTest extends TestCase
             ],
             'shopper_profile' => [
                 'fit_preference' => 'regular',
+                'raw_widget_data' => [
+                    'source' => 'widget_v2_staged',
+                    'precision' => 80,
+                    'raw_measurements' => [
+                        'altura' => 166,
+                        'peso' => 62,
+                    ],
+                ],
             ],
         ])->assertCreated();
 
@@ -193,6 +201,7 @@ class HardeningApiTest extends TestCase
         $this->assertNull($session->ip_hash);
         $this->assertNull($session->user_agent_hash);
         $this->assertNull($log->input_measurements);
+        $this->assertNull($log->raw_widget_payload);
         $this->assertNull($log->score_breakdown);
         $this->assertNull($feedback->comment);
     }

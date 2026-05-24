@@ -43,6 +43,25 @@ class RecommendationApiTest extends TestCase
                 'height' => 166,
                 'weight' => 62,
             ],
+            'shopper_profile' => [
+                'gender' => 'female',
+                'body_shape' => 'hourglass',
+                'fit_preference' => 'regular',
+                'raw_widget_data' => [
+                    'version' => 'v2_sprint_66',
+                    'source' => 'widget_v2_staged',
+                    'precision' => 100,
+                    'steps_completed' => ['step_1', 'step_2', 'step_3'],
+                    'raw_measurements' => [
+                        'altura' => 166,
+                        'peso' => 62,
+                        'idade' => 30,
+                        'busto_cm' => 92,
+                        'cintura_cm' => 74,
+                        'quadril_cm' => 100,
+                    ],
+                ],
+            ],
         ]);
 
         $recommendation->assertCreated()
@@ -62,6 +81,10 @@ class RecommendationApiTest extends TestCase
             'recommended_size' => 'M',
             'status' => 'recommended',
         ]);
+
+        $log = RecommendationLog::query()->findOrFail($recommendation->json('recommendation_id'));
+        $this->assertSame('widget_v2_staged', $log->raw_widget_payload['source']);
+        $this->assertSame(30, $log->raw_widget_payload['raw_measurements']['idade']);
 
         $this->postJson("/api/v1/public/recommendations/{$recommendation->json('recommendation_id')}/feedback", [
             'was_helpful' => true,

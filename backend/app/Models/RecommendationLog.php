@@ -16,6 +16,7 @@ class RecommendationLog extends Model
         return [
             'confidence' => 'decimal:2',
             'input_measurements' => 'array',
+            'raw_widget_payload' => 'array',
             'score_breakdown' => 'array',
             'fit_notes' => 'array',
             'warnings' => 'array',

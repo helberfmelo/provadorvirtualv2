@@ -847,3 +847,21 @@ Entregas:
 - atualizar documentação de BigShop/model3 pro e log de execução.
 
 Status: implementado no commit `9895b34` e publicado com sucesso no run `26354617302`, com deploy remoto e smoke público concluídos.
+
+### Sprint 66 - Widget v2 gamificado com lógica do v1
+
+Objetivo: testar minuciosamente o widget v1, entender suas etapas e migrar a experiência gamificada para o widget universal v2 sem abandonar a identidade visual e os contratos atuais do v2.
+
+Entregas:
+
+- testar `https://provadorvirtual.online/provadorvirtual_v1/demo.php`, links principais e todas as etapas do drawer do v1;
+- documentar o fluxo v1: altura/peso/idade, gênero/formato corporal, medidas detalhadas, barra de precisão, confete em 100%, recomendação e feedback;
+- refatorar o widget v2 para drawer em etapas, mantendo os botões públicos `PV Descubra seu tamanho` e `cm Tabela de Medidas`;
+- derivar medidas detalhadas da tabela configurada do produto;
+- manter recomendação disponível ao longo da jornada, como no v1;
+- exibir feedback final completo e visível no resultado;
+- persistir `shopper_profile.raw_widget_data` em `recommendation_logs.raw_widget_payload` para auditoria, aprendizado e melhoria do fluxo;
+- incluir `raw_widget_payload` na anonimização LGPD;
+- validar desktop, mobile, console, rede, recomendação, feedback e tabela de medidas.
+
+Status: implementado localmente; aguardando commit, push e verificação remota da sprint.

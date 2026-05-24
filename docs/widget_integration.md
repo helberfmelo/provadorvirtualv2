@@ -80,6 +80,17 @@ Status Sprint 24/25: o widget agora segue o padrão comercial de página de prod
 
 Status Sprint 36: o widget usa `pv_shopper_profile_v2` em `localStorage`, envia `profile_id`/token quando houver consentimento, permite limpar medidas salvas, mostra precisao do perfil e envia gênero, formato corporal e preferência de caimento para melhorar recomendações futuras.
 
+Status Sprint 66: o fluxo visual do v2 passou a seguir a lógica gamificada do v1, mantendo a identidade visual do v2. Ao clicar em `Descubra seu tamanho`, o consumidor entra em um drawer lateral com:
+
+1. medidas básicas: altura, peso, idade opcional e consentimento local;
+2. gênero, formato corporal e preferência de caimento;
+3. medidas detalhadas derivadas da tabela configurada do produto;
+4. resultado com tamanho recomendado, confiança, notas do motor e feedback final.
+
+A barra `Nível de precisão da IA` usa pesos progressivos semelhantes ao v1: altura, peso, idade, gênero, formato corporal e medidas detalhadas. Quando chega a 100%, o widget dispara confete leve, sem dependência externa.
+
+O feedback final fica visível no próprio resultado e salva `was_helpful`, `rating`, `selected_size` e `comment` no endpoint público atual. Além das medidas normalizadas usadas pelo motor, o widget envia `shopper_profile.raw_widget_data` com versão, origem, etapas concluídas, identidade técnica do produto, precisão, tabela e medidas brutas da jornada. Esse payload é persistido em `recommendation_logs.raw_widget_payload` e entra na rotina `pv:privacy-anonymize`.
+
 ## Evolucao inteligente prevista
 
 Benchmark Sizebay/Zak em `docs/sizebay_benchmark.md` confirmou que o widget deve evoluir para:
@@ -106,6 +117,8 @@ Endpoints usados pelo widget:
 `config-check` retorna também a tabela de medidas normalizada para o modal público, quando o produto estiver configurado.
 
 `recommendations` retorna `shopper_profile` com `id`, token inicial, qualidade do perfil e mensagem para o consumidor. O token nunca fica em log ou HTML do lojista; fica somente no navegador do comprador.
+
+`recommendations` também aceita `shopper_profile.raw_widget_data` para registrar a jornada completa do widget. Esse campo deve conter apenas dados operacionais da recomendação, sem nome, e-mail, telefone, documento ou outros identificadores pessoais diretos.
 
 `signal` registra eventos `add_to_cart`, `purchase`, `return` e `exchange` para aprendizado estatístico. Plataformas que ainda não tiverem integração automática podem enviar esses sinais depois pelo próprio front ou por conector server-to-server.
 

@@ -25,6 +25,7 @@ class StoreRecommendationRequest extends RecommendationConfigCheckRequest
             'shopper_profile.body_shape' => ['nullable', 'string', 'max:60'],
             'shopper_profile.fit_preference' => ['nullable', 'in:tight,regular,loose'],
             'shopper_profile.known_profile' => ['nullable', 'boolean'],
+            'shopper_profile.raw_widget_data' => ['nullable', 'array'],
         ]);
     }
 }

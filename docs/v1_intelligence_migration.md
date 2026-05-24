@@ -91,7 +91,34 @@ Status no v2: o arquivo foi versionado em `backend/database/data/default_measure
 - feedback da recomendação;
 - configuração dinâmica por produto.
 
-O v2 já tem widget universal, mas as próximas sprints devem recuperar esse fluxo com mais fluidez, acessibilidade e persistência.
+Status Sprint 66: o v2 recuperou esse fluxo no widget público `/widget/v1/provador-virtual.js`, refatorado para a identidade visual atual:
+
+- drawer lateral no desktop e full-width no mobile;
+- etapa 1 com altura, peso, idade opcional e consentimento;
+- etapa 2 com gênero, formato corporal em cards e caimento desejado;
+- etapa 3 com medidas detalhadas derivadas da tabela do produto;
+- barra de precisão persistente no rodapé do drawer;
+- botão de recomendação disponível durante a jornada, como no v1;
+- confete próprio em CSS/JS ao chegar a 100% de precisão;
+- resultado com tamanho, confiança e notas do motor;
+- feedback final visível com sim/não, nota, tamanho escolhido e comentário.
+
+O v2 não copiou a dependência externa de confete do v1. A animação agora é isolada no CSS do widget, sem bloquear a loja e sem carregar biblioteca adicional.
+
+### Teste minucioso do demo v1
+
+Em 2026-05-24, a página `https://provadorvirtual.online/provadorvirtual_v1/demo.php` foi testada com Playwright:
+
+- todos os links principais responderam `200`: home, como funciona, planos, demo, login, cadastro, privacidade, termos e WhatsApp;
+- o botão `Qual o seu tamanho?` abriu o drawer do v1;
+- etapa 1 coletou altura, peso e idade, atualizando a precisão;
+- etapa 2 coletou gênero e formato corporal com cards ilustrados;
+- etapa 3 mostrou medidas detalhadas por gênero/produto;
+- ao preencher 100%, o v1 disparou confete e retornou recomendação de tamanho;
+- o endpoint `widget/recomendar.php` gravou dados em `widget_user_data` e, quando solicitado, `recommendation_logs`;
+- o endpoint `widget/salvar_feedback.php` gravou feedback por `recommendation_log_id`.
+
+Evidências locais da inspeção foram salvas em `.tmp/v1-widget/` e não devem ser versionadas.
 
 ## Melhorias obrigatorias para o v2
 

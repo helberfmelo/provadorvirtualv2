@@ -572,3 +572,16 @@
 - Próxima pendência operacional fora desta sprint: remover qualquer debug temporário que ainda exista no `produto.vue` oficial da BigShop quando a validação assistida terminar, mantendo apenas a depuração condicionada a `?pvdebug=1`.
 - Validação local documental: `git diff --check`.
 - Run `26354617302` do GitHub Actions finalizou com sucesso para o commit `9895b34`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 66 Widget v2 gamificado com lógica do v1
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` sem expor valores sensíveis.
+- Testado `https://provadorvirtual.online/provadorvirtual_v1/demo.php` com Playwright: links principais retornaram `200`, o drawer abriu, as etapas de medidas básicas, gênero/formato corporal, medidas detalhadas, recomendação, confete e feedback foram percorridas.
+- Estudados os arquivos do v1 em `D:\Projetos\provadorvirtual_v1\demo.php`, `widget\widget.js`, `widget\widget.css`, `widget\recomendar.php` e `widget\salvar_feedback.php`.
+- Widget v2 refatorado para fluxo em drawer com etapas progressivas, barra `Nível de precisão da IA`, cards de formato corporal, medidas detalhadas por tabela, confete próprio e feedback final completo.
+- Backend passa a aceitar `shopper_profile.raw_widget_data` e persistir a jornada em `recommendation_logs.raw_widget_payload`.
+- Rotina `pv:privacy-anonymize` atualizada para limpar `raw_widget_payload` junto com os demais dados corporais antigos.
+- Testes automatizados locais passaram: `WidgetAssetTest`, `RecommendationApiTest` e `HardeningApiTest`.
+- Validação visual local com Playwright em página demo virtual na origem `http://127.0.0.1:8012`: botões, etapa 1, etapa 2, etapa 3, recomendação `M`, feedback registrado e tabela de medidas carregada.
+- Validação mobile local em viewport `390x844`: sem rolagem horizontal (`documentElement.scrollWidth = window.innerWidth`).
+- Evidências visuais foram salvas em `.tmp/sprint66-widget/` e não devem ser versionadas.

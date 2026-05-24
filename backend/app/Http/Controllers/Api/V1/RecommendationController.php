@@ -84,6 +84,7 @@ class RecommendationController extends Controller
         $result = $engine->recommend($product->measurementTable, $data['measurements']);
         $recommendedVariant = $this->variantForRecommendation($product, $result->recommendedSize);
         $profileState = $profiles->resolve($product, $data['measurements'], $data['shopper_profile'] ?? []);
+        $rawWidgetPayload = $this->rawWidgetPayload($request->input('shopper_profile.raw_widget_data'));
 
         $session = RecommendationSession::query()->create([
             'uuid' => (string) Str::uuid(),
@@ -110,6 +111,7 @@ class RecommendationController extends Controller
             'recommended_size' => $result->recommendedSize,
             'confidence' => $result->confidence,
             'input_measurements' => $data['measurements'],
+            'raw_widget_payload' => $rawWidgetPayload,
             'score_breakdown' => $result->scoreBreakdown,
             'fit_notes' => $result->fitNotes,
             'warnings' => $result->warnings,
@@ -291,6 +293,32 @@ class RecommendationController extends Controller
 
         return $product->variants
             ->first(fn (ProductVariant $variant) => mb_strtolower($variant->size_label) === mb_strtolower($recommendedSize));
+    }
+
+    private function rawWidgetPayload(mixed $payload): ?array
+    {
+        if (! is_array($payload) || $payload === []) {
+            return null;
+        }
+
+        $json = json_encode($payload);
+
+        if ($json === false) {
+            return null;
+        }
+
+        if (strlen($json) > 12000) {
+            return [
+                'truncated' => true,
+                'original_size' => strlen($json),
+                'version' => $payload['version'] ?? null,
+                'source' => $payload['source'] ?? null,
+                'precision' => $payload['precision'] ?? null,
+                'steps_completed' => $payload['steps_completed'] ?? null,
+            ];
+        }
+
+        return $payload;
     }
 
     private function hashValue(?string $value): ?string

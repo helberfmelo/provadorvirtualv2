@@ -60,6 +60,7 @@ Atualizado em: 2026-05-24
 - Sprint 63 corrige a resolução pública BigShop para usar `platform_connections.external_store_id` como fallback; a Luna Moda Festa passou a retornar `configured=true` no `config-check` com os domínios públicos.
 - Sprint 64 corrige a base padrão da API usada pelo widget em produção para evitar redirect no preflight CORS, publica a correção no run `26354288938` e confirma `config-check` da Luna Moda Festa com `configured=true`.
 - Sprint 65 registra a confirmação visual do piloto Luna Moda Festa em produção: os botões `PV Descubra seu tamanho` e `cm Tabela de Medidas` aparecem na página BigShop model3 pro do produto `716076`; documentação publicada no run `26354617302`.
+- Sprint 66 migra a lógica gamificada do widget v1 para o widget público v2: drawer em etapas, barra de precisão, formato corporal, medidas detalhadas, confete em 100%, feedback final visível e persistência do payload bruto da jornada para aprendizado/LGPD.
 
 ## Referências confirmadas
 
@@ -191,6 +192,7 @@ Atualizado em: 2026-05-24
 - Histórico SaaS de e-mail: `/api/v1/saas/transactional-email-sends`.
 - APIs de usuários/permissões: `/api/v1/merchant/users` e `/api/v1/saas/users`.
 - Widget público: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
+- O widget público v2 mantém os botões `PV Descubra seu tamanho` e `cm Tabela de Medidas`, mas o fluxo de recomendação agora segue a ordem do v1: medidas básicas, gênero/formato corporal, medidas detalhadas, resultado e feedback.
 
 ## Próxima ação recomendada
 

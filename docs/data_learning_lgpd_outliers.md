@@ -180,6 +180,23 @@ Quando não houver dados:
 - convidar a aumentar precisao com formato corporal e medidas detalhadas;
 - salvar somente com consentimento operacional claro.
 
+## Payload bruto do widget
+
+Status Sprint 66: além das medidas normalizadas usadas pelo motor, o widget v2 salva a jornada bruta em `recommendation_logs.raw_widget_payload`.
+
+O payload permitido inclui:
+
+- versão e origem do widget, por exemplo `v2_sprint_66` e `widget_v2_staged`;
+- etapas concluídas;
+- precisão calculada no front;
+- identidade técnica do produto/loja/plataforma;
+- tabela de medidas usada;
+- medidas brutas informadas no fluxo, como altura, peso, idade, gênero, formato corporal, caimento, busto/tórax, cintura, quadril, comprimento e ombro.
+
+Esse payload não deve conter nome, e-mail, telefone, documento, endereço ou qualquer identificador pessoal direto. O objetivo é preservar contexto operacional para auditoria, aprendizado e melhoria de UX, sem transformar o widget em cadastro de consumidor.
+
+`pv:privacy-anonymize` limpa `raw_widget_payload` junto com `input_measurements`, `score_breakdown`, perfil da sessão e comentários antigos de feedback.
+
 ## Pendências
 
 - Revisar texto final de consentimento no widget com juridico/comercial.

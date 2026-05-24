@@ -1,5 +1,6 @@
 docs/credentials.local.md
 temp/
+.tmp/
 
 backend/.env
 backend/.env.*

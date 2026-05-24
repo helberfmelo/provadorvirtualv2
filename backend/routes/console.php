@@ -188,6 +188,7 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
         ->where('created_at', '<', $cutoff)
         ->where(function ($query): void {
             $query->whereNotNull('input_measurements')
+                ->orWhereNotNull('raw_widget_payload')
                 ->orWhereNotNull('score_breakdown');
         });
 
@@ -227,6 +228,7 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
 
         $logs->update([
             'input_measurements' => null,
+            'raw_widget_payload' => null,
             'score_breakdown' => null,
         ]);
 
