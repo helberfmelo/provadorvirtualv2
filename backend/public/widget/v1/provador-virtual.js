@@ -35,6 +35,7 @@
         state.configured = Boolean(result.configured);
         state.config = result;
         config.theme = Object.assign({}, config.theme, result.theme || {});
+        emitConfigEvent(result);
 
         if (state.configured) {
           renderTriggers();
@@ -43,6 +44,8 @@
         }
       })
       .catch(function () {
+        emitConfigEvent({ configured: false, reason: 'load_error' });
+
         if (config.debug) {
           root.innerHTML = '<div class="pv-warning">Nao foi possivel carregar o Provador Virtual.</div>';
         }
@@ -184,13 +187,25 @@
 
   function identityPayload() {
     return {
-      merchant_id: Number(config.merchantId),
+      merchant_id: config.merchantId ? Number(config.merchantId) : null,
       store_id: config.storeId ? Number(config.storeId) : null,
       product_id: config.productId,
       variant_id: config.variantId,
       sku: config.sku,
       platform: config.platform,
     };
+  }
+
+  function emitConfigEvent(result) {
+    var detail = Object.assign({}, identityPayload(), result || {});
+
+    try {
+      window.dispatchEvent(new CustomEvent('provadorvirtual:config', { detail: detail }));
+    } catch (error) {
+      var event = document.createEvent('CustomEvent');
+      event.initCustomEvent('provadorvirtual:config', false, false, detail);
+      window.dispatchEvent(event);
+    }
   }
 
   function configCheck() {
@@ -576,12 +591,10 @@
       return;
     }
 
-    request('/public/shopper-profiles/forget', {
-      merchant_id: Number(config.merchantId),
-      store_id: config.storeId ? Number(config.storeId) : null,
+    request('/public/shopper-profiles/forget', Object.assign(identityPayload(), {
       profile_id: profile.id,
       profile_token: profile.token,
-    }).catch(function () {
+    })).catch(function () {
       // The local profile was already removed; server cleanup can retry in a future interaction.
     });
   }

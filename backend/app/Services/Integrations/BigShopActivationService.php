@@ -131,7 +131,7 @@ class BigShopActivationService
             'widget_public_key' => $widget->public_key,
             'dashboard_url' => url('/app/integracoes'),
             'widget_url' => $widgetUrl,
-            'install_snippet' => $this->installSnippet($storeId, $widgetUrl),
+            'install_snippet' => $this->installSnippet($storeId, $widgetUrl, $widget->merchant_id),
             'integration_contract' => $this->contract($storeId, $widget, $widgetUrl),
             'status' => $connection->status,
         ];
@@ -197,7 +197,7 @@ class BigShopActivationService
         ];
     }
 
-    private function installSnippet(string $storeId, string $widgetUrl): string
+    private function installSnippet(string $storeId, string $widgetUrl, int $merchantId): string
     {
         return <<<HTML
 <div id="provador-virtual-container"></div>
@@ -205,6 +205,7 @@ class BigShopActivationService
   id="provadorVirtualScript"
   src="{$widgetUrl}"
   data-platform="bigshop"
+  data-merchant-id="{$merchantId}"
   data-store-id="{$storeId}"
   data-product-id="BIGSHOP_PRODUCT_ID"
   data-variant-id="BIGSHOP_GRADE_ID"

@@ -54,6 +54,7 @@ Atualizado em: 2026-05-23
 - Sprint 55 removeu os feedbacks de sucesso inline restantes nas telas operacionais e padronizou essas ações no modal central.
 - Sprint 56 registra a conferência remota da Sprint 55 e reforça o ciclo obrigatório de não avançar sprint sem deploy verificado.
 - Sprint 57 atualiza os actions oficiais do workflow para `actions/checkout@v6` e `actions/setup-node@v6`, removendo o risco da depreciação do runtime Node 20 dos actions.
+- Sprint 58 prepara a instalação nativa BigShop model3 pro: widget resolve loja por `platform=bigshop` + `external_store_id`, emite evento de configuração e a cópia local do `produto.vue` passa a carregar o widget sem IDs internos fixos.
 
 ## Referências confirmadas
 
@@ -144,6 +145,7 @@ Atualizado em: 2026-05-23
 - Sprint 54 enviada ao GitHub no commit `7b06d4d`; o run `26348462160` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - Sprint 55 enviada ao GitHub no commit `01d0461`; o run `26348653353` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - Sprint 56 enviada ao GitHub no commit `b90cf10`; o run `26348767486` finalizou com sucesso, incluindo deploy remoto e smoke público.
+- Sprint 57 enviada ao GitHub no commit `7f4a142`; o run `26348869694` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

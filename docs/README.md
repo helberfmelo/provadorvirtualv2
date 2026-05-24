@@ -27,15 +27,16 @@ Antes de desenvolver qualquer sprint, ajuste, correção ou deploy, reler nesta 
 18. `docs/hardening_lgpd_observability.md`
 19. `docs/go_live_cutover.md`
 20. `docs/bigshop_integration.md`
-21. `docs/bigshop_one_click_contract.md`
-22. `docs/commercial_pilot_package.md`
-23. `docs/deploy_runbook.md`
-24. `docs/sprint_governance.md`
-25. `docs/roadmap_sprints.md`
-26. `docs/intelligent_sizing_roadmap.md`
-27. `docs/product_backlog.md`
-28. `docs/security_compliance.md`
-29. `docs/credentials.local.md`, somente quando a sprint envolver produção, banco, SMTP, deploy, IA ou integrações.
+21. `docs/bigshop_model3_pro_widget.md`
+22. `docs/bigshop_one_click_contract.md`
+23. `docs/commercial_pilot_package.md`
+24. `docs/deploy_runbook.md`
+25. `docs/sprint_governance.md`
+26. `docs/roadmap_sprints.md`
+27. `docs/intelligent_sizing_roadmap.md`
+28. `docs/product_backlog.md`
+29. `docs/security_compliance.md`
+30. `docs/credentials.local.md`, somente quando a sprint envolver produção, banco, SMTP, deploy, IA ou integrações.
 
 Nenhuma sprint deve começar sem essa releitura. Depois de executar uma sprint, é obrigatório fazer commit, push, acompanhar GitHub Actions/deploy até o status final e somente então passar para a próxima sprint.
 

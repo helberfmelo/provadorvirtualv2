@@ -733,4 +733,19 @@ Entregas:
 - registrar a correção preventiva na documentação de estado e execução;
 - validar o YAML e acompanhar o deploy remoto até o status final.
 
-Status: documentação e workflow preparados para commit e verificação remota desta sprint.
+Status: implementado no commit `7f4a142` e publicado com sucesso no run `26348869694`, com deploy remoto e smoke público concluídos.
+
+### Sprint 58 - Widget BigShop model3 pro
+
+Objetivo: estudar as cópias locais do front model3 pro, backend BigShop e painel BigShop, instalar o widget universal no ponto correto da página de produto e documentar a configuração por loja.
+
+Entregas:
+
+- permitir que o widget do Provador Virtual resolva loja BigShop por `data-platform="bigshop"` e `data-store-id` externo da BigShop;
+- emitir evento público `provadorvirtual:config` para o front decidir se deve esconder ou manter a tabela de medidas nativa;
+- aplicar na cópia local do `pro_store/produto.vue` o loader dinâmico do widget logo após seleção de cor/tamanho;
+- manter fallback da tabela BigShop quando o produto não tiver tabela no Provador Virtual;
+- documentar app `Provador Virtual` em `Configurações > Apps adicionais`, SQL do catálogo `bbs.apps` e campos por loja;
+- validar backend/widget e registrar que as cópias locais BigShop foram usadas para estudo/aplicação controlada, sem acionar scripts de publicação próprios da BigShop.
+
+Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.

@@ -70,6 +70,7 @@ Premissas BigShop confirmadas pelo dono da plataforma em 2026-05-23:
 - no XML, `g:item_group_id` e sempre o ID do produto pai;
 - a BigShop consegue garantir `g:size`, `g:color`, `g:gender`, `g:product_type`, estoque/disponibilidade e `link` em 100% dos feeds de moda;
 - o ponto oficial para instalação automática será `produto.vue` da model3 plano pro, em sprint futura no repositório BigShop correto.
+- Sprint 58 estudou a cópia local do modelo pro e definiu a instalação no `produto.vue` compartilhado, com configuração por loja em `bbs.template_model3_apps` e resolução automática por `platform=bigshop` + `external_store_id`.
 
 BigShop produto:
 
@@ -129,6 +130,7 @@ O front da loja BigShop possui página de produto em:
 
 - `bigshop/front/stores/pro_store/produto.vue`
 - ponto confirmado para sprint futura: `produto.vue` da model3 plano pro, no repositório BigShop correto.
+- cópia local aplicada na Sprint 58: `D:\Projetos\bigshop\172.16.151.2\bigshop\model3\stores\pro_store\produto.vue`.
 
 Pontos relevantes:
 
@@ -139,6 +141,10 @@ Pontos relevantes:
 - o container deve ficar exatamente onde os botões "Descubra seu tamanho" e "Tabela de Medidas" devem aparecer;
 - para cada troca de grade, atualizar `data-product-id`, `data-variant-id` e `data-sku`;
 - depois da troca de grade, chamar `window.ProvadorVirtual?.reload(...)` para executar novo `config-check`.
+- não fixar IDs internos do SaaS no front compartilhado; enviar `data-store-id` com o `loja.id` BigShop e deixar o Provador Virtual resolver a empresa pelo `external_store_id`;
+- esconder a tabela nativa BigShop somente quando o widget responder `configured=true`.
+
+Detalhes operacionais do modelo pro estão em `docs/bigshop_model3_pro_widget.md`.
 
 Exemplo de recarregamento no front BigShop:
 

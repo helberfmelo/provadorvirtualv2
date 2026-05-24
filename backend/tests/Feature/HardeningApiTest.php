@@ -6,6 +6,7 @@ use App\Models\AiUsageLog;
 use App\Models\AuditLog;
 use App\Models\IntegrationEvent;
 use App\Models\Merchant;
+use App\Models\MerchantCompany;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
@@ -53,6 +54,28 @@ class HardeningApiTest extends TestCase
                 'store_id' => 1,
                 'product_id' => 1,
                 'platform' => 'custom',
+            ])
+            ->assertOk()
+            ->assertHeader('Access-Control-Allow-Origin', 'https://provadorvirtual.online')
+            ->assertJsonPath('configured', true);
+    }
+
+    public function test_bigshop_widget_public_api_allows_origin_with_external_store_id(): void
+    {
+        $this->seed();
+
+        MerchantCompany::query()
+            ->whereKey(1)
+            ->update([
+                'platform' => 'bigshop',
+                'external_store_id' => '53',
+            ]);
+
+        $this->withHeader('Origin', 'https://provadorvirtual.online')
+            ->postJson('/api/v1/public/recommendations/config-check', [
+                'store_id' => 53,
+                'product_id' => 1,
+                'platform' => 'bigshop',
             ])
             ->assertOk()
             ->assertHeader('Access-Control-Allow-Origin', 'https://provadorvirtual.online')

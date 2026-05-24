@@ -8,6 +8,7 @@ use App\Http\Requests\RecommendationConfigCheckRequest;
 use App\Http\Requests\StoreRecommendationFeedbackRequest;
 use App\Http\Requests\StoreRecommendationRequest;
 use App\Http\Requests\StoreRecommendationSignalRequest;
+use App\Models\MerchantCompany;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\RecommendationFeedback;
@@ -189,14 +190,29 @@ class RecommendationController extends Controller
 
     private function resolveProduct(array $data): ?Product
     {
+        $context = $this->resolveMerchantContext($data);
+        $merchantId = $context['merchant_id'];
+        $company = $context['company'];
+
+        if (! $merchantId) {
+            return null;
+        }
+
         $query = Product::query()
-            ->where('merchant_id', $data['merchant_id'])
-            ->when($data['store_id'] ?? null, fn ($query, $storeId) => $query->where('merchant_company_id', $storeId));
+            ->where('merchant_id', $merchantId)
+            ->when($company, fn ($query) => $query->where('merchant_company_id', $company->id))
+            ->when(! $company && ! empty($data['store_id']), fn ($query) => $query->where('merchant_company_id', $data['store_id']));
 
         if (! empty($data['product_id'])) {
             $query->where(function ($subQuery) use ($data): void {
                 $subQuery->whereKey($data['product_id'])
                     ->orWhere('external_product_id', (string) $data['product_id']);
+            });
+        } elseif (! empty($data['variant_id'])) {
+            $variantId = $data['variant_id'];
+            $query->whereHas('variants', function ($variantQuery) use ($variantId): void {
+                $variantQuery->whereKey($variantId)
+                    ->orWhere('external_variant_id', (string) $variantId);
             });
         } elseif (! empty($data['sku'])) {
             $sku = $data['sku'];
@@ -207,6 +223,51 @@ class RecommendationController extends Controller
         }
 
         return $query->first();
+    }
+
+    private function resolveMerchantContext(array $data): array
+    {
+        $merchantId = ! empty($data['merchant_id']) ? (int) $data['merchant_id'] : null;
+        $company = $this->companyForRequest($data, $merchantId);
+
+        if (! $merchantId && $company) {
+            $merchantId = (int) $company->merchant_id;
+        }
+
+        return [
+            'merchant_id' => $merchantId,
+            'company' => $company,
+        ];
+    }
+
+    private function companyForRequest(array $data, ?int $merchantId): ?MerchantCompany
+    {
+        $storeId = $data['store_id'] ?? null;
+
+        if (! $storeId) {
+            return null;
+        }
+
+        if (mb_strtolower((string) ($data['platform'] ?? '')) === 'bigshop') {
+            $company = MerchantCompany::query()
+                ->where('platform', 'bigshop')
+                ->where('external_store_id', (string) $storeId)
+                ->when($merchantId, fn ($query) => $query->where('merchant_id', $merchantId))
+                ->first();
+
+            if ($company) {
+                return $company;
+            }
+        }
+
+        if (! $merchantId || ! is_numeric($storeId)) {
+            return null;
+        }
+
+        return MerchantCompany::query()
+            ->whereKey((int) $storeId)
+            ->where('merchant_id', $merchantId)
+            ->first();
     }
 
     private function variantForRecommendation(Product $product, ?string $recommendedSize): ?ProductVariant

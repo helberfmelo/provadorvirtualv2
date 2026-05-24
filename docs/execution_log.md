@@ -477,3 +477,18 @@
 - Workflow `.github/workflows/deploy.yml` atualizado para `actions/checkout@v6` e `actions/setup-node@v6`.
 - Motivo: o run `26348767486` passou, mas emitiu anotação de depreciação futura do runtime Node 20 dos actions oficiais.
 - Validação local: `git diff --check` e conferência de `actions/checkout@v6`/`actions/setup-node@v6` no workflow.
+- Run `26348869694` do GitHub Actions finalizou com sucesso para o commit `7f4a142`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 58 Widget BigShop model3 pro
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` com conteúdo mascarado.
+- Estudadas as cópias locais `D:\Projetos\bigshop\172.16.151.2\bigshop\model3\stores\pro_store`, `D:\Projetos\bigshop\172.16.151.5\bigshop` e `D:\Projetos\bigbangshop2.0`.
+- Confirmado que o ponto correto do modelo pro é `pro_store/produto.vue`, na página de produto, logo após seletor de cor/tamanho e antes dos blocos de compra/tabela.
+- Backend do Provador Virtual ajustado para resolver BigShop por `platform=bigshop` + `external_store_id`, sem exigir IDs internos no front compartilhado.
+- Widget público passa a emitir `provadorvirtual:config`, usado pelo front BigShop para esconder a tabela nativa somente quando o produto tiver tabela no Provador Virtual.
+- Cópia local do `produto.vue` recebeu loader dinâmico do widget, recarregamento por troca de grade e fallback para tabela BigShop.
+- Cópia local do backend BigShop passa a retornar `ref`, `type` e `cod_4` nos apps da loja.
+- Cópia local do painel BigShop recebeu ajuda e defaults para o app `provador_virtual` em Apps adicionais.
+- Validações locais do Provador Virtual: `vendor\bin\pint --dirty`, `npm run build`, `git diff --check`, `php artisan test --filter=RecommendationApiTest`, `php artisan test --filter=HardeningApiTest` e `php artisan test` completo com 67 testes e 502 assertions.
+- Validações das cópias BigShop: conferência estrutural do `produto.vue`, conferência do SQL em `api-v2/funcoes.php` e `git diff --check` no painel `D:\Projetos\bigbangshop2.0`.
+- Scripts `npm run build` do diretório local `model3` da BigShop não foram executados porque o `package.json` contém comandos de publicação/pull/redis próprios do ambiente oficial, inadequados para a cópia local.

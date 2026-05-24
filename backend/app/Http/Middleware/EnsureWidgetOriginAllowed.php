@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\MerchantCompany;
 use App\Models\RecommendationLog;
 use App\Models\WidgetInstall;
 use Closure;
@@ -38,22 +39,47 @@ class EnsureWidgetOriginAllowed
     {
         $merchantId = $request->input('merchant_id');
 
-        if (is_numeric($merchantId)) {
+        if (is_numeric($merchantId) && (int) $merchantId > 0) {
             return (int) $merchantId;
         }
 
-        return $this->recommendationLog($request)?->merchant_id;
+        return $this->recommendationLog($request)?->merchant_id
+            ?? $this->bigShopCompany($request)?->merchant_id;
     }
 
     private function companyId(Request $request): ?int
     {
+        $bigShopCompany = $this->bigShopCompany($request);
+
+        if ($bigShopCompany) {
+            return (int) $bigShopCompany->id;
+        }
+
         $companyId = $request->input('store_id');
 
-        if (is_numeric($companyId)) {
+        if (is_numeric($companyId) && (int) $companyId > 0) {
             return (int) $companyId;
         }
 
         return $this->recommendationLog($request)?->merchant_company_id;
+    }
+
+    private function bigShopCompany(Request $request): ?MerchantCompany
+    {
+        if (mb_strtolower((string) $request->input('platform')) !== 'bigshop') {
+            return null;
+        }
+
+        $storeId = $request->input('store_id');
+
+        if (! is_numeric($storeId)) {
+            return null;
+        }
+
+        return MerchantCompany::query()
+            ->where('platform', 'bigshop')
+            ->where('external_store_id', (string) $storeId)
+            ->first();
     }
 
     private function recommendationLog(Request $request): ?RecommendationLog

@@ -49,6 +49,7 @@ Atualizado em: 2026-05-23
 - `DONE` BigShop um clique por endpoint assinado.
 - `DONE` Contrato final BigShop um clique com `install_snippet` e `integration_contract`.
 - `DONE` Monitoramento de ativações BigShop no portal.
+- `DONE` Preparar instalação nativa BigShop model3 pro com configuração por loja e fallback da tabela de medidas nativa.
 - `TODO` Cadastrar `BIGSHOP_ACTIVATION_SECRET` para teste real.
 - `DONE` Base do guia/snippet custom no painel.
 - `DONE` Guias e snippets para Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom.

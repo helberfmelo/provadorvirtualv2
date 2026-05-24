@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\MerchantCompany;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
@@ -83,6 +84,43 @@ class RecommendationApiTest extends TestCase
         ])
             ->assertUnprocessable()
             ->assertJsonPath('configured', false);
+    }
+
+    public function test_bigshop_widget_resolves_company_by_external_store_id(): void
+    {
+        $this->seed();
+
+        MerchantCompany::query()
+            ->whereKey(1)
+            ->update([
+                'platform' => 'bigshop',
+                'external_store_id' => '53',
+            ]);
+
+        $this->postJson('/api/v1/public/recommendations/config-check', [
+            'store_id' => 53,
+            'product_id' => 1,
+            'platform' => 'bigshop',
+        ])
+            ->assertOk()
+            ->assertJsonPath('configured', true)
+            ->assertJsonPath('available_sizes.2', 'M');
+
+        $this->postJson('/api/v1/public/recommendations', [
+            'store_id' => 53,
+            'product_id' => 1,
+            'platform' => 'bigshop',
+            'measurements' => [
+                'bust' => 92,
+                'waist' => 74,
+                'hip' => 100,
+                'height' => 166,
+                'weight' => 62,
+            ],
+        ])
+            ->assertCreated()
+            ->assertJsonPath('configured', true)
+            ->assertJsonPath('recommended_size', 'M');
     }
 
     public function test_shopper_profile_with_consent_is_reused_and_can_be_forgotten(): void
