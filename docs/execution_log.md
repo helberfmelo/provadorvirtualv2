@@ -414,3 +414,9 @@
 - Atualizadas expectativas em `HardeningApiTest` e `PublicCheckoutFlowTest`.
 - Governança reforçada: toda sprint precisa conferir GitHub Actions/deploy remoto depois do push antes de ser considerada concluída.
 - Run `26347139903` do GitHub Actions finalizou com sucesso para o commit `c2826a5`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 51 Roadmap e governança do ciclo de integrações
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
+- Roadmap recebeu as Sprints 52, 53 e 54 para UX de integrações, sincronização automática e guia de instalação do widget.
+- Fonte de verdade passou a explicitar que a próxima sprint só começa após commit, push e GitHub Actions/deploy verificados.

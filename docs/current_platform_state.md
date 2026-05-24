@@ -47,6 +47,7 @@ Atualizado em: 2026-05-23
 - Sprint 48 revisou textos em PT-BR com acentos/cedilha/til e registrou a regra nas diretrizes obrigatórias dos portais.
 - Sprint 49 padronizou estados e estilos globais de inputs, selects, textareas, checkboxes e foco/disabled nos portais.
 - Sprint 50 corrigiu os testes que ainda esperavam mensagens sem acento e reforçou a regra obrigatória de conferir GitHub Actions/deploy após cada push.
+- Sprint 51 iniciou o ciclo corretivo de integrações, registrando roadmap e reforçando a governança de releitura obrigatória, commit, push e Actions/deploy antes de avançar sprint.
 
 ## Referências confirmadas
 

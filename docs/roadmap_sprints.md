@@ -640,3 +640,52 @@ Entregas:
 - registrar falhas dos runs `26346764503` e `26346828756` como incidente operacional corrigido.
 
 Status: implementado, enviado ao GitHub no commit `c2826a5` e validado no run `26347139903`, com deploy remoto e smoke público concluídos com sucesso.
+
+### Sprint 51 - Roadmap e governança do ciclo de integrações
+
+Objetivo: registrar o novo ciclo de correções e reforçar a regra operacional de releitura, commit, push e verificação remota antes de avançar sprint.
+
+Entregas:
+
+- atualizar a fonte de verdade para exigir releitura dos documentos obrigatórios antes de cada sprint;
+- reforçar que nenhuma sprint termina sem commit, push e GitHub Actions/deploy verificado;
+- registrar as próximas sprints corretivas de integrações, cron e instalação do widget;
+- manter a sequência numérica após a Sprint 50.
+
+Status: implementado e testado localmente com `git diff --check`.
+
+### Sprint 52 - UX da tela de integrações
+
+Objetivo: corrigir tooltip fora da tela, remover rolagem horizontal indevida, simplificar ações de sincronização/teste e trocar mensagens soltas por modais consistentes.
+
+Entregas previstas:
+
+- ajustar tooltips para ficarem contidos no viewport em desktop e mobile;
+- eliminar overflow horizontal da tela `/app/integracoes` e revisar grids que estouram a largura;
+- reorganizar botões de ação da integração para reduzir ambiguidade entre salvar, sincronizar XML, testar conexão e sincronizar API;
+- garantir que botões sem credencial/URL exibam orientação clara em modal;
+- após sincronizar XML, mostrar modal orientando acessar `/app/produtos` para visualizar os produtos sincronizados.
+
+### Sprint 53 - Sincronização automática de integrações
+
+Objetivo: sincronizar automaticamente integrações por XML/feed e preparar a mesma base para outros conectores necessários.
+
+Entregas previstas:
+
+- criar comando Artisan para sincronizar integrações ativas com `feed_url`;
+- agendar no Laravel scheduler pelo menos 4 execuções diárias;
+- registrar eventos de sucesso/falha em `integration_events`;
+- documentar o cron completo para cPanel e comando manual de validação;
+- atualizar go-live/operacional com a rotina de integração.
+
+### Sprint 54 - Guia detalhado de instalação do widget
+
+Objetivo: deixar claro no portal e na documentação onde o script/container do widget deve ser instalado na loja ou site.
+
+Entregas previstas:
+
+- criar seção detalhada em `/app/widget` e/ou `/app/integracoes` explicando o ponto de instalação na página de produto;
+- documentar que o container deve ficar no local visual dos botões do Provador Virtual, perto do seletor de tamanho/grade e antes ou perto do botão comprar;
+- explicar atualização de produto, variação e SKU em troca de grade;
+- reforçar a orientação específica da BigShop para `produto.vue` da model3 plano pro em sprint futura no repositório BigShop correto;
+- atualizar docs de widget e integrações por plataforma.

@@ -33,6 +33,8 @@ Toda sprint deve seguir:
 14. validar produção quando a sprint incluir deploy;
 15. registrar pendências, incidentes e próxima sprint.
 
+Não iniciar a sprint seguinte enquanto a sprint atual não tiver commit, push e GitHub Actions/deploy conferidos. Se a verificação remota falhar, a próxima sprint passa a ser a correção numerada dessa falha.
+
 ## 4. Commit e push
 
 Ao final de sprint concluida:
