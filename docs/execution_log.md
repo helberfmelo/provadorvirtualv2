@@ -556,3 +556,8 @@
 - Reproduzido por terminal que `OPTIONS /provadorvirtual_v2/api/v1/...` retorna `307`, enquanto `OPTIONS /provadorvirtual_v2/public/api/v1/...` retorna `204` com `Access-Control-Allow-Origin` correto.
 - Widget público ajustado para calcular `api_base` diretamente em `/provadorvirtual_v2/public/api/v1` quando o script estiver em subpasta, evitando redirect no preflight CORS.
 - Adicionado `window.ProvadorVirtual.diagnostics()` e detalhes de falha no evento `provadorvirtual:config` para depuração futura.
+- Validações locais: `php artisan test --filter=WidgetAssetTest`, `php artisan test --filter=RecommendationApiTest`, `php artisan test --filter=HardeningApiTest`, `php artisan test`, `npm run build` e `git diff --check`.
+- Run `26354288938` do GitHub Actions finalizou com sucesso para o commit `445e7bb`, incluindo deploy remoto e smoke público.
+- Após o deploy, o JavaScript público em `https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js` continha `/public/api/v1`, `diagnostics` e os detalhes de falha.
+- Após o deploy, `OPTIONS /provadorvirtual_v2/public/api/v1/public/recommendations/config-check` com `Origin: https://www.lunamodafesta.com.br` retornou `204` sem redirect.
+- Após o deploy, `POST /provadorvirtual_v2/public/api/v1/public/recommendations/config-check` para `store_id=53`, `product_id=716076`, `variant_id=46125939`, `sku=2553` e `platform=bigshop` retornou `configured=true`, `product_id=6`, `measurement_table_id=1` e tamanhos disponíveis.

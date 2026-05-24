@@ -1,6 +1,6 @@
 # Estado Atual da Plataforma
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-24
 
 ## Estado do workspace
 
@@ -58,7 +58,7 @@ Atualizado em: 2026-05-23
 - Sprint 59 adiciona fechamento manual com `x` no canto superior direito do modal central de feedback, preservando o fechamento automático para sucessos e avisos.
 - Sprint 62 corrige o formulário de produto para mostrar tabela somente quando `measurement_table_id` existe, registra o ajuste local do editor BigShop sem hardcoding e confirma os bloqueios atuais da Luna: domínio do widget não liberado e produto `716076` sem tabela vinculada.
 - Sprint 63 corrige a resolução pública BigShop para usar `platform_connections.external_store_id` como fallback; a Luna Moda Festa passou a retornar `configured=true` no `config-check` com os domínios públicos.
-- Sprint 64 corrige a base padrão da API usada pelo widget em produção para evitar redirect no preflight CORS e adiciona diagnóstico público controlado para falhas de carregamento.
+- Sprint 64 corrige a base padrão da API usada pelo widget em produção para evitar redirect no preflight CORS, publica a correção no run `26354288938` e confirma `config-check` da Luna Moda Festa com `configured=true`.
 
 ## Referências confirmadas
 

@@ -832,4 +832,4 @@ Entregas:
 - emitir detalhes de falha no evento `provadorvirtual:config`, incluindo `api_base`, `request_url`, nome/mensagem do erro, status HTTP e trecho de resposta quando houver;
 - documentar o diagnóstico e o motivo técnico do redirect em preflight.
 
-Status: em execução.
+Status: implementado no commit `445e7bb` e publicado com sucesso no run `26354288938`, com deploy remoto, smoke público, `OPTIONS` direto retornando `204` e `config-check` da Luna Moda Festa retornando `configured=true` sem redirect.
