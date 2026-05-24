@@ -63,6 +63,7 @@ Atualizado em: 2026-05-24
 - Sprint 66 migra a lógica gamificada do widget v1 para o widget público v2: drawer em etapas, barra de precisão, formato corporal, medidas detalhadas, confete em 100%, feedback final visível e persistência do payload bruto da jornada para aprendizado/LGPD.
 - Sprint 67 corrige o fluxo sequencial do widget v2: dados salvos no navegador não podem antecipar 100% na etapa 1, o rodapé só envia recomendação na etapa 3, e o confete só dispara quando a precisão real chega a 100%.
 - Sprint 68 refina a paridade com o v1: altura + peso já geram recomendação parcial, o rodapé fixo mostra o tamanho recomendado, as etapas continuam bloqueadas por pré-requisitos, silhuetas variam por gênero, dados são salvos por tabela de medidas e o confete pode ser desligado por configuração do widget.
+- Sprint 69 ajusta a hierarquia visual do widget: cabeçalho do drawer tematizado, CTAs de avanço mais fortes, rodapé discreto até o resultado 100%, feedback com escala explicada e silhuetas herdadas do v1 coloridas pelo tema da loja.
 
 ## Referências confirmadas
 
@@ -158,6 +159,7 @@ Atualizado em: 2026-05-24
 - Sprint 62 enviada ao GitHub no commit `3f242ac`; o run `26353363931` finalizou com sucesso, incluindo deploy remoto e smoke público.
 - Sprint 63 enviada ao GitHub no commit `a575777`; o run `26353804637` finalizou com sucesso, incluindo deploy remoto, smoke público e validação do `config-check` da Luna Moda Festa.
 - Sprint 68 enviada ao GitHub no commit `790d875`; o run `26366746266` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin, smoke público e validação Playwright pós-deploy do widget no produto teste.
+- Sprint 69 implementada localmente; aguardando commit, push e verificação do GitHub Actions/deploy.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

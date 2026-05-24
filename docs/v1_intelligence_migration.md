@@ -109,6 +109,8 @@ Status Sprint 67: reforçada a paridade comportamental com o v1. O usuário prec
 
 Status Sprint 68: a dinâmica do v1 foi refinada no v2. O widget volta a recomendar tamanho a partir do mínimo útil, que é altura + peso, sem recomendar com apenas um deles. O corpo das etapas mantém o incentivo `Aumentar precisão`, o rodapé fixo mantém barra de precisão e tamanho recomendado, os passos 1 a 4 são clicáveis com bloqueios por etapa, as silhuetas mudam por gênero, o perfil é salvo por tabela de medidas e o confete passa a depender de `theme.confetti_enabled`, ativado por padrão.
 
+Status Sprint 69: o v2 passou a reutilizar as imagens de silhueta do v1 como assets públicos em `widget/v1/assets/body-shapes/`. Elas são renderizadas como máscara CSS para receber a cor configurada pela loja. O cabeçalho do drawer também passou a usar as cores do tema, os CTAs de avanço ficaram mais fortes, o CTA fixo do rodapé ficou discreto até o resultado completo e a escala de feedback final ficou explícita para o consumidor.
+
 ### Teste minucioso do demo v1
 
 Em 2026-05-24, a página `https://provadorvirtual.online/provadorvirtual_v1/demo.php` foi testada com Playwright:
@@ -172,6 +174,6 @@ As tabelas atuais do v2 já aceitam `metadata`, mas o schema e as telas ainda pr
 
 - Ativar provider Gemini no backend do v2 usando a chave já copiada localmente.
 - Evoluir o catálogo importado para salvar campos extras como idade, formato corporal, manga, entrepernas e pe em `metadata`.
-- Definir imagens/ilustracoes proprias para formatos corporais do widget.
+- Evoluir no futuro as imagens de formato corporal, se a marca quiser substituir os assets herdados do v1.
 - Decidir se o v2 também tera OpenAI como provider alternativo para OCR e geracao.
 - Cadastrar `GEMINI_API_KEY` em produção quando for liberar OCR real.

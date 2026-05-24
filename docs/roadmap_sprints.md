@@ -900,3 +900,19 @@ Entregas:
 - validar o fluxo com teste local de widget, suíte backend completa e build frontend.
 
 Status: implementado no commit `790d875` e publicado com sucesso no run `26366746266`, com deploy remoto, deploy da raiz pública, master admin, smoke público, verificação dos assets públicos e teste Playwright pós-deploy no produto teste.
+
+### Sprint 69 - Hierarquia visual e silhuetas do widget
+
+Objetivo: ajustar a hierarquia visual do drawer do widget v2 para ficar mais próximo do v1, sem alterar o fluxo progressivo aprovado.
+
+Entregas:
+
+- deixar o cabeçalho do drawer com fundo baseado nas cores configuradas no portal da empresa;
+- destacar os botões de ação `Aumentar precisão` e `Finalizar e ver resultado` no mesmo padrão visual do CTA principal;
+- tornar o botão fixo do rodapé mais discreto enquanto o consumidor ainda está nas etapas 1, 2 ou 3, mantendo destaque forte somente no resultado com 100% de precisão;
+- explicar a escala de feedback final: `1 = não ajudou, 5 = perfeita`;
+- copiar para o v2 as silhuetas do widget v1 e renderizá-las como máscara CSS, permitindo que recebam a tonalidade configurada pela loja;
+- cobrir a existência dos novos assets no teste do widget;
+- validar o fluxo visual com Playwright mockado: cabeçalho tematizado, CTA progressivo, rodapé discreto antes do resultado, silhueta via asset do v1, confete e feedback final.
+
+Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.

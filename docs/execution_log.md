@@ -622,3 +622,15 @@
 - Pós-deploy confirmou que o CSS público contém `.pv-recommendation-inline`, `.pv-stepper button` e `.pv-shape-male`.
 - Pós-deploy validou o endpoint público de recomendação com altura + peso, retornando `recommended_size=M`.
 - Playwright pós-deploy em `https://provadorvirtual.online/produto-teste/blusa-canelada-solar` validou: altura isolada sem recomendação, altura + peso com `Seu tamanho é M`, etapa 2 liberada, 5 silhuetas femininas, etapa 3 liberada, resultado final com confete e perfil salvo em `pv_shopper_profile_v2_table_3`.
+
+## 2026-05-24 - Sprint 69 Hierarquia visual e silhuetas do widget
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
+- Copiadas as imagens de formato corporal do v1 para `backend/public/widget/v1/assets/body-shapes/`.
+- Widget v2 passou a usar as imagens do v1 como máscaras CSS, recebendo a cor do tema configurado pela loja.
+- Cabeçalho do drawer passou a usar fundo em gradiente com as cores de personalização do widget.
+- Botões `Aumentar precisão` e `Finalizar e ver resultado` passaram a usar a hierarquia visual de CTA principal.
+- Botão fixo do rodapé ficou discreto durante as etapas intermediárias e só mantém destaque forte quando o consumidor chega ao resultado com 100% de precisão.
+- Feedback final ganhou texto explicando a escala de nota: `1 = não ajudou, 5 = perfeita`.
+- Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, Playwright mockado em `.tmp/sprint69-widget-visual-check.mjs`, `php artisan test`, `npm run build` e `git diff --check`.
+- Observação local: `npm run build` concluiu com sucesso, mas o Vite avisou que recomenda Node `20.19+`; a máquina local está em Node `20.18.1`.

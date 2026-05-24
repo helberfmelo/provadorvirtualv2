@@ -29,6 +29,10 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('v2_sprint_68', $scriptContents);
         $this->assertStringContainsString('triggerCelebration', $scriptContents);
         $this->assertStringContainsString('data-pv-send-feedback', $scriptContents);
+        $this->assertStringContainsString('assetBaseUrl', $scriptContents);
+        $this->assertStringContainsString('pv-main-button-subtle', $scriptContents);
+        $this->assertStringContainsString('Nota da recomenda&ccedil;&atilde;o', $scriptContents);
+        $this->assertStringContainsString('pv-shape-image', $scriptContents);
         $this->assertStringContainsString("basePath + '/public/api/v1'", $scriptContents);
         $this->assertStringContainsString('diagnostics', $scriptContents);
         $this->assertStringContainsString('.pv-trigger', $cssContents);
@@ -37,5 +41,22 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('.pv-recommendation-inline', $cssContents);
         $this->assertStringContainsString('.pv-stepper button', $cssContents);
         $this->assertStringContainsString('.pv-debug', $cssContents);
+        $this->assertStringContainsString('.pv-shape-image', $cssContents);
+        $this->assertStringContainsString('-webkit-mask', $cssContents);
+        $this->assertStringContainsString('.pv-main-button-subtle', $cssContents);
+
+        foreach ([
+            'retangular.png',
+            'triangulo.png',
+            'triangulo_invertido.png',
+            'oval.png',
+            'ampulheta.png',
+            'masc_retangular.png',
+            'masc_triangulo.png',
+            'masc_tri_invertido.png',
+            'masc_oval.png',
+        ] as $asset) {
+            $this->assertFileExists(public_path('widget/v1/assets/body-shapes/'.$asset));
+        }
     }
 }

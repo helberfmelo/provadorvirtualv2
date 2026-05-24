@@ -138,6 +138,8 @@ O widget expõe `window.ProvadorVirtual.reload(...)` para lojas que alteram tama
 
 O widget também expõe `window.ProvadorVirtual.diagnostics()` para depuração controlada. Em modo debug, falhas de carregamento emitem `provadorvirtual:config` com `api_base`, `request_url`, `error_name`, `error_message`, `http_status` e trecho do `response_body`, quando disponível.
 
+O drawer do widget usa as cores configuradas no tema da loja para cabeçalho, CTAs e barra de precisão. Desde a Sprint 69, as silhuetas de formato corporal são assets públicos herdados do v1 em `/widget/v1/assets/body-shapes/` e renderizados como máscara CSS, para manter a forma original e aplicar a tonalidade do widget configurada no portal.
+
 ## Guias por plataforma
 
 ### BigShop

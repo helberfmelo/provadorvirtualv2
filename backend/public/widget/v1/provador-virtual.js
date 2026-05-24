@@ -81,6 +81,7 @@
     return {
       apiBase: apiBase.replace(/\/$/, ''),
       cssUrl: scriptEl.dataset.cssUrl || src.origin + basePath + '/widget/v1/provador-virtual.css',
+      assetBaseUrl: (scriptEl.dataset.assetBaseUrl || src.origin + basePath + '/widget/v1/assets/body-shapes').replace(/\/$/, ''),
       merchantId: valueFor(scriptEl, 'merchantId', 'lojistaId'),
       storeId: valueFor(scriptEl, 'storeId'),
       productId: valueFor(scriptEl, 'productId'),
@@ -383,7 +384,7 @@
       '<h2 id="pv-title">Descubra seu tamanho</h2>',
       '<p>Uma jornada r&aacute;pida para melhorar a precis&atilde;o da recomenda&ccedil;&atilde;o.</p>',
       '</div>',
-      '<button class="pv-close" type="button" data-pv-close title="Fechar">x</button>',
+      '<button class="pv-close" type="button" data-pv-close aria-label="Fechar">x</button>',
       '</header>',
       '<div class="pv-drawer-body" data-pv-content></div>',
       '<footer class="pv-drawer-footer" data-pv-footer></footer>',
@@ -453,7 +454,7 @@
       '</div>',
       '<label class="pv-consent"><input type="checkbox" data-pv-input="consent"' + (state.form.consent === false ? '' : ' checked') + ' />Salvar minhas medidas neste navegador para pr&oacute;ximas recomenda&ccedil;&otilde;es.</label>',
       '<div class="pv-step-actions">',
-      '<div><p class="pv-action-hint">Quer uma recomenda&ccedil;&atilde;o ainda mais precisa?</p><button type="button" class="pv-button pv-button-secondary" data-pv-next' + disabled + '>Aumentar precis&atilde;o</button></div>',
+      '<div><p class="pv-action-hint">Quer uma recomenda&ccedil;&atilde;o ainda mais precisa?</p><button type="button" class="pv-button pv-action-button" data-pv-next' + disabled + '>Aumentar precis&atilde;o</button></div>',
       '</div>',
       '</section>',
     ].join('');
@@ -475,7 +476,7 @@
       '</div>',
       '<label class="pv-field pv-field-full">Caimento desejado<select data-pv-input="fit_preference">' + fitOptions(state.form.fit_preference || 'regular') + '</select></label>',
       '<div class="pv-step-actions">',
-      '<button type="button" class="pv-button pv-button-secondary" data-pv-next' + disabled + '>Aumentar precis&atilde;o</button>',
+      '<button type="button" class="pv-button pv-action-button" data-pv-next' + disabled + '>Aumentar precis&atilde;o</button>',
       '</div>',
       '</section>',
     ].join('');
@@ -497,7 +498,7 @@
       '</div>',
       '<div class="pv-detail-note">Dica: use uma fita m&eacute;trica sem apertar o corpo. Se estiver em d&uacute;vida, mantenha a recomenda&ccedil;&atilde;o parcial do rodap&eacute; e complete depois.</div>',
       '<div class="pv-step-actions">',
-      '<button type="button" class="pv-button pv-button-secondary" data-pv-final' + (hasAllDetailedMeasures() ? '' : ' disabled') + '>Finalizar e ver resultado</button>',
+      '<button type="button" class="pv-button pv-action-button" data-pv-final' + (hasAllDetailedMeasures() ? '' : ' disabled') + '>Finalizar e ver resultado</button>',
       '</div>',
       '</section>',
     ].join('');
@@ -572,10 +573,12 @@
       choiceButton(true, 'Sim, ajudou'),
       choiceButton(false, 'N&atilde;o ajudou'),
       '</div>',
+      '<div class="pv-rating-label"><strong>Nota da recomenda&ccedil;&atilde;o</strong><small>1 = n&atilde;o ajudou, 5 = perfeita</small></div>',
       '<div class="pv-rating-row" aria-label="Nota da recomendacao">',
       [1, 2, 3, 4, 5].map(function (rating) {
         var active = Number(state.feedback.rating) === rating ? ' active' : '';
-        return '<button type="button" class="pv-rating' + active + '" data-pv-rating="' + rating + '">' + rating + '</button>';
+        var aria = rating === 1 ? '1, n&atilde;o ajudou' : rating === 5 ? '5, perfeita' : String(rating);
+        return '<button type="button" class="pv-rating' + active + '" data-pv-rating="' + rating + '" aria-label="' + aria + '">' + rating + '</button>';
       }).join(''),
       '</div>',
       '<label class="pv-field pv-field-full">Tamanho escolhido<select data-pv-feedback-size>' + sizeOptions(data.recommended_size) + '</select></label>',
@@ -696,24 +699,25 @@
     var isMale = state.form.gender === 'male';
     var options = isMale
       ? [
-        ['straight', 'Retangular', 'Ombros, cintura e quadril parecidos.'],
-        ['triangle', 'Tri&acirc;ngulo', 'Quadril proporcionalmente maior.'],
-        ['inverted_triangle', 'Tri&acirc;ngulo invertido', 'Ombros ou t&oacute;rax maiores.'],
-        ['oval', 'Oval', 'Regi&atilde;o central mais arredondada.'],
+        ['straight', 'Retangular', 'Ombros, cintura e quadril parecidos.', 'masc_retangular.png'],
+        ['triangle', 'Tri&acirc;ngulo', 'Quadril proporcionalmente maior.', 'masc_triangulo.png'],
+        ['inverted_triangle', 'Tri&acirc;ngulo invertido', 'Ombros ou t&oacute;rax maiores.', 'masc_tri_invertido.png'],
+        ['oval', 'Oval', 'Regi&atilde;o central mais arredondada.', 'masc_oval.png'],
       ]
       : [
-        ['straight', 'Retangular', 'Ombros, cintura e quadril parecidos.'],
-        ['triangle', 'Tri&acirc;ngulo', 'Quadril maior que ombros.'],
-        ['inverted_triangle', 'Tri&acirc;ngulo invertido', 'Ombros ou t&oacute;rax maiores.'],
-        ['oval', 'Oval', 'Regi&atilde;o central mais arredondada.'],
-        ['hourglass', 'Ampulheta', 'Cintura mais marcada.'],
+        ['straight', 'Retangular', 'Ombros, cintura e quadril parecidos.', 'retangular.png'],
+        ['triangle', 'Tri&acirc;ngulo', 'Quadril maior que ombros.', 'triangulo.png'],
+        ['inverted_triangle', 'Tri&acirc;ngulo invertido', 'Ombros ou t&oacute;rax maiores.', 'triangulo_invertido.png'],
+        ['oval', 'Oval', 'Regi&atilde;o central mais arredondada.', 'oval.png'],
+        ['hourglass', 'Ampulheta', 'Cintura mais marcada.', 'ampulheta.png'],
       ];
 
     return options.map(function (option) {
       var active = state.form.body_shape === option[0] ? ' active' : '';
+      var image = config.assetBaseUrl + '/' + option[3];
       return [
         '<button type="button" class="pv-shape-card pv-shape-card-' + (isMale ? 'male' : 'female') + active + '" data-pv-shape="' + option[0] + '" aria-pressed="' + (active ? 'true' : 'false') + '">',
-        '<span class="pv-shape-figure pv-shape-' + option[0] + ' pv-shape-' + (isMale ? 'male' : 'female') + '"></span>',
+        '<span class="pv-shape-image" style="--pv-shape-image:url(' + escapeHtml(image) + ')" aria-hidden="true"></span>',
         '<strong>' + option[1] + '</strong>',
         '<small>' + option[2] + '</small>',
         '</button>',
@@ -744,7 +748,7 @@
 
     footer.innerHTML = [
       precisionHtml(state.precision),
-      '<button type="button" class="pv-button pv-main-button" data-pv-footer-action' + (disabled ? ' disabled' : '') + '>' + label + '</button>',
+      '<button type="button" class="' + footerButtonClass() + '" data-pv-footer-action' + (disabled ? ' disabled' : '') + '>' + label + '</button>',
       attributionHtml(),
     ].join('');
 
@@ -799,6 +803,11 @@
     }
 
     return 'Seu tamanho &eacute; ' + escapeHtml(state.recommendation.recommended_size || '-');
+  }
+
+  function footerButtonClass() {
+    var isFinalMax = state.step === 4 && state.precision >= 100 && state.recommendation && state.recommendation.recommended_size;
+    return 'pv-button pv-main-button' + (isFinalMax ? '' : ' pv-main-button-subtle');
   }
 
   function handleFooterAction(backdrop) {
