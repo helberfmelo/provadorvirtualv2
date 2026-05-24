@@ -162,6 +162,7 @@ Atualizado em: 2026-05-24
 - Sprint 69 enviada ao GitHub no commit `a53613a`; o run `26368265436` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin, smoke público, verificação dos assets públicos de silhueta e endpoint público de recomendação.
 - Sprint 70 enviada ao GitHub no commit `d5d4e69`; o run `26370389245` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin, smoke público, assets oficiais de marca e validação Playwright pós-deploy do produto teste sem tamanho padrão.
 - Sprint 71 enviada ao GitHub no commit `d17d412`; o run `26370907476` finalizou com sucesso, substituindo as três imagens oficiais de marca por novas versões: ícone `312x312`, favicon `312x312` e logo `3054x261`.
+- Sprint 72 enviada ao GitHub no commit `4204bf1`; o run `26371467799` finalizou com sucesso, alinhando o cabeçalho do widget ao mesmo gradiente dos botões e da barra de precisão.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -200,7 +201,7 @@ Atualizado em: 2026-05-24
 - APIs de usuários/permissões: `/api/v1/merchant/users` e `/api/v1/saas/users`.
 - Loja teste pública: `/produto-teste` e `/produto-teste/:slug`, usando a identidade oficial do Provador Virtual e carregando produtos sem tamanho selecionado por padrão.
 - Widget público: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
-- O widget público v2 mantém os botões `PV Descubra seu tamanho` e `cm Tabela de Medidas`, mas o fluxo de recomendação agora segue a ordem do v1: medidas básicas, gênero/formato corporal, medidas detalhadas, resultado e feedback. Mesmo com perfil salvo no navegador, a etapa 1 deve limitar a precisão aos campos básicos e nunca pular direto para o resultado; quando houver altura + peso, o rodapé já pode exibir recomendação parcial e incentivar o aumento de precisão.
+- O widget público v2 mantém os botões `PV Descubra seu tamanho` e `cm Tabela de Medidas`, mas o fluxo de recomendação agora segue a ordem do v1: medidas básicas, gênero/formato corporal, medidas detalhadas, resultado e feedback. Mesmo com perfil salvo no navegador, a etapa 1 deve limitar a precisão aos campos básicos e nunca pular direto para o resultado; quando houver altura + peso, o rodapé já pode exibir recomendação parcial e incentivar o aumento de precisão. O cabeçalho do drawer usa o mesmo gradiente dos botões e da barra de precisão, respeitando a cor de destaque configurada no tema da loja.
 - Assets oficiais de marca ficam em `frontend/public/images/brand/` e alimentam o cabeçalho, rodapé, favicon e tags OG/Twitter.
 
 ## Próxima ação recomendada

@@ -958,4 +958,4 @@ Entregas:
 - preservar o fluxo, textos e hierarquia do widget, sem alterar JavaScript nem contratos públicos;
 - validar o asset público do widget, builds do frontend/backend e checagem de diff.
 
-Status: implementação local validada; commit, push, deploy e validação de produção serão registrados após o GitHub Actions finalizar.
+Status: implementado no commit `4204bf1` e publicado com sucesso no run `26371467799`, com deploy remoto, deploy da raiz pública, master admin, smoke público, `validate-production.ps1` e verificação do CSS público com cache bust confirmando o novo gradiente do cabeçalho.
