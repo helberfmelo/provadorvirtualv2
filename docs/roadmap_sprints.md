@@ -945,4 +945,4 @@ Entregas:
 - atualizar dimensões OG do logo para `3054x261`;
 - validar build, assets públicos e smoke de produção após deploy.
 
-Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.
+Status: implementado no commit `d17d412` e publicado com sucesso no run `26370907476`, com deploy remoto, deploy da raiz pública, master admin, smoke público, assets de marca públicos, tags OG atualizadas e `validate-production.ps1`.

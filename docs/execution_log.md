@@ -662,4 +662,7 @@
 - Dimensões atuais confirmadas: ícone `312x312`, favicon `312x312` e logo `3054x261`.
 - Tags OG atualizadas para refletir as dimensões reais do novo logo.
 - Validações locais: `npm run build` e `git diff --check`.
-- Verificação remota será registrada após commit, push e conclusão do GitHub Actions/deploy.
+- Commit `d17d412` enviado para `main`; o run `26370907476` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou `200` e `Content-Length` atualizado para os três assets públicos: logo `530990`, ícone `31679` e favicon `31682`.
+- Pós-deploy confirmou tags OG em produção apontando para `logo_provador_virtual.png` com `og:image:width=3054` e `og:image:height=261`.
+- `scripts/validate-production.ps1` passou completo após o deploy.
