@@ -31,6 +31,7 @@ Atualizado em: 2026-05-23
 - `DONE` Importacao CSV de produtos.
 - `DONE` Importacao CSV de tabelas.
 - `DONE` Parser inicial Google XML.
+- `DONE` Sincronização automática de XML/feed por cron 4 vezes ao dia.
 - `DONE` Analytics.
 - `DONE` SaaS admin básico.
 - `DONE` Código de acesso da empresa no formato `aaaa + id`.

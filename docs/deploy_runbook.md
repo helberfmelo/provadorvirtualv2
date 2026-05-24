@@ -147,7 +147,7 @@ Critério obrigatório:
 
 ## Cron no cPanel
 
-Cron principal recomendado: executar o scheduler do Laravel a cada minuto. Ele já dispara o monitor de pagamentos a cada 5 minutos, o dispatcher de e-mails transacionais a cada 10 minutos e as rotinas de privacidade nos horarios programados.
+Cron principal recomendado: executar o scheduler do Laravel a cada minuto. Ele já dispara o monitor de pagamentos a cada 5 minutos, o dispatcher de e-mails transacionais a cada 10 minutos, a sincronização de XML/feed de integrações 4 vezes por dia e as rotinas de privacidade nos horários programados.
 
 Tempo:
 
@@ -171,6 +171,22 @@ Se o cPanel não aceitar scheduler a cada minuto, cadastrar temporariamente o mo
 cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:payments-sync --limit=50 >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-payments-sync.log 2>&1
 ```
 
+Sincronização automática de XML/feed pelo scheduler Laravel:
+
+- horários: `00:00`, `06:00`, `12:00` e `18:00` em `America/Sao_Paulo`;
+- comando agendado internamente: `php artisan pv:integrations-sync-feeds --limit=50`;
+- critério: integrações com `feed_url` salvo e status diferente de `draft`/`disabled`.
+
+Se o cPanel não puder rodar o scheduler principal, cadastrar o cron direto dos feeds 4 vezes ao dia. Ajuste os horários caso o timezone do cPanel não esteja em `America/Sao_Paulo`:
+
+```cron
+0 0,6,12,18 * * *
+```
+
+```bash
+cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:integrations-sync-feeds --limit=50 >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-integrations-sync.log 2>&1
+```
+
 Validação manual do monitor:
 
 ```bash
@@ -181,6 +197,18 @@ Validação manual dos e-mails transacionais:
 
 ```bash
 cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:emails-dispatch --limit=10
+```
+
+Validação manual das integrações XML/feed:
+
+```bash
+cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:integrations-sync-feeds --limit=10
+```
+
+Prévia sem processar:
+
+```bash
+cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan pv:integrations-sync-feeds --limit=10 --dry-run
 ```
 
 Se `/usr/local/bin/php` não existir no HostGator, trocar pelo path exibido no cPanel ou por `php`.

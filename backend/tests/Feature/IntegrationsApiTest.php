@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\IntegrationEvent;
 use App\Models\MerchantCompany;
 use App\Models\Product;
 use App\Models\ProductVariant;
@@ -131,6 +132,69 @@ XML, 200),
         $variant = ProductVariant::query()->where('external_variant_id', 'VAR-1')->firstOrFail();
 
         $this->assertSame($product->id, $variant->product_id);
+    }
+
+    public function test_xml_feed_sync_command_processes_configured_connections(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $feedUrl = 'https://store.example/scheduled-feed.xml';
+
+        Http::fake([
+            $feedUrl => Http::response(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+  <channel>
+    <item>
+      <g:id>VAR-CRON-1</g:id>
+      <g:item_group_id>GROUP-CRON-1</g:item_group_id>
+      <title>Vestido Cron Azul</title>
+      <g:product_type>Full Body</g:product_type>
+      <link>https://store.example/vestido-cron-azul</link>
+      <g:gender>female</g:gender>
+      <g:color>Azul</g:color>
+      <g:size>G</g:size>
+      <g:availability>in stock</g:availability>
+    </item>
+  </channel>
+</rss>
+XML, 200),
+        ]);
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/integrations/custom', [
+                'feed_url' => $feedUrl,
+            ])
+            ->assertOk();
+
+        $this->artisan('pv:integrations-sync-feeds', ['--limit' => 10])
+            ->assertExitCode(0);
+
+        $this->assertDatabaseHas('platform_connections', [
+            'platform' => 'custom',
+            'feed_url' => $feedUrl,
+            'status' => 'connected',
+        ]);
+        $this->assertDatabaseHas('products', [
+            'external_product_id' => 'GROUP-CRON-1',
+            'sku' => 'GROUP-CRON-1',
+            'name' => 'Vestido Cron Azul',
+        ]);
+        $this->assertDatabaseHas('product_variants', [
+            'external_variant_id' => 'VAR-CRON-1',
+            'size_label' => 'G',
+            'color' => 'Azul',
+            'is_active' => true,
+        ]);
+
+        $event = IntegrationEvent::query()
+            ->where('platform', 'custom')
+            ->where('event_type', 'xml_feed_sync')
+            ->latest('id')
+            ->firstOrFail();
+
+        $this->assertSame('success', $event->status);
+        $this->assertSame('scheduled', $event->summary['trigger'] ?? null);
     }
 
     public function test_merchant_can_validate_widget_installation_on_product_page(): void

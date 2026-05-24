@@ -225,6 +225,7 @@ Chaves comuns:
 - Empresa nasce como `pending_payment` e e ativada por retorno imediato pago ou webhook.
 - O comando `php artisan pv:payments-sync --limit=50` consulta pedidos pendentes na Pagar.me e ativa empresas pagas quando webhook falhar ou atrasar.
 - O scheduler executa o monitor de pagamentos a cada 5 minutos.
+- O comando `php artisan pv:integrations-sync-feeds --limit=50` sincroniza XML/feed de integrações configuradas 4 vezes por dia pelo scheduler.
 
 ## E-mails transacionais
 

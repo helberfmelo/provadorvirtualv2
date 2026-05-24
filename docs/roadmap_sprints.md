@@ -680,6 +680,8 @@ Entregas previstas:
 - documentar o cron completo para cPanel e comando manual de validação;
 - atualizar go-live/operacional com a rotina de integração.
 
+Status: implementado e testado localmente com `php artisan test --filter=IntegrationsApiTest`, `php artisan list pv`, `php artisan schedule:list` e `git diff --check`. O comando `pv:integrations-sync-feeds` roda pelo scheduler às `00:00`, `06:00`, `12:00` e `18:00` em `America/Sao_Paulo`.
+
 ### Sprint 54 - Guia detalhado de instalação do widget
 
 Objetivo: deixar claro no portal e na documentação onde o script/container do widget deve ser instalado na loja ou site.

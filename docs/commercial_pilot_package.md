@@ -51,6 +51,7 @@ Comandos manuais uteis:
 ```bash
 php artisan pv:payments-sync --limit=50
 php artisan pv:emails-dispatch --limit=50
+php artisan pv:integrations-sync-feeds --limit=50
 php artisan pv:privacy-anonymize
 ```
 

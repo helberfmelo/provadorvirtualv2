@@ -377,7 +377,17 @@
 - Corrigido o shell operacional para recriar a tela atual quando `activeCompany.id` muda.
 - A troca pelo seletor de empresa no portal agora remonta a `RouterView` do portal da empresa.
 - Com isso, painel e CRUDs executam novamente seus carregamentos de dados no novo contexto.
-- Validações locais: `npm run build` e `git diff --check`.
+- Validações locais: `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=BigShopIntegrationTest` e `git diff --check`.
+
+## 2026-05-24 - Sprint 53 Sincronização automática de integrações
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
+- Criado `XmlFeedSyncService` para reutilizar a mesma lógica de sync XML/feed no endpoint manual e no cron.
+- Criado comando `php artisan pv:integrations-sync-feeds --limit=50`, com filtros opcionais por plataforma e empresa, além de `--dry-run`.
+- Scheduler configurado para rodar o comando às `00:00`, `06:00`, `12:00` e `18:00` em `America/Sao_Paulo`.
+- Sync automático registra `integration_events` com `summary.trigger=scheduled` e atualiza `last_sync_at`, `status` e `last_error` da conexão.
+- Runbook do cPanel documentado com cron principal via `schedule:run` e fallback direto para feeds.
+- Validações locais: `php artisan test --filter=IntegrationsApiTest`, `php artisan list pv`, `php artisan schedule:list` e `git diff --check`.
 - Run `26344923662` do GitHub Actions finalizou com sucesso e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
 
 ## 2026-05-23 - Sprint 47 Integrações BigShop e XML

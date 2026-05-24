@@ -361,6 +361,7 @@ class GoLiveReadinessController extends Controller
                 'cron' => 'cd /home1/opents62/provadorvirtual.online/provadorvirtual_v2 && /usr/local/bin/php artisan schedule:run >> /home1/opents62/provadorvirtual.online/provadorvirtual_v2/storage/logs/cron-schedule.log 2>&1',
                 'payments' => 'php artisan pv:payments-sync --limit=50',
                 'emails' => 'php artisan pv:emails-dispatch --limit=50',
+                'feeds' => 'php artisan pv:integrations-sync-feeds --limit=50',
                 'privacy' => 'php artisan pv:privacy-anonymize',
                 'validation' => '.\\scripts\\validate-production.ps1',
             ],

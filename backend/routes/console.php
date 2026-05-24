@@ -5,12 +5,14 @@ use App\Models\AuditLog;
 use App\Models\IntegrationEvent;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
+use App\Models\PlatformConnection;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
 use App\Models\ShopperProfile;
 use App\Models\User;
+use App\Services\Integrations\XmlFeedSyncService;
 use App\Services\PagarMeCheckoutService;
 use App\Services\TransactionalEmailService;
 use App\Support\PermissionCatalog;
@@ -268,6 +270,61 @@ Artisan::command('pv:emails-dispatch {--limit=50 : Quantidade maxima de checkout
     return ((int) $summary['failed']) > 0 ? 2 : 0;
 })->purpose('Dispara e-mails transacionais de pagamento pendente, confirmado e recusado.');
 
+Artisan::command('pv:integrations-sync-feeds {--limit=50 : Quantidade maxima de feeds por execucao} {--platform= : Filtrar por plataforma} {--company= : Filtrar por ID da empresa} {--dry-run}', function (): int {
+    $limit = max(1, min(200, (int) ($this->option('limit') ?: 50)));
+    $platform = trim((string) $this->option('platform'));
+    $companyId = (int) ($this->option('company') ?: 0);
+    $dryRun = (bool) $this->option('dry-run');
+
+    $query = PlatformConnection::query()
+        ->with(['merchant', 'company'])
+        ->whereNotNull('feed_url')
+        ->where('feed_url', '<>', '')
+        ->whereNotIn('status', ['draft', 'disabled'])
+        ->orderBy('id')
+        ->limit($limit);
+
+    if ($platform !== '') {
+        $query->where('platform', $platform);
+    }
+
+    if ($companyId > 0) {
+        $query->where('merchant_company_id', $companyId);
+    }
+
+    $connections = $query->get();
+    $summary = [
+        'dry_run' => $dryRun,
+        'checked' => $connections->count(),
+        'success' => 0,
+        'warning' => 0,
+        'failed' => 0,
+        'items' => [],
+    ];
+
+    if (! $dryRun) {
+        $sync = app(XmlFeedSyncService::class);
+
+        foreach ($connections as $connection) {
+            $result = $sync->sync($connection, $connection->company, 'scheduled');
+            $status = $result['status'];
+            $summary[$status === 'success' ? 'success' : ($status === 'warning' ? 'warning' : 'failed')]++;
+            $summary['items'][] = [
+                'connection_id' => $connection->id,
+                'platform' => $connection->platform,
+                'merchant_company_id' => $connection->merchant_company_id,
+                'status' => $status,
+                'import_job_id' => $result['job']?->id,
+                'error' => $result['error'],
+            ];
+        }
+    }
+
+    $this->line(json_encode($summary, JSON_PRETTY_PRINT));
+
+    return ((int) $summary['failed']) > 0 ? 2 : 0;
+})->purpose('Sincroniza automaticamente catálogos XML/feed das integrações configuradas.');
+
 Artisan::command('pv:privacy-prune {--days= : Dias de retencao de logs operacionais} {--dry-run}', function (): int {
     $days = (int) ($this->option('days') ?: config('privacy.operational_log_retention_days', 180));
     $cutoff = now()->subDays(max(30, $days));
@@ -298,5 +355,6 @@ Artisan::command('pv:privacy-prune {--days= : Dias de retencao de logs operacion
 
 Schedule::command('pv:payments-sync --limit=50')->everyFiveMinutes()->withoutOverlapping();
 Schedule::command('pv:emails-dispatch --limit=50')->everyTenMinutes()->withoutOverlapping();
+Schedule::command('pv:integrations-sync-feeds --limit=50')->cron('0 0,6,12,18 * * *')->timezone('America/Sao_Paulo')->withoutOverlapping();
 Schedule::command('pv:privacy-anonymize')->dailyAt('03:17')->withoutOverlapping();
 Schedule::command('pv:privacy-prune')->weeklyOn(0, '03:37')->withoutOverlapping();

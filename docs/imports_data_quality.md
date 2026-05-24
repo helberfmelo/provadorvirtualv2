@@ -15,6 +15,7 @@ Rotas protegidas por Sanctum:
 - `POST /api/v1/imports/preview`
 - `POST /api/v1/imports`
 - `POST /api/v1/integrations/{platform}/sync-xml`, busca `feed_url` salvo na integração e cria um import job de produtos
+- `php artisan pv:integrations-sync-feeds --limit=50`, sincroniza automaticamente integrações com `feed_url` salvo
 
 Payload base:
 
@@ -112,3 +113,17 @@ Cada commit cria `import_jobs` com:
 - erros por linha.
 
 `integration_events` foi criado como trilha para sync/webhook das próximas sprints.
+
+## Sincronização automática
+
+Sprint 53 adicionou o comando `php artisan pv:integrations-sync-feeds --limit=50`.
+
+Regras:
+
+- busca conexões com `feed_url` preenchido;
+- ignora integrações `draft` e `disabled`;
+- processa até o limite informado;
+- registra `integration_events` com `event_type=xml_feed_sync` e `summary.trigger=scheduled`;
+- atualiza `last_sync_at`, `status` e `last_error` da conexão.
+
+O scheduler Laravel roda o comando 4 vezes por dia, às `00:00`, `06:00`, `12:00` e `18:00` em `America/Sao_Paulo`.

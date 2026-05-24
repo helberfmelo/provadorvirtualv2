@@ -7,13 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdatePlatformConnectionRequest;
 use App\Http\Resources\ImportJobResource;
 use App\Http\Resources\PlatformConnectionResource;
+use App\Models\ImportJob;
 use App\Models\IntegrationEvent;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Models\WidgetInstall;
 use App\Services\Audit\AuditLogger;
-use App\Services\Imports\ImportService;
+use App\Services\Integrations\XmlFeedSyncService;
 use App\Support\ActiveTenant;
 use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
@@ -22,7 +23,6 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Throwable;
 
 class IntegrationController extends Controller
 {
@@ -111,7 +111,7 @@ class IntegrationController extends Controller
             ->setStatusCode(200);
     }
 
-    public function syncXml(Request $request, string $platform, ImportService $imports)
+    public function syncXml(Request $request, string $platform, XmlFeedSyncService $xmlFeeds)
     {
         if (! PlatformCatalog::find($platform)) {
             throw new NotFoundHttpException('Integração não encontrada.');
@@ -134,86 +134,25 @@ class IntegrationController extends Controller
             ]);
         }
 
-        $feedUrl = $this->publicUrl($connection->feed_url, 'feed_url', 'Informe a URL pública do XML/feed antes de sincronizar.');
-        $host = (string) parse_url($feedUrl, PHP_URL_HOST);
-        $httpStatus = null;
-        $job = null;
-        $error = null;
-        $status = 'failed';
-
-        try {
-            $response = Http::timeout(30)->retry(1, 200)->get($feedUrl);
-            $httpStatus = $response->status();
-
-            if (! $response->successful()) {
-                throw new \RuntimeException('O XML/feed respondeu HTTP '.$httpStatus.'.');
-            }
-
-            $job = $imports->commit($merchant, $connection->merchant_company_id
-                ? $this->merchantCompany($merchant, $connection->merchant_company_id)
-                : $company, [
-                    'type' => 'products',
-                    'source_format' => $connection->feed_format ?: 'google_xml',
-                    'filename' => $feedUrl,
-                    'content' => (string) $response->body(),
-                ]);
-
-            $status = in_array($job->status, ['completed', 'completed_with_warnings'], true)
-                ? ($job->status === 'completed' ? 'success' : 'warning')
-                : 'failed';
-
-            $connection->update([
-                'status' => $status === 'failed' ? 'error' : 'connected',
-                'last_sync_at' => now(),
-                'last_error' => $status === 'failed' ? 'Importacao XML finalizada com erro.' : null,
-            ]);
-
-            if ($status === 'failed') {
-                $error = data_get($job->errors, '0.errors.0') ?: 'Importacao XML finalizada com erro.';
-            }
-        } catch (Throwable $exception) {
-            $error = $exception->getMessage();
-            $connection->update([
-                'status' => 'error',
-                'last_error' => $error,
-            ]);
-        }
-
-        IntegrationEvent::query()->create([
-            'merchant_id' => $merchant->id,
-            'merchant_company_id' => $connection->merchant_company_id ?: $company?->id,
-            'platform_connection_id' => $connection->id,
-            'platform' => $platform,
-            'event_type' => 'xml_feed_sync',
-            'direction' => 'outbound',
-            'status' => $status,
-            'summary' => [
-                'feed_host' => $host,
-                'feed_url' => $feedUrl,
-                'http_status' => $httpStatus,
-                'import_job_id' => $job?->id,
-                'import_status' => $job?->status,
-                'total_rows' => $job?->total_rows,
-                'imported_rows' => $job?->imported_rows,
-                'failed_rows' => $job?->failed_rows,
-                'summary' => $job?->summary ?? [],
-            ],
-            'error' => $error,
-            'occurred_at' => now(),
-        ]);
+        $result = $xmlFeeds->sync(
+            $connection,
+            $connection->merchant_company_id ? $this->merchantCompany($merchant, $connection->merchant_company_id) : $company,
+            'manual'
+        );
+        $job = $result['job'];
 
         app(AuditLogger::class)->log($request, $merchant, 'integration.xml_synced', 'integrations', 'info', [
             'platform' => $platform,
             'merchant_company_id' => $connection->merchant_company_id ?: $company?->id,
             'module' => 'integrations',
             'action' => 'sync_xml',
-            'status' => $status,
-            'feed_host' => $host,
+            'status' => $result['status'],
+            'feed_host' => data_get($result, 'summary.feed_host'),
         ], $connection);
 
-        if ($error) {
+        if ($result['error'] || ! $job instanceof ImportJob) {
             throw ValidationException::withMessages([
-                'feed_url' => [$error],
+                'feed_url' => [$result['error'] ?: 'Não foi possível sincronizar o XML/feed.'],
             ]);
         }
 
