@@ -28,9 +28,10 @@ Toda sprint deve seguir:
 9. atualizar documentação;
 10. fazer commit;
 11. fazer push;
-12. acompanhar GitHub Actions;
-13. validar produção quando a sprint incluir deploy;
-14. registrar pendências, incidentes e próxima sprint.
+12. acompanhar GitHub Actions até concluir;
+13. conferir se o deploy remoto terminou com sucesso;
+14. validar produção quando a sprint incluir deploy;
+15. registrar pendências, incidentes e próxima sprint.
 
 ## 4. Commit e push
 
@@ -38,8 +39,9 @@ Ao final de sprint concluida:
 
 - sempre fazer commit;
 - sempre fazer push;
-- sempre acompanhar Actions;
-- se push/action falhar, registrar como bloqueio operacional.
+- sempre acompanhar Actions até status final;
+- sempre conferir se o deploy remoto passou depois do push;
+- se push, Actions ou deploy falhar, corrigir imediatamente em nova sprint numerada ou registrar bloqueio operacional explícito.
 
 ## 5. Criterio de pronto
 
@@ -50,7 +52,7 @@ Uma sprint so esta pronta quando:
 - testes/builds/smokes executados quando possível;
 - documentação atualizada;
 - commit e push realizados;
-- Actions verificado;
+- Actions/deploy remoto verificado após o push;
 - pendências registradas.
 
 ## 6. Regras permanentes

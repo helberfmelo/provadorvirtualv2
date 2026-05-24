@@ -627,3 +627,16 @@ Entregas:
 - manter botões operacionais dentro dos padrões `.btn`, `.icon-link`, `.row-actions`, `payment-tabs`, `size-picker` e previews do widget.
 
 Status: implementado e testado localmente com `npm run build` e `git diff --check`.
+
+### Sprint 50 - Correção do CI pós-acentuação e regra de conferência
+
+Objetivo: corrigir os testes que falharam no GitHub Actions após a revisão de textos e tornar obrigatória a conferência de Actions/deploy depois de cada push.
+
+Entregas:
+
+- atualizar expectativas de testes para mensagens em PT-BR com acentos;
+- documentar que push não encerra sprint sem conferir GitHub Actions;
+- documentar comandos de conferência remota no runbook de deploy;
+- registrar falhas dos runs `26346764503` e `26346828756` como incidente operacional corrigido.
+
+Status: implementado localmente; validação remota deve ser acompanhada após o push da sprint.

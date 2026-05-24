@@ -46,6 +46,7 @@ Atualizado em: 2026-05-23
 - Sprint 47 aprofundou integrações por plataforma, adicionou XML/feed por URL, tooltips nos campos de integração, pesquisa Sizebay e roadmap de conectores.
 - Sprint 48 revisou textos em PT-BR com acentos/cedilha/til e registrou a regra nas diretrizes obrigatórias dos portais.
 - Sprint 49 padronizou estados e estilos globais de inputs, selects, textareas, checkboxes e foco/disabled nos portais.
+- Sprint 50 corrigiu os testes que ainda esperavam mensagens sem acento e reforçou a regra obrigatória de conferir GitHub Actions/deploy após cada push.
 
 ## Referências confirmadas
 
@@ -129,6 +130,7 @@ Atualizado em: 2026-05-23
 - Sprint 46 publicada em produção pelo GitHub Actions no run `26344923662`.
 - Sprint 47 enviada ao GitHub no commit `6fd8f46`; validação local passou com `php artisan test --filter=IntegrationsApiTest` e `npm run build`.
 - Sprint 48 enviada ao GitHub no commit `59ced6f`; validação local passou com `npm run build`, `php artisan test --filter=IntegrationsApiTest`, `php artisan test --filter=UserAccessApiTest` e `git diff --check`.
+- Runs `26346764503` e `26346828756` falharam porque testes ainda esperavam mensagens sem acentos após a Sprint 48.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

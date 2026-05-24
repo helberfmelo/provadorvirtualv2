@@ -406,3 +406,10 @@
 - Estados de foco e desabilitado foram padronizados para evitar controles com aparência crua.
 - Checkboxes deixam de herdar largura e altura de input comum, preservando o visual compacto em permissões, widget e variações de produto.
 - Validações locais: `npm run build` e `git diff --check`.
+
+## 2026-05-23 - Sprint 50 Correção do CI pós-acentuação
+
+- GitHub Actions dos commits `59ced6f` e `bac732d` falhou nos runs `26346764503` e `26346828756`.
+- Causa: testes esperavam mensagens antigas sem acento enquanto a API passou a retornar PT-BR correto com acentos.
+- Atualizadas expectativas em `HardeningApiTest` e `PublicCheckoutFlowTest`.
+- Governança reforçada: toda sprint precisa conferir GitHub Actions/deploy remoto depois do push antes de ser considerada concluída.

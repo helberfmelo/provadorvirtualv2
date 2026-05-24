@@ -166,7 +166,7 @@ class PublicCheckoutFlowTest extends TestCase
 
         $this->postJson('/api/v1/public/checkout', $this->payload())
             ->assertUnprocessable()
-            ->assertJsonPath('message', 'E-mail e CPF ja pertencem a usuarios diferentes. Use os dados do mesmo usuario ou fale com o suporte.');
+            ->assertJsonPath('message', 'E-mail e CPF já pertencem a usuários diferentes. Use os dados do mesmo usuário ou fale com o suporte.');
     }
 
     public function test_pagarme_webhook_activates_paid_company(): void

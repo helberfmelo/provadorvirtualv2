@@ -40,7 +40,7 @@ class HardeningApiTest extends TestCase
                 'platform' => 'custom',
             ])
             ->assertForbidden()
-            ->assertJsonPath('message', 'Origem nao autorizada para este widget.');
+            ->assertJsonPath('message', 'Origem não autorizada para este widget.');
     }
 
     public function test_widget_public_api_allows_configured_origin(): void

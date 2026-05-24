@@ -129,6 +129,22 @@ Comportamento:
 - pública a landing/app frontend também na raiz do domínio, preservando `/provadorvirtual_v1/` e `/provadorvirtual_v2/`;
 - faz smoke público.
 
+## Conferência obrigatória pós-push
+
+Depois de todo push para `main`, conferir o workflow remoto antes de encerrar a sprint:
+
+```powershell
+gh run list --branch main --limit 5
+gh run watch <run-id> --exit-status
+```
+
+Critério obrigatório:
+
+- se o run passar, registrar o run/commit no log da sprint quando relevante;
+- se o run falhar, não considerar a sprint concluída;
+- corrigir a falha em sprint numerada, fazer novo commit/push e acompanhar o novo run até sucesso;
+- quando o workflow incluir deploy, também confirmar os smokes de produção executados pelo Actions ou rodar `scripts/validate-production.ps1`.
+
 ## Cron no cPanel
 
 Cron principal recomendado: executar o scheduler do Laravel a cada minuto. Ele já dispara o monitor de pagamentos a cada 5 minutos, o dispatcher de e-mails transacionais a cada 10 minutos e as rotinas de privacidade nos horarios programados.
