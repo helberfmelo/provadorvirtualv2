@@ -25,6 +25,7 @@ export const saveFeedback = reactive({
   actionTo: '',
   pending: 0,
   timer: 0,
+  dismissed: false,
 })
 
 const mutationMethods = new Set(['post', 'put', 'patch', 'delete'])
@@ -77,6 +78,7 @@ export function startSaveFeedback(config: InternalAxiosRequestConfig) {
   saveFeedback.message = 'Aguarde um instante.'
   saveFeedback.actionLabel = ''
   saveFeedback.actionTo = ''
+  saveFeedback.dismissed = false
 }
 
 export function finishSaveFeedback(config?: InternalAxiosRequestConfig) {
@@ -89,6 +91,12 @@ export function finishSaveFeedback(config?: InternalAxiosRequestConfig) {
   saveFeedback.pending = Math.max(0, saveFeedback.pending - 1)
 
   if (saveFeedback.pending > 0) {
+    return
+  }
+
+  if (saveFeedback.dismissed) {
+    saveFeedback.open = false
+    saveFeedback.dismissed = false
     return
   }
 
@@ -119,10 +127,12 @@ export function failSaveFeedback(error: AxiosError) {
   saveFeedback.message = friendlyErrorMessage(error)
   saveFeedback.actionLabel = ''
   saveFeedback.actionTo = ''
+  saveFeedback.dismissed = false
 }
 
 export function closeSaveFeedback() {
   window.clearTimeout(saveFeedback.timer)
+  saveFeedback.dismissed = saveFeedback.status === 'saving'
   saveFeedback.open = false
   saveFeedback.pending = 0
   saveFeedback.actionLabel = ''
@@ -138,6 +148,7 @@ export function showFeedback(options: FeedbackOptions) {
   saveFeedback.message = options.message
   saveFeedback.actionLabel = options.actionLabel || ''
   saveFeedback.actionTo = options.actionTo || ''
+  saveFeedback.dismissed = false
 
   if (options.status !== 'error' && options.duration !== 0) {
     saveFeedback.timer = window.setTimeout(() => {

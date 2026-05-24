@@ -492,3 +492,12 @@
 - Validações locais do Provador Virtual: `vendor\bin\pint --dirty`, `npm run build`, `git diff --check`, `php artisan test --filter=RecommendationApiTest`, `php artisan test --filter=HardeningApiTest` e `php artisan test` completo com 67 testes e 502 assertions.
 - Validações das cópias BigShop: conferência estrutural do `produto.vue`, conferência do SQL em `api-v2/funcoes.php` e `git diff --check` no painel `D:\Projetos\bigbangshop2.0`.
 - Scripts `npm run build` do diretório local `model3` da BigShop não foram executados porque o `package.json` contém comandos de publicação/pull/redis próprios do ambiente oficial, inadequados para a cópia local.
+- Run `26349330161` do GitHub Actions finalizou com sucesso para o commit `98c13a7`, incluindo deploy remoto e smoke público.
+
+## 2026-05-24 - Sprint 59 Fechamento manual dos modais
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint, incluindo `docs/credentials.local.md` com conteúdo mascarado.
+- Modal central `SaveFeedbackModal` recebeu botão `x` no canto superior direito, disponível para mensagens de salvando, sucesso, erro e informação.
+- Serviço `saveFeedback` passa a respeitar fechamento manual durante o estado de salvamento, evitando reabrir sucesso automático da mesma operação após o usuário fechar o modal.
+- Diretriz de UX dos portais atualizada para exigir fechamento manual visível nos modais de feedback.
+- Validações locais: `npm run build`, `php artisan test --filter=HealthTest` e `git diff --check`.

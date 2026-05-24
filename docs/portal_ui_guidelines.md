@@ -63,4 +63,5 @@ O portal SaaS e o portal da empresa não devem misturar menus:
 - conferir se inputs, selects, textareas e botões usam as classes globais (`admin-form`, `form`, `inline-form`, `btn`, `icon-link` ou equivalentes) para evitar controles sem CSS.
 - conferir que tooltips customizados não usam `title` nativo quando houver risco de tooltip do navegador sair da tela ou aparecer na barra inferior;
 - conferir que ações de sucesso, erro e orientação operacional aparecem em modal, não como mensagem solta no topo da página;
+- conferir que modais de feedback tenham fechamento manual visível com `x` no canto superior direito, além de qualquer fechamento automático;
 - conferir que a página inteira não cria rolagem horizontal; conteúdos largos devem rolar apenas dentro de containers próprios como `.table-wrap` ou `.guide-snippet`.

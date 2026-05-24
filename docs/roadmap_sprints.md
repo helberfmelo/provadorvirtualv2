@@ -748,4 +748,17 @@ Entregas:
 - documentar app `Provador Virtual` em `Configurações > Apps adicionais`, SQL do catálogo `bbs.apps` e campos por loja;
 - validar backend/widget e registrar que as cópias locais BigShop foram usadas para estudo/aplicação controlada, sem acionar scripts de publicação próprios da BigShop.
 
+Status: implementado no commit `98c13a7` e publicado com sucesso no run `26349330161`, com deploy remoto e smoke público concluídos.
+
+### Sprint 59 - Fechamento manual dos modais
+
+Objetivo: permitir que o usuário feche manualmente qualquer modal central de feedback sem precisar aguardar o fechamento automático.
+
+Entregas:
+
+- adicionar botão `x` no canto superior direito do `SaveFeedbackModal`;
+- manter o fechamento automático de mensagens de sucesso e informação;
+- evitar que um modal de sucesso reabra automaticamente quando o usuário fechou manualmente o estado de salvamento da mesma operação;
+- registrar a regra em `docs/portal_ui_guidelines.md`.
+
 Status: implementado e validado localmente; aguardando commit, push e verificação remota da sprint.

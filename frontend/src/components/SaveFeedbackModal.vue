@@ -29,6 +29,16 @@ const iconClass = computed(() => {
       aria-modal="true"
       aria-labelledby="save-modal-title"
     >
+      <button
+        class="save-modal-close"
+        type="button"
+        aria-label="Fechar modal"
+        title="Fechar"
+        @click="closeSaveFeedback"
+      >
+        <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+      </button>
+
       <span class="save-modal-icon">
         <i :class="iconClass" aria-hidden="true"></i>
       </span>
