@@ -774,3 +774,17 @@
 - Validações locais: `npm run build`, `git diff --check` e Playwright mobile em `/`, `/produto-teste`, `/produto-teste/camiseta-essencial-marinho`, `/privacidade`, `/termos` e `/app/widget`.
 - Commit `feb76e2` enviado para `main`; o run `26382678616` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Playwright pós-deploy confirmou ausência de `widget` visível nas páginas públicas testadas, presença de `provador`, ausência de overflow horizontal e seção `/app/widget` com `Widget i`, tooltip e `Instalação do provador`.
+
+## 2026-05-25 - Sprint 81 UX mobile premium do portal
+
+- Releitura de `docs/README.md`, `docs/development_guidelines.md`, `docs/portal_ui_guidelines.md` e `docs/sprint_governance.md` confirmada antes de iniciar a sprint; `credentials.local.md` não foi aberto porque a alteração não exigiu segredo operacional.
+- Corrigida a sobreposição do header mobile autenticado: `Portal da empresa` agora fica realmente oculto no viewport mobile e o botão de sair saiu do topo.
+- Drawer autenticado recebeu botão próprio de fechar, usuário e ação `Sair`; o toggle do header fica invisível enquanto qualquer drawer está aberto.
+- Drawer público recebeu botão próprio de fechar e o logout passou a mostrar texto `Sair` no mobile.
+- Menu do portal passou de `Widget` para `Provador`, preservando a seção `/app/widget` com o termo técnico `Widget` e o ícone informativo.
+- Topo da tela `/app/widget` foi simplificado para `Instalação e visual`, com texto auxiliar curto e menos redundante.
+- Textos de topo de produtos, tabelas, usuários, go-live, SaaS e e-mails foram reescritos para evitar `Listagem...` repetindo o H1.
+- Tipografia, largura do workspace, botões de topo e heading do sistema foram compactados para mobile.
+- Validações locais: `npm run build`, `git diff --check` e auditoria Playwright mobile em 360px e 390px cobrindo 36 checagens entre rotas públicas, rotas autenticadas e drawers.
+- Commit `b82316b` enviado para `main`; o run `26383644699` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Playwright pós-deploy em produção confirmou login demo, ausência de overflow/sobreposição em `/`, `/produto-teste`, `/produto-teste/:slug`, `/app`, `/app/widget`, `/app/produtos` e um único botão de fechar nos drawers público e autenticado.

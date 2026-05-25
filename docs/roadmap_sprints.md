@@ -1073,3 +1073,19 @@ Entregas:
 - validar em mobile que as páginas públicas não exibem mais a palavra `widget`, não têm overflow horizontal e que o painel mostra o ícone e a explicação.
 
 Status: implementado no commit `feb76e2` e publicado com sucesso no run `26382678616`, com build local, checagem de diff, Playwright mobile local e smoke Playwright em produção.
+
+### Sprint 81 - UX mobile premium do portal
+
+Objetivo: corrigir sobreposição no header mobile, reduzir redundância nos textos de topo e deixar a navegação do sistema mais clara no celular.
+
+Entregas:
+
+- corrigir a especificidade que mantinha `Portal da empresa` visível no header mobile autenticado;
+- deixar o header mobile do portal com marca e menu, movendo usuário e saída para dentro do drawer;
+- adicionar botão de fechar dentro dos drawers público e autenticado, escondendo o toggle do header enquanto o drawer está aberto;
+- trocar o menu `Widget` do portal para `Provador`, mantendo a explicação técnica com ícone `i` dentro da seção `/app/widget`;
+- compactar tipografia, espaçamento e botões de topo do sistema em mobile;
+- revisar textos redundantes de topo em produtos, tabelas, usuários, provador, go-live, SaaS e e-mails;
+- corrigir acentos visíveis em textos como `Fundação`, `vão`, `instalações`, `Últimos` e `tráfego`.
+
+Status: implementado no commit `b82316b` e publicado com sucesso no run `26383644699`, com build local, checagem de diff, auditoria Playwright mobile local em 36 checks e smoke Playwright mobile em produção.
