@@ -30,6 +30,7 @@ Atualizado em: 2026-05-25
 - `DONE` Opção visual do widget entre drawer lateral e modal central configurável no portal da empresa.
 - `DONE` Opção para habilitar/desabilitar confetes do widget com prévia real no portal ao ativar.
 - `DONE` Guia claro de onde instalar container/script do widget na página de produto.
+- `DONE` Reduzir redundância textual no topo da loja teste pública.
 - `DONE` Catálogo inicial de integrações.
 - `DONE` Importacao CSV de produtos.
 - `DONE` Importacao CSV de tabelas.

@@ -190,6 +190,7 @@ Atualizado em: 2026-05-25
 - Sprint 92 enviada ao GitHub no commit `3436cc5`; o run `26413966332` finalizou com sucesso e a validação de produção confirmou os assets públicos do modo modal.
 - Sprint 93 adiciona prévia real da animação de confetes no portal: ao marcar `Animação de confetes` em `/app/widget`, a empresa vê a mesma celebração usada na loja, mantendo `theme.confetti_enabled` como controle do disparo no resultado completo.
 - Sprint 93 enviada ao GitHub no commit `7093036`; o run `26414392783` finalizou com sucesso e a validação de produção confirmou os assets publicados da prévia de confetes.
+- Sprint 94 limpa a redundância do topo da loja teste: a marca fica apenas no header, o H1 passa a orientar o teste da recomendação e o CTA `Teste o provador` some quando a própria experiência já está aberta.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -233,7 +234,7 @@ Atualizado em: 2026-05-25
 - API SaaS de checkout: `/api/v1/saas/checkout-settings`.
 - Histórico SaaS de e-mail: `/api/v1/saas/transactional-email-sends`.
 - APIs de usuários/permissões: `/api/v1/merchant/users` e `/api/v1/saas/users`.
-- Loja teste pública: `/produto-teste` e `/produto-teste/:slug`, usando a identidade oficial do Provador Virtual, deixando claro que os produtos são fictícios/não estão à venda e carregando produtos sem tamanho selecionado por padrão. Na página de produto, os tamanhos são ilustrativos; o fluxo principal é clicar no provador, aceitar a recomendação e ver o tamanho aplicado automaticamente.
+- Loja teste pública: `/produto-teste` e `/produto-teste/:slug`, usando a identidade oficial do Provador Virtual sem repetir a marca no topo da vitrine. O H1 orienta o teste da recomendação de tamanho, os produtos são fictícios/não estão à venda e carregam sem tamanho selecionado por padrão. Na página de produto, os tamanhos são ilustrativos; o fluxo principal é clicar no provador, aceitar a recomendação e ver o tamanho aplicado automaticamente.
 - Seção protegida `/app/widget`: aparece no menu como `Provador`, mas mantém o termo técnico `Widget` no topo da seção com ícone `i` e explicação de que é o provador exibido na página de produto para abrir recomendação por IA, tabela de medidas e seleção de tamanho.
 - Mobile do portal: header autenticado exibe somente marca e menu; o drawer concentra navegação, usuário, saída e fechamento explícito para evitar sobreposição e reduzir carga visual.
 - Widget público: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.

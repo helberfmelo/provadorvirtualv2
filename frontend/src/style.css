@@ -1481,6 +1481,30 @@ a {
   line-height: 1.7;
 }
 
+.shop-heading p b {
+  color: #0f172a;
+}
+
+.shop-heading-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.shop-heading-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 6px 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  background: #fff;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
 .demo-guide {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

@@ -925,3 +925,12 @@
 - Validações locais: `npm run build`, `php artisan test --filter=Widget` e `git diff --check`.
 - Commit `7093036` enviado para `main`; o run `26414392783` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`; verificação dos assets publicados confirmou `portal-confetti-preview`, `Animação de confetes`, `.pv-confetti-layer` e `@keyframes pv-confetti-fall`.
+
+## 2026-05-25 - Sprint 94 Limpeza do topo da loja teste
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- O topo de `/produto-teste` deixou de repetir `Provador Virtual` no eyebrow e no H1, já que a marca permanece fixa no header.
+- O bloco principal passa a usar a chamada `Teste a recomendação de tamanho`, com texto orientando o usuário a entrar em um produto fictício e clicar em `PV Descubra seu tamanho`.
+- A informação operacional da vitrine foi movida para badges discretos: `Vitrine fictícia` e quantidade de produtos para teste.
+- O CTA público `Teste o provador` fica oculto enquanto o usuário já está em `/produto-teste` ou `/produto-teste/:slug`, evitando link redundante para a mesma experiência.
+- Validações locais: `npm run build`, `php artisan test --filter=DemoProductTest`, `git diff --check` e conferência do build confirmando a nova chamada e ausência da frase antiga `Loja teste do Provador Virtual`.

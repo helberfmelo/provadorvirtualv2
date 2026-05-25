@@ -1314,3 +1314,25 @@ Validação:
 - commit, push e Actions/deploy.
 
 Status: implementado na Sprint 93 no commit `7093036`, publicado com sucesso no run `26414392783`. Validações locais passaram com `npm run build`, `php artisan test --filter=Widget` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`; os assets publicados confirmaram `portal-confetti-preview`, o label `Animação de confetes`, `.pv-confetti-layer` e `@keyframes pv-confetti-fall`.
+
+### Sprint 94 - Limpeza do topo da loja teste
+
+Objetivo: reduzir redundância textual no topo de `/produto-teste`, deixando a marca no header e usando o bloco principal para orientar a ação da demonstração.
+
+Entregas:
+
+- remover a repetição `Provador Virtual` do eyebrow e do título principal da vitrine teste;
+- substituir o H1 por uma chamada focada em testar a recomendação de tamanho;
+- manter a informação de vitrine fictícia em badges discretos;
+- ocultar o CTA público `Teste o provador` quando o usuário já está em `/produto-teste` ou em uma página de produto da loja teste;
+- preservar o fluxo da loja teste, cards de produto, widget público e páginas de produto.
+
+Validação:
+
+- build frontend;
+- teste backend focado no payload demo;
+- checagem de diff;
+- verificação de produção pós-deploy;
+- commit, push e Actions/deploy.
+
+Status: implementado na Sprint 94 com cópia mais objetiva no topo da loja teste e ocultação do CTA redundante na própria rota. Validações locais passaram com `npm run build`, `php artisan test --filter=DemoProductTest`, `git diff --check` e conferência do build sem a frase antiga `Loja teste do Provador Virtual`.

@@ -226,9 +226,13 @@ function price(value: string | number | null | undefined) {
   <section v-else-if="!activeSlug && storefront" class="shop-page">
     <div class="shop-heading">
       <div>
-        <span class="eyebrow">{{ storefront.store.name }}</span>
-        <h1>Loja teste do Provador Virtual</h1>
-        <p>Esta vitrine é uma demonstração. Os produtos não estão à venda; escolha um item apenas para abrir o provador e ver como a recomendação de tamanho funciona.</p>
+        <span class="eyebrow">Demonstração interativa</span>
+        <h1>Teste a recomendação de tamanho</h1>
+        <p>Entre em um produto fictício, clique em <b>PV Descubra seu tamanho</b> e veja o tamanho recomendado ser aplicado automaticamente na página.</p>
+        <div class="shop-heading-meta" aria-label="Informações da demonstração">
+          <span>Vitrine fictícia</span>
+          <span>{{ storefront.products.length }} produtos para teste</span>
+        </div>
       </div>
     </div>
 

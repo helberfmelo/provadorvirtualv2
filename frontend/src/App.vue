@@ -21,6 +21,7 @@ const brandLogoUrl = `${import.meta.env.BASE_URL}images/brand/logo_provador_virt
 const canSeeSaas = computed(() => ['admin', 'support'].includes(auth.user?.role || ''))
 const isCompanyRoute = computed(() => route.path === '/app' || route.path.startsWith('/app/'))
 const isSaasRoute = computed(() => (route.path === '/saas' || route.path.startsWith('/saas/')) && route.path !== '/saas/login')
+const isProductTestRoute = computed(() => route.path === '/produto-teste' || route.path.startsWith('/produto-teste/'))
 const isWorkRoute = computed(() => isCompanyRoute.value || isSaasRoute.value)
 const contextLabel = computed(() => isSaasRoute.value ? 'SaaS admin' : 'Portal da empresa')
 const workNavTitle = computed(() => isSaasRoute.value ? 'Operação SaaS' : 'Operação da loja')
@@ -34,7 +35,7 @@ const workViewKey = computed(() => {
 })
 
 const publicLinks = computed<NavLink[]>(() => [
-  { to: '/produto-teste', label: 'Teste o provador', icon: 'fa-wand-magic-sparkles', show: true },
+  { to: '/produto-teste', label: 'Teste o provador', icon: 'fa-wand-magic-sparkles', show: !isProductTestRoute.value },
   { to: '/checkout', label: 'Contratar', icon: 'fa-credit-card', show: !auth.isAuthenticated },
   { to: '/login', label: 'Entrar', icon: 'fa-right-to-bracket', show: !auth.isAuthenticated },
 ])
