@@ -1058,4 +1058,4 @@ Entregas:
 - transformar os cards de benefícios em linhas compactas com ícone destacado, título e texto legíveis no celular;
 - validar build do frontend, checagem de diff e Playwright mobile da landing.
 
-Status: implementado localmente nesta sprint; commit, push, GitHub Actions/deploy e smokes de produção devem ser registrados no fechamento operacional.
+Status: implementado no commit `83ac2da` e publicado com sucesso no run `26381750743`, com deploy remoto, smoke público e Playwright mobile em produção validando headline, cards e ausência de overflow horizontal.

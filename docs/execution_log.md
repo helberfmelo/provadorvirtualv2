@@ -760,3 +760,5 @@
 - A regra mobile específica de `.landing-benefits.metric-grid` passou a sobrescrever a grade desktop, evitando cards estreitos em 3 colunas no celular.
 - Cards da seção `O que o lojista e o comprador sentem na prática` passaram a usar layout mobile em linha, com ícone em destaque, título e descrição legíveis.
 - Playwright local mobile validou headline sem `BigShop`, uma coluna de cards, ausência de overflow horizontal e seis cards renderizados corretamente.
+- Commit `83ac2da` enviado para `main`; o run `26381750743` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Playwright pós-deploy em `https://provadorvirtual.online/` validou a nova headline, ausência da frase antiga, grid mobile de benefícios em uma coluna, seis cards renderizados e ausência de overflow horizontal.

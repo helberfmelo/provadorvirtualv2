@@ -169,7 +169,7 @@ Atualizado em: 2026-05-24
 - Sprint 76 enviada ao GitHub no commit `6c835c8`; o run `26378458765` finalizou com sucesso, removendo a escala redundante de nota de 1 a 5 do feedback final do widget.
 - Sprint 77 enviada ao GitHub no commit `2a5c055`; o run `26378864592` finalizou com sucesso, posicionando o aviso de salvamento local somente na primeira etapa do widget, no fim do corpo rolável, em itálico e com fonte menor.
 - Sprint 78 enviada ao GitHub no commit `003c996`; o run `26381419082` finalizou com sucesso, ajustando a loja teste mobile e o handoff do widget: tocar no tamanho recomendado fecha o drawer, emite `provadorvirtual:size-selected` e a página `/produto-teste/:slug` marca o tamanho recomendado.
-- Sprint 79 ajusta a landing pública para reforçar o valor do provador com IA para vender mais na loja online e melhora os cards de benefícios no mobile.
+- Sprint 79 enviada ao GitHub no commit `83ac2da`; o run `26381750743` finalizou com sucesso, reforçando na landing pública o valor do provador com IA para vender mais na loja online e melhorando os cards de benefícios no mobile.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
