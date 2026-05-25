@@ -710,27 +710,13 @@
   background: #ecfdf5;
 }
 
-.pv-choice-row,
-.pv-rating-row {
+.pv-choice-row {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
 }
 
-.pv-rating-label {
-  display: grid;
-  gap: 3px;
-  color: var(--pv-primary);
-}
-
-.pv-rating-label small {
-  color: var(--pv-muted);
-  font-size: 0.84em;
-  font-weight: 600;
-}
-
-.pv-choice,
-.pv-rating {
+.pv-choice {
   min-height: 38px;
   padding: 8px 11px;
   border: 1px solid var(--pv-border);
@@ -742,8 +728,7 @@
   font-weight: var(--pv-font-weight);
 }
 
-.pv-choice.active,
-.pv-rating.active {
+.pv-choice.active {
   border-color: var(--pv-primary);
   color: #fff;
   background: var(--pv-primary);

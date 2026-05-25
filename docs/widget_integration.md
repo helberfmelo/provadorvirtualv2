@@ -89,7 +89,7 @@ Status Sprint 66: o fluxo visual do v2 passou a seguir a lógica gamificada do v
 
 A barra `Nível de precisão da IA` usa pesos progressivos semelhantes ao v1: altura, peso, idade, gênero, formato corporal e medidas detalhadas. Quando chega a 100%, o widget dispara confete leve, sem dependência externa.
 
-O feedback final fica visível no próprio resultado e salva `was_helpful`, `rating`, `selected_size` e `comment` no endpoint público atual. Além das medidas normalizadas usadas pelo motor, o widget envia `shopper_profile.raw_widget_data` com versão, origem, etapas concluídas, identidade técnica do produto, precisão, tabela e medidas brutas da jornada. Esse payload é persistido em `recommendation_logs.raw_widget_payload` e entra na rotina `pv:privacy-anonymize`.
+O feedback final fica visível no próprio resultado e salva `was_helpful`, `selected_size` e `comment` no endpoint público atual. O campo `rating` continua aceito pela API para compatibilidade com integrações ou feedbacks antigos, mas o widget público não exibe mais a escala de nota de 1 a 5. Além das medidas normalizadas usadas pelo motor, o widget envia `shopper_profile.raw_widget_data` com versão, origem, etapas concluídas, identidade técnica do produto, precisão, tabela e medidas brutas da jornada. Esse payload é persistido em `recommendation_logs.raw_widget_payload` e entra na rotina `pv:privacy-anonymize`.
 
 Regra Sprint 67: o fluxo do drawer é obrigatoriamente sequencial. A etapa 1 pode pré-preencher dados salvos do navegador, mas a barra de precisão deve considerar somente altura, peso e idade nessa tela. O confete só pode disparar quando a precisão real chegar a 100%, nunca em recomendação básica ou por dados ocultos de etapas futuras.
 
@@ -98,6 +98,8 @@ Regra Sprint 68: a recomendação parcial volta a ficar disponível ao longo da 
 Os passos 1, 2, 3 e 4 são clicáveis para avançar e voltar, mas respeitam bloqueios de dados: `Corpo` exige altura + peso, `Detalhes` exige gênero + formato corporal, e `Resultado` exige todas as medidas detalhadas da tabela. O confete só dispara ao entrar no resultado com 100% depois de preencher as medidas detalhadas. A opção `theme.confetti_enabled` permite desligar a celebração por loja; quando não configurada, o padrão é ativado.
 
 As medidas salvas no navegador passam a usar chave por tabela de medidas (`pv_shopper_profile_v2_table_{id}`), além do fallback legado. Assim, produtos que compartilham a mesma tabela reabrem com dados e progresso preenchidos, mas continuam editáveis. Se o consumidor fechar o widget depois de uma recomendação e alterar algum dado, o widget salva o novo snapshot de forma silenciosa para manter o aprendizado atualizado.
+
+Regra Sprint 76: o resultado final deve manter apenas a pergunta objetiva `Essa recomendação ajudou?`, com botões `Sim, ajudou` e `Não ajudou`, tamanho escolhido e comentário opcional. Não exibir escala redundante de nota de 1 a 5 no widget.
 
 ## Evolucao inteligente prevista
 
@@ -138,7 +140,7 @@ O widget expõe `window.ProvadorVirtual.reload(...)` para lojas que alteram tama
 
 O widget também expõe `window.ProvadorVirtual.diagnostics()` para depuração controlada. Em modo debug, falhas de carregamento emitem `provadorvirtual:config` com `api_base`, `request_url`, `error_name`, `error_message`, `http_status` e trecho do `response_body`, quando disponível.
 
-O drawer do widget usa as cores configuradas no tema da loja para cabeçalho, CTAs e barra de precisão. Desde a Sprint 69, as silhuetas de formato corporal são assets públicos herdados do v1 em `/widget/v1/assets/body-shapes/` e renderizados como máscara CSS, para manter a forma original e aplicar a tonalidade do widget configurada no portal.
+O drawer do widget usa as cores configuradas no tema da loja para cabeçalho, CTAs e barra de precisão. Desde a Sprint 75, as silhuetas de formato corporal são assets públicos herdados do v1 em `/widget/v1/assets/body-shapes/` e renderizados como imagens reais, evitando falhas de máscara CSS em navegadores mobile.
 
 ## Guias por plataforma
 

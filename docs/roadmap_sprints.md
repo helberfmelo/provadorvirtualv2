@@ -910,7 +910,6 @@ Entregas:
 - deixar o cabeçalho do drawer com fundo baseado nas cores configuradas no portal da empresa;
 - destacar os botões de ação `Aumentar precisão` e `Finalizar e ver resultado` no mesmo padrão visual do CTA principal;
 - tornar o botão fixo do rodapé mais discreto enquanto o consumidor ainda está nas etapas 1, 2 ou 3, mantendo destaque forte somente no resultado com 100% de precisão;
-- explicar a escala de feedback final: `1 = não ajudou, 5 = perfeita`;
 - copiar para o v2 as silhuetas do widget v1 e renderizá-las como máscara CSS, permitindo que recebam a tonalidade configurada pela loja;
 - cobrir a existência dos novos assets no teste do widget;
 - validar o fluxo visual com Playwright mockado: cabeçalho tematizado, CTA progressivo, rodapé discreto antes do resultado, silhueta via asset do v1, confete e feedback final.
@@ -987,3 +986,32 @@ Entregas:
 - validar teste de asset, builds do frontend/backend e checagem de diff.
 
 Status: implementado no commit `0c83622` e publicado com sucesso no run `26372649754`, com deploy remoto, deploy da raiz pública, master admin, smoke público, `validate-production.ps1` e verificação do CSS público confirmando `font-size: 0.88em` e `font-style: italic`.
+
+### Sprint 75 - Refinar widget mobile e silhuetas
+
+Objetivo: deixar a experiência mobile do widget mais compacta e corrigir a renderização das silhuetas herdadas do v1.
+
+Entregas:
+
+- aumentar logo e ícone de menu no cabeçalho mobile da loja teste;
+- manter os quatro passos do widget em uma única linha no mobile;
+- escurecer a fonte dos passos com fundo claro para melhorar legibilidade;
+- trocar a renderização das silhuetas de máscara CSS para imagens PNG reais;
+- compactar a etapa de corpo no mobile para reduzir rolagem e mostrar os cards mais cedo;
+- validar o widget em viewports mobile com Playwright.
+
+Status: implementado no commit `2a92a0b` e publicado com sucesso no run `26377480787`, com deploy remoto, smoke público e verificação dos assets públicos do widget.
+
+### Sprint 76 - Remover escala de nota do widget
+
+Objetivo: simplificar o feedback final do widget removendo a avaliação redundante de nota de 1 a 5.
+
+Entregas:
+
+- manter a pergunta `Essa recomendação ajudou?` com os botões `Sim, ajudou` e `Não ajudou`;
+- remover a seção `Nota da recomendação` e os botões de 1 a 5;
+- deixar o widget enviar feedback sem `rating`, preservando a API compatível com registros antigos;
+- remover estilos e testes ligados à escala de nota;
+- atualizar documentação do contrato atual do widget.
+
+Status: implementado nesta sprint; publicação remota verificada após o push.

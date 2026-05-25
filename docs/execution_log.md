@@ -705,3 +705,25 @@
 - Commit `0c83622` enviado para `main`; o run `26372649754` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Pós-deploy confirmou com cache bust que o CSS público contém `.pv-browser-note`, `font-size: 0.88em` e `font-style: italic`.
 - `scripts/validate-production.ps1` passou completo após o deploy.
+
+## 2026-05-24 - Sprint 75 Refinar widget mobile e silhuetas
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
+- Logo e botão de menu mobile da loja teste aumentados para melhorar reconhecimento e toque.
+- Stepper do widget ajustado para manter as quatro etapas em uma única linha no mobile.
+- Cores dos passos claros escurecidas para melhorar contraste e leitura.
+- Silhuetas de corpo passaram de máscara CSS para imagens PNG reais, corrigindo casos em que apareciam apenas como blocos coloridos.
+- Etapa de corpo compactada para reduzir rolagem e exibir os cards de silhueta mais cedo.
+- Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, `php artisan test --filter=DemoProductTest`, `npm run build`, `git diff --check` e Playwright mobile em viewports de `360px` e `400px`.
+- Commit `2a92a0b` enviado para `main`; o run `26377480787` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou que o JS público contém `<img class="pv-shape-image"`, `loading="lazy"` e `content.scrollTop = 0`.
+- Pós-deploy confirmou que o CSS público contém `object-fit: contain;`, passos mobile em quatro colunas e cor mais escura para passos claros.
+- Pós-deploy confirmou `200 image/png` para asset público de silhueta masculina.
+
+## 2026-05-24 - Sprint 76 Remover escala de nota do widget
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` concluída antes de iniciar a sprint.
+- Removida do resultado final a seção redundante `Nota da recomendação` com botões de 1 a 5.
+- Mantida a avaliação principal com `Sim, ajudou` e `Não ajudou`, tamanho escolhido e comentário.
+- Widget deixou de enviar `rating` no feedback novo; o endpoint público segue aceitando `rating` opcional para compatibilidade com integrações antigas.
+- Removidos estilos CSS da escala de nota e atualizada a cobertura do `WidgetAssetTest`.

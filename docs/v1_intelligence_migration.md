@@ -101,7 +101,7 @@ Status Sprint 66: o v2 recuperou esse fluxo no widget público `/widget/v1/prova
 - recomendação parcial disponível com altura + peso e refinada nas etapas seguintes;
 - confete próprio em CSS/JS ao chegar a 100% de precisão;
 - resultado com tamanho, confiança e notas do motor;
-- feedback final visível com sim/não, nota, tamanho escolhido e comentário.
+- feedback final visível com sim/não, tamanho escolhido e comentário.
 
 O v2 não copiou a dependência externa de confete do v1. A animação agora é isolada no CSS do widget, sem bloquear a loja e sem carregar biblioteca adicional.
 
@@ -109,7 +109,9 @@ Status Sprint 67: reforçada a paridade comportamental com o v1. O usuário prec
 
 Status Sprint 68: a dinâmica do v1 foi refinada no v2. O widget volta a recomendar tamanho a partir do mínimo útil, que é altura + peso, sem recomendar com apenas um deles. O corpo das etapas mantém o incentivo `Aumentar precisão`, o rodapé fixo mantém barra de precisão e tamanho recomendado, os passos 1 a 4 são clicáveis com bloqueios por etapa, as silhuetas mudam por gênero, o perfil é salvo por tabela de medidas e o confete passa a depender de `theme.confetti_enabled`, ativado por padrão.
 
-Status Sprint 69: o v2 passou a reutilizar as imagens de silhueta do v1 como assets públicos em `widget/v1/assets/body-shapes/`. Elas são renderizadas como máscara CSS para receber a cor configurada pela loja. O cabeçalho do drawer também passou a usar as cores do tema, os CTAs de avanço ficaram mais fortes, o CTA fixo do rodapé ficou discreto até o resultado completo e a escala de feedback final ficou explícita para o consumidor.
+Status Sprint 69: o v2 passou a reutilizar as imagens de silhueta do v1 como assets públicos em `widget/v1/assets/body-shapes/`. O cabeçalho do drawer também passou a usar as cores do tema, os CTAs de avanço ficaram mais fortes e o CTA fixo do rodapé ficou discreto até o resultado completo.
+
+Status Sprint 76: a escala de nota de 1 a 5 foi removida do widget público por redundância. O feedback final mantém a pergunta objetiva com botões `Sim, ajudou` e `Não ajudou`, tamanho escolhido e comentário opcional.
 
 ### Teste minucioso do demo v1
 

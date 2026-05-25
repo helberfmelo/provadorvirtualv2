@@ -31,12 +31,13 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('data-pv-send-feedback', $scriptContents);
         $this->assertStringContainsString('assetBaseUrl', $scriptContents);
         $this->assertStringContainsString('pv-main-button-subtle', $scriptContents);
-        $this->assertStringContainsString('Nota da recomenda&ccedil;&atilde;o', $scriptContents);
         $this->assertStringContainsString('pv-shape-image', $scriptContents);
         $this->assertStringContainsString("basePath + '/public/api/v1'", $scriptContents);
         $this->assertStringContainsString('diagnostics', $scriptContents);
         $this->assertStringContainsString('browserStorageNoticeHtml', $scriptContents);
         $this->assertStringContainsString('Ao usar o Provador Virtual', $scriptContents);
+        $this->assertStringNotContainsString('Nota da recomenda&ccedil;&atilde;o', $scriptContents);
+        $this->assertStringNotContainsString('data-pv-rating', $scriptContents);
         $this->assertStringNotContainsString('Salvar minhas medidas neste navegador para pr&oacute;ximas recomenda&ccedil;&otilde;es.', $scriptContents);
         $this->assertStringContainsString('<img class="pv-shape-image"', $scriptContents);
         $this->assertStringContainsString('loading="lazy"', $scriptContents);
@@ -47,6 +48,7 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('.pv-stepper button', $cssContents);
         $this->assertStringContainsString('.pv-debug', $cssContents);
         $this->assertStringContainsString('.pv-shape-image', $cssContents);
+        $this->assertStringNotContainsString('.pv-rating', $cssContents);
         $this->assertStringContainsString('object-fit: contain;', $cssContents);
         $this->assertStringContainsString('.pv-main-button-subtle', $cssContents);
         $this->assertStringContainsString('.pv-browser-note', $cssContents);

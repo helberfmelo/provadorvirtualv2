@@ -32,7 +32,6 @@
       celebrated: false,
       feedback: {
         wasHelpful: null,
-        rating: null,
         selectedSize: '',
         comment: '',
         sent: false,
@@ -363,7 +362,6 @@
     state.recommendationSignature = '';
     state.feedback = {
       wasHelpful: null,
-      rating: null,
       selectedSize: '',
       comment: '',
       sent: false,
@@ -576,14 +574,6 @@
       '<div class="pv-choice-row">',
       choiceButton(true, 'Sim, ajudou'),
       choiceButton(false, 'N&atilde;o ajudou'),
-      '</div>',
-      '<div class="pv-rating-label"><strong>Nota da recomenda&ccedil;&atilde;o</strong><small>1 = n&atilde;o ajudou, 5 = perfeita</small></div>',
-      '<div class="pv-rating-row" aria-label="Nota da recomendacao">',
-      [1, 2, 3, 4, 5].map(function (rating) {
-        var active = Number(state.feedback.rating) === rating ? ' active' : '';
-        var aria = rating === 1 ? '1, n&atilde;o ajudou' : rating === 5 ? '5, perfeita' : String(rating);
-        return '<button type="button" class="pv-rating' + active + '" data-pv-rating="' + rating + '" aria-label="' + aria + '">' + rating + '</button>';
-      }).join(''),
       '</div>',
       '<label class="pv-field pv-field-full">Tamanho escolhido<select data-pv-feedback-size>' + sizeOptions(data.recommended_size) + '</select></label>',
       '<label class="pv-field pv-field-full">Coment&aacute;rio<textarea data-pv-feedback-comment rows="3" placeholder="Conte se a sugest&atilde;o fez sentido, se ficou grande/pequeno ou o que podemos melhorar.">' + escapeHtml(state.feedback.comment || '') + '</textarea></label>',
@@ -957,14 +947,6 @@
       });
     });
 
-    backdrop.querySelectorAll('[data-pv-rating]').forEach(function (button) {
-      button.addEventListener('click', function () {
-        state.feedback.rating = Number(button.dataset.pvRating);
-        collectFeedback(backdrop);
-        renderDrawer(backdrop);
-      });
-    });
-
     var sendButton = backdrop.querySelector('[data-pv-send-feedback]');
     if (!sendButton || !state.recommendation) {
       return;
@@ -978,7 +960,6 @@
 
       request('/public/recommendations/' + state.recommendation.recommendation_id + '/feedback', {
         was_helpful: state.feedback.wasHelpful,
-        rating: state.feedback.rating,
         selected_size: state.feedback.selectedSize || state.recommendation.recommended_size,
         comment: state.feedback.comment || null,
       }).then(function () {
