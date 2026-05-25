@@ -135,8 +135,9 @@ Atualizado em: 2026-05-25
 - `DONE` Painel SaaS `/saas/checkout` para escolher `mercado_pago` ou `pagarme`.
 - `DONE` Persistência de `checkout_sessions` e `payment_events`.
 - `DONE` Atualizar regra comercial para plano mensal e anual por plataforma, com mensal em destaque no anual, total anual e economia percentual.
-- `TODO` Implementar recorrência automática no cartão para plano mensal e, quando tecnicamente seguro, para renovação anual.
-- `TODO` Criar opção discreta no portal da empresa para cancelar somente a renovação automática, sem cancelar pagamentos já capturados ou parcelas em andamento.
+- `DONE` Implementar recorrência automática no cartão para plano mensal.
+- `DONE` Criar opção discreta no portal da empresa para cancelar somente a renovação automática, sem cancelar pagamentos já capturados ou parcelas em andamento.
+- `TODO` Validar renovação automática anual quando a operadora permitir sem risco de dupla cobrança ou conflito com parcelamento anual.
 - `DONE` Salvar prova técnica de aceite dos termos no checkout.
 - `TODO` Permitir boleto no checkout somente quando habilitado no painel SaaS.
 - `DONE` Registrar variáveis Mercado Pago em `PRODUCTION_ENV` sem versionar valores reais.

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\CheckoutPaymentProvider;
+use App\Models\BillingSubscription;
 use App\Models\CheckoutSession;
 use App\Models\PaymentEvent;
 use Carbon\CarbonImmutable;
@@ -52,6 +53,11 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         $accessToken = $this->requiredAccessToken();
         $providerOrderCode = $session->provider_order_code ?: ('PV-MP-'.strtoupper(Str::random(10)));
         $paymentMethod = $this->normalizePaymentMethod((string) ($buyerData['payment_method'] ?? 'pix'));
+
+        if ($paymentMethod === 'credit_card' && $this->shouldCreateSubscription($session)) {
+            return $this->createSubscription($session, $buyerData, $providerOrderCode);
+        }
+
         $payload = $this->buildPaymentPayload($session, $buyerData, $providerOrderCode, $paymentMethod);
 
         try {
@@ -86,15 +92,20 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
     public function handleWebhook(array $payload, array $headers, string $rawBody, array $query = []): PaymentEvent
     {
         $paymentId = $this->resolvePaymentId($payload, $query);
+        $notificationType = $this->resolveNotificationType($payload, $query);
 
         if (! $this->validSignature($headers, $paymentId)) {
             throw new RuntimeException('Assinatura do webhook invalida.');
         }
 
+        if ($this->isSubscriptionNotification($notificationType, $payload, $query)) {
+            return $this->handleSubscriptionWebhook($payload, $query, $paymentId, $rawBody);
+        }
+
         $eventId = $this->extractString($payload, ['id', 'event_id'])
-            ?: ($paymentId ? "payment_{$paymentId}_".($this->resolveNotificationType($payload, $query) ?: 'updated') : sha1($rawBody));
+            ?: ($paymentId ? "payment_{$paymentId}_".($notificationType ?: 'updated') : sha1($rawBody));
         $eventId = Str::startsWith($eventId, 'mp_') ? $eventId : 'mp_'.$eventId;
-        $eventType = $this->resolveNotificationType($payload, $query) ?: 'unknown';
+        $eventType = $notificationType ?: 'unknown';
 
         return DB::transaction(function () use ($eventId, $eventType, $payload, $query, $paymentId): PaymentEvent {
             $event = PaymentEvent::query()->firstOrCreate(
@@ -203,6 +214,11 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
 
     public function syncCheckoutSession(CheckoutSession $session): CheckoutSession
     {
+        $subscription = $session->billingSubscription()->first();
+        if ($subscription) {
+            return $this->syncSubscription($subscription)->checkoutSession()->first() ?: $session->fresh() ?: $session;
+        }
+
         if (! $session->provider_order_id) {
             throw new RuntimeException('Checkout sem payment_id do Mercado Pago.');
         }
@@ -215,6 +231,77 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         );
     }
 
+    public function syncSubscription(BillingSubscription $subscription): BillingSubscription
+    {
+        if (! $subscription->provider_subscription_id) {
+            throw new RuntimeException('Assinatura sem ID do Mercado Pago.');
+        }
+
+        $session = $subscription->checkoutSession()->first();
+        if (! $session) {
+            throw new RuntimeException('Assinatura sem checkout vinculado.');
+        }
+
+        $this->applySubscriptionPayload(
+            $session,
+            $this->fetchSubscription($subscription->provider_subscription_id),
+            $session->provider_order_code ?: ('PV-MP-'.$session->public_reference),
+        );
+
+        return $subscription->fresh() ?: $subscription;
+    }
+
+    public function cancelSubscription(BillingSubscription $subscription): BillingSubscription
+    {
+        if (! $subscription->provider_subscription_id) {
+            throw new RuntimeException('Assinatura sem ID do Mercado Pago.');
+        }
+
+        if (! $subscription->auto_renewal_enabled || in_array($subscription->status, ['canceled', 'cancelled', 'paused'], true)) {
+            return $subscription;
+        }
+
+        try {
+            $payload = $this->providerClient($this->requiredAccessToken())
+                ->put('/preapproval/'.$subscription->provider_subscription_id, ['status' => 'canceled'])
+                ->throw()
+                ->json();
+        } catch (ConnectionException $exception) {
+            throw new RuntimeException('Nao foi possivel conectar ao Mercado Pago para cancelar a renovacao.', 0, $exception);
+        } catch (RequestException $exception) {
+            throw new RuntimeException(
+                $this->providerErrorMessage($exception, 'Nao foi possivel cancelar a renovacao no Mercado Pago.'),
+                0,
+                $exception,
+            );
+        }
+
+        $session = $subscription->checkoutSession()->first();
+        if ($session) {
+            $this->applySubscriptionPayload(
+                $session,
+                is_array($payload) ? $payload : [],
+                $session->provider_order_code ?: ('PV-MP-'.$session->public_reference),
+                ['action' => 'cancel_auto_renewal'],
+            );
+        }
+
+        $subscription = $subscription->fresh() ?: $subscription;
+        $subscription->forceFill([
+            'auto_renewal_enabled' => false,
+            'cancel_requested_at' => $subscription->cancel_requested_at ?: now(),
+            'cancelled_at' => in_array($subscription->status, ['canceled', 'cancelled'], true)
+                ? ($subscription->cancelled_at ?: now())
+                : $subscription->cancelled_at,
+            'metadata' => [
+                ...Arr::wrap($subscription->metadata),
+                'renewal_cancelled_without_reversing_existing_payments' => true,
+            ],
+        ])->save();
+
+        return $subscription->fresh() ?: $subscription;
+    }
+
     public function publicCheckoutUrl(string $reference): string
     {
         $base = trim((string) config('services.mercado_pago.checkout_success_url'))
@@ -223,6 +310,62 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         $separator = str_contains($base, '?') ? '&' : '?';
 
         return $base.$separator.http_build_query(['ref' => $reference]);
+    }
+
+    private function createSubscription(CheckoutSession $session, array $buyerData, string $providerOrderCode): CheckoutSession
+    {
+        $payload = $this->buildSubscriptionPayload($session, $buyerData);
+
+        try {
+            $response = $this->providerClient($this->requiredAccessToken())
+                ->withHeaders(['X-Idempotency-Key' => $providerOrderCode])
+                ->post('/preapproval', $payload)
+                ->throw()
+                ->json();
+        } catch (ConnectionException $exception) {
+            throw new RuntimeException('Nao foi possivel conectar ao Mercado Pago agora. Tente novamente em instantes.', 0, $exception);
+        } catch (RequestException $exception) {
+            Log::warning('O Mercado Pago recusou a criacao da assinatura recorrente.', [
+                'status' => $exception->response?->status(),
+                'response' => $exception->response?->json(),
+            ]);
+
+            throw new RuntimeException(
+                $this->providerErrorMessage($exception, 'Nao foi possivel iniciar a recorrencia no Mercado Pago com os dados enviados.'),
+                0,
+                $exception,
+            );
+        }
+
+        return $this->applySubscriptionPayload(
+            $session,
+            is_array($response) ? $response : [],
+            $providerOrderCode,
+        );
+    }
+
+    private function buildSubscriptionPayload(CheckoutSession $session, array $buyerData): array
+    {
+        $token = trim((string) ($buyerData['card_token'] ?? ''));
+        if ($token === '') {
+            throw new RuntimeException('Dados do cartao incompletos para criar a recorrencia.');
+        }
+
+        return $this->cleanArray([
+            'reason' => $this->paymentDescription($session).' - renovacao automatica',
+            'external_reference' => $session->public_reference,
+            'payer_email' => mb_strtolower(trim((string) ($buyerData['admin_email'] ?? $session->lead_email))),
+            'card_token_id' => $token,
+            'auto_recurring' => [
+                'frequency' => 1,
+                'frequency_type' => 'months',
+                'start_date' => now()->toIso8601String(),
+                'transaction_amount' => round($session->amount_cents / 100, 2),
+                'currency_id' => $session->currency ?: 'BRL',
+            ],
+            'back_url' => $this->publicCheckoutUrl($session->public_reference),
+            'status' => 'authorized',
+        ]);
     }
 
     private function buildPaymentPayload(
@@ -349,6 +492,81 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         return $freshSession;
     }
 
+    private function applySubscriptionPayload(
+        CheckoutSession $session,
+        array $payload,
+        string $providerOrderCode,
+        array $notificationPayload = [],
+    ): CheckoutSession {
+        $subscriptionId = $this->extractString($payload, ['id']) ?: $session->provider_order_id;
+        $subscriptionStatus = $this->normalizeSubscriptionStatus($payload);
+        $snapshot = $this->subscriptionSnapshot($payload, $subscriptionStatus);
+        $sessionStatus = $this->sessionStatusForSubscription($session, $subscriptionStatus);
+
+        $subscription = BillingSubscription::query()
+            ->when($subscriptionId, fn ($query) => $query->where('provider', $this->key())->where('provider_subscription_id', $subscriptionId))
+            ->when(! $subscriptionId, fn ($query) => $query->where('checkout_session_id', $session->id))
+            ->first() ?: new BillingSubscription;
+
+        $cancelledAt = in_array($subscriptionStatus, ['canceled', 'cancelled'], true)
+            ? ($subscription->cancelled_at ?: now())
+            : $subscription->cancelled_at;
+        $autoRenewalEnabled = $subscriptionStatus === 'authorized' && ! $cancelledAt && ! $subscription->cancel_requested_at;
+
+        $subscription->forceFill([
+            'checkout_session_id' => $session->id,
+            'merchant_id' => $session->merchant_id,
+            'merchant_company_id' => $session->merchant_company_id,
+            'user_id' => $session->user_id,
+            'provider' => $this->key(),
+            'provider_subscription_id' => $subscriptionId,
+            'provider_payment_id' => $this->extractString($payload, ['summarized.last_payment_id', 'last_payment_id']),
+            'plan_code' => $session->plan_code,
+            'billing_cycle' => (string) data_get($session->metadata, 'plan.billing_cycle', $session->plan_code),
+            'payment_method' => 'credit_card',
+            'status' => $subscriptionStatus,
+            'auto_renewal_enabled' => $autoRenewalEnabled,
+            'amount_cents' => $session->amount_cents,
+            'currency' => $session->currency ?: 'BRL',
+            'next_charge_at' => $this->parseProviderDate($this->extractString($payload, ['next_payment_date'])),
+            'started_at' => $this->parseProviderDate($this->extractString($payload, ['date_created', 'auto_recurring.start_date'])),
+            'cancelled_at' => $cancelledAt,
+            'last_provider_sync_at' => now(),
+            'provider_payload' => $payload,
+            'metadata' => [
+                ...Arr::wrap($subscription->metadata),
+                'checkout_reference' => $session->public_reference,
+                'renewal_cancelled_without_reversing_existing_payments' => (bool) data_get($subscription->metadata, 'renewal_cancelled_without_reversing_existing_payments', false),
+            ],
+        ])->save();
+
+        $session->forceFill([
+            'provider_order_code' => $providerOrderCode,
+            'provider_order_id' => $subscriptionId ?: $session->provider_order_id,
+            'payment_method' => 'credit_card',
+            'status' => $sessionStatus,
+            'metadata' => [
+                ...Arr::wrap($session->metadata),
+                'provider_payload' => $payload,
+                'last_webhook_payload' => $notificationPayload ?: data_get($session->metadata, 'last_webhook_payload'),
+                'subscription_snapshot' => $snapshot,
+                'payment_snapshot' => [
+                    'method' => 'credit_card',
+                    'status' => $subscriptionStatus,
+                    'subscription' => $snapshot,
+                ],
+            ],
+            'paid_at' => $subscriptionStatus === 'authorized' ? ($session->paid_at ?: now()) : $session->paid_at,
+            'last_provider_sync_at' => now(),
+        ])->save();
+
+        $freshSession = $session->fresh(['merchant', 'company', 'user']) ?? $session;
+        $this->activateAccessIfPaid($freshSession);
+        $this->dispatchStatusEmail($freshSession);
+
+        return $freshSession;
+    }
+
     private function activateAccessIfPaid(CheckoutSession $session): void
     {
         if ($session->status !== CheckoutSession::STATUS_PAID) {
@@ -377,6 +595,78 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         }
     }
 
+    private function handleSubscriptionWebhook(array $payload, array $query, ?string $subscriptionId, string $rawBody): PaymentEvent
+    {
+        $eventType = $this->resolveNotificationType($payload, $query) ?: 'preapproval';
+        $eventId = $this->extractString($payload, ['id', 'event_id'])
+            ?: ($subscriptionId ? "preapproval_{$subscriptionId}_{$eventType}" : sha1($rawBody));
+        $eventId = Str::startsWith($eventId, 'mp_') ? $eventId : 'mp_'.$eventId;
+
+        return DB::transaction(function () use ($eventId, $eventType, $payload, $query, $subscriptionId): PaymentEvent {
+            $event = PaymentEvent::query()->firstOrCreate(
+                ['provider_event_id' => $eventId],
+                [
+                    'provider' => $this->key(),
+                    'event_type' => $eventType,
+                    'payload' => [
+                        'notification' => $payload,
+                        'query' => $query,
+                    ],
+                ],
+            );
+
+            if ($event->processed_at) {
+                return $event;
+            }
+
+            $subscriptionPayload = $subscriptionId ? $this->fetchSubscription($subscriptionId) : [];
+            $session = $this->resolveSubscriptionSession($subscriptionPayload, $payload);
+
+            if ($session) {
+                $this->applySubscriptionPayload(
+                    $session,
+                    $subscriptionPayload,
+                    $session->provider_order_code ?: ('PV-MP-'.$session->public_reference),
+                    [
+                        'notification' => $payload,
+                        'query' => $query,
+                    ],
+                );
+            }
+
+            $event->forceFill([
+                'payload' => [
+                    'notification' => $payload,
+                    'query' => $query,
+                    'subscription' => $subscriptionPayload,
+                ],
+                'processed_at' => now(),
+            ])->save();
+
+            return $event;
+        });
+    }
+
+    private function fetchSubscription(string $subscriptionId): array
+    {
+        try {
+            $payload = $this->providerClient($this->requiredAccessToken())
+                ->get('/preapproval/'.$subscriptionId)
+                ->throw()
+                ->json();
+        } catch (ConnectionException $exception) {
+            throw new RuntimeException('Nao foi possivel conectar ao Mercado Pago para sincronizar a assinatura.', 0, $exception);
+        } catch (RequestException $exception) {
+            throw new RuntimeException(
+                $this->providerErrorMessage($exception, 'Nao foi possivel consultar a assinatura no Mercado Pago.'),
+                0,
+                $exception,
+            );
+        }
+
+        return is_array($payload) ? $payload : [];
+    }
+
     private function fetchPayment(string $paymentId): array
     {
         try {
@@ -395,6 +685,31 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         }
 
         return is_array($payload) ? $payload : [];
+    }
+
+    private function resolveSubscriptionSession(array $subscriptionPayload, array $notificationPayload = []): ?CheckoutSession
+    {
+        $subscriptionId = $this->extractString($subscriptionPayload, ['id'])
+            ?: $this->extractString($notificationPayload, ['data.id', 'resource', 'id']);
+        if ($subscriptionId && Str::contains($subscriptionId, '/')) {
+            $subscriptionId = basename($subscriptionId);
+        }
+
+        if ($subscriptionId) {
+            $subscription = BillingSubscription::query()
+                ->where('provider', $this->key())
+                ->where('provider_subscription_id', $subscriptionId)
+                ->first();
+
+            if ($subscription?->checkoutSession) {
+                return $subscription->checkoutSession;
+            }
+        }
+
+        $reference = $this->extractString($subscriptionPayload, ['external_reference'])
+            ?: $this->extractString($notificationPayload, ['external_reference', 'data.external_reference']);
+
+        return $reference ? CheckoutSession::query()->where('public_reference', $reference)->first() : null;
     }
 
     private function resolveSession(array $paymentPayload, array $notificationPayload = []): ?CheckoutSession
@@ -435,6 +750,31 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         };
     }
 
+    private function normalizeSubscriptionStatus(array $payload): string
+    {
+        $status = Str::lower((string) ($this->extractString($payload, ['status']) ?: 'pending'));
+
+        return match ($status) {
+            'authorized', 'active' => 'authorized',
+            'paused' => 'paused',
+            'cancelled', 'canceled' => 'canceled',
+            default => 'pending',
+        };
+    }
+
+    private function sessionStatusForSubscription(CheckoutSession $session, string $subscriptionStatus): string
+    {
+        if ($session->status === CheckoutSession::STATUS_PAID) {
+            return CheckoutSession::STATUS_PAID;
+        }
+
+        return match ($subscriptionStatus) {
+            'authorized' => CheckoutSession::STATUS_PAID,
+            'canceled' => CheckoutSession::STATUS_CANCELLED,
+            default => CheckoutSession::STATUS_CHECKOUT_CREATED,
+        };
+    }
+
     private function paymentSnapshot(array $payload, ?string $fallbackMethod = null): array
     {
         $paymentMethodId = Str::lower((string) ($this->extractString($payload, ['payment_method_id']) ?: ''));
@@ -462,10 +802,38 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         ]);
     }
 
+    private function subscriptionSnapshot(array $payload, string $status): array
+    {
+        return $this->cleanArray([
+            'id' => $this->extractString($payload, ['id']),
+            'status' => $status,
+            'external_reference' => $this->extractString($payload, ['external_reference']),
+            'payment_method_id' => $this->extractString($payload, ['payment_method_id']),
+            'next_payment_date' => $this->extractString($payload, ['next_payment_date']),
+            'amount' => data_get($payload, 'auto_recurring.transaction_amount'),
+            'frequency' => data_get($payload, 'auto_recurring.frequency'),
+            'frequency_type' => data_get($payload, 'auto_recurring.frequency_type'),
+            'auto_renewal_enabled' => $status === 'authorized',
+        ]);
+    }
+
     private function resolveExpiresAt(array $payload, array $snapshot): ?CarbonImmutable
     {
         $value = data_get($snapshot, 'pix.expires_at') ?: $this->extractString($payload, ['date_of_expiration']);
 
+        if (! $value) {
+            return null;
+        }
+
+        try {
+            return CarbonImmutable::parse($value);
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function parseProviderDate(?string $value): ?CarbonImmutable
+    {
         if (! $value) {
             return null;
         }
@@ -502,6 +870,24 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         }
 
         return $this->extractString($payload, ['type', 'topic', 'action']);
+    }
+
+    private function isSubscriptionNotification(?string $notificationType, array $payload, array $query): bool
+    {
+        $type = Str::lower((string) $notificationType);
+
+        if (Str::contains($type, ['preapproval', 'subscription'])) {
+            return true;
+        }
+
+        $resource = Str::lower((string) ($this->extractString($payload, ['resource']) ?: ''));
+        if (Str::contains($resource, '/preapproval/')) {
+            return true;
+        }
+
+        $topic = Str::lower((string) ($query['topic'] ?? $query['type'] ?? ''));
+
+        return Str::contains($topic, ['preapproval', 'subscription']);
     }
 
     private function providerClient(string $accessToken)
@@ -621,6 +1007,12 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
             'credit_card', 'visa', 'master', 'mastercard', 'amex', 'elo', 'hipercard' => 'credit_card',
             default => 'pix',
         };
+    }
+
+    private function shouldCreateSubscription(CheckoutSession $session): bool
+    {
+        return (string) data_get($session->metadata, 'plan.billing_cycle', $session->plan_code) === 'monthly'
+            && (int) data_get($session->metadata, 'plan.interval_months', 1) === 1;
     }
 
     private function notificationUrl(): string

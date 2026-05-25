@@ -434,7 +434,7 @@ function selectPlan(planCode: string) {
             {{ periodTotalLabel }} {{ price(periodCardCents) }}. Economia de {{ savingsPercent(activeCyclePricing?.savings_percent) }}%
             em relação ao mensal.
           </small>
-          <small v-else>Pagamento mensal de {{ price(periodCardCents) }}. A recorrência automática no cartão será vinculada a este ciclo.</small>
+          <small v-else>Pagamento mensal de {{ price(periodCardCents) }}. No cartão, a recorrência automática será vinculada a este ciclo.</small>
         </div>
 
         <div class="plan-choice-grid">

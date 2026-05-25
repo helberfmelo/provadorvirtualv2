@@ -869,3 +869,13 @@
 - App Vue ganhou aviso discreto no rodapé sobre cookies técnicos, localStorage e registros operacionais, com botão `OK` e persistência por cookie/localStorage para não reaparecer.
 - Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test`, `npm run build`, `php -l` nos novos/alterados arquivos PHP, `vendor/bin/pint --dirty` e `git diff --check`.
 - Commit `ae0dc2b` enviado para `main`; o run `26411780677` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+
+## 2026-05-25 - Sprint 89 Recorrência mensal e cancelamento de renovação
+
+- Documentação oficial Mercado Pago conferida: criação de assinatura via `POST /preapproval`, consulta por `GET /preapproval/{id}`, faturas em `authorized_payments` e cancelamento/pausa por `PUT /preapproval/{id}` com `status=canceled` ou `paused`.
+- Plano mensal pago por cartão no Mercado Pago passa a criar assinatura recorrente sem plano associado, com `card_token_id`, frequência mensal, `status=authorized`, valor mensal e referência externa do checkout.
+- Criada tabela `billing_subscriptions` para registrar provedor, ID remoto, plano, ciclo, status, próxima cobrança, aceite de renovação, cancelamento futuro e payload da operadora.
+- Webhook/sincronização Mercado Pago passam a reconhecer notificações de `preapproval` e atualizar assinatura/checkout sem reverter acesso pago quando a renovação futura é cancelada.
+- Portal da empresa ganhou seção discreta `Preferências do plano` no dashboard, com checkbox `Renovação automática`; ao desmarcar, o backend chama `PUT /preapproval/{id}` com `status=canceled`.
+- Cancelar a renovação futura marca `auto_renewal_enabled=false`, `cancel_requested_at` e mantém `checkout_sessions.status=paid`, sem estornar pagamentos aprovados nem parcelas em andamento.
+- Renovação anual automática ficou documentada como pendência operacional: o anual continua como pagamento normal no cartão/Pix até validação segura sem dupla cobrança ou conflito com parcelamento anual.

@@ -65,4 +65,9 @@ class Merchant extends Model
     {
         return $this->hasMany(AuditLog::class);
     }
+
+    public function billingSubscriptions()
+    {
+        return $this->hasMany(BillingSubscription::class);
+    }
 }

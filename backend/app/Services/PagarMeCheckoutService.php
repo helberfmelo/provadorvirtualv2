@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\CheckoutPaymentProvider;
+use App\Models\BillingSubscription;
 use App\Models\CheckoutSession;
 use App\Models\PaymentEvent;
 use Carbon\CarbonImmutable;
@@ -198,6 +199,16 @@ class PagarMeCheckoutService implements CheckoutPaymentProvider
             $session->payment_method ?: 'pix',
             $session->provider_order_code ?: ('PV-'.$session->public_reference),
         );
+    }
+
+    public function syncSubscription(BillingSubscription $subscription): BillingSubscription
+    {
+        throw new RuntimeException('Recorrência Pagar.me ainda não está habilitada neste checkout.');
+    }
+
+    public function cancelSubscription(BillingSubscription $subscription): BillingSubscription
+    {
+        throw new RuntimeException('Cancelamento de renovação Pagar.me ainda não está habilitado neste checkout.');
     }
 
     public function publicCheckoutUrl(string $reference): string

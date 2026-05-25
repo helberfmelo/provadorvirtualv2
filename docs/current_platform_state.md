@@ -180,6 +180,7 @@ Atualizado em: 2026-05-25
 - Sprint 87 atualiza a matriz de planos para mensal/anual por plataforma, com preços `489,80`, `389,80`, `449,80` e `349,90`, total anual e percentual de economia retornados pela API.
 - Sprint 88 reforça `/termos` e `/privacidade`, exige aceite no checkout, salva prova técnica em `checkout_acceptances` com IP/data/hora/usuário/empresa/versões legais e adiciona aviso inferior de cookies/localStorage com persistência no navegador.
 - Sprint 88 enviada ao GitHub no commit `ae0dc2b`; o run `26411780677` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Sprint 89 implementa recorrência mensal no cartão via Mercado Pago `/preapproval`, salva assinaturas em `billing_subscriptions` e adiciona opção discreta no dashboard para cancelar somente a renovação futura.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -188,7 +189,7 @@ Atualizado em: 2026-05-25
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
-- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual e Pix como alternativa à vista com tag `5% off`; a regra comercial atual já tem planos mensal/anual por plataforma e aceite legal obrigatório. A trilha iniciada na Sprint 86 segue para recorrência e boleto controlado pelo SaaS.
+- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual e Pix como alternativa à vista com tag `5% off`; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório e recorrência mensal no cartão. A trilha iniciada na Sprint 86 segue para boleto controlado pelo SaaS e validação futura de recorrência anual.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
 - Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.
@@ -217,6 +218,7 @@ Atualizado em: 2026-05-25
 - APIs públicas: health, produto demo e recomendações do widget.
 - APIs públicas inteligentes: `/api/v1/public/recommendations/{id}/signal` e `/api/v1/public/shopper-profiles/forget`.
 - APIs públicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}`, `/api/v1/webhooks/mercado-pago` e `/api/v1/webhooks/pagarme`. O `POST /public/checkout` exige `accepted_terms=true` e grava a prova técnica do aceite.
+- APIs protegidas de assinatura: `/api/v1/billing/subscription` e `/api/v1/billing/subscription/auto-renewal` permitem consultar a assinatura da empresa ativa e desabilitar apenas a renovação futura.
 - APIs públicas de empresa: `/api/v1/public/company-access`.
 - APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.
 - API SaaS de checkout: `/api/v1/saas/checkout-settings`.

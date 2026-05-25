@@ -133,6 +133,12 @@ class PublicCheckoutController extends Controller
                             'privacy_version' => self::PRIVACY_VERSION,
                             'accepted_at' => $acceptedAt->toISOString(),
                         ],
+                        'recurrence' => [
+                            'auto_renewal_requested' => $data['payment_method'] === 'credit_card'
+                                && ($plan['billing_cycle'] ?? null) === CheckoutPlanCatalog::PLAN_MONTHLY,
+                            'annual_auto_renewal_enabled' => false,
+                            'annual_auto_renewal_reason' => 'Renovacao anual fica pendente ate validacao operacional sem risco de dupla cobranca ou conflito com parcelamento.',
+                        ],
                     ],
                 ]);
 
@@ -155,6 +161,8 @@ class PublicCheckoutController extends Controller
                         'platform' => $company->platform,
                         'payment_method' => $data['payment_method'],
                         'amount_cents' => $pricing['payable_cents'],
+                        'auto_renewal_requested' => $data['payment_method'] === 'credit_card'
+                            && ($plan['billing_cycle'] ?? null) === CheckoutPlanCatalog::PLAN_MONTHLY,
                     ],
                 ]);
 

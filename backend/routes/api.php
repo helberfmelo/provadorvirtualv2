@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\AuditLogController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BigShopActivationController;
 use App\Http\Controllers\Api\V1\BigShopIntegrationController;
+use App\Http\Controllers\Api\V1\BillingSubscriptionController;
 use App\Http\Controllers\Api\V1\DemoProductController;
 use App\Http\Controllers\Api\V1\GoLiveReadinessController;
 use App\Http\Controllers\Api\V1\HealthController;
@@ -111,6 +112,10 @@ Route::prefix('v1')->group(function (): void {
                 ],
             ]);
         })->middleware('portal.permission:merchant,dashboard,view');
+        Route::get('/billing/subscription', [BillingSubscriptionController::class, 'show'])
+            ->middleware('portal.permission:merchant,dashboard,view');
+        Route::patch('/billing/subscription/auto-renewal', [BillingSubscriptionController::class, 'updateAutoRenewal'])
+            ->middleware('portal.permission:merchant,dashboard,edit');
         Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index'])
             ->middleware('portal.permission:merchant,measurement_tables,view');
         Route::get('/widget-install', [WidgetInstallController::class, 'show'])

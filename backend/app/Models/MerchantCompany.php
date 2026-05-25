@@ -44,4 +44,9 @@ class MerchantCompany extends Model
     {
         return $this->belongsTo(Merchant::class);
     }
+
+    public function billingSubscriptions()
+    {
+        return $this->hasMany(BillingSubscription::class);
+    }
 }

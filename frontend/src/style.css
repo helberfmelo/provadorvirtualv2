@@ -877,6 +877,58 @@ a {
   line-height: 1.5;
 }
 
+.billing-preferences {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #6b7280;
+  background: #fff;
+  font-size: 0.88rem;
+}
+
+.billing-preferences strong {
+  display: block;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.billing-preferences small {
+  display: block;
+  line-height: 1.45;
+}
+
+.subtle-toggle {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  color: #4b5563;
+  font-weight: 800;
+}
+
+.subtle-toggle input {
+  width: 16px;
+  min-height: 16px;
+}
+
+.billing-note {
+  width: 100%;
+  color: #6b7280;
+}
+
+.billing-note.ok {
+  color: #047857;
+}
+
+.billing-note.warning {
+  color: #991b1b;
+}
+
 .quick-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

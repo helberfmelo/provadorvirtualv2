@@ -199,6 +199,66 @@ class PublicCheckoutFlowTest extends TestCase
         });
     }
 
+    public function test_monthly_credit_card_creates_mercado_pago_subscription(): void
+    {
+        $this->configureMercadoPago();
+
+        Http::fake([
+            'https://api.mercadopago.com/preapproval' => Http::response([
+                'id' => 'preapproval_monthly_123',
+                'status' => 'authorized',
+                'external_reference' => 'mp-monthly-ref',
+                'payment_method_id' => 'visa',
+                'next_payment_date' => now()->addMonth()->toIso8601String(),
+                'date_created' => now()->toIso8601String(),
+                'auto_recurring' => [
+                    'frequency' => 1,
+                    'frequency_type' => 'months',
+                    'transaction_amount' => 489.8,
+                    'currency_id' => 'BRL',
+                ],
+            ], 201),
+        ]);
+
+        $response = $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'plan_code' => 'monthly',
+            'payment_method' => 'credit_card',
+            'card_token' => 'mp-card-token',
+            'payment_method_id' => 'visa',
+            'installments' => 1,
+        ])
+            ->assertCreated()
+            ->assertJsonPath('status', 'paid')
+            ->assertJsonPath('payment.subscription.id', 'preapproval_monthly_123')
+            ->assertJsonPath('payment.subscription.status', 'authorized');
+
+        $this->assertNotEmpty($response->json('reference'));
+        $this->assertDatabaseHas('billing_subscriptions', [
+            'provider' => 'mercado_pago',
+            'provider_subscription_id' => 'preapproval_monthly_123',
+            'plan_code' => 'monthly',
+            'billing_cycle' => 'monthly',
+            'auto_renewal_enabled' => true,
+            'amount_cents' => 48980,
+        ]);
+        $this->assertDatabaseHas('merchant_companies', [
+            'name' => 'Loja Checkout Teste',
+            'status' => 'active',
+        ]);
+
+        Http::assertSent(function ($request): bool {
+            $payload = $request->data();
+
+            return $request->url() === 'https://api.mercadopago.com/preapproval'
+                && data_get($payload, 'card_token_id') === 'mp-card-token'
+                && data_get($payload, 'auto_recurring.frequency') === 1
+                && data_get($payload, 'auto_recurring.frequency_type') === 'months'
+                && data_get($payload, 'auto_recurring.transaction_amount') === 489.8
+                && data_get($payload, 'status') === 'authorized';
+        });
+    }
+
     public function test_checkout_does_not_accept_boleto(): void
     {
         $this->configurePagarme();

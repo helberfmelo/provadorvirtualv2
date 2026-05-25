@@ -47,6 +47,8 @@ Módulos:
 APIs protegidas já implementadas:
 
 - `GET /api/v1/merchant/overview`
+- `GET /api/v1/billing/subscription`
+- `PATCH /api/v1/billing/subscription/auto-renewal`
 - `GET|POST|PATCH|DELETE /api/v1/products`
 - `POST|PATCH|DELETE /api/v1/products/{product}/variants`
 - `GET|POST|PATCH|DELETE /api/v1/measurement-tables`
@@ -191,6 +193,7 @@ Tabelas propostas:
 - `audit_logs`
 - `checkout_sessions`
 - `checkout_acceptances`
+- `billing_subscriptions`
 - `payment_events`
 - `saas_settings`
 - `email_settings`

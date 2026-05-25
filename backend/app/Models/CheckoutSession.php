@@ -54,4 +54,9 @@ class CheckoutSession extends Model
     {
         return $this->hasOne(CheckoutAcceptance::class);
     }
+
+    public function billingSubscription()
+    {
+        return $this->hasOne(BillingSubscription::class);
+    }
 }

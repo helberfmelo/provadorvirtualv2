@@ -1226,6 +1226,8 @@ Validação:
 - build frontend;
 - commit, push e Actions/deploy.
 
+Status: implementado na Sprint 89 para plano mensal no cartão via Mercado Pago `/preapproval`, com registro local em `billing_subscriptions`, consulta/cancelamento no portal e cancelamento remoto por `PUT /preapproval/{id}` com `status=canceled`. A renovação anual permanece pendente por segurança operacional até validação sem dupla cobrança ou conflito com parcelamento.
+
 ### Sprint 90 - Boleto habilitável pelo SaaS
 
 Objetivo: oferecer boleto no checkout somente quando o SaaS habilitar esse meio de pagamento.

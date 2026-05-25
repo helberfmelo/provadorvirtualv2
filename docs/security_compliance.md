@@ -25,6 +25,8 @@ Status Sprint 36: `shopper_profiles` salva medidas somente com consentimento ope
 
 Status Sprint 88: checkout público exige aceite dos termos e política de privacidade. O aceite é versionado e registrado em `checkout_acceptances` com IP, user-agent, usuário, empresa, documento, e-mail, data/hora e contexto do plano/meio de pagamento. O site e o sistema exibem aviso inferior sobre cookies técnicos, localStorage e registros operacionais, com aceite persistido no navegador.
 
+Status Sprint 89: plano mensal no cartão cria assinatura Mercado Pago e salva `billing_subscriptions`. O cancelamento pelo portal desativa somente a renovação futura na operadora e preserva pagamentos já aprovados, parcelas em andamento e o checkout pago.
+
 ## Segredos
 
 Nunca commitar:

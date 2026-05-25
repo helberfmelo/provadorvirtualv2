@@ -175,6 +175,8 @@ Provider recomendado: OpenAI por alinhamento com os projetos recentes. Gemini po
   - cliente BigShop anual: `R$ 349,90/mes`, com total anual e economia versus mensal.
 - Em todo plano anual, o preço em destaque deve ser o valor mensal equivalente; o total anual e o percentual de economia devem aparecer próximos ao destaque.
 - Checkout público deve exigir aceite dos termos e da política de privacidade, salvar prova técnica com IP, user-agent, usuário, empresa, data/hora, versões legais e contexto do pedido.
+- Plano mensal pago por cartão deve usar recorrência automática com renovação mensal, salvando assinatura local e permitindo que a empresa desabilite apenas renovações futuras no painel.
+- Renovação anual automática só deve ser habilitada quando a operadora permitir confirmar o comportamento sem dupla cobrança inicial e sem conflito com parcelamento do período anual.
 - Site e sistema devem exibir aviso discreto de cookies técnicos/localStorage até o usuário confirmar.
 - Painel deve mostrar bloqueio funcional quando assinatura estiver inativa.
 

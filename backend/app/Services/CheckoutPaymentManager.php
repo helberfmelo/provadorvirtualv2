@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\CheckoutPaymentProvider;
+use App\Models\BillingSubscription;
 use App\Models\CheckoutSession;
 use App\Models\PaymentEvent;
 use App\Models\SaasSetting;
@@ -115,6 +116,11 @@ class CheckoutPaymentManager
             'limit' => $limit,
             'synced_at' => now()->toISOString(),
         ];
+    }
+
+    public function cancelSubscription(BillingSubscription $subscription): BillingSubscription
+    {
+        return $this->provider($subscription->provider)->cancelSubscription($subscription);
     }
 
     public function providerConfigured(string $provider): bool
