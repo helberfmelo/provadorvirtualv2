@@ -1293,3 +1293,24 @@ Validação:
 - commit, push e Actions/deploy.
 
 Status: implementado na Sprint 92 no commit `3436cc5`, publicado com sucesso no run `26413966332`. Validações locais passaram com `php artisan test --filter=Widget`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1` e assets públicos confirmando o modo modal.
+
+### Sprint 93 - Previa de confetes no portal do widget
+
+Objetivo: permitir que a empresa habilite ou desabilite a animacao de confetes nas configuracoes do widget e veja uma previa real ao ativar a opcao no portal.
+
+Entregas:
+
+- manter `theme.confetti_enabled` como configuracao editavel em `/app/widget`;
+- ajustar a copia da opcao para deixar claro que se trata da animacao de confetes exibida no resultado completo;
+- disparar, no portal, a mesma animacao usada na loja quando a empresa marca a opcao;
+- preservar a regra do widget publico: confete so aparece para o comprador quando a precisao chega a 100% e a configuracao esta ativa;
+- reutilizar a classe, quantidade de pecas, cores, duracao e keyframes do widget publico para garantir paridade visual.
+
+Validação:
+
+- build frontend;
+- testes backend focados no widget;
+- `git diff --check`;
+- commit, push e Actions/deploy.
+
+Status: implementado na Sprint 93 com prévia de confetes no portal, reaproveitando a mesma animação visual do widget público. Validações locais passaram com `npm run build`, `php artisan test --filter=Widget` e `git diff --check`.

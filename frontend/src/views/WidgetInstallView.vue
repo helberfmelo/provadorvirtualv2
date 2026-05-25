@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
@@ -47,6 +47,7 @@ const install = ref<WidgetInstall | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const copied = ref(false)
+let confettiPreviewTimeout: number | null = null
 
 const form = reactive({
   platform: 'custom',
@@ -131,6 +132,10 @@ onMounted(() => {
   loadInstall()
 })
 
+onBeforeUnmount(() => {
+  removeConfettiPreview()
+})
+
 async function loadInstall() {
   loading.value = true
 
@@ -192,6 +197,48 @@ async function copySnippet() {
   window.setTimeout(() => {
     copied.value = false
   }, 1800)
+}
+
+function handleConfettiChange(event: Event) {
+  if ((event.target as HTMLInputElement).checked) {
+    triggerConfettiPreview()
+  }
+}
+
+function triggerConfettiPreview() {
+  removeConfettiPreview()
+
+  const layer = document.createElement('div')
+  const colors = ['#ff4d5e', '#ff7a1a', '#0f172a', '#22c55e', '#38bdf8']
+
+  layer.className = 'pv-confetti-layer portal-confetti-preview'
+  layer.setAttribute('aria-hidden', 'true')
+
+  for (let index = 0; index < 42; index += 1) {
+    const piece = document.createElement('i')
+    piece.style.left = `${Math.round(Math.random() * 100)}%`
+    piece.style.background = colors[index % colors.length]
+    piece.style.animationDelay = `${(Math.random() * 0.35).toFixed(2)}s`
+    piece.style.transform = `rotate(${Math.round(Math.random() * 180)}deg)`
+    layer.appendChild(piece)
+  }
+
+  document.body.appendChild(layer)
+
+  confettiPreviewTimeout = window.setTimeout(() => {
+    removeConfettiPreview()
+  }, 2200)
+}
+
+function removeConfettiPreview() {
+  if (confettiPreviewTimeout) {
+    window.clearTimeout(confettiPreviewTimeout)
+    confettiPreviewTimeout = null
+  }
+
+  document.querySelectorAll('.portal-confetti-preview').forEach((layer) => {
+    layer.remove()
+  })
 }
 </script>
 
@@ -332,8 +379,13 @@ async function copySnippet() {
             <input v-model="form.theme.button_radius" type="number" min="0" max="24" />
           </label>
           <label class="toggle-line">
-            Confete
-            <input v-model="form.theme.confetti_enabled" type="checkbox" />
+            Animação de confetes
+            <input
+              v-model="form.theme.confetti_enabled"
+              type="checkbox"
+              @change="handleConfettiChange"
+            />
+            <small>Ao ativar, o cliente vê essa celebração quando chega ao resultado completo.</small>
           </label>
         </div>
 

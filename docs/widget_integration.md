@@ -146,6 +146,8 @@ O drawer do widget usa as cores configuradas no tema da loja para cabeçalho, CT
 
 Status Sprint 92: o tema do widget aceita `presentation_mode` com os valores `drawer` e `modal`. O padrão continua `drawer` para instalações existentes. Quando o lojista escolhe `modal` em `/app/widget`, o mesmo fluxo de recomendação abre em um modal central grande no desktop e ocupa a tela toda no mobile, sem alterar etapas, eventos, recomendação, feedback, tabela de medidas ou persistência local. Publicado no run `26413966332` e validado em produção.
 
+Status Sprint 93: a opção `theme.confetti_enabled` continua controlando a celebração por loja. Em `/app/widget`, ao marcar `Animação de confetes`, o portal dispara uma prévia com a mesma classe `.pv-confetti-layer`, 42 peças, cores e keyframes do widget público, para a empresa ver exatamente o efeito que o comprador verá ao chegar ao resultado completo.
+
 ## Guias por plataforma
 
 ### BigShop

@@ -914,3 +914,12 @@
 - Validações locais: `php artisan test --filter=Widget`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.
 - Commit `3436cc5` enviado para `main`; o run `26413966332` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`; verificação dos assets públicos confirmou `presentation_mode`, `pv-recommendation-modal` e regra mobile `height: 100dvh`.
+
+## 2026-05-25 - Sprint 93 Previa de confetes no portal do widget
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- Confirmado que `theme.confetti_enabled` já existia no contrato do widget e que a loja usa `.pv-confetti-layer` com 42 peças, cores fixas e animação `pv-confetti-fall`.
+- A personalização do widget em `/app/widget` passa a exibir `Animação de confetes` com texto operacional sobre a celebração no resultado completo.
+- Ao marcar a opção no portal, a tela dispara a mesma animação visual usada na loja, sem alterar a regra pública de disparo no resultado com 100% de precisão.
+- A prévia remove camadas anteriores e limpa timers ao sair da tela para evitar resíduos visuais no portal.
+- Validações locais: `npm run build`, `php artisan test --filter=Widget` e `git diff --check`.

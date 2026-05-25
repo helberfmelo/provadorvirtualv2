@@ -188,6 +188,7 @@ Atualizado em: 2026-05-25
 - Sprint 91 enviada ao GitHub no commit `61e8fac`; o run `26413377677` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin, smoke público e nova validação de produção pós-deploy.
 - Sprint 92 adiciona opção visual do provador entre drawer lateral e modal central. A preferência fica em `theme.presentation_mode`, é alterável em `/app/widget` e não muda a dinâmica de recomendação.
 - Sprint 92 enviada ao GitHub no commit `3436cc5`; o run `26413966332` finalizou com sucesso e a validação de produção confirmou os assets públicos do modo modal.
+- Sprint 93 adiciona prévia real da animação de confetes no portal: ao marcar `Animação de confetes` em `/app/widget`, a empresa vê a mesma celebração usada na loja, mantendo `theme.confetti_enabled` como controle do disparo no resultado completo.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -236,7 +237,7 @@ Atualizado em: 2026-05-25
 - Mobile do portal: header autenticado exibe somente marca e menu; o drawer concentra navegação, usuário, saída e fechamento explícito para evitar sobreposição e reduzir carga visual.
 - Widget público: `/widget/v1/provador-virtual.js` e `/widget/v1/provador-virtual.css`.
 - O widget público v2 mantém os botões `PV Descubra seu tamanho` e `cm Tabela de Medidas`, mas o fluxo de recomendação agora segue a ordem do v1: medidas básicas, gênero/formato corporal, medidas detalhadas, resultado e feedback. Mesmo com perfil salvo no navegador, a etapa 1 deve limitar a precisão aos campos básicos e nunca pular direto para o resultado; quando houver altura + peso, o rodapé já pode exibir recomendação parcial e incentivar o aumento de precisão. O cabeçalho do drawer usa o mesmo gradiente dos botões e da barra de precisão, respeitando a cor de destaque configurada no tema da loja. O aviso de salvamento local das medidas aparece somente na etapa 1, no final do corpo rolável do widget, sem checkbox, em itálico e com fonte menor. O feedback final não exibe escala de nota de 1 a 5; usa apenas botões `Sim, ajudou` e `Não ajudou`, tamanho escolhido e comentário opcional. O tamanho recomendado é acionável no banner parcial, no rodapé e no resultado; ao tocar, o widget fecha e emite `provadorvirtual:size-selected` para a loja marcar a variação correspondente quando houver integração.
-- A abertura do fluxo de recomendação pode ser configurada por loja como drawer lateral ou modal central. O modal central usa o mesmo conteúdo e ocupa a tela toda no mobile.
+- A abertura do fluxo de recomendação pode ser configurada por loja como drawer lateral ou modal central. O modal central usa o mesmo conteúdo e ocupa a tela toda no mobile. A animação de confetes pode ser desligada por loja e o portal mostra a mesma prévia visual quando a empresa ativa a opção.
 - Assets oficiais de marca ficam em `frontend/public/images/brand/` e alimentam o cabeçalho, rodapé, favicon e tags OG/Twitter.
 
 ## Próxima ação recomendada

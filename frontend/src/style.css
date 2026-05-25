@@ -2758,6 +2758,40 @@ textarea {
   width: 22px;
 }
 
+.pv-confetti-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1000000;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pv-confetti-layer i {
+  position: absolute;
+  top: -14px;
+  display: block;
+  width: 8px;
+  height: 14px;
+  border-radius: 2px;
+  animation: pv-confetti-fall 1.9s ease-in forwards;
+}
+
+.portal-confetti-preview {
+  z-index: 1000002;
+}
+
+@keyframes pv-confetti-fall {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, -20px, 0) rotate(0deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(24px, 110vh, 0) rotate(540deg);
+  }
+}
+
 .mode-selector {
   display: grid;
   gap: 8px;
