@@ -67,7 +67,7 @@ const currentYear = new Date().getFullYear()
   <section class="landing-section muted-band">
     <div class="landing-split reverse">
       <div class="landing-media">
-        <img :src="widgetPreviewUrl" alt="Widget do Provador Virtual em uma experiência de compra" />
+        <img :src="widgetPreviewUrl" alt="Provador Virtual em uma experiência de compra" />
       </div>
       <div class="landing-copy">
         <span class="eyebrow">
@@ -156,7 +156,7 @@ const currentYear = new Date().getFullYear()
       <article class="metric-card">
         <i class="fa-solid fa-palette" aria-hidden="true"></i>
         <strong>Visual configurável</strong>
-        <span>O lojista ajusta cores, fonte e botões do widget com preview antes de publicar.</span>
+        <span>O lojista ajusta cores, fonte e botões do provador com prévia antes de publicar.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>

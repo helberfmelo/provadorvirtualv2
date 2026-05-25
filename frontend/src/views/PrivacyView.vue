@@ -5,7 +5,7 @@
         <span class="eyebrow">Provador Virtual</span>
         <h1>Privacidade</h1>
         <p>
-          Esta política resume como tratamos dados no widget, no painel do lojista e nas
+          Esta política resume como tratamos dados no provador, no painel do lojista e nas
           integrações da plataforma.
         </p>
       </div>
@@ -19,7 +19,7 @@
       <article>
         <h2>Dados do consumidor</h2>
         <p>
-          O widget pede apenas medidas aproximadas necessárias para recomendar tamanho. Nome,
+          O provador pede apenas medidas aproximadas necessárias para recomendar tamanho. Nome,
           telefone e e-mail não fazem parte do fluxo padrão de recomendação.
         </p>
       </article>
@@ -33,7 +33,7 @@
       <article>
         <h2>Retenção</h2>
         <p>
-          Dados corporais e identificadores técnicos do widget têm retenção curta e podem ser
+          Dados corporais e identificadores técnicos do provador têm retenção curta e podem ser
           anonimizados por rotina operacional.
         </p>
       </article>
@@ -55,7 +55,7 @@
         <h2>Contato</h2>
         <p>
           Solicitações de privacidade podem ser enviadas para o suporte comercial do Provador
-          Virtual ou para o lojista responsável pela loja onde o widget foi usado.
+          Virtual ou para o lojista responsável pela loja onde o provador foi usado.
         </p>
       </article>
     </div>

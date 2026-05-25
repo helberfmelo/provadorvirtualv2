@@ -33,7 +33,7 @@
       <article>
         <h2>Integração</h2>
         <p>
-          O widget deve ser instalado nos domínios autorizados da loja. Requisições fora desses
+          O provador deve ser instalado nos domínios autorizados da loja. Requisições fora desses
           domínios podem ser bloqueadas automaticamente.
         </p>
       </article>

@@ -147,7 +147,7 @@ function selectVariant(variantId: number, source: 'manual' | 'widget' = 'manual'
 }
 
 function handleDemoSizeClick() {
-  widgetSelectionMessage.value = 'Na loja teste, os tamanhos são apenas ilustrativos. Clique em "PV Descubra seu tamanho" para ver o widget escolher por você.'
+  widgetSelectionMessage.value = 'Na loja teste, os tamanhos são apenas ilustrativos. Clique em "PV Descubra seu tamanho" para ver o provador escolher por você.'
 }
 
 function handleWidgetSizeSelected(event: CustomEvent) {
@@ -228,7 +228,7 @@ function price(value: string | number | null | undefined) {
       <div>
         <span class="eyebrow">{{ storefront.store.name }}</span>
         <h1>Loja teste do Provador Virtual</h1>
-        <p>Esta vitrine é uma demonstração. Os produtos não estão à venda; escolha um item apenas para abrir o widget e ver como a recomendação de tamanho funciona.</p>
+        <p>Esta vitrine é uma demonstração. Os produtos não estão à venda; escolha um item apenas para abrir o provador e ver como a recomendação de tamanho funciona.</p>
       </div>
     </div>
 
@@ -283,7 +283,7 @@ function price(value: string | number | null | undefined) {
       <div class="product-demo-alert">
         <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
         <div>
-          <strong>Produto fictício para testar o widget.</strong>
+          <strong>Produto fictício para testar o provador.</strong>
           <span>Não escolha tamanho manualmente: clique em <b>PV Descubra seu tamanho</b> e deixe o Provador Virtual recomendar.</span>
         </div>
       </div>
@@ -298,7 +298,7 @@ function price(value: string | number | null | undefined) {
 
       <div class="demo-size-header">
         <strong>Tamanhos ilustrativos</strong>
-        <span>O widget seleciona o tamanho recomendado aqui depois do teste.</span>
+        <span>O provador seleciona o tamanho recomendado aqui depois do teste.</span>
       </div>
 
       <div class="size-picker" aria-label="Escolha de tamanho">
@@ -321,7 +321,7 @@ function price(value: string | number | null | undefined) {
         <div>
           <span class="eyebrow">Provador Virtual</span>
           <h2>Clique aqui para testar a recomendação</h2>
-          <p>Preencha altura e peso no widget. Quando aparecer o tamanho recomendado, toque em <b>Usar tamanho</b> para voltar à página com ele marcado.</p>
+          <p>Preencha altura e peso no provador. Quando aparecer o tamanho recomendado, toque em <b>Usar tamanho</b> para voltar à página com ele marcado.</p>
         </div>
 
         <div id="provador-virtual-container"></div>

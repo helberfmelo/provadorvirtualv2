@@ -33,7 +33,7 @@ const workViewKey = computed(() => {
 })
 
 const publicLinks = computed<NavLink[]>(() => [
-  { to: '/produto-teste', label: 'Teste o widget', icon: 'fa-wand-magic-sparkles', show: true },
+  { to: '/produto-teste', label: 'Teste o provador', icon: 'fa-wand-magic-sparkles', show: true },
   { to: '/checkout', label: 'Contratar', icon: 'fa-credit-card', show: !auth.isAuthenticated },
   { to: '/login', label: 'Entrar', icon: 'fa-right-to-bracket', show: !auth.isAuthenticated },
 ])

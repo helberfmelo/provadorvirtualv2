@@ -98,8 +98,8 @@ const installationSteps = computed(() => {
   const steps = [
     'Instale na página de produto, no template que renderiza a vitrine de cada item.',
     'Coloque o container no ponto exato em que os botões devem aparecer, perto do seletor de tamanho/grade e antes ou próximo ao botão Comprar.',
-    'Carregue o script com defer no template da página, no head ou no fim do body, garantindo que o container exista quando o widget iniciar.',
-    'Preencha produto, variação e SKU com os dados reais do item atual; quando a grade mudar, atualize esses dados e recarregue o widget.',
+    'Carregue o script com defer no template da página, no head ou no fim do body, garantindo que o container exista quando o provador iniciar.',
+    'Preencha produto, variação e SKU com os dados reais do item atual; quando a grade mudar, atualize esses dados e recarregue o provador.',
   ]
 
   if (isBigShopContract.value || form.platform === 'bigshop') {
@@ -191,8 +191,20 @@ async function copySnippet() {
   <section class="dashboard app-workspace">
     <div class="page-heading">
       <div>
-        <span class="eyebrow">Widget</span>
-        <h1>Instalação</h1>
+        <span class="eyebrow">
+          Widget
+          <span
+            class="info-tooltip title-info-tooltip"
+            tabindex="0"
+            role="button"
+            aria-label="O widget do Provador Virtual é o provador que aparece na página do produto da loja."
+            data-tooltip="É o provador que aparece na página do produto da loja. Ele mostra os botões Descubra seu tamanho e Tabela de Medidas, abre a recomendação por IA e ajuda o cliente a escolher o tamanho certo sem sair da compra."
+          >i</span>
+        </span>
+        <h1>Instalação do provador</h1>
+        <p class="page-heading-help">
+          Configure aqui o provador que será exibido na página de produto da loja para recomendar tamanho, mostrar a tabela de medidas e aplicar a identidade visual da marca.
+        </p>
       </div>
       <button class="btn btn-secondary" type="button" :disabled="!install" @click="copySnippet">
         <i class="fa-solid fa-copy" aria-hidden="true"></i>
@@ -200,7 +212,7 @@ async function copySnippet() {
       </button>
     </div>
 
-    <div v-if="loading" class="empty-state">Carregando widget...</div>
+    <div v-if="loading" class="empty-state">Carregando provador...</div>
 
     <div v-else class="install-grid">
       <form class="panel-main admin-form" @submit.prevent="saveInstall">
@@ -303,7 +315,7 @@ async function copySnippet() {
         <div class="action-row compact">
           <button class="btn btn-primary" type="submit" :disabled="saving">
             <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-            Salvar widget
+            Salvar provador
           </button>
         </div>
       </form>
@@ -311,7 +323,7 @@ async function copySnippet() {
       <aside class="install-preview">
         <div class="subsection-heading">
           <h2>Visualizador</h2>
-          <span>Widget e tabela</span>
+          <span>Provador e tabela</span>
         </div>
         <div class="widget-style-preview" :style="previewStyle">
           <div class="preview-product-line">
@@ -352,7 +364,7 @@ async function copySnippet() {
         <div class="check-list">
           <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Produto ativo</span>
           <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Tabela vinculada</span>
-          <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Widget público</span>
+          <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Provador público</span>
         </div>
       </aside>
     </div>

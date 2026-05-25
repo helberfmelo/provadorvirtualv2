@@ -1577,6 +1577,14 @@ th {
   margin-bottom: 0;
 }
 
+.page-heading-help {
+  max-width: 720px;
+  margin: 10px 0 0;
+  color: #4b5563;
+  font-size: 0.98rem;
+  line-height: 1.55;
+}
+
 .page-heading .action-row,
 .subsection-heading .action-row {
   margin-top: 0;
@@ -2109,6 +2117,7 @@ textarea {
   opacity: 0;
   overflow-wrap: anywhere;
   pointer-events: none;
+  text-transform: none;
   transform: translateY(-4px);
   transition: opacity 140ms ease, transform 140ms ease;
   white-space: normal;
@@ -2124,6 +2133,17 @@ textarea {
 .info-tooltip:focus::after {
   opacity: 1;
   transform: translateY(0);
+}
+
+.title-info-tooltip {
+  width: 22px;
+  height: 22px;
+  flex-basis: 22px;
+  border-color: #fed7aa;
+  color: #9a3412;
+  background: #fff7ed;
+  font-size: 0.78rem;
+  text-transform: none;
 }
 
 .install-preview,
