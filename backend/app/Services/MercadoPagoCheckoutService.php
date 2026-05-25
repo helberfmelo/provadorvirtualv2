@@ -52,6 +52,7 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
     {
         $accessToken = $this->requiredAccessToken();
         $providerOrderCode = $session->provider_order_code ?: ('PV-MP-'.strtoupper(Str::random(10)));
+        $idempotencyKey = $this->ensureIdempotencyKey($session, $providerOrderCode);
         $paymentMethod = $this->normalizePaymentMethod((string) ($buyerData['payment_method'] ?? 'pix'));
 
         if ($paymentMethod === 'credit_card' && $this->shouldCreateSubscription($session)) {
@@ -62,7 +63,7 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
 
         try {
             $response = $this->providerClient($accessToken)
-                ->withHeaders(['X-Idempotency-Key' => $providerOrderCode])
+                ->withHeaders(['X-Idempotency-Key' => $idempotencyKey])
                 ->post('/v1/payments', $payload)
                 ->throw()
                 ->json();
@@ -315,10 +316,11 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
     private function createSubscription(CheckoutSession $session, array $buyerData, string $providerOrderCode): CheckoutSession
     {
         $payload = $this->buildSubscriptionPayload($session, $buyerData);
+        $idempotencyKey = $this->ensureIdempotencyKey($session, $providerOrderCode);
 
         try {
             $response = $this->providerClient($this->requiredAccessToken())
-                ->withHeaders(['X-Idempotency-Key' => $providerOrderCode])
+                ->withHeaders(['X-Idempotency-Key' => $idempotencyKey])
                 ->post('/preapproval', $payload)
                 ->throw()
                 ->json();
@@ -926,6 +928,26 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
             ->asJson()
             ->withToken($accessToken)
             ->withHeaders(['User-Agent' => self::PROVIDER_USER_AGENT]);
+    }
+
+    private function ensureIdempotencyKey(CheckoutSession $session, string $providerOrderCode): string
+    {
+        $metadata = Arr::wrap($session->metadata);
+        $idempotencyKey = (string) data_get($metadata, 'mercado_pago.idempotency_key');
+
+        if ($idempotencyKey === '') {
+            $idempotencyKey = (string) Str::uuid();
+            data_set($metadata, 'mercado_pago.idempotency_key', $idempotencyKey);
+        }
+
+        if ($session->provider_order_code !== $providerOrderCode || $session->metadata !== $metadata) {
+            $session->forceFill([
+                'provider_order_code' => $providerOrderCode,
+                'metadata' => $metadata,
+            ])->save();
+        }
+
+        return $idempotencyKey;
     }
 
     private function requiredAccessToken(): string

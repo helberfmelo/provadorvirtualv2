@@ -202,6 +202,7 @@ Atualizado em: 2026-05-25
 - Sprint 98 enviada ao GitHub no commit `1e0af18`; o run `26419066028` finalizou com sucesso e a validação de produção confirmou `/checkout`.
 - Sprint 99 adiciona retorno no cabeçalho público para usuários autenticados voltarem ao SaaS ou ao Portal da Empresa e canonicaliza rotas antigas de frontend em `/provadorvirtual_v2`.
 - Sprint 99 enviada ao GitHub no commit `360ed12`; o run `26419953084` finalizou com sucesso e a validação de produção confirmou páginas, APIs, widget e redirects legados para a raiz.
+- Sprint 100 corrige a conclusão do checkout: Pix mostra QR Code/copia e cola, boleto mostra abrir/baixar/copiar código de barras, cartão aprovado mostra sucesso e falhas da operadora viram modal amigável com código técnico.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -211,7 +212,7 @@ Atualizado em: 2026-05-25
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
-- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` apenas no plano anual com desconto real e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão, cancelamento de renovação futura pelo portal e coleta de empresa limitada a CNPJ. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
+- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` apenas no plano anual com desconto real e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão, cancelamento de renovação futura pelo portal e coleta de empresa limitada a CNPJ. A conclusão exibe Pix com QR Code/copia e cola, boleto com link/download/código de barras, cartão aprovado com sucesso e falhas com mensagem amigável mais código técnico. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
 - Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.
@@ -224,7 +225,7 @@ Atualizado em: 2026-05-25
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
 - Diretriz obrigatória de telas: `docs/portal_ui_guidelines.md`.
-- Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão e links para termos/privacidade.
+- Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão, links para termos/privacidade, modal amigável de falha por meio de pagamento e conclusão específica para Pix, boleto e cartão.
 - Site público raiz: landing comercial do Provador Virtual, com planos mensal/anual por plataforma, CTA para loja teste/checkout e cards de benefícios otimizados para mobile. A cópia pública usa `provador` em vez de `widget` para evitar jargão técnico. Quando há sessão autenticada, o cabeçalho mostra retorno para `Voltar ao SaaS` ou `Voltar ao portal`, conforme o papel carregado por `/me`.
 - APIs protegidas: produtos, variações, tabelas, templates, widget-install e integrações, com middleware de permissão por módulo e escopo da empresa ativa.
 - Importacoes protegidas: preview, commit e histórico em `/api/v1/imports`.
@@ -239,7 +240,7 @@ Atualizado em: 2026-05-25
 - BigShop público assinado: ativação em `/api/v1/public/bigshop/activate`.
 - APIs públicas: health, produto demo e recomendações do widget.
 - APIs públicas inteligentes: `/api/v1/public/recommendations/{id}/signal` e `/api/v1/public/shopper-profiles/forget`.
-- APIs públicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}`, `/api/v1/webhooks/mercado-pago` e `/api/v1/webhooks/pagarme`. O `POST /public/checkout` exige `accepted_terms=true` e grava a prova técnica do aceite.
+- APIs públicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}`, `/api/v1/webhooks/mercado-pago` e `/api/v1/webhooks/pagarme`. O `POST /public/checkout` exige `accepted_terms=true`, grava a prova técnica do aceite e retorna falhas da operadora com mensagem amigável, `error_code`, referência, operadora e meio de pagamento.
 - APIs protegidas de assinatura: `/api/v1/billing/subscription` e `/api/v1/billing/subscription/auto-renewal` permitem consultar a assinatura da empresa ativa e desabilitar apenas a renovação futura.
 - APIs públicas de empresa: `/api/v1/public/company-access`.
 - APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.

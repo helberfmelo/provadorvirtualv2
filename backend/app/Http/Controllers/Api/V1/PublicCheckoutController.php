@@ -58,11 +58,13 @@ class PublicCheckoutController extends Controller
 
             $session = $this->checkoutPayments->createOrder($session, $data);
         } catch (RuntimeException $exception) {
+            $failedSession = $session ?? null;
+
             if (isset($session) && $session instanceof CheckoutSession) {
-                $this->markCheckoutAsFailed($session, $exception);
+                $failedSession = $this->markCheckoutAsFailed($session, $exception);
             }
 
-            return response()->json(['message' => $exception->getMessage()], 422);
+            return response()->json($this->checkoutErrorPayload($exception, $failedSession), 422);
         }
 
         app(TransactionalEmailService::class)->sendForCheckout(TransactionalEmailService::CODE_SIGNUP, $session);
@@ -109,6 +111,7 @@ class PublicCheckoutController extends Controller
                     'name' => $session->user?->name ?: $session->lead_name,
                     'email' => $session->user?->email ?: $session->lead_email,
                 ],
+                'failure' => data_get($session->metadata, 'failure'),
             ],
             'payment' => data_get($session->metadata, 'payment_snapshot', []),
         ]);
@@ -327,12 +330,18 @@ class PublicCheckoutController extends Controller
 
     private function markCheckoutAsFailed(CheckoutSession $session, RuntimeException $exception): CheckoutSession
     {
+        $rawMessage = trim($exception->getMessage());
+        $friendlyMessage = $this->friendlyCheckoutErrorMessage($rawMessage, $session->payment_method);
+        $errorCode = $this->checkoutErrorCode($rawMessage, $session);
+
         $session->forceFill([
             'status' => CheckoutSession::STATUS_FAILED,
             'metadata' => [
                 ...Arr::wrap($session->metadata),
                 'failure' => [
-                    'message' => $exception->getMessage(),
+                    'message' => $friendlyMessage,
+                    'technical_message' => $rawMessage !== $friendlyMessage ? $rawMessage : null,
+                    'error_code' => $errorCode,
                     'failed_at' => now()->toISOString(),
                     'provider' => $session->provider,
                     'payment_method' => $session->payment_method,
@@ -348,6 +357,55 @@ class PublicCheckoutController extends Controller
         }
 
         return $session->fresh(['merchant', 'company', 'user']) ?? $session;
+    }
+
+    private function checkoutErrorPayload(RuntimeException $exception, ?CheckoutSession $session): array
+    {
+        $rawMessage = trim($exception->getMessage());
+        $paymentMethod = (string) ($session?->payment_method ?: '');
+
+        return array_filter([
+            'message' => $this->friendlyCheckoutErrorMessage($rawMessage, $paymentMethod),
+            'error_code' => $this->checkoutErrorCode($rawMessage, $session),
+            'reference' => $session?->public_reference,
+            'provider' => $session?->provider,
+            'payment_method' => $paymentMethod ?: null,
+        ], fn ($value) => filled($value));
+    }
+
+    private function friendlyCheckoutErrorMessage(string $message, string $paymentMethod): string
+    {
+        $message = trim($message);
+
+        if ($message !== '' && ! $this->looksLikeTechnicalProviderMessage($message)) {
+            return $message;
+        }
+
+        return match ($paymentMethod) {
+            'pix' => 'Não conseguimos gerar o Pix agora. Confira os dados informados e tente novamente em instantes.',
+            'boleto' => 'Não conseguimos gerar o boleto agora. Confira os dados informados e tente novamente em instantes.',
+            'credit_card' => 'Não foi possível aprovar o cartão. Confira os dados, tente outro cartão ou escolha Pix.',
+            default => 'Não foi possível concluir a contratação agora. Confira os dados e tente novamente em instantes.',
+        };
+    }
+
+    private function looksLikeTechnicalProviderMessage(string $message): bool
+    {
+        $normalized = Str::lower(trim($message));
+
+        return $normalized === ''
+            || Str::startsWith($normalized, ['|', ';'])
+            || Str::contains($normalized, ['internal_error', 'bad_request', 'invalid_', 'idempotency'])
+            || (bool) preg_match('/\d{2}-\d{2}-\d{4}t\d{2}:\d{2}:\d{2}utc;[0-9a-f-]{32,36}/i', $message);
+    }
+
+    private function checkoutErrorCode(string $message, ?CheckoutSession $session): string
+    {
+        if (preg_match('/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i', $message, $matches)) {
+            return $matches[0];
+        }
+
+        return 'PV-CHK-'.($session?->id ?: Str::upper(Str::random(8)));
     }
 
     private function resolveCheckoutUser(array $data): User

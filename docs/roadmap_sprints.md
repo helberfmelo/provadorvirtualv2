@@ -1456,3 +1456,30 @@ Validação:
 - `scripts/validate-production.ps1` após deploy, incluindo redirects legados para a raiz.
 
 Status: implementado na Sprint 99 no commit `360ed12`, publicado com sucesso no run `26419953084`. Validações locais passaram com `npm run build`, `php artisan test` com 85 testes e 690 assertions e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo redirects de `/provadorvirtual_v2/`, `/provadorvirtual_v2/login` e `/provadorvirtual_v2/app/produtos/novo` para as URLs limpas da raiz.
+
+### Sprint 100 - Conclusão e erros do checkout
+
+Objetivo: impedir que erros técnicos da operadora apareçam para o cliente e garantir telas corretas de conclusão para Pix, boleto e cartão.
+
+Entregas:
+
+- usar chave de idempotência UUID no Mercado Pago e salvar essa chave nos metadados da sessão;
+- traduzir erros opacos da operadora para mensagens amigáveis por meio de pagamento, mantendo código técnico para suporte;
+- registrar em pedidos SaaS a mensagem amigável, a mensagem técnica original, o código do erro, operadora e meio de pagamento;
+- exibir modal de erro no checkout com mensagem amigável e código de referência, incluindo atalho discreto para tentar Pix quando aplicável;
+- desmontar o CardForm do Mercado Pago ao trocar para Pix/boleto ou alterar plano, evitando tokenização de cartão em pagamentos Pix;
+- mostrar em `/checkout/sucesso` Pix com QR Code, copia e cola e botão de copiar; boleto com abrir, baixar e copiar código de barras; cartão aprovado com tela de sucesso;
+- exibir sessão falhada em `/checkout/sucesso` com mensagem amigável e código do erro quando o cliente voltar por referência.
+
+Validação:
+
+- `npm run build`;
+- `php artisan test --filter=PublicCheckoutFlowTest`;
+- `php artisan test --filter=SaasCheckoutOrdersApiTest`;
+- `php artisan test`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: em implementação na Sprint 100. Validações locais já passaram com `npm run build`, `PublicCheckoutFlowTest` com 16 testes e 90 assertions, `php artisan test` com 86 testes e 700 assertions e `vendor/bin/pint --dirty`.

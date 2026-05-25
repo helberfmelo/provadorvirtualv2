@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '../services/api'
 import { createMercadoPagoCardForm, tokenizePagarMeCard, type MercadoPagoCardFormData, type PublicCheckoutConfig } from '../services/pagarme'
@@ -35,12 +35,24 @@ type PricingVariant = {
 }
 
 type PaymentMethod = 'pix' | 'credit_card' | 'boleto'
+type CheckoutErrorModal = {
+  open: boolean
+  title: string
+  message: string
+  code: string
+}
 
 const router = useRouter()
 const route = useRoute()
 const loading = ref(true)
 const submitting = ref(false)
 const error = ref('')
+const checkoutError = reactive<CheckoutErrorModal>({
+  open: false,
+  title: '',
+  message: '',
+  code: '',
+})
 const checkoutConfig = ref<PublicCheckoutConfig | null>(null)
 const plans = ref<Plan[]>([])
 const pricing = ref<Record<string, PricingVariant>>({})
@@ -138,6 +150,10 @@ onMounted(async () => {
   await loadConfig()
 })
 
+onBeforeUnmount(() => {
+  disposeMercadoPagoCardForm()
+})
+
 async function loadConfig() {
   loading.value = true
   try {
@@ -176,6 +192,7 @@ async function submitCheckout() {
 
   submitting.value = true
   error.value = ''
+  closeCheckoutError()
 
   try {
     let cardTokenPayload: Record<string, string | null> = {}
@@ -212,10 +229,73 @@ async function submitCheckout() {
     const { data } = await api.post('/public/checkout', payload)
     await router.push(`/checkout/sucesso?ref=${encodeURIComponent(data.reference)}`)
   } catch (requestError: any) {
-    error.value = requestError.response?.data?.message || requestError.message || 'Não foi possível concluir o checkout.'
+    showCheckoutError(requestError)
   } finally {
     submitting.value = false
   }
+}
+
+function showCheckoutError(requestError: any) {
+  const data = requestError?.response?.data || {}
+  const rawMessage = String(data.message || requestError?.message || '')
+
+  checkoutError.title = checkoutErrorTitle()
+  checkoutError.message = friendlyCheckoutErrorMessage(rawMessage)
+  checkoutError.code = String(data.error_code || extractErrorCode(rawMessage) || 'ERRO-CHECKOUT')
+  checkoutError.open = true
+}
+
+function closeCheckoutError() {
+  checkoutError.open = false
+  checkoutError.title = ''
+  checkoutError.message = ''
+  checkoutError.code = ''
+}
+
+function checkoutErrorTitle() {
+  if (form.payment_method === 'credit_card') {
+    return 'Cartão não aprovado'
+  }
+
+  if (form.payment_method === 'boleto') {
+    return 'Boleto não gerado'
+  }
+
+  return 'Pix não gerado'
+}
+
+function friendlyCheckoutErrorMessage(message: string) {
+  const cleanMessage = message.trim()
+
+  if (cleanMessage && !looksLikeTechnicalError(cleanMessage)) {
+    return cleanMessage
+  }
+
+  if (form.payment_method === 'credit_card') {
+    return 'Não foi possível aprovar o cartão. Confira os dados, tente outro cartão ou escolha Pix.'
+  }
+
+  if (form.payment_method === 'boleto') {
+    return 'Não conseguimos gerar o boleto agora. Confira os dados informados e tente novamente em instantes.'
+  }
+
+  return 'Não conseguimos gerar o Pix agora. Confira os dados informados e tente novamente em instantes.'
+}
+
+function looksLikeTechnicalError(message: string) {
+  const normalized = message.trim().toLowerCase()
+
+  return !normalized
+    || normalized.startsWith('|')
+    || normalized.startsWith(';')
+    || normalized.includes('internal_error')
+    || normalized.includes('bad_request')
+    || normalized.includes('idempotency')
+    || /\d{2}-\d{2}-\d{4}t\d{2}:\d{2}:\d{2}utc;[0-9a-f-]{32,36}/i.test(message)
+}
+
+function extractErrorCode(message: string) {
+  return message.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i)?.[0] || ''
 }
 
 async function selectPaymentMethod(method: PaymentMethod) {
@@ -231,7 +311,12 @@ async function selectPaymentMethod(method: PaymentMethod) {
   form.installments = ''
   installmentsTouched.value = false
 
-  if (method === 'credit_card' && isMercadoPago.value) {
+  if (method !== 'credit_card') {
+    disposeMercadoPagoCardForm()
+    return
+  }
+
+  if (isMercadoPago.value) {
     await prepareMercadoPagoCardForm()
   }
 }
@@ -249,6 +334,7 @@ async function prepareMercadoPagoCardForm() {
     return
   }
 
+  disposeMercadoPagoCardForm()
   mercadoPagoCardForm.value = await createMercadoPagoCardForm(checkoutConfig.value, periodCardCents.value)
   mercadoPagoCardFormKey.value = key
   setupMercadoPagoInstallments()
@@ -291,6 +377,23 @@ function setupMercadoPagoInstallments() {
   mercadoPagoInstallmentObserver = new MutationObserver(() => normalizeMercadoPagoInstallmentOptions())
   mercadoPagoInstallmentObserver.observe(select, { childList: true, subtree: true })
   normalizeMercadoPagoInstallmentOptions()
+}
+
+function disposeMercadoPagoCardForm() {
+  const select = document.getElementById('mp-installments') as HTMLSelectElement | null
+  select?.removeEventListener('change', handleInstallmentSelection)
+  mercadoPagoInstallmentObserver?.disconnect()
+  mercadoPagoInstallmentObserver = null
+
+  try {
+    mercadoPagoCardForm.value?.unmount?.()
+    mercadoPagoCardForm.value?.destroy?.()
+  } catch {
+    // The SDK does not expose the same teardown method in every version.
+  }
+
+  mercadoPagoCardForm.value = null
+  mercadoPagoCardFormKey.value = ''
 }
 
 function normalizeMercadoPagoInstallmentOptions() {
@@ -384,8 +487,7 @@ function selectPlan(planCode: string) {
   form.plan_code = planCode
   form.installments = ''
   installmentsTouched.value = false
-  mercadoPagoCardForm.value = null
-  mercadoPagoCardFormKey.value = ''
+  disposeMercadoPagoCardForm()
 
   if (form.payment_method === 'credit_card' && isMercadoPago.value) {
     prepareMercadoPagoCardForm()
@@ -406,7 +508,13 @@ function selectPlan(planCode: string) {
     <p v-if="error" class="form-error">{{ error }}</p>
     <div v-if="loading" class="empty-state">Carregando checkout...</div>
 
-    <form v-else id="checkout-form" class="checkout-grid" @submit.prevent="submitCheckout">
+    <form
+      v-else
+      :id="form.payment_method === 'credit_card' && isMercadoPago ? 'checkout-form' : undefined"
+      :key="form.payment_method"
+      class="checkout-grid"
+      @submit.prevent="submitCheckout"
+    >
       <section class="panel-main admin-form">
         <div class="subsection-heading">
           <h2>{{ selectedPlan?.name }}</h2>
@@ -656,5 +764,32 @@ function selectPlan(planCode: string) {
         </button>
       </section>
     </form>
+
+    <div v-if="checkoutError.open" class="checkout-error-layer" role="presentation">
+      <section class="checkout-error-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-error-title">
+        <button class="checkout-error-close" type="button" aria-label="Fechar aviso" @click="closeCheckoutError">
+          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+        </button>
+        <span class="checkout-error-icon">
+          <i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>
+        </span>
+        <div>
+          <strong id="checkout-error-title">{{ checkoutError.title }}</strong>
+          <p>{{ checkoutError.message }}</p>
+          <small>Código do erro: <code>{{ checkoutError.code }}</code></small>
+          <div class="checkout-error-actions">
+            <button class="btn btn-primary" type="button" @click="closeCheckoutError">Entendi</button>
+            <button
+              v-if="form.payment_method !== 'pix'"
+              class="btn btn-secondary"
+              type="button"
+              @click="selectPaymentMethod('pix'); closeCheckoutError()"
+            >
+              Tentar Pix
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
   </section>
 </template>

@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 class PublicCheckoutFlowTest extends TestCase
@@ -190,13 +191,56 @@ class PublicCheckoutFlowTest extends TestCase
 
         Http::assertSent(function ($request): bool {
             $payload = $request->data();
+            $idempotencyHeader = $request->header('X-Idempotency-Key');
+            $idempotencyKey = is_array($idempotencyHeader)
+                ? (string) ($idempotencyHeader[0] ?? '')
+                : (string) $idempotencyHeader;
 
             return $request->url() === 'https://api.mercadopago.com/v1/payments'
+                && Str::isUuid($idempotencyKey)
                 && data_get($payload, 'payment_method_id') === 'pix'
                 && data_get($payload, 'transaction_amount') === 5127.72
                 && data_get($payload, 'payer.address.zip_code') === '01001000'
                 && data_get($payload, 'metadata.platform') === 'provadorvirtual';
         });
+
+        $session = CheckoutSession::query()->where('public_reference', $response->json('reference'))->firstOrFail();
+        $this->assertTrue(Str::isUuid((string) data_get($session->metadata, 'mercado_pago.idempotency_key')));
+    }
+
+    public function test_mercado_pago_opaque_pix_error_is_returned_with_friendly_message_and_code(): void
+    {
+        $this->configureMercadoPago();
+
+        Http::fake([
+            'https://api.mercadopago.com/v1/payments' => Http::response([
+                'message' => ' | 25-05-2026T21:37:38UTC;3e640a80-db11-4831-bf3f-34b1c503bf20',
+                'error' => 'bad_request',
+            ], 422),
+        ]);
+
+        $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'plan_code' => 'monthly',
+            'platform' => 'bigshop',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Não conseguimos gerar o Pix agora. Confira os dados informados e tente novamente em instantes.')
+            ->assertJsonPath('error_code', '3e640a80-db11-4831-bf3f-34b1c503bf20')
+            ->assertJsonPath('provider', 'mercado_pago')
+            ->assertJsonPath('payment_method', 'pix');
+
+        $session = CheckoutSession::query()->firstOrFail();
+        $this->assertSame(CheckoutSession::STATUS_FAILED, $session->status);
+        $this->assertSame(
+            'Não conseguimos gerar o Pix agora. Confira os dados informados e tente novamente em instantes.',
+            data_get($session->metadata, 'failure.message'),
+        );
+        $this->assertSame(
+            '| 25-05-2026T21:37:38UTC;3e640a80-db11-4831-bf3f-34b1c503bf20',
+            data_get($session->metadata, 'failure.technical_message'),
+        );
+        $this->assertSame('3e640a80-db11-4831-bf3f-34b1c503bf20', data_get($session->metadata, 'failure.error_code'));
     }
 
     public function test_public_checkout_config_exposes_monthly_and_annual_prices(): void

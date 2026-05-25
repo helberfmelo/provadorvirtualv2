@@ -8,6 +8,7 @@ const loading = ref(true)
 const error = ref('')
 const session = ref<any>(null)
 const payment = ref<any>(null)
+const copied = ref('')
 
 onMounted(async () => {
   const reference = String(route.query.ref || '')
@@ -27,6 +28,33 @@ onMounted(async () => {
     loading.value = false
   }
 })
+
+async function copyPaymentCode(value: string | undefined | null, type: string) {
+  if (!value) {
+    return
+  }
+
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value)
+  } else {
+    const textarea = document.createElement('textarea')
+    textarea.value = value
+    textarea.setAttribute('readonly', 'readonly')
+    textarea.style.position = 'fixed'
+    textarea.style.opacity = '0'
+    document.body.appendChild(textarea)
+    textarea.select()
+    document.execCommand('copy')
+    document.body.removeChild(textarea)
+  }
+
+  copied.value = type
+  window.setTimeout(() => {
+    if (copied.value === type) {
+      copied.value = ''
+    }
+  }, 2200)
+}
 </script>
 
 <template>
@@ -60,21 +88,59 @@ onMounted(async () => {
           <img v-if="payment.pix.qr_code_base64" class="pix-qr-image" :src="`data:image/jpeg;base64,${payment.pix.qr_code_base64}`" alt="QR Code Pix" />
           <strong>Pix copia e cola</strong>
           <textarea :value="payment.pix.qr_code" rows="4" readonly></textarea>
-          <a v-if="payment.pix.ticket_url" class="btn btn-secondary" :href="payment.pix.ticket_url" target="_blank" rel="noopener">
-            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-            Abrir Pix
-          </a>
+          <div class="payment-action-row">
+            <button class="btn btn-primary" type="button" @click="copyPaymentCode(payment.pix.qr_code, 'pix')">
+              <i class="fa-solid fa-copy" aria-hidden="true"></i>
+              Copiar código Pix
+            </button>
+            <a v-if="payment.pix.ticket_url" class="btn btn-secondary" :href="payment.pix.ticket_url" target="_blank" rel="noopener">
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+              Abrir Pix
+            </a>
+          </div>
+          <small v-if="copied === 'pix'" class="copy-feedback">Código Pix copiado.</small>
           <small>O acesso da empresa será liberado automaticamente quando a operadora confirmar o pagamento.</small>
         </div>
 
         <div v-if="payment?.boleto?.ticket_url || payment?.boleto?.digitable_line || payment?.boleto?.barcode" class="payment-box">
           <strong>Boleto bancário</strong>
           <textarea v-if="payment.boleto.digitable_line || payment.boleto.barcode" :value="payment.boleto.digitable_line || payment.boleto.barcode" rows="3" readonly></textarea>
-          <a v-if="payment.boleto.ticket_url" class="btn btn-secondary" :href="payment.boleto.ticket_url" target="_blank" rel="noopener">
-            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-            Abrir boleto
-          </a>
+          <div class="payment-action-row">
+            <a v-if="payment.boleto.ticket_url" class="btn btn-primary" :href="payment.boleto.ticket_url" target="_blank" rel="noopener">
+              <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+              Abrir boleto
+            </a>
+            <a v-if="payment.boleto.ticket_url" class="btn btn-secondary" :href="payment.boleto.ticket_url" target="_blank" rel="noopener" download>
+              <i class="fa-solid fa-download" aria-hidden="true"></i>
+              Baixar boleto
+            </a>
+            <button
+              v-if="payment.boleto.digitable_line || payment.boleto.barcode"
+              class="btn btn-secondary"
+              type="button"
+              @click="copyPaymentCode(payment.boleto.digitable_line || payment.boleto.barcode, 'boleto')"
+            >
+              <i class="fa-solid fa-barcode" aria-hidden="true"></i>
+              Copiar código de barras
+            </button>
+          </div>
+          <small v-if="copied === 'boleto'" class="copy-feedback">Código do boleto copiado.</small>
           <small>O acesso da empresa será liberado automaticamente quando a operadora confirmar a compensação do boleto.</small>
+        </div>
+
+        <div v-if="session.status === 'paid' && session.payment_method === 'credit_card'" class="payment-box payment-success-box">
+          <strong>Contratação aprovada</strong>
+          <p>Seu pagamento no cartão foi confirmado e o acesso da empresa já pode ser usado.</p>
+        </div>
+
+        <div v-if="session.status === 'failed'" class="payment-box payment-error-box">
+          <strong>Pagamento não aprovado</strong>
+          <p>{{ session.failure?.message || 'Não foi possível confirmar esse pagamento.' }}</p>
+          <small v-if="session.failure?.error_code">Código do erro: <code>{{ session.failure.error_code }}</code></small>
+          <RouterLink to="/checkout" class="btn btn-secondary">
+            <i class="fa-solid fa-rotate-right" aria-hidden="true"></i>
+            Tentar novamente
+          </RouterLink>
         </div>
 
         <div class="action-row">

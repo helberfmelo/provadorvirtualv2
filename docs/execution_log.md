@@ -996,3 +996,15 @@
 - Validações locais passaram com `npm run build`, `php artisan test` com 85 testes e 690 assertions, e `git diff --check`.
 - Commit `360ed12` enviado para `main`; o run `26419953084` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público com checagem de URL efetiva.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo redirects de `/provadorvirtual_v2/`, `/provadorvirtual_v2/login` e `/provadorvirtual_v2/app/produtos/novo` para a raiz limpa.
+
+## 2026-05-25 - Sprint 100 Conclusão e erros do checkout
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- Erros opacos do Mercado Pago, como `| 25-05-2026T21:37:38UTC;...`, deixam de ser exibidos como texto bruto para o cliente.
+- O backend passa a responder falhas do checkout com mensagem amigável, `error_code`, referência, operadora e meio de pagamento, mantendo a mensagem técnica original em `metadata.failure.technical_message` para suporte.
+- As tentativas falhas continuam salvas em pedidos SaaS, agora com mensagem amigável, código técnico e payload interno mais útil para diagnóstico.
+- A integração Mercado Pago usa `X-Idempotency-Key` com UUID persistido em `metadata.mercado_pago.idempotency_key`, separado do código interno do pedido.
+- O checkout público passa a mostrar modal de erro para Pix, boleto e cartão, com código de referência e opção de tentar Pix quando o método atual não for Pix.
+- Ao trocar de cartão para Pix/boleto ou ao mudar plano, o CardForm do Mercado Pago é desmontado e o DOM do formulário é recriado por método de pagamento para evitar tokenização indevida no submit Pix.
+- A tela `/checkout/sucesso` ganhou ações completas por método: Pix com QR Code, copia e cola e botão de copiar; boleto com abrir, baixar e copiar código de barras; cartão aprovado com bloco de sucesso; sessão falhada com mensagem e código do erro.
+- Validações locais passaram com `npm run build`, `php artisan test --filter=PublicCheckoutFlowTest` com 16 testes e 90 assertions, `php artisan test` com 86 testes e 700 assertions, `vendor/bin/pint --dirty` e `git diff --check`.
