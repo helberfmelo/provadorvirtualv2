@@ -762,3 +762,15 @@
 - Playwright local mobile validou headline sem `BigShop`, uma coluna de cards, ausência de overflow horizontal e seis cards renderizados corretamente.
 - Commit `83ac2da` enviado para `main`; o run `26381750743` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Playwright pós-deploy em `https://provadorvirtual.online/` validou a nova headline, ausência da frase antiga, grid mobile de benefícios em uma coluna, seis cards renderizados e ausência de overflow horizontal.
+
+## 2026-05-25 - Sprint 80 Linguagem do provador e ajuda do widget
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` e da governança de commit/push/Actions confirmada antes de encerrar a sprint.
+- Site público, loja teste, página de produto teste, termos e privacidade passaram a usar `provador` nos textos visíveis ao usuário final, removendo `widget` da cópia pública.
+- Navegação pública passou de `Teste o widget` para `Teste o provador`.
+- A seção protegida `/app/widget` manteve o rótulo técnico `Widget`, agora com ícone `i` de informação e tooltip explicando que é o provador exibido na página de produto da loja.
+- Título principal da seção passou para `Instalação do provador`, com texto auxiliar explicando recomendação de tamanho, tabela de medidas e identidade visual.
+- Microcópias da tela de instalação foram ajustadas para `Carregando provador`, `Salvar provador`, `Provador e tabela` e `Provador público`.
+- Validações locais: `npm run build`, `git diff --check` e Playwright mobile em `/`, `/produto-teste`, `/produto-teste/camiseta-essencial-marinho`, `/privacidade`, `/termos` e `/app/widget`.
+- Commit `feb76e2` enviado para `main`; o run `26382678616` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Playwright pós-deploy confirmou ausência de `widget` visível nas páginas públicas testadas, presença de `provador`, ausência de overflow horizontal e seção `/app/widget` com `Widget i`, tooltip e `Instalação do provador`.

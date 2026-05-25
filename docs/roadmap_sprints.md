@@ -1059,3 +1059,17 @@ Entregas:
 - validar build do frontend, checagem de diff e Playwright mobile da landing.
 
 Status: implementado no commit `83ac2da` e publicado com sucesso no run `26381750743`, com deploy remoto, smoke público e Playwright mobile em produção validando headline, cards e ausência de overflow horizontal.
+
+### Sprint 80 - Linguagem do provador e ajuda do widget
+
+Objetivo: trocar a palavra widget por provador nas superficies públicas e explicar o que é o widget dentro da seção técnica do painel.
+
+Entregas:
+
+- substituir textos públicos de site, loja teste, produto teste, termos e privacidade para usar `provador` quando o usuário final vê a experiência;
+- manter a seção técnica `/app/widget` como `Widget`, mas adicionar ícone `i` de informação ao título da seção;
+- explicar que o widget é o provador que aparece na página de produto da loja, abre a recomendação por IA, mostra tabela de medidas e ajuda o cliente a escolher tamanho sem sair da compra;
+- renomear o título principal da seção para `Instalação do provador` e ajustar microcópias de carregamento, salvamento, preview e checklist;
+- validar em mobile que as páginas públicas não exibem mais a palavra `widget`, não têm overflow horizontal e que o painel mostra o ícone e a explicação.
+
+Status: implementado no commit `feb76e2` e publicado com sucesso no run `26382678616`, com build local, checagem de diff, Playwright mobile local e smoke Playwright em produção.
