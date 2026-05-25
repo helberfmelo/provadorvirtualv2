@@ -1410,3 +1410,26 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 97 no commit `c188d4e`, publicado com sucesso no run `26418672266`. Validações locais passaram com build frontend, `WidgetInstallApiTest`, suíte backend completa com 85 testes e 690 assertions e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/widget`.
+
+### Sprint 98 - Checkout contato em duas linhas e Pix mensal sem tag
+
+Objetivo: ajustar a leitura do bloco `Acesso e pagamento` no checkout público e remover promessa visual de desconto Pix no plano mensal.
+
+Entregas:
+
+- colocar Nome e CPF na primeira linha dos dados de acesso;
+- colocar E-mail e Telefone na segunda linha;
+- preservar CPF e telefone com largura mais compacta que nome/e-mail;
+- esconder a tag `5% off` da aba Pix quando o cliente selecionar plano mensal;
+- manter a tag e o resumo de desconto Pix apenas quando o ciclo anual tiver desconto real.
+
+Validação:
+
+- `npm run build`;
+- `php artisan test --filter=PublicCheckoutFlowTest`;
+- `php artisan test`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente; publicação e validação de produção em andamento.

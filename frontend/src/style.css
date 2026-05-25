@@ -1977,7 +1977,7 @@ th {
 }
 
 .checkout-contact-grid {
-  grid-template-columns: minmax(150px, 1fr) minmax(188px, 1.18fr) minmax(118px, 0.72fr);
+  grid-template-columns: minmax(190px, 1fr) minmax(120px, 0.72fr);
 }
 
 .checkout-password-grid {
@@ -2007,6 +2007,7 @@ th {
   max-width: 360px;
 }
 
+.checkout-contact-grid .field-cpf,
 .checkout-contact-grid .field-phone {
   max-width: 180px;
 }
@@ -4164,6 +4165,7 @@ td small {
   }
 
   .checkout-company-grid .field-document,
+  .checkout-contact-grid .field-cpf,
   .checkout-contact-grid .field-phone,
   .checkout-card-grid .field-card-holder,
   .checkout-card-grid .field-card-number,

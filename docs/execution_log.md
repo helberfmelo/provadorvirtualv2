@@ -974,3 +974,11 @@
 - Validações locais passaram com `npm run build`, `php artisan test --filter=WidgetInstallApiTest`, `php artisan test` com 85 testes e 690 assertions, e `git diff --check`.
 - Commit `c188d4e` enviado para `main`; o run `26418672266` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/widget`.
+
+## 2026-05-25 - Sprint 98 Checkout contato em duas linhas e Pix mensal sem tag
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- O bloco `Acesso e pagamento` do checkout público foi reorganizado para exibir Nome e CPF na primeira linha, E-mail e Telefone na segunda.
+- CPF e telefone mantêm largura compacta, enquanto nome e e-mail ocupam a coluna maior.
+- A tag `5% off` da aba Pix e o resumo `Desconto Pix` agora aparecem somente quando o plano selecionado é anual e há desconto Pix real.
+- Validações locais passaram com `npm run build`, `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test` com 85 testes e 690 assertions, e `git diff --check`.

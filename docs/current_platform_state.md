@@ -198,6 +198,7 @@ Atualizado em: 2026-05-25
 - Sprint 96 enviada ao GitHub no commit `f44d281`; o run `26416798463` finalizou com sucesso e a validação de produção confirmou `/app/widget` junto do pacote público/API principal.
 - Sprint 97 ajusta `/app/widget` para manter plataforma, chave pública, status e cores em leitura vertical, com tooltip de domínios liberados.
 - Sprint 97 enviada ao GitHub no commit `c188d4e`; o run `26418672266` finalizou com sucesso e a validação de produção confirmou `/app/widget`.
+- Sprint 98 ajusta o checkout público para organizar Nome/CPF e E-mail/Telefone em duas linhas e ocultar `5% off` do Pix mensal.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -206,7 +207,7 @@ Atualizado em: 2026-05-25
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
-- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão, cancelamento de renovação futura pelo portal e coleta de empresa limitada a CNPJ. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
+- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` apenas no plano anual com desconto real e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão, cancelamento de renovação futura pelo portal e coleta de empresa limitada a CNPJ. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
 - Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.

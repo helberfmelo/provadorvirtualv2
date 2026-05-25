@@ -123,6 +123,7 @@ const pixDiscountCents = computed(() => {
   return values ? values.card_total_cents - values.pix_total_cents : 0
 })
 const isAnnualPlan = computed(() => form.plan_code === 'annual')
+const showPixDiscount = computed(() => isAnnualPlan.value && pixDiscountCents.value > 0)
 const cycleLabel = computed(() => isAnnualPlan.value ? 'Plano anual' : 'Plano mensal')
 const periodTotalLabel = computed(() => isAnnualPlan.value ? 'Total anual' : 'Total mensal')
 const paymentMethodLabel = computed(() => {
@@ -478,13 +479,13 @@ function selectPlan(planCode: string) {
             Nome
             <input v-model="form.admin_name" required />
           </label>
-          <label class="field-email">
-            E-mail
-            <input v-model="form.admin_email" type="email" required />
-          </label>
           <label class="field-cpf">
             CPF
             <input v-model="form.admin_cpf" inputmode="numeric" required />
+          </label>
+          <label class="field-email">
+            E-mail
+            <input v-model="form.admin_email" type="email" required />
           </label>
           <label class="field-phone">
             Telefone
@@ -514,7 +515,7 @@ function selectPlan(planCode: string) {
           </button>
           <button type="button" :class="{ active: form.payment_method === 'pix' }" @click="selectPaymentMethod('pix')">
             Pix
-            <span class="payment-tab-badge">5% off</span>
+            <span v-if="showPixDiscount" class="payment-tab-badge">5% off</span>
           </button>
           <button v-if="canUseBoleto" type="button" :class="{ active: form.payment_method === 'boleto' }" @click="selectPaymentMethod('boleto')">
             Boleto
@@ -598,11 +599,11 @@ function selectPlan(planCode: string) {
           <div class="checkout-summary">
             <span>
               Total no Pix
-              <small v-if="pixDiscountCents > 0">5% off</small>
+              <small v-if="showPixDiscount">5% off</small>
             </span>
             <strong>{{ price(payableCents) }}</strong>
           </div>
-          <div v-if="pixDiscountCents > 0" class="checkout-summary muted">
+          <div v-if="showPixDiscount" class="checkout-summary muted">
             <span>Desconto Pix</span>
             <strong>{{ price(pixDiscountCents) }}</strong>
           </div>
