@@ -167,7 +167,7 @@ Atualizado em: 2026-05-24
 - Sprint 74 enviada ao GitHub no commit `0c83622`; o run `26372649754` finalizou com sucesso, refinando o aviso de salvamento local para itálico e mesma escala da linha de precisão.
 - Sprint 75 enviada ao GitHub no commit `2a92a0b`; o run `26377480787` finalizou com sucesso, refinando o widget mobile, aumentando logo/menu e corrigindo as silhuetas para renderizar como imagens PNG reais.
 - Sprint 76 enviada ao GitHub no commit `6c835c8`; o run `26378458765` finalizou com sucesso, removendo a escala redundante de nota de 1 a 5 do feedback final do widget.
-- Sprint 77 posiciona o aviso de salvamento local somente na primeira etapa do widget, no fim do corpo rolável, em itálico e com fonte menor.
+- Sprint 77 enviada ao GitHub no commit `2a5c055`; o run `26378864592` finalizou com sucesso, posicionando o aviso de salvamento local somente na primeira etapa do widget, no fim do corpo rolável, em itálico e com fonte menor.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

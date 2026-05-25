@@ -1028,4 +1028,4 @@ Entregas:
 - cobrir a regra de renderização e o novo tamanho no `WidgetAssetTest`;
 - validar sintaxe do widget, teste de asset, build do frontend e checagem de diff.
 
-Status: implementado nesta sprint; commit, push e publicação remota conferidos no fechamento operacional.
+Status: implementado no commit `2a5c055` e publicado com sucesso no run `26378864592`, com deploy remoto, smoke público, verificação dos assets públicos e Playwright mobile em produção.

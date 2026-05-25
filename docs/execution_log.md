@@ -737,3 +737,5 @@
 - Aviso mantido no fim do corpo rolável da primeira etapa, com `font-style: italic`, `font-size: 11px`, peso normal e alinhamento central.
 - Teste `WidgetAssetTest` atualizado para proteger a chamada do aviso dentro do bloco `state.step === 1` e o novo tamanho da fonte.
 - Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, `vendor/bin/pint --dirty`, `npm run build`, `git diff --check` e Playwright mobile confirmando o aviso no passo 1 com `11px` e ausência no passo 2.
+- Commit `2a5c055` enviado para `main`; o run `26378864592` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou que o JS público chama `browserStorageNoticeHtml()` dentro de `state.step === 1`, que o CSS público contém `.pv-widget-root .pv-browser-note`, `font-size: 11px` e `font-style: italic`, e que o Playwright mobile em produção mostra o aviso no passo 1 e remove no passo 2.
