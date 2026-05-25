@@ -1045,3 +1045,13 @@
 - Validações locais passaram com `npm run build` e `git diff --check`.
 - Commit `0fb2dfe` enviado para `main`; o run `26424134815` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/`, `/checkout`, `/app/widget`, rotas públicas, SaaS, portal, widget, APIs e redirects legados.
+
+## 2026-05-25 - Sprint 104 Enxuga textos e tooltips do provador
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- A primeira etapa do provador público troca os textos redundantes por `Comece com altura e peso. A idade é opcional.` e `Preencha altura e peso para ver o tamanho inicial.`.
+- O aviso adicional sobre altura/peso foi removido do estado padrão, deixando apenas um bloco informativo antes dos campos.
+- As mensagens de cálculo e dados mínimos da recomendação inicial foram encurtadas.
+- Os blocos informativos do widget tiveram menor espaçamento e entrelinha mais compacta.
+- Os tooltips de medidas deixam de exibir entidades HTML escapadas e passam a mostrar acentuação correta.
+- Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.

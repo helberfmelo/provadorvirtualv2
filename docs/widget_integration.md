@@ -103,6 +103,8 @@ Regra Sprint 76: o resultado final deve manter apenas a pergunta objetiva `Essa 
 
 Regra Sprint 78: qualquer clique/toque no tamanho recomendado, seja no banner de recomendação parcial, no rodapé fixo ou no resultado, fecha o drawer e emite `provadorvirtual:size-selected` com `selected_size`, `recommended_size`, `confidence`, `precision` e o payload completo da recomendação. A loja pode ouvir esse evento para marcar o tamanho correspondente na página de produto. O widget também bloqueia o clique fantasma de touch que poderia reabrir o drawer imediatamente após aplicar o tamanho.
 
+Status Sprint 104: a etapa inicial do fluxo foi enxugada para evitar repetição sobre altura e peso. O estado padrão mostra uma frase curta e apenas um aviso para preencher altura/peso, com blocos mais compactos. Tooltips de medidas devem exibir acentuação correta e não entidades HTML escapadas.
+
 ## Evolucao inteligente prevista
 
 Benchmark Sizebay/Zak em `docs/sizebay_benchmark.md` confirmou que o widget deve evoluir para:

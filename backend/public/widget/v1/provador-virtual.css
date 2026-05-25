@@ -280,7 +280,7 @@
 .pv-step-panel,
 .pv-result-step {
   display: grid;
-  gap: 14px;
+  gap: 10px;
 }
 
 .pv-step-panel h3,
@@ -295,7 +295,7 @@
 .pv-result-step p {
   margin: 0;
   color: #4b5563;
-  line-height: 1.45;
+  line-height: 1.32;
 }
 
 .pv-known,
@@ -305,11 +305,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 11px 12px;
+  padding: 9px 11px;
   border-radius: var(--pv-radius);
   color: #374151;
   background: var(--pv-soft);
-  line-height: 1.45;
+  line-height: 1.32;
+}
+
+.pv-compact-note {
+  min-height: 40px;
 }
 
 .pv-known button,
@@ -490,8 +494,8 @@
   box-shadow: 0 14px 38px rgba(15, 23, 42, 0.24);
   content: attr(data-pv-tooltip);
   font-size: 12px;
-  font-weight: 700;
-  line-height: 1.35;
+  font-weight: 600;
+  line-height: 1.25;
   text-align: left;
   transform: translateX(-50%);
   white-space: normal;

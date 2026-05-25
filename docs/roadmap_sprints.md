@@ -1554,3 +1554,25 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 103 no commit `0fb2dfe`, publicado com sucesso no run `26424134815`. Validação local passou com `npm run build` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/`, `/checkout`, `/app/widget`, APIs, widget e redirects legados.
+
+### Sprint 104 - Enxuga textos e tooltips do provador
+
+Objetivo: reduzir redundância e espaçamento visual na primeira etapa do provador, corrigindo também textos de tooltip que apareciam com entidades HTML escapadas.
+
+Entregas:
+
+- trocar a introdução da etapa `Suas medidas` para uma frase curta sobre altura, peso e idade opcional;
+- remover o aviso redundante que repetia que altura e peso liberam a recomendação inicial;
+- simplificar as mensagens de carregamento e liberação da recomendação inicial;
+- reduzir espaçamentos e entrelinhas dos blocos informativos do widget;
+- corrigir os tooltips de medidas para exibir acentuação correta, como `cabeça`, `chão`, `recomendações` e `peça`.
+
+Validação:
+
+- `node --check backend/public/widget/v1/provador-virtual.js`;
+- `npm run build`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: em implementação na Sprint 104. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.

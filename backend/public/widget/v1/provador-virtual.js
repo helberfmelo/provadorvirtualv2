@@ -466,13 +466,13 @@
     var profile = readSavedProfile();
     var note = profile
       ? '<div class="pv-known"><span>Encontramos medidas salvas neste navegador. Voc&ecirc; pode revisar antes de continuar.</span><button type="button" data-pv-clear-profile>Limpar</button></div>'
-      : '<div class="pv-known">Com altura e peso j&aacute; conseguimos uma recomenda&ccedil;&atilde;o inicial. As pr&oacute;ximas etapas aumentam a precis&atilde;o.</div>';
+      : '';
     var disabled = hasStarterMeasures() ? '' : ' disabled';
 
     return [
       '<section class="pv-step-panel">',
       '<h3>Suas medidas</h3>',
-      '<p>Informe medidas aproximadas em cent&iacute;metros e quilos.</p>',
+      '<p>Comece com altura e peso. A idade &eacute; opcional.</p>',
       note,
       recommendationBannerHtml(),
       '<div class="pv-grid">',
@@ -539,11 +539,11 @@
 
   function recommendationBannerHtml() {
     if (!hasStarterMeasures()) {
-      return '<div class="pv-known" data-pv-recommendation-banner>Informe altura e peso para liberar a primeira recomenda&ccedil;&atilde;o de tamanho.</div>';
+      return '<div class="pv-known pv-compact-note" data-pv-recommendation-banner>Preencha altura e peso para ver o tamanho inicial.</div>';
     }
 
     if (state.loading && !state.recommendation) {
-      return '<div class="pv-known" data-pv-recommendation-banner>Calculando uma recomenda&ccedil;&atilde;o inicial. Voc&ecirc; pode continuar preenchendo para aumentar a precis&atilde;o.</div>';
+      return '<div class="pv-known pv-compact-note" data-pv-recommendation-banner>Calculando a sugest&atilde;o inicial. Voc&ecirc; pode continuar para aumentar a precis&atilde;o.</div>';
     }
 
     if (state.recommendation && state.recommendation.recommended_size) {
@@ -555,7 +555,7 @@
       ].join('');
     }
 
-    return '<div class="pv-known" data-pv-recommendation-banner>J&aacute; temos os dados m&iacute;nimos. A recomenda&ccedil;&atilde;o aparecer&aacute; no rodap&eacute; assim que o c&aacute;lculo terminar.</div>';
+    return '<div class="pv-known pv-compact-note" data-pv-recommendation-banner>Dados m&iacute;nimos recebidos. A sugest&atilde;o aparece no rodap&eacute; em instantes.</div>';
   }
 
   function updateRecommendationBanner(backdrop) {
@@ -700,14 +700,14 @@
 
   function tooltipText(key) {
     var texts = {
-      height: 'Sua altura total, do topo da cabe&ccedil;a at&eacute; o ch&atilde;o.',
-      weight: 'Seu peso aproximado em quilos.',
-      age: 'Opcional. Ajuda a calibrar recomenda&ccedil;&otilde;es futuras.',
-      bust: 'Me&ccedil;a a volta na parte mais cheia do busto ou t&oacute;rax.',
-      waist: 'Me&ccedil;a a volta da cintura natural, sem apertar.',
-      hip: 'Me&ccedil;a a volta da parte mais larga do quadril.',
-      length: 'Comprimento da pe&ccedil;a que costuma vestir bem em voc&ecirc;.',
-      shoulder: 'Dist&acirc;ncia entre as extremidades dos ombros.',
+      height: 'Altura total, do topo da cabe\u00e7a ao ch\u00e3o.',
+      weight: 'Peso aproximado em quilos.',
+      age: 'Opcional. Ajuda a calibrar recomenda\u00e7\u00f5es futuras.',
+      bust: 'Me\u00e7a a volta na parte mais cheia do busto ou t\u00f3rax.',
+      waist: 'Me\u00e7a a volta da cintura natural, sem apertar.',
+      hip: 'Me\u00e7a a volta da parte mais larga do quadril.',
+      length: 'Comprimento da pe\u00e7a que costuma vestir bem em voc\u00ea.',
+      shoulder: 'Dist\u00e2ncia entre as extremidades dos ombros.',
     };
 
     return texts[key] || '';
