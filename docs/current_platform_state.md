@@ -185,6 +185,7 @@ Atualizado em: 2026-05-25
 - Sprint 90 adiciona boleto habilitável pelo SaaS: `/saas/checkout` controla a exibição, o checkout público mantém boleto oculto por padrão e Mercado Pago gera pagamento `bolbradesco` quando habilitado.
 - Sprint 90 enviada ao GitHub no commit `6ddf1c5`; o run `26412934331` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Sprint 91 valida o pacote comercial completo: `php artisan test` passou com 79 testes/635 assertions, `npm run build` passou e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK` em produção, com go-live `ready_with_warnings` por pendências externas já conhecidas.
+- Sprint 91 enviada ao GitHub no commit `61e8fac`; o run `26413377677` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin, smoke público e nova validação de produção pós-deploy.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

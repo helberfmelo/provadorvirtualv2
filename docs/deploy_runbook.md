@@ -301,8 +301,9 @@ O script usa a URL pública, valida páginas públicas, checkout, termos, privac
 rotas SaaS/app, widget, APIs, recomendação, CORS e o endpoint protegido de go-live
 com o usuário demo.
 
-Status Sprint 91: validação executada em produção com `PRODUCTION VALIDATION OK` e
-go-live readiness `ready_with_warnings`; os warnings restantes são operacionais
+Status Sprint 91: validação executada em produção antes e depois do deploy do
+commit `61e8fac`, publicado no run `26413377677`, com `PRODUCTION VALIDATION OK`
+e go-live readiness `ready_with_warnings`; os warnings restantes são operacionais
 externos, como transação real Mercado Pago, cron/webhook, BigShop real e validação
 de recorrência anual.
 
