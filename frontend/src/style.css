@@ -2601,9 +2601,9 @@ textarea {
 
 .widget-install-summary {
   display: grid;
-  grid-template-columns: minmax(170px, 0.9fr) minmax(170px, 1fr) minmax(150px, 0.86fr);
   gap: 12px;
-  align-items: stretch;
+  grid-template-columns: 1fr;
+  align-items: start;
   min-width: 0;
 }
 
@@ -2613,14 +2613,20 @@ textarea {
   min-width: 0;
 }
 
+.widget-config-form input:not([type="checkbox"]):not([type="color"]),
+.widget-config-form select {
+  min-height: 44px;
+  padding-block: 9px;
+}
+
 .widget-field-platform select,
 .widget-field-key input {
   min-height: 44px;
 }
 
 .widget-inline-toggle {
-  height: 100%;
   margin: 0;
+  min-height: 58px;
 }
 
 .widget-platform-guide {
@@ -2683,8 +2689,9 @@ textarea {
 
 .widget-color-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  max-width: 320px;
 }
 
 .widget-type-grid {
@@ -2700,6 +2707,10 @@ textarea {
 .widget-color-grid label,
 .widget-color-grid input {
   min-width: 0;
+}
+
+.widget-color-grid label {
+  gap: 6px;
 }
 
 .widget-confetti-toggle {

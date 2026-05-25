@@ -1388,3 +1388,25 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 96 no commit `f44d281`, publicado com sucesso no run `26416798463`. Validações locais passaram com 85 testes backend e 690 assertions, build frontend, Pint e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, agora cobrindo também `/app/widget`.
+
+### Sprint 97 - Ajuste vertical da configuração do widget
+
+Objetivo: corrigir a leitura visual da tela `/app/widget` depois da reorganização anterior, priorizando campos empilhados e controles com largura/altura previsíveis.
+
+Entregas:
+
+- colocar plataforma, chave pública e status do widget um abaixo do outro;
+- manter selects e inputs da configuração do widget com altura consistente;
+- adicionar tooltip explicando por que a empresa deve informar domínios liberados;
+- listar cores uma abaixo da outra, com campo hexadecimal legível;
+- preservar preview, snippet e guias por plataforma.
+
+Validação:
+
+- `npm run build`;
+- `php artisan test --filter=WidgetInstallApiTest`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente; publicação e validação de produção em andamento.

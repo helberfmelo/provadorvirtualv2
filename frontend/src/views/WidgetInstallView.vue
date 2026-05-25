@@ -385,7 +385,16 @@ function removeConfettiPreview() {
             <span>{{ domains.length || 0 }} liberado{{ domains.length === 1 ? '' : 's' }}</span>
           </div>
           <label>
-            Domínios liberados
+            <span class="field-label">
+              Domínios liberados
+              <span
+                class="info-tooltip"
+                tabindex="0"
+                role="button"
+                aria-label="Os domínios liberados protegem o provador contra uso não autorizado em outras lojas."
+                data-tooltip="Informe os domínios onde o provador pode aparecer. Isso bloqueia chamadas feitas por lojas não autorizadas e evita uso indevido da sua chave pública."
+              >i</span>
+            </span>
             <textarea
               v-model="form.allowed_domains"
               rows="4"
