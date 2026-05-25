@@ -172,19 +172,22 @@ Atualizado em: 2026-05-25
 - Sprint 79 enviada ao GitHub no commit `83ac2da`; o run `26381750743` finalizou com sucesso, reforçando na landing pública o valor do provador com IA para vender mais na loja online e melhorando os cards de benefícios no mobile.
 - Sprint 80 enviada ao GitHub no commit `feb76e2`; o run `26382678616` finalizou com sucesso, trocando a cópia pública de `widget` para `provador` e adicionando explicação com ícone `i` na seção técnica `/app/widget`.
 - Sprint 81 enviada ao GitHub no commit `b82316b`; o run `26383644699` finalizou com sucesso, corrigindo sobreposição do header mobile, refinando drawers e compactando a UI mobile do portal.
+- Sprint 82 implementa checkout transparente Mercado Pago, adiciona seleção de operadora em `/saas/checkout`, preserva Pagar.me como alternativa pendente e documenta as chaves de produção do NoAzul apenas em referência local ignorada pelo Git.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
 - Falta chave de IA externa (`OPENAI_API_KEY` ou `GEMINI_API_KEY`) para OCR real de imagem.
 - Falta credencial BigShop real para loja de teste.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
-- Falta cadastrar as chaves Pagar.me em `PRODUCTION_ENV`, com URLs de retorno na raiz, configurar cron no cPanel e validar uma transação real de baixo valor.
-- Sprint 37 deixa essas pendências visíveis em `/app/go-live`; teste real de Pagar.me e BigShop continua bloqueado até receber/cadastrar as credenciais oficiais.
+- Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
+- Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
+- Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
+- Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.
 
 ## Superficie atual
 
 - Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/usuarios`.
-- Painel SaaS protegido por papel/permissão: `/saas`, `/saas/empresas`, `/saas/usuarios` e `/saas/emails`, com entrada administrativa em `/saas/login`.
+- Painel SaaS protegido por papel/permissão: `/saas`, `/saas/empresas`, `/saas/usuarios`, `/saas/checkout` e `/saas/emails`, com entrada administrativa em `/saas/login`.
 - CRUDs do SaaS seguem padrão list-first: listagem ocupa a tela e novo/editar abre rota própria.
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
@@ -204,9 +207,10 @@ Atualizado em: 2026-05-25
 - BigShop público assinado: ativação em `/api/v1/public/bigshop/activate`.
 - APIs públicas: health, produto demo e recomendações do widget.
 - APIs públicas inteligentes: `/api/v1/public/recommendations/{id}/signal` e `/api/v1/public/shopper-profiles/forget`.
-- APIs públicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}` e `/api/v1/webhooks/pagarme`.
+- APIs públicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}`, `/api/v1/webhooks/mercado-pago` e `/api/v1/webhooks/pagarme`.
 - APIs públicas de empresa: `/api/v1/public/company-access`.
 - APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.
+- API SaaS de checkout: `/api/v1/saas/checkout-settings`.
 - Histórico SaaS de e-mail: `/api/v1/saas/transactional-email-sends`.
 - APIs de usuários/permissões: `/api/v1/merchant/users` e `/api/v1/saas/users`.
 - Loja teste pública: `/produto-teste` e `/produto-teste/:slug`, usando a identidade oficial do Provador Virtual, deixando claro que os produtos são fictícios/não estão à venda e carregando produtos sem tamanho selecionado por padrão. Na página de produto, os tamanhos são ilustrativos; o fluxo principal é clicar no provador, aceitar a recomendação e ver o tamanho aplicado automaticamente.
@@ -218,4 +222,4 @@ Atualizado em: 2026-05-25
 
 ## Próxima ação recomendada
 
-Aguardar credenciais oficiais de Pagar.me e BigShop para executar transação real, ativação BigShop assinada e piloto em loja real; enquanto isso, usar `/app/go-live` como roteiro de demo assistida.
+Cadastrar/confirmar Mercado Pago em `PRODUCTION_ENV`, selecionar `Mercado Pago` em `/saas/checkout`, executar uma transação Pix/cartão de baixo valor e acompanhar webhook/cron; depois seguir com BigShop real e finalizar Pagar.me quando as pendências chegarem.

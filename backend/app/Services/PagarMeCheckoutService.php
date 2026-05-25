@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Contracts\CheckoutPaymentProvider;
 use App\Models\CheckoutSession;
 use App\Models\PaymentEvent;
 use Carbon\CarbonImmutable;
@@ -14,19 +15,32 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use RuntimeException;
 
-class PagarMeCheckoutService
+class PagarMeCheckoutService implements CheckoutPaymentProvider
 {
     private const PROVIDER_USER_AGENT = 'provadorvirtual/1.0';
+
+    public function key(): string
+    {
+        return 'pagarme';
+    }
+
+    public function label(): string
+    {
+        return 'Pagar.me';
+    }
 
     public function configuration(): array
     {
         $publicKey = trim((string) config('services.pagarme.public_key'));
 
         return [
-            'provider' => 'pagarme',
+            'provider' => $this->key(),
+            'provider_label' => $this->label(),
             'payment_methods' => $publicKey !== '' ? ['pix', 'credit_card'] : ['pix'],
             'credit_card_enabled' => $publicKey !== '',
             'public_key' => $publicKey !== '' ? $publicKey : null,
+            'sdk_url' => null,
+            'tokenization' => 'pagarme_tokens',
             'token_url' => $this->baseUrl().'/tokens',
             'token_query_param' => 'appId',
             'token_expires_in_seconds' => 60,
@@ -63,7 +77,7 @@ class PagarMeCheckoutService
         return $this->applyProviderPayload($session, $response, $paymentMethod, $providerOrderCode);
     }
 
-    public function handleWebhook(array $payload, array $headers, string $rawBody): PaymentEvent
+    public function handleWebhook(array $payload, array $headers, string $rawBody, array $query = []): PaymentEvent
     {
         if (! $this->validSignature($headers, $rawBody)) {
             throw new RuntimeException('Assinatura do webhook invalida.');
@@ -112,6 +126,7 @@ class PagarMeCheckoutService
 
         $sessions = CheckoutSession::query()
             ->whereIn('status', [CheckoutSession::STATUS_PENDING, CheckoutSession::STATUS_CHECKOUT_CREATED])
+            ->where('provider', $this->key())
             ->whereNotNull('provider_order_id')
             ->where(function ($query) use ($syncBefore): void {
                 $query->whereNull('last_provider_sync_at')

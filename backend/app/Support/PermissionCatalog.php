@@ -31,6 +31,7 @@ class PermissionCatalog
             ['key' => 'saas_users', 'label' => 'Usuários SaaS', 'description' => 'Usuários internos e equipe de suporte do SaaS.'],
             ['key' => 'saas_company_users', 'label' => 'Usuários das empresas', 'description' => 'Usuários vinculados a empresas clientes e permissões do portal da empresa.'],
             ['key' => 'saas_emails', 'label' => 'E-mails', 'description' => 'Credenciais SMTP e e-mails transacionais.'],
+            ['key' => 'saas_checkout', 'label' => 'Checkout', 'description' => 'Operadora ativa do checkout transparente e status das credenciais.'],
             ['key' => 'saas_audit', 'label' => 'Auditoria', 'description' => 'Logs, diagnosticos e rastreabilidade.'],
         ];
     }

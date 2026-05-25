@@ -78,6 +78,20 @@ export type TransactionalEmailSend = {
   created_at: string | null
 }
 
+export type CheckoutProviderOption = {
+  key: string
+  label: string
+  configured: boolean
+  credit_card_enabled: boolean
+  payment_methods: string[]
+}
+
+export type CheckoutSettings = {
+  payment_provider: string
+  active_provider_configured: boolean
+  providers: CheckoutProviderOption[]
+}
+
 export type Permission = { view: boolean; edit: boolean }
 export type PermissionMap = Record<string, Permission>
 export type Module = { key: string; label: string; description: string }

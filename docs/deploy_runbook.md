@@ -1,6 +1,6 @@
 # Deploy e Operação
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-25
 
 ## Estrategia
 
@@ -95,8 +95,11 @@ BigShop:
 
 Pagamentos:
 
+- `CHECKOUT_PAYMENT_PROVIDER=mercado_pago` define a operadora ativa padrão; o painel SaaS também persiste a escolha em `saas_settings`.
+- Mercado Pago deve usar `MERCADO_PAGO_PUBLIC_KEY`, `MERCADO_PAGO_ACCESS_TOKEN`, `MERCADO_PAGO_WEBHOOK_SECRET`, `MERCADO_PAGO_WEBHOOK_URL`, `MERCADO_PAGO_CHECKOUT_SUCCESS_URL` e `MERCADO_PAGO_CHECKOUT_CANCEL_URL`.
+- As chaves de produção herdadas como referência do projeto `D:\Projetos\NoAzul` ficam somente em `docs/credentials.local.md`, `.env` local/remoto ou secret seguro. Não registrar valores reais em documentos versionados.
 - `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY`, `PAGARME_WEBHOOK_SECRET`, `PAGARME_ENV`, `PAGARME_BASE_URL`, `PAGARME_CHECKOUT_SUCCESS_URL` e `PAGARME_CHECKOUT_CANCEL_URL`.
-- Para checkout público na raiz, usar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` e `PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout`.
+- Para checkout público na raiz, usar URLs de sucesso/cancelamento em `https://provadorvirtual.online/checkout/sucesso` e `https://provadorvirtual.online/checkout`.
 
 Hardening:
 
@@ -247,6 +250,19 @@ MAIL_FROM_NAME="Provador Virtual"
 PRIVACY_WIDGET_DATA_RETENTION_DAYS=30
 OPERATIONAL_LOG_RETENTION_DAYS=180
 CORS_ALLOWED_ORIGINS=http://127.0.0.1:5173,http://localhost:5173
+
+CHECKOUT_PAYMENT_PROVIDER=mercado_pago
+CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso
+CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout
+
+MERCADO_PAGO_ENV=production
+MERCADO_PAGO_BASE_URL=https://api.mercadopago.com
+MERCADO_PAGO_PUBLIC_KEY=<public>
+MERCADO_PAGO_ACCESS_TOKEN=<access-token>
+MERCADO_PAGO_WEBHOOK_SECRET=<webhook-secret>
+MERCADO_PAGO_WEBHOOK_URL=https://provadorvirtual.online/provadorvirtual_v2/public/api/v1/webhooks/mercado-pago
+MERCADO_PAGO_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso
+MERCADO_PAGO_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout
 
 PAGARME_ENV=production
 PAGARME_API_VERSION=v5

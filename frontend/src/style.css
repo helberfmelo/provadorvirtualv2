@@ -1245,6 +1245,41 @@ a {
   margin-top: 18px;
 }
 
+.pix-qr-image {
+  width: min(220px, 100%);
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.mercado-card-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  min-width: 0;
+}
+
+.mercado-card-fields label {
+  min-width: 0;
+}
+
+.mercado-card-fields .wide {
+  grid-column: 1 / -1;
+}
+
+.mp-secure-field {
+  width: 100%;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.mp-secure-field iframe {
+  width: 100% !important;
+}
+
 .shop-heading {
   display: flex;
   align-items: end;
@@ -2501,6 +2536,73 @@ textarea {
   padding: 10px;
 }
 
+.provider-choice-list {
+  display: grid;
+  gap: 10px;
+}
+
+.provider-choice {
+  display: grid !important;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  gap: 12px !important;
+  align-items: center;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.provider-choice.active {
+  border-color: #fed7aa;
+  background: #fff7ed;
+}
+
+.provider-choice input {
+  width: 18px;
+  min-height: 18px;
+}
+
+.provider-choice span,
+.provider-choice strong,
+.provider-choice small {
+  min-width: 0;
+}
+
+.provider-choice strong,
+.provider-choice small {
+  display: block;
+}
+
+.provider-choice strong {
+  color: #0f172a;
+}
+
+.provider-choice small {
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.provider-choice em {
+  justify-self: end;
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.provider-choice em.ok {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.provider-choice em.warning {
+  color: #92400e;
+  background: #fffbeb;
+}
+
 .platform-card {
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) auto;
@@ -3224,6 +3326,51 @@ td small {
   .checkout-page {
     width: min(100% - 28px, 1180px);
     padding-top: 28px;
+  }
+
+  .checkout-page .page-heading {
+    align-items: flex-start;
+  }
+
+  .checkout-total {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 1.12rem;
+  }
+
+  .checkout-grid {
+    gap: 14px;
+    margin-top: 18px;
+  }
+
+  .annual-plan-summary,
+  .checkout-summary {
+    padding: 14px;
+  }
+
+  .payment-tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .payment-tabs button {
+    min-height: 46px;
+  }
+
+  .mercado-card-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .provider-choice {
+    grid-template-columns: 20px minmax(0, 1fr);
+  }
+
+  .provider-choice em {
+    grid-column: 2;
+    justify-self: start;
   }
 
   .shop-heading {

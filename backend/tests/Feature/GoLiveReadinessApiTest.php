@@ -12,6 +12,11 @@ class GoLiveReadinessApiTest extends TestCase
 
     public function test_merchant_can_read_go_live_readiness(): void
     {
+        config()->set('services.mercado_pago.access_token', null);
+        config()->set('services.mercado_pago.public_key', null);
+        config()->set('services.pagarme.secret_key', null);
+        config()->set('services.pagarme.public_key', null);
+
         $this->seed();
 
         $token = $this->loginToken();
@@ -23,7 +28,7 @@ class GoLiveReadinessApiTest extends TestCase
             ->assertJsonPath('missing_credentials.bigshop_activation_secret', true)
             ->assertJsonPath('missing_credentials.bigshop_test_store', true)
             ->assertJsonPath('missing_credentials.external_ai_key', true)
-            ->assertJsonPath('missing_credentials.pagarme_keys', true)
+            ->assertJsonPath('missing_credentials.checkout_provider_keys', true)
             ->assertJsonStructure([
                 'pilot_package' => [
                     'status',
@@ -37,7 +42,7 @@ class GoLiveReadinessApiTest extends TestCase
         $this->assertSame('passed', $this->statusFor($response->json('checks'), 'products'));
         $this->assertSame('passed', $this->statusFor($response->json('checks'), 'product_test'));
         $this->assertSame('warning', $this->statusFor($response->json('checks'), 'bigshop_pilot'));
-        $this->assertSame('warning', $this->statusFor($response->json('checks'), 'pagarme_provider'));
+        $this->assertSame('warning', $this->statusFor($response->json('checks'), 'checkout_provider'));
         $this->assertSame('passed', $this->statusFor($response->json('checks'), 'widget_performance'));
         $this->assertSame('passed', $this->statusFor($response->json('checks'), 'accessibility_mobile'));
     }

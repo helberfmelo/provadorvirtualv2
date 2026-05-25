@@ -8,7 +8,7 @@ use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\User;
 use App\Models\WidgetInstall;
-use App\Services\PagarMeCheckoutService;
+use App\Services\CheckoutPaymentManager;
 use App\Services\TransactionalEmailService;
 use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
@@ -20,12 +20,12 @@ use RuntimeException;
 
 class PublicCheckoutController extends Controller
 {
-    public function __construct(private readonly PagarMeCheckoutService $checkoutService) {}
+    public function __construct(private readonly CheckoutPaymentManager $checkoutPayments) {}
 
     public function config(): array
     {
         return [
-            'checkout' => $this->checkoutService->configuration(),
+            'checkout' => $this->checkoutPayments->configuration(),
             'plans' => array_values($this->plans()),
             'pricing' => $this->pricingConfig(),
         ];
@@ -40,7 +40,8 @@ class PublicCheckoutController extends Controller
         abort_if(! $plan, 422, 'Plano selecionado indisponível.');
 
         try {
-            $session = DB::transaction(function () use ($data, $plan, $pricing): CheckoutSession {
+            $provider = $this->checkoutPayments->currentProviderKey();
+            $session = DB::transaction(function () use ($data, $plan, $pricing, $provider): CheckoutSession {
                 $merchant = Merchant::query()->create([
                     'name' => $data['company_name'],
                     'slug' => $this->uniqueMerchantSlug($data['company_name']),
@@ -111,7 +112,7 @@ class PublicCheckoutController extends Controller
                     'lead_phone' => $data['admin_phone'],
                     'amount_cents' => $pricing['payable_cents'],
                     'currency' => 'BRL',
-                    'provider' => 'pagarme',
+                    'provider' => $provider,
                     'payment_method' => $data['payment_method'],
                     'status' => CheckoutSession::STATUS_PENDING,
                     'metadata' => [
@@ -122,7 +123,7 @@ class PublicCheckoutController extends Controller
                     ],
                 ]);
 
-                return $this->checkoutService->createOrder($session, $data);
+                return $this->checkoutPayments->createOrder($session, $data);
             });
         } catch (RuntimeException $exception) {
             return response()->json(['message' => $exception->getMessage()], 422);
@@ -131,7 +132,7 @@ class PublicCheckoutController extends Controller
         app(TransactionalEmailService::class)->sendForCheckout(TransactionalEmailService::CODE_SIGNUP, $session);
 
         return response()->json([
-            'checkout_url' => $this->checkoutService->publicCheckoutUrl($session->public_reference),
+            'checkout_url' => $this->checkoutPayments->publicCheckoutUrl($session->public_reference, $session->provider),
             'reference' => $session->public_reference,
             'status' => $session->status,
             'company' => [
@@ -157,6 +158,8 @@ class PublicCheckoutController extends Controller
                 'status_label' => $this->statusLabel($session->status),
                 'plan_name' => $session->plan_name,
                 'amount_cents' => $session->amount_cents,
+                'provider' => $session->provider,
+                'provider_label' => $this->checkoutPayments->provider($session->provider)->label(),
                 'payment_method' => $session->payment_method,
                 'paid_at' => $session->paid_at?->toISOString(),
                 'expires_at' => $session->expires_at?->toISOString(),
@@ -175,10 +178,16 @@ class PublicCheckoutController extends Controller
         ]);
     }
 
-    public function webhook(Request $request)
+    public function webhook(Request $request, string $provider = 'pagarme')
     {
         try {
-            $event = $this->checkoutService->handleWebhook($request->all(), $request->headers->all(), $request->getContent());
+            $event = $this->checkoutPayments->handleWebhook(
+                $provider,
+                $request->all(),
+                $request->headers->all(),
+                $request->getContent(),
+                $request->query(),
+            );
         } catch (RuntimeException $exception) {
             return response()->json(['message' => $exception->getMessage()], 401);
         }
@@ -221,6 +230,10 @@ class PublicCheckoutController extends Controller
             'admin_phone' => ['required', 'string', 'max:60'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'card_token' => ['nullable', 'string', 'max:255', 'required_if:payment_method,credit_card'],
+            'payment_method_id' => ['nullable', 'string', 'max:80'],
+            'issuer_id' => ['nullable', 'string', 'max:80'],
+            'card_brand' => ['nullable', 'string', 'max:80'],
+            'card_last_four_digits' => ['nullable', 'string', 'max:4'],
             'installments' => ['nullable', 'integer', 'min:1', 'max:12'],
         ]);
     }

@@ -1,6 +1,6 @@
 # Arquitetura Tecnica
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-25
 
 ## Estrutura alvo do repositório
 
@@ -72,6 +72,7 @@ APIs protegidas já implementadas:
 - `GET|POST /api/v1/saas/companies`
 - `PATCH /api/v1/saas/companies/{company}`
 - `GET|PATCH /api/v1/saas/email-settings`
+- `GET|PATCH /api/v1/saas/checkout-settings`
 - `GET|POST /api/v1/saas/transactional-emails`
 - `PATCH /api/v1/saas/transactional-emails/{transactionalEmail}`
 - `GET /api/v1/saas/transactional-email-sends`
@@ -84,6 +85,7 @@ APIs públicas adicionais:
 - `POST /api/v1/public/checkout`
 - `GET /api/v1/public/checkout/{reference}`
 - `POST /api/v1/webhooks/pagarme`
+- `POST /api/v1/webhooks/mercado-pago`
 
 ## Autenticacao e multiempresa
 
@@ -143,6 +145,7 @@ Rotas iniciais:
 - `/saas/usuarios-empresas`
 - `/saas/usuarios-empresas/novo`
 - `/saas/usuarios-empresas/:id/editar`
+- `/saas/checkout`
 - `/saas/emails`
 - `/saas/emails/configuracoes`
 - `/saas/emails/novo`
@@ -188,6 +191,7 @@ Tabelas propostas:
 - `audit_logs`
 - `checkout_sessions`
 - `payment_events`
+- `saas_settings`
 - `email_settings`
 - `transactional_emails`
 - `transactional_email_sends`
@@ -216,14 +220,16 @@ Chaves comuns:
 10. Widget exibe recomendação, permite editar medidas e coleta feedback.
 11. Feedback, compra, devolucao e troca entram como `recommendation_learning_events`.
 
-## Checkout Pagar.me
+## Checkout transparente
 
-- Cartão e tokenizado no navegador usando `PAGARME_PUBLIC_KEY`.
-- Backend nunca recebe PAN/CVV; recebe apenas `card_token`.
-- Backend cria pedido transparente em `POST /orders` na API Core v5 da Pagar.me.
-- Pix retorna instrucoes na tela `/checkout/sucesso`; boleto não e oferecido no checkout atual.
-- Empresa nasce como `pending_payment` e e ativada por retorno imediato pago ou webhook.
-- O comando `php artisan pv:payments-sync --limit=50` consulta pedidos pendentes na Pagar.me e ativa empresas pagas quando webhook falhar ou atrasar.
+- `CheckoutPaymentManager` escolhe a operadora ativa por `saas_settings.checkout.payment_provider`, com fallback em `CHECKOUT_PAYMENT_PROVIDER`.
+- O painel SaaS em `/saas/checkout` permite alternar entre `mercado_pago` e `pagarme`.
+- Mercado Pago e a operadora ativa de produção: cartão usa MercadoPago.js/CardForm no navegador, Pix usa `POST /v1/payments` e webhook em `POST /api/v1/webhooks/mercado-pago`.
+- Pagar.me permanece preservada como operadora alternativa: cartão e tokenizado no navegador com `PAGARME_PUBLIC_KEY`, backend cria pedido em `POST /orders` Core v5 e webhook segue em `POST /api/v1/webhooks/pagarme`.
+- Backend nunca recebe PAN/CVV; recebe apenas token de cartão da operadora.
+- Pix retorna QR Code/copia e cola/ticket na tela `/checkout/sucesso`; boleto não e oferecido no checkout atual.
+- Empresa nasce como `pending_payment` e e ativada por retorno imediato pago, webhook ou sincronização.
+- O comando `php artisan pv:payments-sync --limit=50` consulta pagamentos pendentes nas operadoras e ativa empresas pagas quando webhook falhar ou atrasar.
 - O scheduler executa o monitor de pagamentos a cada 5 minutos.
 - O comando `php artisan pv:integrations-sync-feeds --limit=50` sincroniza XML/feed de integrações configuradas 4 vezes por dia pelo scheduler.
 

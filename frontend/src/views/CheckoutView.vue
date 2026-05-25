@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, nextTick, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '../services/api'
-import { tokenizePagarMeCard, type PublicCheckoutConfig } from '../services/pagarme'
+import { createMercadoPagoCardForm, tokenizePagarMeCard, type MercadoPagoCardFormData, type PublicCheckoutConfig } from '../services/pagarme'
 
 type Plan = {
   code: string
@@ -30,6 +30,8 @@ const error = ref('')
 const checkoutConfig = ref<PublicCheckoutConfig | null>(null)
 const plans = ref<Plan[]>([])
 const pricing = ref<Record<string, PricingVariant>>({})
+const mercadoPagoCardForm = ref<any>(null)
+const mercadoPagoCardFormKey = ref('')
 const platformOptions = [
   { value: 'bigshop', label: 'BigShop' },
   { value: 'shopify', label: 'Shopify' },
@@ -78,6 +80,8 @@ const card = reactive({
 
 const selectedPlan = computed(() => plans.value.find((plan) => plan.code === form.plan_code))
 const canUseCreditCard = computed(() => Boolean(checkoutConfig.value?.credit_card_enabled))
+const checkoutProvider = computed(() => checkoutConfig.value?.provider || checkoutConfig.value?.active_provider || '')
+const isMercadoPago = computed(() => checkoutProvider.value === 'mercado_pago')
 const activePricing = computed(() => pricing.value[form.platform === 'bigshop' ? 'bigshop' : 'default'])
 const payableCents = computed(() => {
   const values = activePricing.value
@@ -88,6 +92,7 @@ const payableCents = computed(() => {
   return form.payment_method === 'pix' ? values.annual_pix_cents : values.annual_card_cents
 })
 const monthlyCents = computed(() => activePricing.value?.monthly_cents || 0)
+const annualCardCents = computed(() => activePricing.value?.annual_card_cents || 0)
 const cardInstallmentCents = computed(() => Math.ceil((activePricing.value?.annual_card_cents || 0) / Number(form.installments || 12)))
 const pixDiscountCents = computed(() => {
   const values = activePricing.value
@@ -153,11 +158,21 @@ async function submitCheckout() {
     let cardTokenPayload: Record<string, string | null> = {}
 
     if (form.payment_method === 'credit_card') {
-      const token = await tokenizePagarMeCard(checkoutConfig.value, card)
-      cardTokenPayload = {
-        card_token: token.token,
-        card_brand: token.brand,
-        card_last_four_digits: token.last_four_digits,
+      if (isMercadoPago.value) {
+        const cardData = await mercadoPagoCardData()
+        cardTokenPayload = {
+          card_token: cardData.token,
+          payment_method_id: cardData.paymentMethodId,
+          issuer_id: cardData.issuerId || null,
+        }
+        form.installments = String(cardData.installments || form.installments || '1')
+      } else {
+        const token = await tokenizePagarMeCard(checkoutConfig.value, card)
+        cardTokenPayload = {
+          card_token: token.token,
+          card_brand: token.brand,
+          card_last_four_digits: token.last_four_digits,
+        }
       }
     }
 
@@ -174,6 +189,64 @@ async function submitCheckout() {
   } finally {
     submitting.value = false
   }
+}
+
+async function selectPaymentMethod(method: 'pix' | 'credit_card') {
+  if (method === 'credit_card' && !canUseCreditCard.value) {
+    return
+  }
+
+  form.payment_method = method
+
+  if (method === 'credit_card' && isMercadoPago.value) {
+    await prepareMercadoPagoCardForm()
+  }
+}
+
+async function prepareMercadoPagoCardForm() {
+  if (!checkoutConfig.value || !isMercadoPago.value || form.payment_method !== 'credit_card') {
+    return
+  }
+
+  await nextTick()
+  syncMercadoPagoDocumentFields()
+
+  const key = `${checkoutConfig.value.public_key || ''}:${annualCardCents.value}`
+  if (mercadoPagoCardForm.value && mercadoPagoCardFormKey.value === key) {
+    return
+  }
+
+  mercadoPagoCardForm.value = await createMercadoPagoCardForm(checkoutConfig.value, annualCardCents.value)
+  mercadoPagoCardFormKey.value = key
+}
+
+async function mercadoPagoCardData(): Promise<MercadoPagoCardFormData> {
+  await prepareMercadoPagoCardForm()
+  syncMercadoPagoDocumentFields()
+
+  const cardData = await mercadoPagoCardForm.value?.getCardFormData()
+  if (!cardData?.token || !cardData?.paymentMethodId) {
+    throw new Error('Confira os dados do cartão antes de finalizar.')
+  }
+
+  return cardData
+}
+
+function syncMercadoPagoDocumentFields() {
+  const identificationNumber = document.getElementById('mp-identification-number') as HTMLInputElement | null
+  const identificationType = document.getElementById('mp-identification-type') as HTMLSelectElement | null
+
+  if (identificationNumber) {
+    identificationNumber.value = form.admin_cpf.replace(/\D+/g, '')
+  }
+
+  if (identificationType && !identificationType.value) {
+    identificationType.value = 'CPF'
+  }
+}
+
+function updateAdminCpf(event: Event) {
+  form.admin_cpf = (event.target as HTMLInputElement).value
 }
 
 function price(cents: number) {
@@ -194,7 +267,7 @@ function price(cents: number) {
     <p v-if="error" class="form-error">{{ error }}</p>
     <div v-if="loading" class="empty-state">Carregando checkout...</div>
 
-    <form v-else class="checkout-grid" @submit.prevent="submitCheckout">
+    <form v-else id="checkout-form" class="checkout-grid" @submit.prevent="submitCheckout">
       <section class="panel-main admin-form">
         <div class="subsection-heading">
           <h2>{{ selectedPlan?.name }}</h2>
@@ -314,20 +387,20 @@ function price(cents: number) {
         </div>
 
         <div class="payment-tabs">
-          <button type="button" :class="{ active: form.payment_method === 'pix' }" @click="form.payment_method = 'pix'">
+          <button type="button" :class="{ active: form.payment_method === 'pix' }" @click="selectPaymentMethod('pix')">
             Pix
           </button>
           <button
             type="button"
             :disabled="!canUseCreditCard"
             :class="{ active: form.payment_method === 'credit_card' }"
-            @click="form.payment_method = 'credit_card'"
+            @click="selectPaymentMethod('credit_card')"
           >
             Cartão
           </button>
         </div>
 
-        <div v-if="form.payment_method === 'credit_card'" class="form-grid">
+        <div v-if="form.payment_method === 'credit_card' && !isMercadoPago" class="form-grid">
           <label>
             Nome no cartão
             <input v-model="card.holder_name" :required="form.payment_method === 'credit_card'" />
@@ -355,6 +428,43 @@ function price(cents: number) {
                 {{ item }}x de {{ price(Math.ceil((activePricing?.annual_card_cents || 0) / item)) }}
               </option>
             </select>
+          </label>
+        </div>
+
+        <div v-if="form.payment_method === 'credit_card' && isMercadoPago" class="mercado-card-fields">
+          <label class="wide">
+            Nome no cartão
+            <input id="mp-cardholder-name" v-model="card.holder_name" :required="form.payment_method === 'credit_card'" autocomplete="cc-name" />
+          </label>
+          <label class="wide">
+            Número
+            <div id="mp-card-number" class="mp-secure-field"></div>
+          </label>
+          <label>
+            Validade
+            <div id="mp-expiration-date" class="mp-secure-field"></div>
+          </label>
+          <label>
+            CVV
+            <div id="mp-security-code" class="mp-secure-field"></div>
+          </label>
+          <label>
+            Bandeira
+            <select id="mp-issuer"></select>
+          </label>
+          <label>
+            Parcelas
+            <select id="mp-installments" v-model="form.installments"></select>
+          </label>
+          <label>
+            Documento
+            <select id="mp-identification-type" aria-label="Tipo de documento">
+              <option value="CPF">CPF</option>
+            </select>
+          </label>
+          <label class="wide">
+            Número do documento
+            <input id="mp-identification-number" :value="form.admin_cpf.replace(/\D+/g, '')" inputmode="numeric" required @input="updateAdminCpf" />
           </label>
         </div>
 

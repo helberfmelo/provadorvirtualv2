@@ -1,10 +1,21 @@
 export type PublicCheckoutConfig = {
   provider: string
+  provider_label?: string
+  active_provider?: string
+  available_providers?: Array<{
+    key: string
+    label: string
+    configured: boolean
+    credit_card_enabled: boolean
+    payment_methods: string[]
+  }>
   payment_methods: string[]
   credit_card_enabled: boolean
   public_key: string | null
-  token_url: string
-  token_query_param: string
+  sdk_url?: string | null
+  tokenization?: string | null
+  token_url: string | null
+  token_query_param: string | null
   token_expires_in_seconds: number
 }
 
@@ -22,11 +33,26 @@ export type PagarMeCardTokenResult = {
   last_four_digits: string | null
 }
 
+export type MercadoPagoCardFormData = {
+  token: string
+  paymentMethodId: string
+  issuerId?: string
+  installments?: string | number
+}
+
+declare global {
+  interface Window {
+    MercadoPago?: any
+  }
+}
+
+let mercadoPagoSdkPromise: Promise<void> | null = null
+
 export async function tokenizePagarMeCard(
   config: PublicCheckoutConfig,
   payload: PagarMeCardTokenPayload,
 ): Promise<PagarMeCardTokenResult> {
-  if (!config.public_key) {
+  if (!config.public_key || !config.token_url) {
     throw new Error('A tokenização do cartão não está disponível para este ambiente agora.')
   }
 
@@ -73,6 +99,77 @@ export async function tokenizePagarMeCard(
       ? data.card.last_four_digits
       : (typeof data?.card?.last_4_digits === 'string' ? data.card.last_4_digits : null),
   }
+}
+
+export async function createMercadoPagoCardForm(
+  config: PublicCheckoutConfig,
+  amountCents: number,
+): Promise<any> {
+  if (!config.public_key) {
+    throw new Error('A tokenização do cartão não está disponível para este ambiente agora.')
+  }
+
+  await loadMercadoPagoSdk(config.sdk_url || 'https://sdk.mercadopago.com/js/v2')
+
+  if (!window.MercadoPago) {
+    throw new Error('Não foi possível carregar o Mercado Pago no navegador.')
+  }
+
+  const mp = new window.MercadoPago(config.public_key, { locale: 'pt-BR' })
+
+  return mp.cardForm({
+    amount: String((amountCents / 100).toFixed(2)),
+    iframe: true,
+    form: {
+      id: 'checkout-form',
+      cardNumber: { id: 'mp-card-number', placeholder: '0000 0000 0000 0000' },
+      expirationDate: { id: 'mp-expiration-date', placeholder: 'MM/AA' },
+      securityCode: { id: 'mp-security-code', placeholder: '123' },
+      cardholderName: { id: 'mp-cardholder-name' },
+      issuer: { id: 'mp-issuer' },
+      installments: { id: 'mp-installments' },
+      identificationType: { id: 'mp-identification-type' },
+      identificationNumber: { id: 'mp-identification-number' },
+    },
+    callbacks: {
+      onFormMounted: (error: unknown) => {
+        if (error) {
+          console.warn('Mercado Pago card form error', error)
+        }
+      },
+      onSubmit: (event: Event) => {
+        event.preventDefault()
+      },
+    },
+  })
+}
+
+function loadMercadoPagoSdk(src: string): Promise<void> {
+  if (window.MercadoPago) {
+    return Promise.resolve()
+  }
+
+  if (mercadoPagoSdkPromise) {
+    return mercadoPagoSdkPromise
+  }
+
+  mercadoPagoSdkPromise = new Promise((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>(`script[src="${src}"]`)
+    if (existing) {
+      existing.addEventListener('load', () => resolve(), { once: true })
+      existing.addEventListener('error', () => reject(new Error('Falha ao carregar o SDK do Mercado Pago.')), { once: true })
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = src
+    script.async = true
+    script.onload = () => resolve()
+    script.onerror = () => reject(new Error('Falha ao carregar o SDK do Mercado Pago.'))
+    document.head.appendChild(script)
+  })
+
+  return mercadoPagoSdkPromise
 }
 
 function normalizeCardYear(value: string) {

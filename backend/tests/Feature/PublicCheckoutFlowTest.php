@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\MerchantCompany;
+use App\Models\SaasSetting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -59,6 +60,50 @@ class PublicCheckoutFlowTest extends TestCase
         $this->getJson('/api/v1/public/checkout/'.$response->json('reference'))
             ->assertOk()
             ->assertJsonPath('session.company.access_code', now()->year.'0001');
+    }
+
+    public function test_public_checkout_creates_transparent_mercado_pago_pix_payment(): void
+    {
+        $this->configureMercadoPago();
+
+        Http::fake([
+            'https://api.mercadopago.com/v1/payments' => Http::response([
+                'id' => 998877,
+                'status' => 'pending',
+                'status_detail' => 'pending_waiting_transfer',
+                'payment_method_id' => 'pix',
+                'date_of_expiration' => now()->addDay()->toIso8601String(),
+                'point_of_interaction' => [
+                    'transaction_data' => [
+                        'qr_code' => '000201-mp-pix',
+                        'qr_code_base64' => 'base64-pix',
+                        'ticket_url' => 'https://www.mercadopago.com.br/payments/998877/ticket',
+                    ],
+                ],
+            ]),
+        ]);
+
+        $response = $this->postJson('/api/v1/public/checkout', $this->payload())
+            ->assertCreated()
+            ->assertJsonPath('status', 'checkout_created')
+            ->assertJsonPath('payment.pix.qr_code', '000201-mp-pix')
+            ->assertJsonPath('payment.pix.qr_code_base64', 'base64-pix');
+
+        $this->assertDatabaseHas('checkout_sessions', [
+            'public_reference' => $response->json('reference'),
+            'provider' => 'mercado_pago',
+            'provider_order_id' => '998877',
+        ]);
+
+        Http::assertSent(function ($request): bool {
+            $payload = $request->data();
+
+            return $request->url() === 'https://api.mercadopago.com/v1/payments'
+                && data_get($payload, 'payment_method_id') === 'pix'
+                && data_get($payload, 'transaction_amount') === 2164.86
+                && data_get($payload, 'payer.address.zip_code') === '01001000'
+                && data_get($payload, 'metadata.platform') === 'provadorvirtual';
+        });
     }
 
     public function test_bigshop_platform_receives_discounted_annual_price(): void
@@ -204,6 +249,48 @@ class PublicCheckoutFlowTest extends TestCase
         ]);
     }
 
+    public function test_mercado_pago_webhook_activates_paid_company(): void
+    {
+        $this->configureMercadoPago();
+
+        Http::fake([
+            'https://api.mercadopago.com/v1/payments' => Http::response([
+                'id' => 998877,
+                'status' => 'pending',
+                'payment_method_id' => 'pix',
+            ]),
+            'https://api.mercadopago.com/v1/payments/998877' => Http::response([
+                'id' => 998877,
+                'status' => 'approved',
+                'payment_method_id' => 'pix',
+                'metadata' => [
+                    'checkout_session_id' => '1',
+                    'checkout_reference' => 'mp-ref',
+                ],
+            ]),
+        ]);
+
+        $checkout = $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'company_domain' => 'mp-checkout.test',
+        ])->assertCreated();
+        $company = MerchantCompany::query()->firstOrFail();
+
+        $this->postJson('/api/v1/webhooks/mercado-pago', [
+            'id' => 'evt_mp_paid_123',
+            'type' => 'payment',
+            'data' => [
+                'id' => '998877',
+            ],
+        ])->assertOk();
+
+        $this->assertNotEmpty($checkout->json('reference'));
+        $this->assertDatabaseHas('merchant_companies', [
+            'id' => $company->id,
+            'status' => 'active',
+        ]);
+    }
+
     private function payload(): array
     {
         return [
@@ -231,9 +318,23 @@ class PublicCheckoutFlowTest extends TestCase
 
     private function configurePagarme(): void
     {
+        SaasSetting::setValue('checkout.payment_provider', 'pagarme');
+        config()->set('services.checkout.default_provider', 'pagarme');
         config()->set('services.pagarme.secret_key', 'sk_test_checkout');
         config()->set('services.pagarme.public_key', 'pk_test_checkout');
         config()->set('services.pagarme.base_url', 'https://api.pagar.me/core/v5');
         config()->set('services.pagarme.checkout_success_url', 'https://provadorvirtual.online/checkout/sucesso');
+    }
+
+    private function configureMercadoPago(): void
+    {
+        SaasSetting::setValue('checkout.payment_provider', 'mercado_pago');
+        config()->set('services.checkout.default_provider', 'mercado_pago');
+        config()->set('services.mercado_pago.access_token', 'APP_USR-test-token');
+        config()->set('services.mercado_pago.public_key', 'APP_USR-test-public');
+        config()->set('services.mercado_pago.base_url', 'https://api.mercadopago.com');
+        config()->set('services.mercado_pago.webhook_secret', null);
+        config()->set('services.mercado_pago.checkout_success_url', 'https://provadorvirtual.online/checkout/sucesso');
+        config()->set('services.mercado_pago.webhook_url', 'https://provadorvirtual.online/api/v1/webhooks/mercado-pago');
     }
 }

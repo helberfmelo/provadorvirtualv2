@@ -788,3 +788,19 @@
 - Validações locais: `npm run build`, `git diff --check` e auditoria Playwright mobile em 360px e 390px cobrindo 36 checagens entre rotas públicas, rotas autenticadas e drawers.
 - Commit `b82316b` enviado para `main`; o run `26383644699` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Playwright pós-deploy em produção confirmou login demo, ausência de overflow/sobreposição em `/`, `/produto-teste`, `/produto-teste/:slug`, `/app`, `/app/widget`, `/app/produtos` e um único botão de fechar nos drawers público e autenticado.
+
+## 2026-05-25 - Sprint 82 Checkout Mercado Pago transparente
+
+- Releitura obrigatória dos documentos do projeto concluída antes da implementação.
+- Projeto `D:\Projetos\NoAzul` analisado como referência de Mercado Pago: `checkout.php`, `api/checkout.php`, `api/webhook_mp.php` e variáveis `MERCADOPAGO_*`.
+- Documentação oficial Mercado Pago conferida para Checkout Transparente via Payments, Pix, CardForm/MercadoPago.js, `X-Idempotency-Key`, `notification_url` e assinatura `x-signature`.
+- Criada camada `CheckoutPaymentManager` para escolher operadora ativa entre `mercado_pago` e `pagarme`.
+- Implementado `MercadoPagoCheckoutService` com Pix, cartão tokenizado no frontend, webhook `/api/v1/webhooks/mercado-pago`, polling pelo comando `pv:payments-sync` e ativação automática da empresa paga.
+- Pagar.me foi preservada e filtrada por `provider=pagarme` no sync, para não tentar consultar pagamentos Mercado Pago.
+- Criada configuração SaaS `/saas/checkout` e API `/api/v1/saas/checkout-settings` para selecionar a operadora ativa.
+- Adicionadas migrations `saas_settings` e permissão `saas_checkout` para admins/suporte existentes.
+- Checkout Vue passou a carregar MercadoPago.js somente quando cartão Mercado Pago estiver ativo; Pix segue direto pelo backend e `/checkout/sucesso` mostra QR Code/copia e cola/ticket sem mencionar Pagar.me.
+- Documentação atualizada para `MERCADO_PAGO_*`, com regra explícita de não versionar valores reais; chaves de produção vindas do NoAzul devem ficar apenas em `docs/credentials.local.md`, `.env` local/remoto ou secret seguro.
+- `backend/.env`, `docs/credentials.local.md` e o secret GitHub Actions `PRODUCTION_ENV` foram atualizados com Mercado Pago sem exibir valores sensíveis.
+- Validações focadas passaram: `PublicCheckoutFlowTest`, `SaasCheckoutSettingsApiTest`, `PaymentSyncCommandTest` e `GoLiveReadinessApiTest`.
+- Validação local completa passou com `php artisan test`, `npm run build`, `vendor/bin/pint --dirty`, `git diff --check` e Playwright mobile mockado do checkout Mercado Pago sem overflow horizontal.

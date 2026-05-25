@@ -47,15 +47,24 @@ onMounted(async () => {
             <small>Status da empresa</small>
           </span>
           <span>
+            <strong>{{ session.provider_label || session.provider }}</strong>
+            <small>Operadora</small>
+          </span>
+          <span>
             <strong>{{ session.payment_method }}</strong>
-            <small>Pagamento</small>
+            <small>Meio</small>
           </span>
         </div>
 
         <div v-if="payment?.pix?.qr_code" class="payment-box">
+          <img v-if="payment.pix.qr_code_base64" class="pix-qr-image" :src="`data:image/jpeg;base64,${payment.pix.qr_code_base64}`" alt="QR Code Pix" />
           <strong>Pix copia e cola</strong>
           <textarea :value="payment.pix.qr_code" rows="4" readonly></textarea>
-          <small>O acesso da empresa será liberado automaticamente quando a Pagar.me confirmar o pagamento.</small>
+          <a v-if="payment.pix.ticket_url" class="btn btn-secondary" :href="payment.pix.ticket_url" target="_blank" rel="noopener">
+            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            Abrir Pix
+          </a>
+          <small>O acesso da empresa será liberado automaticamente quando a operadora confirmar o pagamento.</small>
         </div>
 
         <div class="action-row">

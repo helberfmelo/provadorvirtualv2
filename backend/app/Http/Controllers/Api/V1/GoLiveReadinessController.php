@@ -10,6 +10,7 @@ use App\Models\PlatformConnection;
 use App\Models\Product;
 use App\Models\RecommendationLog;
 use App\Models\WidgetInstall;
+use App\Services\CheckoutPaymentManager;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 
@@ -67,8 +68,8 @@ class GoLiveReadinessController extends Controller
                 'bigshop_activation_secret' => ! filled(config('services.bigshop.activation_secret')),
                 'bigshop_test_store' => ! $this->hasConfiguredBigShop($merchant->id, $company?->id),
                 'external_ai_key' => ! $this->hasExternalAiKey(),
-                'pagarme_keys' => ! $this->hasPagarMeKeys(),
-                'pagarme_real_transaction' => ! $this->hasPaidCheckout(),
+                'checkout_provider_keys' => ! $this->hasCheckoutProviderKeys(),
+                'checkout_real_transaction' => ! $this->hasPaidCheckout(),
                 'cron_scheduler_recent' => ! $this->hasRecentSchedulerLog(),
             ],
             'pilot_package' => $this->pilotPackage(),
@@ -177,14 +178,16 @@ class GoLiveReadinessController extends Controller
 
     private function paymentProviderCheck(): array
     {
-        $configured = $this->hasPagarMeKeys();
+        $manager = app(CheckoutPaymentManager::class);
+        $provider = $manager->provider();
+        $configured = $manager->activeProviderConfigured();
 
         return $this->check(
-            key: 'pagarme_provider',
-            label: 'Checkout Pagar.me',
+            key: 'checkout_provider',
+            label: 'Checkout '.$provider->label(),
             status: $configured ? 'passed' : 'warning',
-            detail: $configured ? 'Chaves Pagar.me e URLs de retorno configuradas.' : 'Chaves reais Pagar.me ainda não estão completas em produção.',
-            action: $configured ? 'Executar compra real de baixo valor antes da campanha.' : 'Cadastrar PAGARME_SECRET_KEY, PAGARME_PUBLIC_KEY, PAGARME_WEBHOOK_SECRET e URLs na raiz.'
+            detail: $configured ? 'Operadora ativa com credenciais minimas configuradas.' : 'Credenciais da operadora ativa ainda nao estao completas em producao.',
+            action: $configured ? 'Executar compra real de baixo valor antes da campanha.' : 'Configurar Mercado Pago ou Pagar.me no ambiente e selecionar a operadora no painel SaaS.'
         );
     }
 
@@ -193,11 +196,11 @@ class GoLiveReadinessController extends Controller
         $paid = $this->hasPaidCheckout();
 
         return $this->check(
-            key: 'pagarme_real_transaction',
+            key: 'checkout_real_transaction',
             label: 'Transação real de pagamento',
             status: $paid ? 'passed' : 'warning',
             detail: $paid ? 'Existe checkout aprovado registrado.' : 'Nenhuma transação real aprovada registrada ainda.',
-            action: $paid ? 'Manter webhook e cron monitorados.' : 'Depois das chaves Pagar.me, executar uma compra Pix/cartão de baixo valor.'
+            action: $paid ? 'Manter webhook e cron monitorados.' : 'Depois das chaves da operadora, executar uma compra Pix/cartao de baixo valor.'
         );
     }
 
@@ -315,13 +318,9 @@ class GoLiveReadinessController extends Controller
         return filled(config('services.ai.openai_api_key')) || filled(config('services.ai.gemini_api_key'));
     }
 
-    private function hasPagarMeKeys(): bool
+    private function hasCheckoutProviderKeys(): bool
     {
-        return filled(config('services.pagarme.secret_key'))
-            && filled(config('services.pagarme.public_key'))
-            && filled(config('services.pagarme.webhook_secret'))
-            && filled(config('services.pagarme.checkout_success_url'))
-            && filled(config('services.pagarme.checkout_cancel_url'));
+        return app(CheckoutPaymentManager::class)->activeProviderConfigured();
     }
 
     private function hasPaidCheckout(): bool
@@ -341,7 +340,7 @@ class GoLiveReadinessController extends Controller
     private function pilotPackage(): array
     {
         return [
-            'status' => $this->hasPagarMeKeys() && $this->hasPaidCheckout() ? 'commercial_ready' : 'assisted_demo_ready',
+            'status' => $this->hasCheckoutProviderKeys() && $this->hasPaidCheckout() ? 'commercial_ready' : 'assisted_demo_ready',
             'sales_assets' => [
                 ['label' => 'Site público', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/'],
                 ['label' => 'Produto teste', 'url' => rtrim((string) config('app.frontend_url', config('app.url')), '/').'/produto-teste'],
@@ -366,7 +365,7 @@ class GoLiveReadinessController extends Controller
                 'validation' => '.\\scripts\\validate-production.ps1',
             ],
             'pending_real_world_tests' => [
-                'Transação Pagar.me Pix/cartão de baixo valor com webhook e cron.',
+                'Transação Mercado Pago Pix/cartao de baixo valor com webhook e cron.',
                 'Ativação BigShop um clique com payload assinado real.',
                 'Probe e sync em loja BigShop piloto com produto, grade e tabela.',
                 'Teste de widget em página real de cliente com cache frio e mobile.',

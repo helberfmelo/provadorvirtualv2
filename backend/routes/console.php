@@ -12,8 +12,8 @@ use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
 use App\Models\ShopperProfile;
 use App\Models\User;
+use App\Services\CheckoutPaymentManager;
 use App\Services\Integrations\XmlFeedSyncService;
-use App\Services\PagarMeCheckoutService;
 use App\Services\TransactionalEmailService;
 use App\Support\PermissionCatalog;
 use Illuminate\Foundation\Inspiring;
@@ -256,12 +256,12 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
 
 Artisan::command('pv:payments-sync {--limit=50 : Quantidade maxima de checkouts pendentes por execucao}', function (): int {
     $limit = max(1, min(200, (int) ($this->option('limit') ?: 50)));
-    $summary = app(PagarMeCheckoutService::class)->syncPendingCheckouts($limit);
+    $summary = app(CheckoutPaymentManager::class)->syncPendingCheckouts($limit);
 
     $this->line(json_encode($summary, JSON_PRETTY_PRINT));
 
     return ((int) $summary['errors']) > 0 ? 2 : 0;
-})->purpose('Consulta a Pagar.me e libera acessos de checkouts pendentes aprovados.');
+})->purpose('Consulta operadoras de pagamento e libera acessos de checkouts pendentes aprovados.');
 
 Artisan::command('pv:emails-dispatch {--limit=50 : Quantidade maxima de checkouts avaliados por execucao}', function (): int {
     $limit = max(1, min(200, (int) ($this->option('limit') ?: 50)));

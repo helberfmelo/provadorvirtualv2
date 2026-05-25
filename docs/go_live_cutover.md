@@ -123,7 +123,7 @@ Sem chave externa, o assistente continua operando com parser local para texto/CS
 
 `/app/go-live`, `GET /api/v1/go-live/readiness` e `scripts/validate-production.ps1` passaram a incluir:
 
-- checks de Pagar.me e transação real;
+- checks da operadora de checkout ativa, transação real e painel SaaS `/saas/checkout`;
 - check de cron/scheduler recente;
 - check de peso do widget;
 - check básico de acessibilidade/mobile do widget;

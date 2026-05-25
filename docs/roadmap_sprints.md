@@ -1089,3 +1089,18 @@ Entregas:
 - corrigir acentos visíveis em textos como `Fundação`, `vão`, `instalações`, `Últimos` e `tráfego`.
 
 Status: implementado no commit `b82316b` e publicado com sucesso no run `26383644699`, com build local, checagem de diff, auditoria Playwright mobile local em 36 checks e smoke Playwright mobile em produção.
+
+### Sprint 82 - Checkout transparente Mercado Pago
+
+Objetivo: ativar Mercado Pago como operadora funcional do checkout transparente e deixar a escolha da operadora controlável pelo painel SaaS.
+
+Entregas:
+
+- criar camada `CheckoutPaymentManager` para alternar entre Mercado Pago e Pagar.me;
+- implementar Mercado Pago via API de pagamentos (`/v1/payments`) com Pix, cartão tokenizado pelo MercadoPago.js/CardForm, webhook e sincronização pendente;
+- adicionar `/saas/checkout` e `/api/v1/saas/checkout-settings` para selecionar `mercado_pago` ou `pagarme`;
+- manter Pagar.me preservada como alternativa, mas marcada como pendente até as informações faltantes chegarem;
+- documentar variáveis `MERCADO_PAGO_*` e registrar que os valores reais herdados do NoAzul ficam apenas em `docs/credentials.local.md`, `.env` remoto/local ou secret seguro;
+- cobrir checkout Mercado Pago, webhook, seleção SaaS e sync de pagamentos em testes.
+
+Status: em implementação nesta sprint; publicar somente após testes locais, commit, push e GitHub Actions/deploy acompanhados até sucesso.

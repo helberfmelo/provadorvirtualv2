@@ -36,6 +36,7 @@ Nunca commitar:
 - secrets de pagamento.
 
 `docs/credentials.local.md` fica no `.gitignore`.
+Chaves reais do Mercado Pago, inclusive as usadas como referência a partir do projeto `D:\Projetos\NoAzul`, só podem ficar em `docs/credentials.local.md`, `.env` local/remoto ou secrets do provedor. A documentação versionada registra nomes de variáveis e origem operacional, nunca valores.
 
 ## CORS e widget
 

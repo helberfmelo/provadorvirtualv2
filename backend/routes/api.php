@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\ProductVariantController;
 use App\Http\Controllers\Api\V1\PublicCheckoutController;
 use App\Http\Controllers\Api\V1\RecommendationController;
 use App\Http\Controllers\Api\V1\SaasAdminController;
+use App\Http\Controllers\Api\V1\SaasCheckoutController;
 use App\Http\Controllers\Api\V1\SaasEmailController;
 use App\Http\Controllers\Api\V1\UserAccessController;
 use App\Http\Controllers\Api\V1\WidgetInstallController;
@@ -62,6 +63,9 @@ Route::prefix('v1')->group(function (): void {
     Route::get('/public/checkout/{reference}', [PublicCheckoutController::class, 'show'])
         ->middleware('throttle:60,1');
     Route::post('/webhooks/pagarme', [PublicCheckoutController::class, 'webhook'])
+        ->middleware('throttle:120,1');
+    Route::post('/webhooks/mercado-pago', [PublicCheckoutController::class, 'webhook'])
+        ->defaults('provider', 'mercado_pago')
         ->middleware('throttle:120,1');
     Route::post('/public/bigshop/activate', BigShopActivationController::class)
         ->middleware('throttle:20,1');
@@ -177,6 +181,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:saas,saas_emails,view');
         Route::patch('/saas/email-settings', [SaasEmailController::class, 'updateSettings'])
             ->middleware('portal.permission:saas,saas_emails,edit');
+        Route::get('/saas/checkout-settings', [SaasCheckoutController::class, 'show'])
+            ->middleware('portal.permission:saas,saas_checkout,view');
+        Route::patch('/saas/checkout-settings', [SaasCheckoutController::class, 'update'])
+            ->middleware('portal.permission:saas,saas_checkout,edit');
         Route::get('/saas/transactional-emails', [SaasEmailController::class, 'templates'])
             ->middleware('portal.permission:saas,saas_emails,view');
         Route::post('/saas/transactional-emails', [SaasEmailController::class, 'storeTemplate'])

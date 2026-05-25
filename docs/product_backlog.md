@@ -107,7 +107,8 @@ Atualizado em: 2026-05-23
 - `DONE` Site público com CTA separado para plano padrão e plano BigShop, WhatsApp oficial, favicon PV e tags OG.
 - `DONE` Menu mobile em drawer no site/app Vue.
 - `DONE` Footer público com crédito OTS e CTA para criar loja na BigShop.
-- `TODO` Configurar `PAGARME_CHECKOUT_SUCCESS_URL=https://provadorvirtual.online/checkout/sucesso` em produção junto com as chaves reais.
+- `DONE` Implementar Mercado Pago como operadora ativa do checkout transparente.
+- `DONE` Criar configuração SaaS para escolher entre Mercado Pago e Pagar.me.
 - `DONE` Monitorar pagamento pendente por cron além do webhook.
 - `DONE` CRUD de credenciais SMTP e e-mails transacionais.
 - `DONE` Disparar automaticamente e-mails transacionais por evento.
@@ -130,12 +131,14 @@ Atualizado em: 2026-05-23
 ## Pagamentos
 
 - `DONE` Checkout transparente Pagar.me com tokenizacao de cartão no navegador.
+- `DONE` Checkout transparente Mercado Pago com Pix, cartão tokenizado pelo MercadoPago.js, webhook e sincronização pendente.
+- `DONE` Painel SaaS `/saas/checkout` para escolher `mercado_pago` ou `pagarme`.
 - `DONE` Persistência de `checkout_sessions` e `payment_events`.
 - `DONE` Regra comercial atual: plano anual único, cartão até 12x, Pix com 5% de desconto, sem boleto.
 - `DONE` Preço padrão `R$ 189,90/mes` e preço BigShop `R$ 129,90/mes`.
-- `TODO` Cadastrar `PAGARME_SECRET_KEY`, `PAGARME_PUBLIC_KEY` e `PAGARME_WEBHOOK_SECRET` em produção.
-- `TODO` Cadastrar URLs Pagar.me de sucesso/cancelamento apontando para a raiz do domínio.
-- `TODO` Executar transação real Pagar.me de baixo valor e confirmar webhook/cron.
+- `DONE` Registrar variáveis Mercado Pago em `PRODUCTION_ENV` sem versionar valores reais.
+- `TODO` Executar transação real Mercado Pago de baixo valor e confirmar webhook/cron.
+- `TODO` Finalizar Pagar.me quando as informações pendentes chegarem.
 
 ## Benchmark e mercado
 

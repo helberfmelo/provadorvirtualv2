@@ -94,6 +94,11 @@ async function loadOverview() {
         <strong>E-mails</strong>
         <span>Credenciais SMTP, templates e histórico de envios.</span>
       </RouterLink>
+      <RouterLink to="/saas/checkout" class="quick-card">
+        <i class="fa-solid fa-credit-card" aria-hidden="true"></i>
+        <strong>Checkout</strong>
+        <span>Operadora ativa, meios de pagamento e status das credenciais.</span>
+      </RouterLink>
     </div>
 
     <section class="panel-main subsection">
