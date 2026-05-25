@@ -55,7 +55,7 @@ async function toggleUser(user: SaasUser) {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>Usuários SaaS</h1>
-        <p>Listagem de usuários internos e acessos vinculados. Cadastro e edição ficam em telas próprias.</p>
+        <p>Controle a equipe interna, papéis administrativos e permissões de suporte.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadUsers">

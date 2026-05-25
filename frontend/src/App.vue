@@ -44,7 +44,7 @@ const companyLinks = computed<NavLink[]>(() => [
   { to: '/app/tabelas-de-medidas', label: 'Tabelas', icon: 'fa-ruler-combined', show: auth.canView('measurement_tables') },
   { to: '/app/assistente', label: 'Assistente IA', icon: 'fa-wand-magic-sparkles', show: auth.canView('ai_assistant') },
   { to: '/app/importacoes', label: 'Importações', icon: 'fa-file-arrow-up', show: auth.canView('imports') },
-  { to: '/app/widget', label: 'Widget', icon: 'fa-code', show: auth.canView('widget') },
+  { to: '/app/widget', label: 'Provador', icon: 'fa-code', show: auth.canView('widget') },
   { to: '/app/integracoes', label: 'Integrações', icon: 'fa-plug', show: auth.canView('integrations') },
   { to: '/app/analytics', label: 'Analytics', icon: 'fa-chart-line', show: auth.canView('analytics') },
   { to: '/app/go-live', label: 'Go-live', icon: 'fa-rocket', show: auth.canView('go_live') },
@@ -94,7 +94,7 @@ async function switchCompany(event: Event) {
 </script>
 
 <template>
-  <div class="shell" :class="{ 'shell-work': isWorkRoute, 'shell-company': isCompanyRoute, 'shell-saas': isSaasRoute }">
+  <div class="shell" :class="{ 'shell-work': isWorkRoute, 'shell-company': isCompanyRoute, 'shell-saas': isSaasRoute, 'nav-open': navOpen }">
     <header class="topbar" :class="{ 'topbar-work': isWorkRoute }">
       <RouterLink to="/" class="brand" aria-label="Provador Virtual">
         <img class="brand-logo" :src="brandLogoUrl" alt="Provador Virtual" />
@@ -116,7 +116,12 @@ async function switchCompany(event: Event) {
 
       <nav v-if="!isWorkRoute" id="main-navigation" class="nav public-nav" :class="{ open: navOpen }" aria-label="Principal">
         <div class="public-nav-header">
-          <img :src="brandLogoUrl" alt="Provador Virtual" />
+          <div class="drawer-header-row">
+            <img :src="brandLogoUrl" alt="Provador Virtual" />
+            <button class="drawer-close" type="button" aria-label="Fechar menu" @click="navOpen = false">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
           <span>Menu</span>
         </div>
         <RouterLink
@@ -130,6 +135,7 @@ async function switchCompany(event: Event) {
         </RouterLink>
         <button v-if="auth.isAuthenticated" class="nav-button" type="button" title="Sair" @click="logout">
           <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+          <span>Sair</span>
         </button>
       </nav>
 
@@ -159,7 +165,12 @@ async function switchCompany(event: Event) {
     <div v-if="isWorkRoute" class="work-layout">
       <aside id="main-navigation" class="work-sidebar" :class="{ open: navOpen }" aria-label="Menu operacional">
         <div class="work-sidebar-header">
-          <span>{{ workNavTitle }}</span>
+          <div class="drawer-header-row">
+            <span>{{ workNavTitle }}</span>
+            <button class="drawer-close" type="button" aria-label="Fechar menu" @click="navOpen = false">
+              <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+            </button>
+          </div>
           <strong>{{ isSaasRoute ? 'Provador Virtual' : activeCompanyName }}</strong>
         </div>
 
@@ -183,6 +194,35 @@ async function switchCompany(event: Event) {
             <span>{{ link.label }}</span>
           </RouterLink>
         </nav>
+
+        <div class="work-sidebar-mobile-actions">
+          <RouterLink
+            v-if="isCompanyRoute && canSeeSaas && auth.canSaasView('saas_dashboard')"
+            to="/saas"
+            class="context-link"
+            @click="navOpen = false"
+          >
+            <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+            SaaS
+          </RouterLink>
+          <RouterLink
+            v-if="isSaasRoute && auth.activeCompany"
+            to="/app"
+            class="context-link"
+            @click="navOpen = false"
+          >
+            <i class="fa-solid fa-store" aria-hidden="true"></i>
+            Portal da empresa
+          </RouterLink>
+          <span class="user-chip">
+            <i class="fa-solid fa-circle-user" aria-hidden="true"></i>
+            {{ auth.user?.name || 'Usuário' }}
+          </span>
+          <button class="nav-button" type="button" title="Sair" @click="logout">
+            <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
+            <span>Sair</span>
+          </button>
+        </div>
       </aside>
 
       <main class="work-main">

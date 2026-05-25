@@ -55,7 +55,7 @@ async function toggleUser(user: PortalUser) {
       <div>
         <span class="eyebrow">Usuários</span>
         <h1>Acessos da empresa</h1>
-        <p>Listagem de acessos. Cadastro e edição abrem em tela própria.</p>
+        <p>Convide a equipe e libere apenas os módulos necessários para cada pessoa.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadUsers">

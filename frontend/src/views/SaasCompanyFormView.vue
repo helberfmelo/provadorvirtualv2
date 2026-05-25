@@ -155,7 +155,7 @@ async function saveCompany() {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>{{ editing ? 'Editar empresa' : 'Nova empresa' }}</h1>
-        <p>Cadastro em tela própria para manter a listagem limpa e operacional.</p>
+        <p>Informe dados comerciais, cobrança e proprietário antes de liberar o portal.</p>
       </div>
       <RouterLink class="btn btn-secondary" to="/saas/empresas">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>

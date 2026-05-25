@@ -104,8 +104,7 @@ function packageStatusLabel(status: ReadinessPayload['pilot_package']['status'])
         <span class="eyebrow">Go-live assistido</span>
         <h1>Prontidão de produção</h1>
         <p>
-          Use este painel para conferir se produto teste, widget, segurança e integrações estão
-          prontos antes de mover trafego real.
+          Revise produto teste, segurança, integrações e publicação antes de levar tráfego real para a loja.
         </p>
       </div>
       <button class="btn btn-secondary" type="button" title="Atualizar checklist" @click="loadReadiness">

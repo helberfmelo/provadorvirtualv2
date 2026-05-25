@@ -94,7 +94,7 @@ async function saveTemplate() {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>{{ editing ? 'Editar e-mail' : 'Novo e-mail' }}</h1>
-        <p>Template transacional em tela própria para edição sem poluir a listagem.</p>
+        <p>Defina assunto, variáveis e conteúdo usado nas mensagens automáticas.</p>
       </div>
       <RouterLink class="btn btn-secondary" to="/saas/emails">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>

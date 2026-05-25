@@ -128,7 +128,7 @@ function statusLabel(status: string) {
         <article class="metric-card">
           <i class="fa-solid fa-chart-line" aria-hidden="true"></i>
           <strong>{{ analytics.summary.recommendations_7d }}</strong>
-          <span>Ultimos 7 dias</span>
+          <span>Últimos 7 dias</span>
         </article>
         <article class="metric-card">
           <i class="fa-solid fa-thumbs-up" aria-hidden="true"></i>

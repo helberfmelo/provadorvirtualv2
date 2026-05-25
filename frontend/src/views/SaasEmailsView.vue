@@ -63,7 +63,7 @@ async function toggleTemplate(template: TransactionalEmail) {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>E-mails</h1>
-        <p>Listagens e configurações de e-mails transacionais do SaaS.</p>
+        <p>Gerencie templates, SMTP e histórico de mensagens enviadas pela plataforma.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadEmails">

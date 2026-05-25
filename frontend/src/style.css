@@ -112,6 +112,27 @@ a {
   display: none;
 }
 
+.drawer-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.drawer-close {
+  display: none;
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  place-items: center;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #0f172a;
+  background: #fff;
+  cursor: pointer;
+}
+
 .menu-toggle {
   display: none;
   width: 42px;
@@ -175,6 +196,10 @@ a {
   color: #374151;
   background: #fff;
   cursor: pointer;
+}
+
+.public-nav .nav-button span {
+  display: none;
 }
 
 .nav a.router-link-active,
@@ -268,6 +293,10 @@ a {
   width: 100%;
 }
 
+.work-sidebar-mobile-actions {
+  display: none;
+}
+
 .work-nav {
   display: grid;
   gap: 6px;
@@ -306,6 +335,23 @@ a {
 .shell-work .app-workspace {
   width: min(1240px, calc(100% - 32px));
   padding-top: 34px;
+}
+
+.shell-work .dashboard h1 {
+  font-size: clamp(1.85rem, 3vw, 3rem);
+  line-height: 1.08;
+}
+
+.shell-work .dashboard p {
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+.shell-work .page-heading p,
+.shell-work .page-heading-help {
+  max-width: 680px;
+  font-size: 0.96rem;
+  line-height: 1.5;
 }
 
 .hero-section,
@@ -2815,6 +2861,7 @@ td small {
 
 @media (max-width: 860px) {
   .topbar {
+    gap: 12px;
     padding: 10px 12px;
   }
 
@@ -2826,7 +2873,15 @@ td small {
     width: min(224px, calc(100vw - 86px));
   }
 
-  .brand-context {
+  .brand .brand-context {
+    display: none;
+  }
+
+  .topbar-work .brand {
+    max-width: calc(100% - 60px);
+  }
+
+  .topbar-work .work-top-actions {
     display: none;
   }
 
@@ -2841,6 +2896,11 @@ td small {
 
   .menu-toggle i {
     font-size: 1.25rem;
+  }
+
+  .shell.nav-open > .topbar > .menu-toggle {
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .nav-scrim {
@@ -2881,8 +2941,12 @@ td small {
   }
 
   .public-nav-header img {
-    width: min(220px, 100%);
+    width: min(220px, calc(100% - 54px));
     height: auto;
+  }
+
+  .drawer-close {
+    display: inline-grid;
   }
 
   .nav.open {
@@ -2912,6 +2976,15 @@ td small {
     display: inline-flex;
   }
 
+  .public-nav .nav-button {
+    gap: 8px;
+    font-weight: 800;
+  }
+
+  .public-nav .nav-button span {
+    display: inline;
+  }
+
   .work-layout {
     grid-template-columns: 1fr;
   }
@@ -2921,7 +2994,7 @@ td small {
     top: 0;
     right: 0;
     z-index: 40;
-    width: min(340px, calc(100vw - 38px));
+    width: min(356px, calc(100vw - 24px));
     height: 100vh;
     padding: 78px 18px 24px;
     border-right: 0;
@@ -2935,13 +3008,29 @@ td small {
     transform: translateX(0);
   }
 
-  .work-top-actions {
-    margin-left: auto;
+  .work-sidebar-mobile-actions {
+    display: grid;
+    gap: 8px;
+    margin-top: 8px;
+    padding-top: 14px;
+    border-top: 1px solid #f3f4f6;
   }
 
-  .work-top-actions .context-link,
-  .work-top-actions .user-chip {
-    display: none;
+  .work-sidebar-mobile-actions .context-link,
+  .work-sidebar-mobile-actions .user-chip,
+  .work-sidebar-mobile-actions .nav-button {
+    width: 100%;
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  .work-sidebar-mobile-actions .nav-button {
+    display: inline-flex;
+    gap: 10px;
+    height: auto;
+    min-height: 44px;
+    padding: 10px 12px;
+    font-weight: 800;
   }
 
   .hero-section,
@@ -3032,6 +3121,41 @@ td small {
   .subsection-heading {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .shell-work .dashboard,
+  .shell-work .app-workspace {
+    width: min(100% - 28px, 1240px);
+    padding-top: 24px;
+  }
+
+  .shell-work .dashboard h1 {
+    font-size: clamp(1.55rem, 7vw, 2.15rem);
+    line-height: 1.1;
+  }
+
+  .shell-work .dashboard p,
+  .shell-work .page-heading p,
+  .shell-work .page-heading-help {
+    font-size: 0.94rem;
+    line-height: 1.5;
+  }
+
+  .page-heading .action-row.compact {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
+    width: 100%;
+    gap: 10px;
+  }
+
+  .page-heading .action-row.compact .btn,
+  .page-heading > .btn,
+  .page-heading > a.btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+    padding-right: 10px;
+    padding-left: 10px;
   }
 
   .readiness-row {

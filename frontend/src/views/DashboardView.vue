@@ -26,10 +26,9 @@ onMounted(() => {
   <section class="dashboard">
     <div>
       <span class="eyebrow">Painel</span>
-      <h1>Fundacao pronta para configurar lojas</h1>
+      <h1>Sua loja pronta para configurar</h1>
       <p>
-        Acompanhe os cadastros principais, publique o widget e mantenha as
-        conexões da loja em um único lugar.
+        Cadastre produtos, vincule tabelas, publique o provador e acompanhe as conexões em um só lugar.
       </p>
     </div>
 
@@ -37,7 +36,7 @@ onMounted(() => {
       <article class="metric-card">
         <i class="fa-solid fa-box-open" aria-hidden="true"></i>
         <strong>{{ summary.products }} produto{{ summary.products === 1 ? '' : 's' }}</strong>
-        <span>Cadastre e vincule tabelas aos produtos que vao usar o provador.</span>
+        <span>Cadastre e vincule tabelas aos produtos que vão usar o provador.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
@@ -46,13 +45,13 @@ onMounted(() => {
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-plug" aria-hidden="true"></i>
-        <strong>{{ summary.widget_active ? 'Widget ativo' : 'Widget pendente' }}</strong>
+        <strong>{{ summary.widget_active ? 'Provador ativo' : 'Provador pendente' }}</strong>
         <span>{{ summary.recommendations_today }} recomendações registradas hoje.</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-link" aria-hidden="true"></i>
         <strong>{{ summary.integrations_configured }} integração{{ summary.integrations_configured === 1 ? '' : 'es' }}</strong>
-        <span>BigShop, lojas externas e instalacoes manuais.</span>
+        <span>BigShop, lojas externas e instalações manuais.</span>
       </article>
     </div>
 
@@ -81,7 +80,7 @@ onMounted(() => {
       <RouterLink class="onboarding-step" to="/app/widget">
         <i class="fa-solid fa-code" aria-hidden="true"></i>
         <span>
-          <strong>Widget</strong>
+          <strong>Provador</strong>
           <small>{{ summary.widget_active ? 'ativo' : 'pendente' }}</small>
         </span>
       </RouterLink>
@@ -138,7 +137,7 @@ onMounted(() => {
       </RouterLink>
       <RouterLink class="btn btn-secondary" to="/app/widget">
         <i class="fa-solid fa-code" aria-hidden="true"></i>
-        Widget
+        Provador
       </RouterLink>
     </div>
   </section>

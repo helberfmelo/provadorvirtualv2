@@ -64,7 +64,7 @@ async function loadOverview() {
       <article class="metric-card">
         <i class="fa-solid fa-code" aria-hidden="true"></i>
         <strong>{{ summary.active_widgets || 0 }}</strong>
-        <span>Widgets ativos</span>
+        <span>Provadores ativos</span>
       </article>
       <article class="metric-card">
         <i class="fa-solid fa-chart-line" aria-hidden="true"></i>

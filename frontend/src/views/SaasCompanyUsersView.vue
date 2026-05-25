@@ -84,7 +84,7 @@ function companyDocument(row: CompanyUserRow) {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>Usuários das empresas</h1>
-        <p>Listagem de usuários dos clientes. Cadastro e edição ficam em telas próprias.</p>
+        <p>Gerencie quem acessa cada empresa cliente e quais módulos ficam disponíveis.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadUsers">

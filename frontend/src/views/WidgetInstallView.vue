@@ -201,9 +201,9 @@ async function copySnippet() {
             data-tooltip="É o provador que aparece na página do produto da loja. Ele mostra os botões Descubra seu tamanho e Tabela de Medidas, abre a recomendação por IA e ajuda o cliente a escolher o tamanho certo sem sair da compra."
           >i</span>
         </span>
-        <h1>Instalação do provador</h1>
+        <h1>Instalação e visual</h1>
         <p class="page-heading-help">
-          Configure aqui o provador que será exibido na página de produto da loja para recomendar tamanho, mostrar a tabela de medidas e aplicar a identidade visual da marca.
+          Ajuste botões, cores, domínios e código para exibir o provador na página de produto.
         </p>
       </div>
       <button class="btn btn-secondary" type="button" :disabled="!install" @click="copySnippet">

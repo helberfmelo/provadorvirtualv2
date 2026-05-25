@@ -44,7 +44,7 @@ async function removeTable(table: MeasurementTable) {
       <div>
         <span class="eyebrow">Tabelas</span>
         <h1>Tabelas de medidas</h1>
-        <p>Listagem das tabelas da empresa. Cadastro e edição abrem em tela própria.</p>
+        <p>Defina faixas por tamanho e mantenha cada produto com uma base de recomendação confiável.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadTables">

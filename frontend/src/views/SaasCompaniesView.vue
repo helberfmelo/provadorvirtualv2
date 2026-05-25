@@ -72,7 +72,7 @@ async function toggleCompany(company: CompanyRow) {
       <div>
         <span class="eyebrow">SaaS</span>
         <h1>Empresas</h1>
-        <p>Listagem operacional de empresas clientes. Cadastros e edições abrem em tela própria.</p>
+        <p>Acompanhe clientes, status e dados de acesso sem abrir formulários na listagem.</p>
       </div>
       <div class="action-row compact">
         <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadCompanies">
