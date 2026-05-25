@@ -1575,4 +1575,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: em implementação na Sprint 104. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.
+Status: implementado na Sprint 104 no commit `9256077`, publicado com sucesso no run `26424515050`. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/produto-teste`, widget JS/CSS, APIs e redirects legados.

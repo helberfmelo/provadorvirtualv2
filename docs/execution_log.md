@@ -1055,3 +1055,5 @@
 - Os blocos informativos do widget tiveram menor espaçamento e entrelinha mais compacta.
 - Os tooltips de medidas deixam de exibir entidades HTML escapadas e passam a mostrar acentuação correta.
 - Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.
+- Commit `9256077` enviado para `main`; o run `26424515050` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/produto-teste`, widget JS/CSS, rotas públicas, SaaS, portal, APIs e redirects legados.
