@@ -892,3 +892,4 @@
 - Mercado Pago cria boleto por `/v1/payments` com `payment_method_id=bolbradesco`, vencimento operacional de 3 dias e snapshot com `ticket_url`, linha digitável/código de barras e expiração quando retornados.
 - Checkout Vue ganhou aba `Boleto`, resumo sem desconto Pix e tela de sucesso com link/linha digitável e aviso de liberação após compensação.
 - Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=SaasCheckoutSettingsApiTest`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.
+- Commit `6ddf1c5` enviado para `main`; o run `26412934331` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
