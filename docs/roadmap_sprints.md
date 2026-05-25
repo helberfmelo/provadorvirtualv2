@@ -1532,4 +1532,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: em implementação na Sprint 102. Validação local passou com `npm run build` e `git diff --check`.
+Status: implementado na Sprint 102 no commit `84c383a`, publicado com sucesso no run `26423505273`. Validação local passou com `npm run build` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados.

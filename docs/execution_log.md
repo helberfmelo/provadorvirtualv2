@@ -1032,3 +1032,5 @@
 - Status e formas de pagamento passam a ser exibidos em português, como `Aguardando pagamento`, `Pago`, `Não aprovado`, `Pix`, `Boleto` e `Cartão de crédito`.
 - Os botões `Acessar painel` e `Voltar ao site` ganharam espaçamento real no bloco final.
 - Validações locais passaram com `npm run build` e `git diff --check`.
+- Commit `84c383a` enviado para `main`; o run `26423505273` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/checkout`, `/saas/pedidos`, rotas públicas, SaaS, portal, widget, APIs e redirects legados.
