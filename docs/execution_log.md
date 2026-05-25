@@ -835,3 +835,5 @@
 - O `iframe` interno do MercadoPago.js passou a ser restringido para 22px de altura visual, evitando que estilos inline do SDK estiquem os campos no Android.
 - Validação local passou com `npm run build`.
 - Auditoria Playwright mobile local em 390px mockou o SDK com iframes de 260px e confirmou campos em 44px, iframes em 22px, aba `Cartão` ativa, 10 parcelas carregadas e ausência de overflow horizontal.
+- Commit `84ca5e6` enviado para `main`; o run `26386718075` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Smoke Playwright mobile em produção em `https://provadorvirtual.online/checkout?platform=bigshop` confirmou os três campos seguros reais do Mercado Pago em 44px, iframes em 22px, `Cartão` ativo, regra CSS publicada e ausência de overflow horizontal.

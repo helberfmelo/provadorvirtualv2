@@ -175,6 +175,7 @@ Atualizado em: 2026-05-25
 - Sprint 82 enviada ao GitHub no commit `e9ab2f9`; o run `26384825165` finalizou com sucesso, implementando checkout transparente Mercado Pago, seleção de operadora em `/saas/checkout`, Pagar.me preservada como alternativa pendente e chaves de produção do NoAzul registradas apenas em referência local ignorada pelo Git/secret seguro.
 - Sprint 83 enviada ao GitHub no commit `7eadd35`; o run `26386034325` finalizou com sucesso, priorizando cartão no checkout público, limitando parcelas a 10x sem juros e deixando Pix como alternativa com tag `5% off`.
 - Sprint 84 enviada ao GitHub no commit `fe2ab48`; o run `26386407174` finalizou com sucesso, atualizando a cópia pública e transacional para cartão em até 10x sem juros ou Pix à vista com 5% de desconto.
+- Sprint 85 enviada ao GitHub no commit `84ca5e6`; o run `26386718075` finalizou com sucesso, corrigindo os campos seguros reais do Mercado Pago no checkout mobile para 44px sem overflow horizontal.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

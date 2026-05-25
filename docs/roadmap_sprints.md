@@ -1144,4 +1144,4 @@ Entregas:
 - manter a experiência de toque confortável, sem overflow horizontal e com cartão como aba inicial;
 - validar em Playwright mobile com SDK mockado inserindo iframes propositalmente gigantes.
 
-Status: em implementação nesta sprint; publicar somente após `git diff --check`, commit, push e GitHub Actions/deploy acompanhados até sucesso.
+Status: implementado no commit `84ca5e6` e publicado com sucesso no run `26386718075`, com build local, checagem de diff, Playwright mobile mockado e smoke Playwright mobile em produção confirmando campos Mercado Pago em 44px.
