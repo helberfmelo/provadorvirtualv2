@@ -815,3 +815,5 @@
 - Select de parcelas mostra `Nx de R$ ... sem juros`; selects técnicos do Mercado Pago que o cliente não precisa escolher foram ocultados.
 - Resumo do cartão não exibe total anual antes da escolha de parcelas; após a escolha, destaca o valor da parcela e deixa o total anual em segundo plano. Em 1x, o valor principal já é o total.
 - Validações locais: `npm run build`, `vendor/bin/pint --dirty`, `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=SaasCheckoutSettingsApiTest`, `php artisan test`, `git diff --check` e auditoria mobile Playwright mockada em 390px sem overflow horizontal.
+- Commit `7eadd35` enviado para `main`; o run `26386034325` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Smoke pós-deploy confirmou Mercado Pago ativo, cartão habilitado, métodos `pix,credit_card` e `max_installments=10` nas tabelas de preço pública.

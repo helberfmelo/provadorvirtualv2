@@ -1119,4 +1119,4 @@ Entregas:
 - destacar o valor da parcela e deixar o total anual menos proeminente, exceto em 1x;
 - ocultar selects técnicos do Mercado Pago que o comprador não precisa escolher.
 
-Status: em implementação nesta sprint; publicar somente após testes locais, commit, push e GitHub Actions/deploy acompanhados até sucesso.
+Status: implementado no commit `7eadd35` e publicado com sucesso no run `26386034325`, com build frontend, suíte backend completa, Pint, checagem de diff, auditoria mobile mockada e smoke pós-deploy confirmando `max_installments=10`.
