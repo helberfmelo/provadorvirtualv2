@@ -1433,3 +1433,26 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 98 no commit `1e0af18`, publicado com sucesso no run `26419066028`. Validações locais passaram com build frontend, `PublicCheckoutFlowTest`, suíte backend completa com 85 testes e 690 assertions e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/checkout`.
+
+### Sprint 99 - Retorno para plataforma e URLs limpas
+
+Objetivo: quando um usuário autenticado entrar no site público, oferecer retorno claro ao SaaS ou ao Portal da Empresa e impedir que telas de frontend mantenham `/provadorvirtual_v2` na barra de endereço.
+
+Entregas:
+
+- exibir no cabeçalho público um botão `Voltar ao SaaS` para usuários `admin/support` com permissão SaaS;
+- exibir no cabeçalho público um botão `Voltar ao portal` para usuários autenticados de empresa;
+- manter o botão de saída no cabeçalho público para sessões autenticadas;
+- redirecionar rotas antigas de frontend em `/provadorvirtual_v2` para as rotas canônicas na raiz do domínio;
+- preservar `/provadorvirtual_v2/public/api`, `/provadorvirtual_v2/widget` e `/provadorvirtual_v2/up` como caminhos técnicos de API/widget/health;
+- reforçar o smoke de deploy e a validação de produção para confirmar o destino limpo das URLs antigas.
+
+Validação:
+
+- `npm run build`;
+- `php artisan test`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy, incluindo redirects legados para a raiz.
+
+Status: em implementação na Sprint 99.

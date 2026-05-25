@@ -20,8 +20,9 @@ Publicação comercial atual depois da Sprint 27:
 - Site público raiz: `https://provadorvirtual.online/`
 - Build estática da raiz: `/home1/opents62/provadorvirtual.online`
 - Backup da raiz: `/home1/opents62/deploy_backups/provadorvirtual_root`
-- Backend/app operacional e rollback continuam em `/provadorvirtual_v2/`.
+- Backend operacional, widget, assets técnicos e rollback continuam em `/provadorvirtual_v2/`.
 - A raiz aponta APIs e widget para `/provadorvirtual_v2/public/api/v1` e `/provadorvirtual_v2/widget/v1`.
+- Páginas de frontend devem aparecer na barra de endereço pela raiz (`/`, `/login`, `/app`, `/saas`, `/checkout`); acessos legados a `/provadorvirtual_v2` redirecionam para a URL limpa correspondente.
 
 ## Banco de produção
 
@@ -129,7 +130,8 @@ Comportamento:
 - extrai novo release;
 - aplica `PRODUCTION_ENV` se cadastrado;
 - roda `optimize:clear`, `migrate --force`, `ProductionSeeder` se existir, `storage:link` e caches;
-- pública a landing/app frontend também na raiz do domínio, preservando `/provadorvirtual_v1/` e `/provadorvirtual_v2/`;
+- pública a landing/app frontend também na raiz do domínio, preservando `/provadorvirtual_v1/` e `/provadorvirtual_v2/` para backend/widget/rollback;
+- redireciona rotas legadas de frontend em `/provadorvirtual_v2` para as rotas canônicas da raiz, sem redirecionar API/widget;
 - faz smoke público.
 
 ## Conferência obrigatória pós-push
@@ -282,9 +284,12 @@ PAGARME_CHECKOUT_CANCEL_URL=https://provadorvirtual.online/checkout
 4. Validar:
    - `/`;
    - `/checkout`;
-   - `/provadorvirtual_v2/`;
-   - `/provadorvirtual_v2/login`;
-   - `/provadorvirtual_v2/produto-teste`;
+   - `/login`;
+   - `/saas/login`;
+   - `/app`;
+   - `/provadorvirtual_v2/` redirecionando para `/`;
+   - `/provadorvirtual_v2/login` redirecionando para `/login`;
+   - `/provadorvirtual_v2/app/produtos/novo` redirecionando para `/app/produtos/novo`;
    - `/provadorvirtual_v2/api/v1/health` com `curl -L`;
    - `/provadorvirtual_v2/api/v1/ops/status` com `curl -L`;
    - `/provadorvirtual_v2/up`.

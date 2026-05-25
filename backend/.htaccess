@@ -5,6 +5,9 @@
     RewriteRule ^(.*/)?sanctum/(.*)$ /provadorvirtual_v2/public/sanctum/$2 [R=307,L,QSA]
     RewriteRule ^(.*/)?up$ /provadorvirtual_v2/public/up [R=307,L,QSA]
 
+    RewriteRule ^$ / [R=301,L]
+    RewriteRule ^(app|cadastro|checkout|login|privacidade|produto-teste|saas|termos)(/.*)?$ /$1$2 [R=301,L]
+
     RewriteRule ^public/ - [L]
     RewriteRule ^public$ public/ [L]
     RewriteRule ^$ public/ [L]

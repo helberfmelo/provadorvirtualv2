@@ -163,6 +163,16 @@ a {
   font-weight: 800;
 }
 
+.nav a.platform-return-link {
+  border: 1px solid #fed7aa;
+  color: #0f172a;
+  background: #fff7ed;
+}
+
+.nav a.platform-return-link i {
+  color: #ff4d5e;
+}
+
 .company-switcher {
   display: inline-grid;
   gap: 3px;

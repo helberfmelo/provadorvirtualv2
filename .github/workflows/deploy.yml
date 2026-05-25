@@ -392,6 +392,8 @@ jobs:
             echo '<IfModule mod_rewrite.c>'
             echo '    Options -MultiViews -Indexes'
             echo '    RewriteEngine On'
+            echo '    RewriteRule ^provadorvirtual_v2/?$ / [R=301,L]'
+            echo '    RewriteRule ^provadorvirtual_v2/(app|cadastro|checkout|login|privacidade|produto-teste|saas|termos)(/.*)?$ /$1$2 [R=301,L]'
             echo '    RewriteRule ^provadorvirtual_v1(/.*)?$ - [L]'
             echo '    RewriteRule ^provadorvirtual_v2(/.*)?$ - [L]'
             echo '    RewriteRule ^api/(.*)$ /provadorvirtual_v2/public/api/$1 [L,R=307]'
@@ -480,6 +482,14 @@ jobs:
             grep -Fq -- "$expected" <<< "$body"
           }
 
+          assert_effective_url() {
+            local url="$1"
+            local expected="$2"
+            local effective
+            effective="$(curl --fail --silent --show-error -L -o /dev/null -w '%{url_effective}' "$url")"
+            test "$effective" = "$expected"
+          }
+
           assert_contains "${PRODUCTION_APP_URL}/" '<div id="app"'
           assert_contains "${PRODUCTION_APP_URL}/login" '<div id="app"'
           assert_contains "${PRODUCTION_APP_URL}/saas/login" '<div id="app"'
@@ -504,6 +514,9 @@ jobs:
           assert_contains "${PRODUCTION_ROOT_URL}/app/produtos/novo" '<div id="app"'
           assert_contains "${PRODUCTION_ROOT_URL}/api/v1/health" '"status":"ok"'
           assert_contains "${PRODUCTION_ROOT_URL}/widget/v1/provador-virtual.js" 'data-pv-recommend'
+          assert_effective_url "${PRODUCTION_APP_URL}/" "${PRODUCTION_ROOT_URL}/"
+          assert_effective_url "${PRODUCTION_APP_URL}/login" "${PRODUCTION_ROOT_URL}/login"
+          assert_effective_url "${PRODUCTION_APP_URL}/app/produtos/novo" "${PRODUCTION_ROOT_URL}/app/produtos/novo"
 
       - name: Diagnose public failure
         if: failure() && steps.scaffold.outputs.ready == 'true'

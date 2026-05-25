@@ -202,7 +202,8 @@ Atualizado em: 2026-05-25
 - Sprint 98 enviada ao GitHub no commit `1e0af18`; o run `26419066028` finalizou com sucesso e a validação de produção confirmou `/checkout`.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
-- A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
+- A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
+- `/provadorvirtual_v2/` permanece como caminho técnico de backend, API, widget, assets internos e rollback.
 - Falta chave de IA externa (`OPENAI_API_KEY` ou `GEMINI_API_KEY`) para OCR real de imagem.
 - Falta credencial BigShop real para loja de teste.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
@@ -222,7 +223,7 @@ Atualizado em: 2026-05-25
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
 - Diretriz obrigatória de telas: `docs/portal_ui_guidelines.md`.
 - Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão e links para termos/privacidade.
-- Site público raiz: landing comercial do Provador Virtual, com planos mensal/anual por plataforma, CTA para loja teste/checkout e cards de benefícios otimizados para mobile. A cópia pública usa `provador` em vez de `widget` para evitar jargão técnico.
+- Site público raiz: landing comercial do Provador Virtual, com planos mensal/anual por plataforma, CTA para loja teste/checkout e cards de benefícios otimizados para mobile. A cópia pública usa `provador` em vez de `widget` para evitar jargão técnico. Quando há sessão autenticada, o cabeçalho mostra retorno para `Voltar ao SaaS` ou `Voltar ao portal`, conforme o papel carregado por `/me`.
 - APIs protegidas: produtos, variações, tabelas, templates, widget-install e integrações, com middleware de permissão por módulo e escopo da empresa ativa.
 - Importacoes protegidas: preview, commit e histórico em `/api/v1/imports`.
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`.

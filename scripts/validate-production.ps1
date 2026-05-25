@@ -38,6 +38,33 @@ function Assert-Page {
     "PAGE $Path OK"
 }
 
+function Assert-LegacyFrontendRedirect {
+    param(
+        [string] $LegacyPath,
+        [string] $CleanPath
+    )
+
+    $request = [System.Net.WebRequest]::Create("$BaseUrl$LegacyPath")
+    $request.AllowAutoRedirect = $false
+    $response = $request.GetResponse()
+
+    try {
+        $statusCode = [int] $response.StatusCode
+        $location = $response.Headers["Location"]
+        $expectedUrl = "$BaseUrl$CleanPath"
+
+        if (-not [string]::IsNullOrWhiteSpace($location) -and $location.StartsWith("/")) {
+            $location = "$BaseUrl$location"
+        }
+
+        Assert-True (@(301, 302, 307, 308) -contains $statusCode) "$LegacyPath nao redirecionou"
+        Assert-True ($location -eq $expectedUrl) "$LegacyPath redirecionou para $location, esperado $expectedUrl"
+        "REDIRECT $LegacyPath -> $CleanPath OK"
+    } finally {
+        $response.Close()
+    }
+}
+
 Assert-Page "/"
 Assert-Page "/login"
 Assert-Page "/saas/login"
@@ -64,6 +91,12 @@ Assert-Page "/app/tabelas-de-medidas"
 Assert-Page "/app/tabelas-de-medidas/nova"
 Assert-Page "/app/usuarios"
 Assert-Page "/app/usuarios/novo"
+
+if (-not $BaseUrl.EndsWith("/provadorvirtual_v2")) {
+    Assert-LegacyFrontendRedirect "/provadorvirtual_v2/" "/"
+    Assert-LegacyFrontendRedirect "/provadorvirtual_v2/login" "/login"
+    Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/produtos/novo" "/app/produtos/novo"
+}
 
 $WidgetBase = if ($BaseUrl.EndsWith("/provadorvirtual_v2")) {
     "$BaseUrl/widget/v1"

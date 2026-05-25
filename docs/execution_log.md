@@ -984,3 +984,12 @@
 - Validações locais passaram com `npm run build`, `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test` com 85 testes e 690 assertions, e `git diff --check`.
 - Commit `1e0af18` enviado para `main`; o run `26419066028` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/checkout`.
+
+## 2026-05-25 - Sprint 99 Retorno para plataforma e URLs limpas
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- O cabeçalho público passa a mostrar `Voltar ao SaaS` para usuários `admin/support` autenticados com permissão SaaS e `Voltar ao portal` para usuários autenticados de empresa.
+- O retorno aparece somente após a sessão ser carregada por `/me`, evitando direcionar usuário SaaS para o portal antes de conhecer o papel.
+- As rotas antigas de frontend em `/provadorvirtual_v2` passam a redirecionar para a URL limpa da raiz; API, widget, `public/` e `up` continuam preservados no caminho técnico.
+- O frontend também possui fallback de canonicalização para limpar `/provadorvirtual_v2` caso uma cópia de SPA antiga ainda seja servida.
+- O smoke de deploy e `scripts/validate-production.ps1` foram ampliados para validar os redirects legados para a raiz.

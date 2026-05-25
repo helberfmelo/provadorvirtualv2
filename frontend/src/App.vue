@@ -9,6 +9,7 @@ type NavLink = {
   label: string
   icon: string
   show: boolean
+  variant?: 'platform'
 }
 
 const route = useRoute()
@@ -26,6 +27,21 @@ const isWorkRoute = computed(() => isCompanyRoute.value || isSaasRoute.value)
 const contextLabel = computed(() => isSaasRoute.value ? 'SaaS admin' : 'Portal da empresa')
 const workNavTitle = computed(() => isSaasRoute.value ? 'Operação SaaS' : 'Operação da loja')
 const activeCompanyName = computed(() => auth.activeCompany?.name || 'Sem empresa ativa')
+const publicPlatformLink = computed<NavLink | null>(() => {
+  if (!auth.isAuthenticated || !auth.user) {
+    return null
+  }
+
+  const shouldReturnToSaas = canSeeSaas.value && auth.canSaasView('saas_dashboard')
+
+  return {
+    to: shouldReturnToSaas ? '/saas' : '/app',
+    label: shouldReturnToSaas ? 'Voltar ao SaaS' : 'Voltar ao portal',
+    icon: shouldReturnToSaas ? 'fa-user-shield' : 'fa-store',
+    show: true,
+    variant: 'platform',
+  }
+})
 const workViewKey = computed(() => {
   if (!isCompanyRoute.value) {
     return `${route.fullPath}:saas`
@@ -35,6 +51,7 @@ const workViewKey = computed(() => {
 })
 
 const publicLinks = computed<NavLink[]>(() => [
+  ...(publicPlatformLink.value ? [publicPlatformLink.value] : []),
   { to: '/produto-teste', label: 'Teste o provador', icon: 'fa-wand-magic-sparkles', show: !isProductTestRoute.value },
   { to: '/checkout', label: 'Contratar', icon: 'fa-credit-card', show: !auth.isAuthenticated },
   { to: '/login', label: 'Entrar', icon: 'fa-right-to-bracket', show: !auth.isAuthenticated },
@@ -144,6 +161,7 @@ function acceptCookieNotice() {
           v-for="link in publicLinks.filter((item) => item.show)"
           :key="link.to"
           :to="link.to"
+          :class="{ 'platform-return-link': link.variant === 'platform' }"
           @click="navOpen = false"
         >
           <i class="fa-solid" :class="link.icon" aria-hidden="true"></i>
