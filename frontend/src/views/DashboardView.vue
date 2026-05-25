@@ -1,10 +1,22 @@
 <script setup lang="ts">
-import { onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
 const auth = useAuthStore()
+const platformOptions = [
+  { value: 'bigshop', label: 'BigShop' },
+  { value: 'shopify', label: 'Shopify' },
+  { value: 'woocommerce', label: 'WooCommerce' },
+  { value: 'nuvemshop', label: 'Nuvemshop' },
+  { value: 'vtex', label: 'VTEX' },
+  { value: 'tray', label: 'Tray' },
+  { value: 'loja_integrada', label: 'Loja Integrada' },
+  { value: 'magento', label: 'Magento' },
+  { value: 'opencart', label: 'OpenCart' },
+  { value: 'custom', label: 'Personalizada' },
+]
 type BillingSubscription = {
   id: number
   status: string
@@ -29,14 +41,99 @@ const billing = reactive({
   saved: '',
   subscription: null as BillingSubscription | null,
 })
+const companyProfile = reactive({
+  name: '',
+  legal_name: '',
+  domain: '',
+  platform: 'bigshop',
+  zip_code: '',
+  street: '',
+  number: '',
+  complement: '',
+  district: '',
+  city: '',
+  state: '',
+})
+const profileState = reactive({
+  saving: false,
+  cepLoading: false,
+  error: '',
+  saved: '',
+})
+const showCompanyProfile = computed(() => Boolean(auth.activeCompany && !auth.activeCompany.profile_completed))
+const activeCompanyDocument = computed(() => auth.activeCompany?.document || '')
 
 onMounted(() => {
-  auth.loadMe().catch(() => undefined)
+  auth.loadMe()
+    .then(syncCompanyProfile)
+    .catch(() => syncCompanyProfile())
   api.get('/merchant/overview')
     .then(({ data }) => Object.assign(summary, data.summary))
     .catch(() => undefined)
   loadBillingSubscription()
 })
+
+function syncCompanyProfile() {
+  const company = auth.activeCompany
+  if (!company) {
+    return
+  }
+
+  Object.assign(companyProfile, {
+    name: isPlaceholderCompanyName(company.name) ? '' : company.name || '',
+    legal_name: company.legal_name || '',
+    domain: company.domain || '',
+    platform: company.platform || 'bigshop',
+    zip_code: company.zip_code || '',
+    street: company.street || '',
+    number: company.number || '',
+    complement: company.complement || '',
+    district: company.district || '',
+    city: company.city || '',
+    state: company.state || '',
+  })
+}
+
+async function lookupCompanyCep() {
+  const cep = companyProfile.zip_code.replace(/\D+/g, '')
+  if (cep.length !== 8) {
+    return
+  }
+
+  profileState.cepLoading = true
+
+  try {
+    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
+    const data = await response.json()
+    if (data?.erro) {
+      return
+    }
+
+    companyProfile.street = data.logradouro || companyProfile.street
+    companyProfile.district = data.bairro || companyProfile.district
+    companyProfile.city = data.localidade || companyProfile.city
+    companyProfile.state = data.uf || companyProfile.state
+  } finally {
+    profileState.cepLoading = false
+  }
+}
+
+async function saveCompanyProfile() {
+  profileState.saving = true
+  profileState.error = ''
+  profileState.saved = ''
+
+  try {
+    await api.patch('/merchant/company-profile', companyProfile)
+    await auth.loadMe()
+    syncCompanyProfile()
+    profileState.saved = 'Dados da empresa salvos.'
+  } catch (requestError: any) {
+    profileState.error = requestError.response?.data?.message || 'Não foi possível salvar os dados da empresa.'
+  } finally {
+    profileState.saving = false
+  }
+}
 
 async function loadBillingSubscription() {
   billing.loading = true
@@ -85,6 +182,10 @@ function price(cents: number) {
     currency: 'BRL',
   }).format((cents || 0) / 100)
 }
+
+function isPlaceholderCompanyName(name: string | undefined) {
+  return Boolean(name?.startsWith('Empresa CNPJ '))
+}
 </script>
 
 <template>
@@ -96,6 +197,81 @@ function price(cents: number) {
         Cadastre produtos, vincule tabelas, publique o provador e acompanhe as conexões em um só lugar.
       </p>
     </div>
+
+    <section v-if="showCompanyProfile" class="panel-main admin-form company-profile-panel">
+      <div class="subsection-heading">
+        <h2>Dados da empresa</h2>
+        <span>Primeiro acesso</span>
+      </div>
+
+      <p v-if="profileState.error" class="form-error">{{ profileState.error }}</p>
+      <p v-if="profileState.saved" class="form-success">{{ profileState.saved }}</p>
+
+      <form class="admin-form" @submit.prevent="saveCompanyProfile">
+        <div class="company-profile-grid">
+          <label class="company-field-name">
+            Empresa
+            <input v-model="companyProfile.name" required />
+          </label>
+          <label class="company-field-legal">
+            Razão social
+            <input v-model="companyProfile.legal_name" required />
+          </label>
+          <label class="company-field-document">
+            CNPJ
+            <input :value="activeCompanyDocument" disabled />
+          </label>
+          <label class="company-field-platform">
+            Plataforma
+            <select v-model="companyProfile.platform" required>
+              <option v-for="platform in platformOptions" :key="platform.value" :value="platform.value">
+                {{ platform.label }}
+              </option>
+            </select>
+          </label>
+          <label class="company-field-domain">
+            Domínio
+            <input v-model="companyProfile.domain" placeholder="loja.com.br" required />
+          </label>
+          <label class="company-field-zip">
+            CEP
+            <input v-model="companyProfile.zip_code" inputmode="numeric" required @blur="lookupCompanyCep" />
+            <small>{{ profileState.cepLoading ? 'Buscando endereço...' : ' ' }}</small>
+          </label>
+          <label class="company-field-street">
+            Rua
+            <input v-model="companyProfile.street" required />
+          </label>
+          <label class="company-field-number">
+            Número
+            <input v-model="companyProfile.number" required />
+          </label>
+          <label class="company-field-complement">
+            Complemento
+            <input v-model="companyProfile.complement" />
+          </label>
+          <label class="company-field-district">
+            Bairro
+            <input v-model="companyProfile.district" required />
+          </label>
+          <label class="company-field-city">
+            Cidade
+            <input v-model="companyProfile.city" required />
+          </label>
+          <label class="company-field-state">
+            UF
+            <input v-model="companyProfile.state" maxlength="2" required />
+          </label>
+        </div>
+
+        <div class="action-row compact">
+          <button class="btn btn-primary" type="submit" :disabled="profileState.saving">
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+            {{ profileState.saving ? 'Salvando...' : 'Salvar dados da empresa' }}
+          </button>
+        </div>
+      </form>
+    </section>
 
     <div class="metric-grid">
       <article class="metric-card">

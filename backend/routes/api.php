@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\ImportController;
 use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\MeasurementTableController;
 use App\Http\Controllers\Api\V1\MeasurementTemplateController;
+use App\Http\Controllers\Api\V1\MerchantCompanyProfileController;
 use App\Http\Controllers\Api\V1\OperationalStatusController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
@@ -21,6 +22,7 @@ use App\Http\Controllers\Api\V1\PublicCheckoutController;
 use App\Http\Controllers\Api\V1\RecommendationController;
 use App\Http\Controllers\Api\V1\SaasAdminController;
 use App\Http\Controllers\Api\V1\SaasCheckoutController;
+use App\Http\Controllers\Api\V1\SaasCheckoutOrderController;
 use App\Http\Controllers\Api\V1\SaasEmailController;
 use App\Http\Controllers\Api\V1\UserAccessController;
 use App\Http\Controllers\Api\V1\WidgetInstallController;
@@ -116,6 +118,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,dashboard,view');
         Route::patch('/billing/subscription/auto-renewal', [BillingSubscriptionController::class, 'updateAutoRenewal'])
             ->middleware('portal.permission:merchant,dashboard,edit');
+        Route::patch('/merchant/company-profile', [MerchantCompanyProfileController::class, 'update'])
+            ->middleware('portal.permission:merchant,dashboard,edit');
         Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index'])
             ->middleware('portal.permission:merchant,measurement_tables,view');
         Route::get('/widget-install', [WidgetInstallController::class, 'show'])
@@ -190,6 +194,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:saas,saas_checkout,view');
         Route::patch('/saas/checkout-settings', [SaasCheckoutController::class, 'update'])
             ->middleware('portal.permission:saas,saas_checkout,edit');
+        Route::get('/saas/checkout-orders', [SaasCheckoutOrderController::class, 'index'])
+            ->middleware('portal.permission:saas,saas_checkout,view');
+        Route::get('/saas/checkout-orders/{checkoutSession}', [SaasCheckoutOrderController::class, 'show'])
+            ->middleware('portal.permission:saas,saas_checkout,view');
         Route::get('/saas/transactional-emails', [SaasEmailController::class, 'templates'])
             ->middleware('portal.permission:saas,saas_emails,view');
         Route::post('/saas/transactional-emails', [SaasEmailController::class, 'storeTemplate'])

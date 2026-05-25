@@ -227,6 +227,10 @@ class PagarMeCheckoutService implements CheckoutPaymentProvider
     ): array {
         $document = preg_replace('/\D+/', '', (string) ($buyerData['company_document'] ?? '')) ?: '';
         $customerType = strlen($document) === 11 ? 'individual' : 'company';
+        $customerName = trim((string) (($buyerData['company_legal_name'] ?? null)
+            ?: ($buyerData['company_name'] ?? null)
+            ?: $session->lead_company
+            ?: $session->lead_name));
 
         return $this->cleanArray([
             'closed' => true,
@@ -240,7 +244,7 @@ class PagarMeCheckoutService implements CheckoutPaymentProvider
                 ],
             ],
             'customer' => [
-                'name' => trim((string) (($buyerData['company_legal_name'] ?? null) ?: $buyerData['company_name'])),
+                'name' => $customerName,
                 'type' => $customerType,
                 'email' => trim((string) $buyerData['admin_email']),
                 'document' => $document,
@@ -507,10 +511,18 @@ class PagarMeCheckoutService implements CheckoutPaymentProvider
 
     private function addressPayload(array $buyerData): array
     {
+        $zipCode = preg_replace('/\D+/', '', (string) ($buyerData['company_zip_code'] ?? '')) ?: null;
+        $street = trim((string) ($buyerData['company_address_street'] ?? ''));
+        $number = trim((string) ($buyerData['company_address_number'] ?? ''));
+
+        if (! $zipCode && $street === '' && $number === '') {
+            return [];
+        }
+
         return $this->cleanArray([
-            'line_1' => trim((string) ($buyerData['company_address_street'] ?? '')).', '.trim((string) ($buyerData['company_address_number'] ?? '')),
+            'line_1' => trim($street.', '.$number, ', '),
             'line_2' => trim((string) ($buyerData['company_address_complement'] ?? '')) ?: null,
-            'zip_code' => preg_replace('/\D+/', '', (string) ($buyerData['company_zip_code'] ?? '')) ?: null,
+            'zip_code' => $zipCode,
             'city' => trim((string) ($buyerData['company_address_city'] ?? '')),
             'state' => trim((string) ($buyerData['company_address_state'] ?? '')),
             'country' => 'BR',

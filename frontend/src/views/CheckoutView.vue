@@ -40,7 +40,6 @@ const router = useRouter()
 const route = useRoute()
 const loading = ref(true)
 const submitting = ref(false)
-const cepLoading = ref(false)
 const error = ref('')
 const checkoutConfig = ref<PublicCheckoutConfig | null>(null)
 const plans = ref<Plan[]>([])
@@ -67,17 +66,7 @@ const form = reactive({
   plan_code: 'annual',
   payment_method: 'credit_card',
   platform: 'bigshop',
-  company_name: '',
-  company_legal_name: '',
   company_document: '',
-  company_domain: '',
-  company_zip_code: '',
-  company_address_street: '',
-  company_address_number: '',
-  company_address_complement: '',
-  company_address_district: '',
-  company_address_city: '',
-  company_address_state: '',
   admin_name: '',
   admin_email: '',
   admin_cpf: '',
@@ -176,30 +165,6 @@ async function loadConfig() {
 
   if (form.payment_method === 'credit_card' && isMercadoPago.value) {
     await prepareMercadoPagoCardForm()
-  }
-}
-
-async function lookupCep() {
-  const cep = form.company_zip_code.replace(/\D+/g, '')
-  if (cep.length !== 8) {
-    return
-  }
-
-  cepLoading.value = true
-
-  try {
-    const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`)
-    const data = await response.json()
-    if (data?.erro) {
-      return
-    }
-
-    form.company_address_street = data.logradouro || form.company_address_street
-    form.company_address_district = data.bairro || form.company_address_district
-    form.company_address_city = data.localidade || form.company_address_city
-    form.company_address_state = data.uf || form.company_address_state
-  } finally {
-    cepLoading.value = false
   }
 }
 
@@ -333,10 +298,7 @@ function normalizeMercadoPagoInstallmentOptions() {
     return
   }
 
-  if (select.options.length === 0) {
-    form.installments = ''
-    return
-  }
+  ensureMercadoPagoInstallmentFallbackOptions(select)
 
   Array.from(select.options).forEach((option) => {
     const installments = Number(option.value)
@@ -368,6 +330,18 @@ function normalizeMercadoPagoInstallmentOptions() {
   }
 }
 
+function ensureMercadoPagoInstallmentFallbackOptions(select: HTMLSelectElement) {
+  const existingValues = new Set(Array.from(select.options).map((option) => option.value))
+
+  installmentOptions.value.forEach((installments) => {
+    const value = String(installments)
+    if (!existingValues.has(value)) {
+      select.add(new Option(installmentLabel(installments), value))
+      existingValues.add(value)
+    }
+  })
+}
+
 function handleInstallmentSelection(event: Event) {
   const select = event.target as HTMLSelectElement
   const installments = Number(select.value)
@@ -381,10 +355,6 @@ function handleInstallmentSelection(event: Event) {
   const normalized = Math.min(installments, maxInstallments.value)
   form.installments = String(normalized)
   installmentsTouched.value = true
-}
-
-function updateAdminCpf(event: Event) {
-  form.admin_cpf = (event.target as HTMLInputElement).value
 }
 
 function installmentCents(installments: number) {
@@ -479,8 +449,8 @@ function selectPlan(planCode: string) {
           </label>
         </div>
 
-        <div class="form-grid">
-          <label>
+        <div class="checkout-company-grid">
+          <label class="field-platform">
             Plataforma
             <select v-model="form.platform">
               <option v-for="platform in platformOptions" :key="platform.value" :value="platform.value">
@@ -489,59 +459,10 @@ function selectPlan(planCode: string) {
             </select>
             <small v-if="form.platform === 'bigshop'">Cliente BigShop tem preço especial.</small>
           </label>
-          <label>
-            Empresa
-            <input v-model="form.company_name" required />
-          </label>
-          <label>
-            Razao social
-            <input v-model="form.company_legal_name" required />
-          </label>
-        </div>
-
-        <div class="form-grid">
-          <label>
+          <label class="field-document">
             CNPJ
             <input v-model="form.company_document" inputmode="numeric" required />
-          </label>
-          <label>
-            Domínio
-            <input v-model="form.company_domain" placeholder="loja.com.br" />
-          </label>
-          <label>
-            CEP
-            <input v-model="form.company_zip_code" inputmode="numeric" required @blur="lookupCep" />
-            <small>{{ cepLoading ? 'Buscando endereço...' : ' ' }}</small>
-          </label>
-        </div>
-
-        <div class="form-grid">
-          <label>
-            Rua
-            <input v-model="form.company_address_street" required />
-          </label>
-          <label>
-            Número
-            <input v-model="form.company_address_number" required />
-          </label>
-          <label>
-            Complemento
-            <input v-model="form.company_address_complement" />
-          </label>
-        </div>
-
-        <div class="form-grid">
-          <label>
-            Bairro
-            <input v-model="form.company_address_district" required />
-          </label>
-          <label>
-            Cidade
-            <input v-model="form.company_address_city" required />
-          </label>
-          <label>
-            UF
-            <input v-model="form.company_address_state" maxlength="2" required />
+            <small>Os demais dados da empresa serão preenchidos no primeiro acesso ao portal.</small>
           </label>
         </div>
       </section>
@@ -552,26 +473,26 @@ function selectPlan(planCode: string) {
           <span>{{ paymentMethodLabel }}</span>
         </div>
 
-        <div class="form-grid">
-          <label>
+        <div class="checkout-contact-grid">
+          <label class="field-name">
             Nome
             <input v-model="form.admin_name" required />
           </label>
-          <label>
+          <label class="field-email">
             E-mail
             <input v-model="form.admin_email" type="email" required />
           </label>
-          <label>
+          <label class="field-cpf">
             CPF
             <input v-model="form.admin_cpf" inputmode="numeric" required />
           </label>
-        </div>
-
-        <div class="form-grid">
-          <label>
+          <label class="field-phone">
             Telefone
             <input v-model="form.admin_phone" inputmode="tel" required />
           </label>
+        </div>
+
+        <div class="checkout-password-grid">
           <label>
             Senha
             <input v-model="form.password" type="password" minlength="8" required autocomplete="new-password" />
@@ -600,28 +521,32 @@ function selectPlan(planCode: string) {
           </button>
         </div>
 
-        <div v-if="form.payment_method === 'credit_card' && !isMercadoPago" class="form-grid">
-          <label>
+        <p v-if="form.payment_method === 'credit_card'" class="checkout-payment-helper">
+          Preencha os dados do cartão e escolha as parcelas abaixo. O nome, e-mail e CPF acima identificam o comprador.
+        </p>
+
+        <div v-if="form.payment_method === 'credit_card' && !isMercadoPago" class="checkout-card-grid">
+          <label class="field-card-holder">
             Nome no cartão
             <input v-model="card.holder_name" :required="form.payment_method === 'credit_card'" />
           </label>
-          <label>
+          <label class="field-card-number">
             Número
             <input v-model="card.number" inputmode="numeric" :required="form.payment_method === 'credit_card'" />
           </label>
-          <label>
+          <label class="field-card-cvv">
             CVV
             <input v-model="card.cvv" inputmode="numeric" :required="form.payment_method === 'credit_card'" />
           </label>
-          <label>
+          <label class="field-card-month">
             Mes
             <input v-model="card.exp_month" inputmode="numeric" placeholder="MM" :required="form.payment_method === 'credit_card'" />
           </label>
-          <label>
+          <label class="field-card-year">
             Ano
             <input v-model="card.exp_year" inputmode="numeric" placeholder="AAAA" :required="form.payment_method === 'credit_card'" />
           </label>
-          <label>
+          <label class="field-installments">
             Parcelas
             <select v-model="form.installments" required @change="handleInstallmentSelection">
               <option value="">Escolha as parcelas</option>
@@ -632,20 +557,20 @@ function selectPlan(planCode: string) {
           </label>
         </div>
 
-        <div v-if="form.payment_method === 'credit_card' && isMercadoPago" class="mercado-card-fields">
-          <label class="wide">
+        <div v-if="form.payment_method === 'credit_card' && isMercadoPago" class="mercado-card-fields checkout-card-grid">
+          <label class="field-card-holder">
             Nome no cartão
             <input id="mp-cardholder-name" v-model="card.holder_name" :required="form.payment_method === 'credit_card'" autocomplete="cc-name" />
           </label>
-          <label class="wide">
+          <label class="field-card-number">
             Número
             <div id="mp-card-number" class="mp-secure-field"></div>
           </label>
-          <label>
+          <label class="field-card-expiration">
             Validade
             <div id="mp-expiration-date" class="mp-secure-field"></div>
           </label>
-          <label>
+          <label class="field-card-cvv">
             CVV
             <div id="mp-security-code" class="mp-secure-field"></div>
           </label>
@@ -653,7 +578,7 @@ function selectPlan(planCode: string) {
             Bandeira
             <select id="mp-issuer"></select>
           </label>
-          <label class="wide">
+          <label class="field-installments">
             Parcelas
             <select id="mp-installments" v-model="form.installments" required @change="handleInstallmentSelection"></select>
           </label>
@@ -663,9 +588,9 @@ function selectPlan(planCode: string) {
               <option value="CPF">CPF</option>
             </select>
           </label>
-          <label class="wide">
+          <label class="mp-hidden-control">
             Número do documento
-            <input id="mp-identification-number" :value="form.admin_cpf.replace(/\D+/g, '')" inputmode="numeric" required @input="updateAdminCpf" />
+            <input id="mp-identification-number" :value="form.admin_cpf.replace(/\D+/g, '')" inputmode="numeric" />
           </label>
         </div>
 

@@ -99,6 +99,11 @@ async function loadOverview() {
         <strong>Checkout</strong>
         <span>Operadora ativa, meios de pagamento e status das credenciais.</span>
       </RouterLink>
+      <RouterLink to="/saas/pedidos" class="quick-card">
+        <i class="fa-solid fa-receipt" aria-hidden="true"></i>
+        <strong>Pedidos</strong>
+        <span>Contratações, tentativas recusadas e detalhes da operadora.</span>
+      </RouterLink>
     </div>
 
     <section class="panel-main subsection">

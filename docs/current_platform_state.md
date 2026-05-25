@@ -192,6 +192,7 @@ Atualizado em: 2026-05-25
 - Sprint 93 enviada ao GitHub no commit `7093036`; o run `26414392783` finalizou com sucesso e a validação de produção confirmou os assets publicados da prévia de confetes.
 - Sprint 94 limpa a redundância do topo da loja teste: a marca fica apenas no header, o H1 passa a orientar o teste da recomendação e o CTA `Teste o provador` some quando a própria experiência já está aberta.
 - Sprint 94 enviada ao GitHub no commit `c0985fd`; o run `26414805731` finalizou com sucesso e a validação de produção confirmou a nova cópia no topo da loja teste.
+- Sprint 95 simplifica o checkout para coletar somente CNPJ da empresa, registra tentativas recusadas pela operadora com motivo, adiciona `/saas/pedidos` com detalhe completo e move dados cadastrais da empresa para o primeiro acesso ao portal.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -200,7 +201,7 @@ Atualizado em: 2026-05-25
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
-- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão e cancelamento de renovação futura pelo portal. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
+- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão, cancelamento de renovação futura pelo portal e coleta de empresa limitada a CNPJ. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
 - Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.
@@ -208,7 +209,7 @@ Atualizado em: 2026-05-25
 ## Superficie atual
 
 - Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/usuarios`.
-- Painel SaaS protegido por papel/permissão: `/saas`, `/saas/empresas`, `/saas/usuarios`, `/saas/checkout` e `/saas/emails`, com entrada administrativa em `/saas/login`.
+- Painel SaaS protegido por papel/permissão: `/saas`, `/saas/empresas`, `/saas/usuarios`, `/saas/checkout`, `/saas/pedidos` e `/saas/emails`, com entrada administrativa em `/saas/login`.
 - CRUDs do SaaS seguem padrão list-first: listagem ocupa a tela e novo/editar abre rota própria.
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.

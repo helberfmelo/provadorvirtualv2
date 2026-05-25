@@ -14,6 +14,7 @@ use App\Services\TransactionalEmailService;
 use App\Support\CheckoutPlanCatalog;
 use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -47,129 +48,20 @@ class PublicCheckoutController extends Controller
 
         try {
             $provider = $this->checkoutPayments->currentProviderKey();
-            $session = DB::transaction(function () use ($data, $plan, $pricing, $provider, $request): CheckoutSession {
-                $acceptedAt = now();
+            $session = DB::transaction(fn (): CheckoutSession => $this->createPendingCheckoutSession(
+                $data,
+                $plan,
+                $pricing,
+                $provider,
+                $request,
+            ));
 
-                $merchant = Merchant::query()->create([
-                    'name' => $data['company_name'],
-                    'slug' => $this->uniqueMerchantSlug($data['company_name']),
-                    'billing_status' => 'pending_payment',
-                    'trial_ends_at' => null,
-                ]);
-
-                $user = $this->resolveCheckoutUser($data);
-                $merchant->users()->syncWithoutDetaching([
-                    $user->id => ['role' => 'owner', 'is_owner' => true],
-                ]);
-
-                $company = MerchantCompany::query()->create([
-                    'merchant_id' => $merchant->id,
-                    'name' => $data['company_name'],
-                    'legal_name' => $data['company_legal_name'],
-                    'document' => $data['company_document'],
-                    'zip_code' => $data['company_zip_code'],
-                    'street' => $data['company_address_street'],
-                    'number' => $data['company_address_number'],
-                    'complement' => $data['company_address_complement'] ?? null,
-                    'district' => $data['company_address_district'],
-                    'city' => $data['company_address_city'],
-                    'state' => $data['company_address_state'],
-                    'country' => 'BR',
-                    'domain' => $data['company_domain'] ?? null,
-                    'platform' => $data['platform'] ?? 'custom',
-                    'external_store_id' => null,
-                    'status' => 'pending_payment',
-                ]);
-                $company->ensureAccessCode();
-
-                WidgetInstall::query()->create([
-                    'merchant_id' => $merchant->id,
-                    'merchant_company_id' => $company->id,
-                    'public_key' => 'pv_'.Str::lower(Str::random(24)),
-                    'platform' => $company->platform,
-                    'allowed_domains' => array_values(array_filter([
-                        $company->domain,
-                        'localhost',
-                        '127.0.0.1',
-                    ])),
-                    'theme' => [
-                        'primary' => '#0f172a',
-                        'secondary' => '#ff4d5e',
-                        'accent' => '#ff7a1a',
-                        'background' => '#ffffff',
-                        'text' => '#111827',
-                        'font_family' => 'Manrope, Inter, Arial, sans-serif',
-                        'font_size' => '14',
-                        'font_weight' => '800',
-                        'button_radius' => '8',
-                        'confetti_enabled' => true,
-                        'presentation_mode' => 'drawer',
-                    ],
-                    'is_active' => true,
-                ]);
-
-                $session = CheckoutSession::query()->create([
-                    'merchant_id' => $merchant->id,
-                    'merchant_company_id' => $company->id,
-                    'user_id' => $user->id,
-                    'public_reference' => Str::random(48),
-                    'plan_code' => $plan['code'],
-                    'plan_name' => $plan['name'],
-                    'lead_name' => $data['admin_name'],
-                    'lead_company' => $data['company_name'],
-                    'lead_email' => $data['admin_email'],
-                    'lead_phone' => $data['admin_phone'],
-                    'amount_cents' => $pricing['payable_cents'],
-                    'currency' => 'BRL',
-                    'provider' => $provider,
-                    'payment_method' => $data['payment_method'],
-                    'status' => CheckoutSession::STATUS_PENDING,
-                    'metadata' => [
-                        'plan' => $plan,
-                        'pricing' => $pricing,
-                        'platform' => $company->platform,
-                        'company_access_code' => $company->access_code,
-                        'legal_acceptance' => [
-                            'terms_version' => self::TERMS_VERSION,
-                            'privacy_version' => self::PRIVACY_VERSION,
-                            'accepted_at' => $acceptedAt->toISOString(),
-                        ],
-                        'recurrence' => [
-                            'auto_renewal_requested' => $data['payment_method'] === 'credit_card'
-                                && ($plan['billing_cycle'] ?? null) === CheckoutPlanCatalog::PLAN_MONTHLY,
-                            'annual_auto_renewal_enabled' => false,
-                            'annual_auto_renewal_reason' => 'Renovacao anual fica pendente ate validacao operacional sem risco de dupla cobranca ou conflito com parcelamento.',
-                        ],
-                    ],
-                ]);
-
-                CheckoutAcceptance::query()->create([
-                    'checkout_session_id' => $session->id,
-                    'merchant_id' => $merchant->id,
-                    'merchant_company_id' => $company->id,
-                    'user_id' => $user->id,
-                    'lead_email' => $data['admin_email'],
-                    'company_document' => $data['company_document'],
-                    'terms_version' => self::TERMS_VERSION,
-                    'privacy_version' => self::PRIVACY_VERSION,
-                    'accepted_terms' => true,
-                    'accepted_at' => $acceptedAt,
-                    'ip_address' => $request->ip(),
-                    'user_agent' => $request->userAgent(),
-                    'metadata' => [
-                        'plan_code' => $plan['code'],
-                        'billing_cycle' => $plan['billing_cycle'] ?? $plan['code'],
-                        'platform' => $company->platform,
-                        'payment_method' => $data['payment_method'],
-                        'amount_cents' => $pricing['payable_cents'],
-                        'auto_renewal_requested' => $data['payment_method'] === 'credit_card'
-                            && ($plan['billing_cycle'] ?? null) === CheckoutPlanCatalog::PLAN_MONTHLY,
-                    ],
-                ]);
-
-                return $this->checkoutPayments->createOrder($session, $data);
-            });
+            $session = $this->checkoutPayments->createOrder($session, $data);
         } catch (RuntimeException $exception) {
+            if (isset($session) && $session instanceof CheckoutSession) {
+                $this->markCheckoutAsFailed($session, $exception);
+            }
+
             return response()->json(['message' => $exception->getMessage()], 422);
         }
 
@@ -249,7 +141,9 @@ class PublicCheckoutController extends Controller
             'company_zip_code' => preg_replace('/\D+/', '', (string) $request->input('company_zip_code')) ?: '',
             'admin_cpf' => preg_replace('/\D+/', '', (string) $request->input('admin_cpf')) ?: '',
             'admin_email' => mb_strtolower(trim((string) $request->input('admin_email'))),
-            'company_address_state' => mb_strtoupper(trim((string) $request->input('company_address_state'))),
+            'company_address_state' => filled($request->input('company_address_state'))
+                ? mb_strtoupper(trim((string) $request->input('company_address_state')))
+                : '',
             'platform' => $request->input('platform') ?: 'bigshop',
         ]);
 
@@ -257,17 +151,17 @@ class PublicCheckoutController extends Controller
             'plan_code' => ['required', 'string', Rule::in(array_keys($this->plans()))],
             'payment_method' => ['required', 'string', Rule::in($this->checkoutPayments->allowedPaymentMethods())],
             'platform' => ['nullable', 'string', Rule::in(PlatformCatalog::keys())],
-            'company_name' => ['required', 'string', 'max:255'],
-            'company_legal_name' => ['required', 'string', 'max:255'],
-            'company_document' => ['required', 'string', 'min:11', 'max:14'],
+            'company_name' => ['nullable', 'string', 'max:255'],
+            'company_legal_name' => ['nullable', 'string', 'max:255'],
+            'company_document' => ['required', 'string', 'size:14'],
             'company_domain' => ['nullable', 'string', 'max:180'],
-            'company_zip_code' => ['required', 'string', 'size:8'],
-            'company_address_street' => ['required', 'string', 'max:255'],
-            'company_address_number' => ['required', 'string', 'max:40'],
+            'company_zip_code' => ['nullable', 'string', 'size:8'],
+            'company_address_street' => ['nullable', 'string', 'max:255'],
+            'company_address_number' => ['nullable', 'string', 'max:40'],
             'company_address_complement' => ['nullable', 'string', 'max:255'],
-            'company_address_district' => ['required', 'string', 'max:255'],
-            'company_address_city' => ['required', 'string', 'max:255'],
-            'company_address_state' => ['required', 'string', 'size:2'],
+            'company_address_district' => ['nullable', 'string', 'max:255'],
+            'company_address_city' => ['nullable', 'string', 'max:255'],
+            'company_address_state' => ['nullable', 'string', 'size:2'],
             'admin_name' => ['required', 'string', 'max:255'],
             'admin_email' => ['required', 'email', 'max:255'],
             'admin_cpf' => ['required', 'string', 'size:11'],
@@ -296,6 +190,164 @@ class PublicCheckoutController extends Controller
     private function pricingFor(array $data): array
     {
         return CheckoutPlanCatalog::pricingFor($data);
+    }
+
+    private function createPendingCheckoutSession(
+        array $data,
+        array $plan,
+        array $pricing,
+        string $provider,
+        Request $request,
+    ): CheckoutSession {
+        $acceptedAt = now();
+        $companyName = $this->checkoutCompanyName($data);
+
+        $merchant = Merchant::query()->create([
+            'name' => $companyName,
+            'slug' => $this->uniqueMerchantSlug($companyName),
+            'billing_status' => 'pending_payment',
+            'trial_ends_at' => null,
+        ]);
+
+        $user = $this->resolveCheckoutUser($data);
+        $merchant->users()->syncWithoutDetaching([
+            $user->id => ['role' => 'owner', 'is_owner' => true],
+        ]);
+
+        $company = MerchantCompany::query()->create([
+            'merchant_id' => $merchant->id,
+            'name' => $companyName,
+            'legal_name' => $data['company_legal_name'] ?? null,
+            'document' => $data['company_document'],
+            'zip_code' => $data['company_zip_code'] ?? null,
+            'street' => $data['company_address_street'] ?? null,
+            'number' => $data['company_address_number'] ?? null,
+            'complement' => $data['company_address_complement'] ?? null,
+            'district' => $data['company_address_district'] ?? null,
+            'city' => $data['company_address_city'] ?? null,
+            'state' => $data['company_address_state'] ?? null,
+            'country' => 'BR',
+            'domain' => $data['company_domain'] ?? null,
+            'platform' => $data['platform'] ?? 'custom',
+            'external_store_id' => null,
+            'status' => 'pending_payment',
+        ]);
+        $company->ensureAccessCode();
+
+        WidgetInstall::query()->create([
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $company->id,
+            'public_key' => 'pv_'.Str::lower(Str::random(24)),
+            'platform' => $company->platform,
+            'allowed_domains' => array_values(array_filter([
+                $company->domain,
+                'localhost',
+                '127.0.0.1',
+            ])),
+            'theme' => [
+                'primary' => '#0f172a',
+                'secondary' => '#ff4d5e',
+                'accent' => '#ff7a1a',
+                'background' => '#ffffff',
+                'text' => '#111827',
+                'font_family' => 'Manrope, Inter, Arial, sans-serif',
+                'font_size' => '14',
+                'font_weight' => '800',
+                'button_radius' => '8',
+                'confetti_enabled' => true,
+                'presentation_mode' => 'drawer',
+            ],
+            'is_active' => true,
+        ]);
+
+        $session = CheckoutSession::query()->create([
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $company->id,
+            'user_id' => $user->id,
+            'public_reference' => Str::random(48),
+            'plan_code' => $plan['code'],
+            'plan_name' => $plan['name'],
+            'lead_name' => $data['admin_name'],
+            'lead_company' => $companyName,
+            'lead_email' => $data['admin_email'],
+            'lead_phone' => $data['admin_phone'],
+            'amount_cents' => $pricing['payable_cents'],
+            'currency' => 'BRL',
+            'provider' => $provider,
+            'payment_method' => $data['payment_method'],
+            'status' => CheckoutSession::STATUS_PENDING,
+            'metadata' => [
+                'plan' => $plan,
+                'pricing' => $pricing,
+                'platform' => $company->platform,
+                'company_access_code' => $company->access_code,
+                'checkout_collected_company_fields' => ['company_document'],
+                'company_profile_pending' => true,
+                'legal_acceptance' => [
+                    'terms_version' => self::TERMS_VERSION,
+                    'privacy_version' => self::PRIVACY_VERSION,
+                    'accepted_at' => $acceptedAt->toISOString(),
+                ],
+                'recurrence' => [
+                    'auto_renewal_requested' => $data['payment_method'] === 'credit_card'
+                        && ($plan['billing_cycle'] ?? null) === CheckoutPlanCatalog::PLAN_MONTHLY,
+                    'annual_auto_renewal_enabled' => false,
+                    'annual_auto_renewal_reason' => 'Renovacao anual fica pendente ate validacao operacional sem risco de dupla cobranca ou conflito com parcelamento.',
+                ],
+            ],
+        ]);
+
+        CheckoutAcceptance::query()->create([
+            'checkout_session_id' => $session->id,
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $company->id,
+            'user_id' => $user->id,
+            'lead_email' => $data['admin_email'],
+            'company_document' => $data['company_document'],
+            'terms_version' => self::TERMS_VERSION,
+            'privacy_version' => self::PRIVACY_VERSION,
+            'accepted_terms' => true,
+            'accepted_at' => $acceptedAt,
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->userAgent(),
+            'metadata' => [
+                'plan_code' => $plan['code'],
+                'billing_cycle' => $plan['billing_cycle'] ?? $plan['code'],
+                'platform' => $company->platform,
+                'payment_method' => $data['payment_method'],
+                'amount_cents' => $pricing['payable_cents'],
+                'collected_company_fields' => ['company_document'],
+                'auto_renewal_requested' => $data['payment_method'] === 'credit_card'
+                    && ($plan['billing_cycle'] ?? null) === CheckoutPlanCatalog::PLAN_MONTHLY,
+            ],
+        ]);
+
+        return $session;
+    }
+
+    private function markCheckoutAsFailed(CheckoutSession $session, RuntimeException $exception): CheckoutSession
+    {
+        $session->forceFill([
+            'status' => CheckoutSession::STATUS_FAILED,
+            'metadata' => [
+                ...Arr::wrap($session->metadata),
+                'failure' => [
+                    'message' => $exception->getMessage(),
+                    'failed_at' => now()->toISOString(),
+                    'provider' => $session->provider,
+                    'payment_method' => $session->payment_method,
+                ],
+            ],
+            'last_provider_sync_at' => now(),
+        ])->save();
+
+        try {
+            app(TransactionalEmailService::class)->sendForCheckout(TransactionalEmailService::CODE_PAYMENT_ERROR, $session);
+        } catch (\Throwable) {
+            // E-mail transacional não deve mascarar o erro original do checkout.
+        }
+
+        return $session->fresh(['merchant', 'company', 'user']) ?? $session;
     }
 
     private function resolveCheckoutUser(array $data): User
@@ -330,6 +382,27 @@ class PublicCheckoutController extends Controller
         $user->forceFill($payload)->save();
 
         return $user;
+    }
+
+    private function checkoutCompanyName(array $data): string
+    {
+        $provided = trim((string) ($data['company_name'] ?? ''));
+        if ($provided !== '') {
+            return $provided;
+        }
+
+        return 'Empresa CNPJ '.$this->maskDocument((string) $data['company_document']);
+    }
+
+    private function maskDocument(string $document): string
+    {
+        $digits = preg_replace('/\D+/', '', $document) ?: $document;
+
+        if (strlen($digits) !== 14) {
+            return $digits;
+        }
+
+        return substr($digits, 0, 2).'.'.substr($digits, 2, 3).'.'.substr($digits, 5, 3).'/'.substr($digits, 8, 4).'-'.substr($digits, 12, 2);
     }
 
     private function uniqueMerchantSlug(string $name): string

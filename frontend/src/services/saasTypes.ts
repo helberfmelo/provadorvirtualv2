@@ -93,6 +93,89 @@ export type CheckoutSettings = {
   providers: CheckoutProviderOption[]
 }
 
+export type CheckoutOrderRow = {
+  id: number
+  reference: string
+  created_at: string | null
+  lead_name: string
+  lead_email: string
+  lead_company: string
+  company_document: string | null
+  plan_code: string
+  plan_name: string
+  amount_cents: number
+  currency: string
+  provider: string
+  provider_label: string
+  payment_method: string
+  status: string
+  status_label: string
+  failure_reason: string | null
+  paid_at: string | null
+  expires_at: string | null
+  merchant: {
+    id: number | null
+    name: string | null
+  }
+  company: {
+    id: number | null
+    name: string | null
+    access_code: string | null
+    status: string | null
+  }
+}
+
+export type CheckoutOrderDetail = CheckoutOrderRow & {
+  lead: {
+    name: string
+    company: string
+    email: string
+    phone: string | null
+  }
+  merchant: {
+    id: number | null
+    name: string | null
+    slug: string | null
+    billing_status: string | null
+  }
+  company: CompanyRow | null
+  user: {
+    id: number | null
+    name: string | null
+    email: string | null
+    cpf: string | null
+    role: string | null
+    status: string | null
+  }
+  provider: {
+    key: string
+    label: string
+    order_code: string | null
+    order_id: string | null
+    charge_id: string | null
+    last_sync_at: string | null
+  }
+  acceptance: {
+    id: number
+    lead_email: string
+    company_document: string
+    terms_version: string
+    privacy_version: string
+    accepted_terms: boolean
+    accepted_at: string | null
+    ip_address: string | null
+    user_agent: string | null
+    metadata: Record<string, unknown> | null
+  } | null
+  billing_subscription: Record<string, unknown> | null
+  failure: Record<string, unknown> | null
+  payment_snapshot: Record<string, unknown> | null
+  provider_payload: Record<string, unknown> | null
+  last_webhook_payload: Record<string, unknown> | null
+  metadata: Record<string, unknown>
+  timestamps: Record<string, string | null>
+}
+
 export type Permission = { view: boolean; edit: boolean }
 export type PermissionMap = Record<string, Permission>
 export type Module = { key: string; label: string; description: string }

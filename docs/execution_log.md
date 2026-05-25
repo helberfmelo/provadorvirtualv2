@@ -936,3 +936,16 @@
 - Validações locais: `npm run build`, `php artisan test --filter=DemoProductTest`, `git diff --check` e conferência do build confirmando a nova chamada e ausência da frase antiga `Loja teste do Provador Virtual`.
 - Commit `c0985fd` enviado para `main`; o run `26414805731` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`; verificação dos assets publicados confirmou `Teste a recomendação de tamanho`, `Demonstração interativa`, ausência de `Loja teste do Provador Virtual`, regra de CTA sensível à rota e CSS `.shop-heading-meta`.
+
+## 2026-05-25 - Sprint 95 Checkout enxuto, pedidos SaaS e primeiro acesso
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- Checkout público reorganizado: a seção de empresa coleta somente plataforma e CNPJ, e os dados cadastrais completos ficam para o primeiro acesso ao portal.
+- Inputs do checkout foram agrupados por tamanho esperado: CNPJ/CPF/telefone mais estreitos, nome/e-mail/cartão mais amplos e campos de validade/CVV/UF compactos.
+- Parcelas no cartão agora aparecem como opções calculadas no próprio checkout quando o SDK ainda não populou o select, deixando claro que o usuário pode escolher antes de finalizar.
+- Backend do checkout cria a sessão pendente antes de chamar a operadora; se a operadora recusar, a tentativa fica salva como `failed` com motivo técnico em `metadata.failure`.
+- Painel SaaS ganhou `/saas/pedidos` e `/saas/pedidos/:id`, com listagem de pedidos/tentativas, motivo de falha e detalhe completo de aceite, empresa, usuário, assinatura, IDs da operadora e payloads.
+- Portal da empresa ganhou formulário de dados cadastrais no dashboard quando a empresa nasceu apenas com CNPJ no checkout; ao salvar, a empresa fica com `profile_completed=true`.
+- Pagar.me foi ajustada para usar o nome interno da sessão quando o checkout não envia razão social e para omitir endereço quando ele ainda não foi preenchido.
+- Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=SaasCheckoutOrdersApiTest`, `php artisan test --filter=MerchantCompanyProfileApiTest`, `npm run build`, `vendor/bin/pint --dirty` e `php artisan test`.
+- A suíte backend completa passou com 85 testes e 678 assertions; o build frontend passou com `vue-tsc --noEmit && vite build`.

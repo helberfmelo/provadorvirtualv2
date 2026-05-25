@@ -1336,3 +1336,31 @@ Validação:
 - commit, push e Actions/deploy.
 
 Status: implementado na Sprint 94 no commit `c0985fd`, publicado com sucesso no run `26414805731`. Validações locais passaram com `npm run build`, `php artisan test --filter=DemoProductTest`, `git diff --check` e conferência do build sem a frase antiga `Loja teste do Provador Virtual`. Validação de produção passou com `scripts/validate-production.ps1`; os assets publicados confirmaram a nova headline, ausência do texto antigo, CTA público oculto na rota da loja teste e CSS `.shop-heading-meta`.
+
+### Sprint 95 - Checkout enxuto, pedidos SaaS e primeiro acesso
+
+Objetivo: reduzir fricção no checkout público, registrar todas as tentativas de contratação e levar os dados completos da empresa para o primeiro acesso do portal.
+
+Entregas:
+
+- reorganizar os inputs do checkout com larguras proporcionais ao conteúdo esperado;
+- manter no checkout apenas plataforma, CNPJ, dados de acesso, pagamento e aceite legal;
+- deixar empresa, razão social, domínio e endereço para preenchimento no primeiro acesso ao portal da empresa;
+- manter parcelas de cartão visíveis e claras mesmo antes de a operadora popular o select;
+- gravar a sessão local antes da chamada à operadora para preservar tentativas recusadas e motivo da falha;
+- adicionar `/saas/pedidos` com todos os pedidos e tentativas, incluindo falhas;
+- adicionar detalhe do pedido com dados completos, aceite, IDs da operadora, assinatura, payloads e metadados;
+- adicionar formulário de dados da empresa no dashboard quando o perfil ainda estiver incompleto.
+
+Validação:
+
+- `php artisan test --filter=PublicCheckoutFlowTest`;
+- `php artisan test --filter=SaasCheckoutOrdersApiTest`;
+- `php artisan test --filter=MerchantCompanyProfileApiTest`;
+- `php artisan test`;
+- `npm run build`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy.
+
+Status: implementado localmente na Sprint 95. Validações locais passaram com 85 testes backend e 678 assertions, além do build frontend. Publicação e validação de produção serão registradas após o push e conclusão do workflow.

@@ -1962,6 +1962,108 @@ th {
   min-width: 0;
 }
 
+.checkout-company-grid,
+.checkout-contact-grid,
+.checkout-password-grid,
+.checkout-card-grid {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.checkout-company-grid {
+  grid-template-columns: minmax(170px, 0.78fr) minmax(210px, 1fr);
+  align-items: start;
+}
+
+.checkout-contact-grid {
+  grid-template-columns: minmax(150px, 1fr) minmax(188px, 1.18fr) minmax(118px, 0.72fr);
+}
+
+.checkout-password-grid {
+  grid-template-columns: repeat(2, minmax(170px, 1fr));
+}
+
+.checkout-card-grid {
+  grid-template-columns: minmax(128px, 1fr) minmax(150px, 1.15fr) minmax(78px, 0.58fr) minmax(78px, 0.58fr);
+}
+
+.checkout-company-grid label,
+.checkout-company-grid input,
+.checkout-company-grid select,
+.checkout-contact-grid label,
+.checkout-contact-grid input,
+.checkout-contact-grid select,
+.checkout-password-grid label,
+.checkout-password-grid input,
+.checkout-card-grid label,
+.checkout-card-grid input,
+.checkout-card-grid select,
+.checkout-card-grid textarea {
+  min-width: 0;
+}
+
+.checkout-company-grid .field-document {
+  max-width: 360px;
+}
+
+.checkout-contact-grid .field-phone {
+  max-width: 180px;
+}
+
+.checkout-card-grid .field-card-holder,
+.checkout-card-grid .field-card-number,
+.checkout-card-grid .field-installments {
+  grid-column: span 2;
+}
+
+.checkout-card-grid .field-card-expiration,
+.checkout-card-grid .field-card-month,
+.checkout-card-grid .field-card-year,
+.checkout-card-grid .field-card-cvv {
+  max-width: 120px;
+}
+
+.checkout-payment-helper {
+  margin: 0;
+  padding: 11px 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  color: #1e3a8a;
+  background: #eff6ff;
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.company-profile-panel {
+  margin-top: 20px;
+}
+
+.company-profile-grid {
+  display: grid;
+  grid-template-columns: minmax(160px, 0.8fr) minmax(210px, 1.1fr) minmax(120px, 0.58fr) minmax(150px, 0.72fr);
+  gap: 14px;
+  min-width: 0;
+}
+
+.company-profile-grid label,
+.company-profile-grid input,
+.company-profile-grid select {
+  min-width: 0;
+}
+
+.company-profile-grid .company-field-name,
+.company-profile-grid .company-field-legal,
+.company-profile-grid .company-field-domain,
+.company-profile-grid .company-field-street {
+  grid-column: span 2;
+}
+
+.company-profile-grid .company-field-state {
+  max-width: 96px;
+}
+
 .form-grid label,
 .form-grid input,
 .form-grid select,
@@ -3262,6 +3364,70 @@ td small {
   background: #fffbeb;
 }
 
+.checkout-orders-table table {
+  min-width: 1160px;
+}
+
+.checkout-order-reason {
+  max-width: 260px;
+  color: #6b7280;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.order-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.42fr) minmax(0, 1fr);
+  gap: 9px 12px;
+  margin: 0;
+}
+
+.detail-list dt {
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.detail-list dd {
+  min-width: 0;
+  margin: 0;
+  color: #111827;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.order-json-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.order-json-grid strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.json-box {
+  max-height: 360px;
+  margin: 0;
+  padding: 12px;
+  overflow: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #111827;
+  background: #f9fafb;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
 .readiness-list {
   display: grid;
   gap: 10px;
@@ -3529,6 +3695,11 @@ td small {
   .quick-grid,
   .app-grid,
   .form-grid,
+  .checkout-company-grid,
+  .checkout-contact-grid,
+  .checkout-password-grid,
+  .checkout-card-grid,
+  .company-profile-grid,
   .inline-form,
   .integration-actions,
   .smart-catalog-panel,
@@ -3540,6 +3711,8 @@ td small {
   .analytics-grid,
   .color-grid,
   .data-support-grid,
+  .order-detail-grid,
+  .order-json-grid,
   .legal-grid {
     grid-template-columns: 1fr;
   }
@@ -3750,6 +3923,24 @@ td small {
 
   .mercado-card-fields {
     grid-template-columns: 1fr;
+  }
+
+  .checkout-company-grid .field-document,
+  .checkout-contact-grid .field-phone,
+  .checkout-card-grid .field-card-holder,
+  .checkout-card-grid .field-card-number,
+  .checkout-card-grid .field-installments,
+  .checkout-card-grid .field-card-expiration,
+  .checkout-card-grid .field-card-month,
+  .checkout-card-grid .field-card-year,
+  .checkout-card-grid .field-card-cvv,
+  .company-profile-grid .company-field-name,
+  .company-profile-grid .company-field-legal,
+  .company-profile-grid .company-field-domain,
+  .company-profile-grid .company-field-street,
+  .company-profile-grid .company-field-state {
+    grid-column: auto;
+    max-width: none;
   }
 
   .provider-choice {

@@ -144,6 +144,8 @@ Atualizado em: 2026-05-25
 - `DONE` Salvar prova técnica de aceite dos termos no checkout.
 - `DONE` Permitir boleto no checkout somente quando habilitado no painel SaaS.
 - `DONE` Validar o pacote comercial completo em local e produção, incluindo planos, aceite, termos, privacidade, recorrência mensal, cancelamento de renovação futura e boleto habilitável.
+- `DONE` Simplificar checkout para coletar somente CNPJ da empresa e completar demais dados no primeiro acesso ao portal.
+- `DONE` Registrar todas as tentativas de checkout, inclusive recusas da operadora, com listagem e detalhe em `/saas/pedidos`.
 - `DONE` Registrar variáveis Mercado Pago em `PRODUCTION_ENV` sem versionar valores reais.
 - `TODO` Executar transação real Mercado Pago de baixo valor e confirmar webhook/cron.
 - `TODO` Finalizar Pagar.me quando as informações pendentes chegarem.

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\CheckoutSession;
 use App\Models\MerchantCompany;
 use App\Models\SaasSetting;
 use App\Models\User;
@@ -67,6 +68,91 @@ class PublicCheckoutFlowTest extends TestCase
         $this->getJson('/api/v1/public/checkout/'.$response->json('reference'))
             ->assertOk()
             ->assertJsonPath('session.company.access_code', now()->year.'0001');
+    }
+
+    public function test_public_checkout_accepts_only_company_document_for_company_data(): void
+    {
+        $this->configurePagarme();
+
+        Http::fake([
+            'https://api.pagar.me/core/v5/orders' => Http::response([
+                'id' => 'or_pv_cnpj_only',
+                'status' => 'pending',
+                'charges' => [
+                    [
+                        'id' => 'ch_pv_cnpj_only',
+                        'status' => 'pending',
+                        'payment_method' => 'pix',
+                    ],
+                ],
+            ]),
+        ]);
+
+        $payload = $this->payload();
+        unset(
+            $payload['company_name'],
+            $payload['company_legal_name'],
+            $payload['company_domain'],
+            $payload['company_zip_code'],
+            $payload['company_address_street'],
+            $payload['company_address_number'],
+            $payload['company_address_district'],
+            $payload['company_address_city'],
+            $payload['company_address_state'],
+        );
+
+        $response = $this->postJson('/api/v1/public/checkout', $payload)
+            ->assertCreated()
+            ->assertJsonPath('status', 'checkout_created');
+
+        $this->assertDatabaseHas('merchant_companies', [
+            'document' => '11222333000181',
+            'name' => 'Empresa CNPJ 11.222.333/0001-81',
+            'legal_name' => null,
+            'domain' => null,
+        ]);
+
+        $session = CheckoutSession::query()->where('public_reference', $response->json('reference'))->firstOrFail();
+        $this->assertTrue((bool) data_get($session->metadata, 'company_profile_pending'));
+        $this->assertSame(['company_document'], data_get($session->metadata, 'checkout_collected_company_fields'));
+
+        Http::assertSent(function ($request): bool {
+            $payload = $request->data();
+
+            return data_get($payload, 'customer.name') === 'Empresa CNPJ 11.222.333/0001-81'
+                && data_get($payload, 'customer.document') === '11222333000181'
+                && data_get($payload, 'customer.address') === null;
+        });
+    }
+
+    public function test_provider_rejection_is_recorded_as_failed_checkout_attempt(): void
+    {
+        $this->configurePagarme();
+
+        Http::fake([
+            'https://api.pagar.me/core/v5/orders' => Http::response([
+                'errors' => [
+                    'payment' => ['Cartão recusado pela operadora.'],
+                ],
+            ], 422),
+        ]);
+
+        $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'payment_method' => 'credit_card',
+            'card_token' => 'card-token-recused',
+            'installments' => 1,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Cartão recusado pela operadora.');
+
+        $session = CheckoutSession::query()->firstOrFail();
+        $this->assertSame(CheckoutSession::STATUS_FAILED, $session->status);
+        $this->assertSame('Cartão recusado pela operadora.', data_get($session->metadata, 'failure.message'));
+        $this->assertDatabaseHas('checkout_acceptances', [
+            'checkout_session_id' => $session->id,
+            'lead_email' => 'admin.checkout@example.com',
+        ]);
     }
 
     public function test_public_checkout_creates_transparent_mercado_pago_pix_payment(): void

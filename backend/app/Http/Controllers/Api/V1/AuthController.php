@@ -11,6 +11,7 @@ use App\Support\ActiveTenant;
 use App\Support\PermissionCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -339,9 +340,21 @@ class AuthController extends Controller
             'id' => $company->id,
             'name' => $company->name,
             'access_code' => $company->access_code,
+            'legal_name' => $company->legal_name,
             'document' => $company->document,
+            'zip_code' => $company->zip_code,
+            'street' => $company->street,
+            'number' => $company->number,
+            'complement' => $company->complement,
+            'district' => $company->district,
+            'city' => $company->city,
+            'state' => $company->state,
+            'country' => $company->country,
+            'domain' => $company->domain,
             'platform' => $company->platform,
+            'external_store_id' => $company->external_store_id,
             'status' => $company->status,
+            'profile_completed' => $this->companyProfileCompleted($company),
             'merchant' => $company->merchant ? $this->serializeMerchant($company->merchant) : null,
         ];
     }
@@ -383,9 +396,36 @@ class AuthController extends Controller
             'id' => $company->id,
             'name' => $company->name,
             'access_code' => $company->access_code,
+            'legal_name' => $company->legal_name,
             'document' => $company->document,
+            'zip_code' => $company->zip_code,
+            'street' => $company->street,
+            'number' => $company->number,
+            'complement' => $company->complement,
+            'district' => $company->district,
+            'city' => $company->city,
+            'state' => $company->state,
+            'country' => $company->country,
+            'domain' => $company->domain,
             'platform' => $company->platform,
+            'external_store_id' => $company->external_store_id,
             'status' => $company->status,
+            'profile_completed' => $this->companyProfileCompleted($company),
         ];
+    }
+
+    private function companyProfileCompleted(MerchantCompany $company): bool
+    {
+        if (Str::startsWith((string) $company->name, 'Empresa CNPJ ')) {
+            return false;
+        }
+
+        foreach (['name', 'legal_name', 'document', 'domain', 'zip_code', 'street', 'number', 'district', 'city', 'state'] as $field) {
+            if (blank($company->{$field})) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

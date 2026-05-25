@@ -20,9 +20,21 @@ type AuthCompany = {
   id: number
   name: string
   access_code: string
+  legal_name?: string | null
   document: string | null
+  zip_code?: string | null
+  street?: string | null
+  number?: string | null
+  complement?: string | null
+  district?: string | null
+  city?: string | null
+  state?: string | null
+  country?: string | null
+  domain?: string | null
   platform: string
+  external_store_id?: string | null
   status: string
+  profile_completed?: boolean
 }
 type CompanyOption = AuthCompany & {
   merchant: AuthMerchant | null

@@ -20,6 +20,8 @@ import SaasCompaniesView from '../views/SaasCompaniesView.vue'
 import SaasCompanyFormView from '../views/SaasCompanyFormView.vue'
 import SaasCompanyUserFormView from '../views/SaasCompanyUserFormView.vue'
 import SaasCompanyUsersView from '../views/SaasCompanyUsersView.vue'
+import SaasCheckoutOrderDetailView from '../views/SaasCheckoutOrderDetailView.vue'
+import SaasCheckoutOrdersView from '../views/SaasCheckoutOrdersView.vue'
 import SaasCheckoutSettingsView from '../views/SaasCheckoutSettingsView.vue'
 import SaasEmailFormView from '../views/SaasEmailFormView.vue'
 import SaasEmailsView from '../views/SaasEmailsView.vue'
@@ -73,6 +75,8 @@ const router = createRouter({
     { path: '/saas/usuarios-empresas/novo', component: SaasCompanyUserFormView },
     { path: '/saas/usuarios-empresas/:id/editar', component: SaasCompanyUserFormView },
     { path: '/saas/checkout', component: SaasCheckoutSettingsView },
+    { path: '/saas/pedidos', component: SaasCheckoutOrdersView },
+    { path: '/saas/pedidos/:id', component: SaasCheckoutOrderDetailView },
     { path: '/saas/emails', component: SaasEmailsView },
     { path: '/saas/emails/configuracoes', component: SaasEmailSettingsView },
     { path: '/saas/emails/novo', component: SaasEmailFormView },

@@ -59,6 +59,7 @@ const saasLinks = computed<NavLink[]>(() => [
   { to: '/saas/usuarios', label: 'Usuários SaaS', icon: 'fa-user-shield', show: auth.canSaasView('saas_users') },
   { to: '/saas/usuarios-empresas', label: 'Usuários das empresas', icon: 'fa-users-gear', show: auth.canSaasView('saas_company_users') },
   { to: '/saas/checkout', label: 'Checkout', icon: 'fa-credit-card', show: auth.canSaasView('saas_checkout') },
+  { to: '/saas/pedidos', label: 'Pedidos', icon: 'fa-receipt', show: auth.canSaasView('saas_checkout') },
   { to: '/saas/emails', label: 'E-mails', icon: 'fa-envelope-open-text', show: auth.canSaasView('saas_emails') },
 ])
 
