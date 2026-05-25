@@ -199,6 +199,7 @@ Atualizado em: 2026-05-25
 - Sprint 97 ajusta `/app/widget` para manter plataforma, chave pública, status e cores em leitura vertical, com tooltip de domínios liberados.
 - Sprint 97 enviada ao GitHub no commit `c188d4e`; o run `26418672266` finalizou com sucesso e a validação de produção confirmou `/app/widget`.
 - Sprint 98 ajusta o checkout público para organizar Nome/CPF e E-mail/Telefone em duas linhas e ocultar `5% off` do Pix mensal.
+- Sprint 98 enviada ao GitHub no commit `1e0af18`; o run `26419066028` finalizou com sucesso e a validação de produção confirmou `/checkout`.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

@@ -1432,4 +1432,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente; publicação e validação de produção em andamento.
+Status: implementado na Sprint 98 no commit `1e0af18`, publicado com sucesso no run `26419066028`. Validações locais passaram com build frontend, `PublicCheckoutFlowTest`, suíte backend completa com 85 testes e 690 assertions e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/checkout`.
