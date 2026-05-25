@@ -205,6 +205,7 @@ Atualizado em: 2026-05-25
 - Sprint 100 corrige a conclusão do checkout: Pix mostra QR Code/copia e cola, boleto mostra abrir/baixar/copiar código de barras, cartão aprovado mostra sucesso e falhas da operadora viram modal amigável com código técnico.
 - Sprint 100 enviada ao GitHub no commit `c0415bd`; o run `26421412473` finalizou com sucesso e a validação de produção confirmou `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados para URLs limpas.
 - Sprint 101 corrige a causa real da falha Pix Mercado Pago: `date_of_expiration` passa a usar milissegundos e timezone `America/Sao_Paulo`, preservando a mensagem técnica e o UUID de rastreio apenas no SaaS.
+- Sprint 101 enviada ao GitHub no commit `17fe291`; o run `26422281931` finalizou com sucesso e a validação de produção confirmou `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.

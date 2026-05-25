@@ -1021,3 +1021,5 @@
 - O checkout público continua exibindo mensagem amigável quando a operadora devolver erro técnico de data.
 - Pagamentos diagnósticos criados durante a investigação foram conferidos como `cancelled/by_collector`.
 - Validações locais passaram com `npm run build`, `php artisan test --filter=PublicCheckoutFlowTest` com 17 testes e 94 assertions, `php artisan test` com 87 testes e 704 assertions e `vendor/bin/pint --dirty`.
+- Commit `17fe291` enviado para `main`; o run `26422281931` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/checkout`, `/saas/pedidos`, rotas públicas, SaaS, portal, widget, APIs e redirects legados.
