@@ -903,3 +903,12 @@
 - Resultado de produção: `PRODUCTION VALIDATION OK`; go-live readiness retornou `ready_with_warnings`, mantendo apenas pendências externas conhecidas.
 - Pendências externas mantidas: transação real Mercado Pago Pix/cartão de baixo valor com webhook/cron, validação de renovação anual sem dupla cobrança ou conflito com parcelamento, credenciais oficiais BigShop/piloto real e finalização Pagar.me quando chegarem os dados operacionais.
 - Commit `61e8fac` enviado para `main`; o run `26413377677` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público. A validação de produção foi repetida após esse deploy e retornou novamente `PRODUCTION VALIDATION OK`.
+
+## 2026-05-25 - Sprint 92 Modo modal central do provador
+
+- Releitura obrigatória de `docs/README.md`, documentos listados, `docs/sprint_governance.md`, diretrizes de portais e integração do widget concluída antes da implementação.
+- A personalização do widget em `/app/widget` ganhou a opção visual `Drawer lateral` ou `Modal central`.
+- A preferência é salva em `theme.presentation_mode`, com padrão `drawer` para instalações existentes e novas.
+- O widget público passa a abrir o mesmo fluxo de recomendação em modal central amplo no desktop quando `presentation_mode=modal`; no mobile, o modal ocupa a tela toda.
+- A mudança é visual: etapas, recomendação parcial, tabela de medidas, resultado, feedback, dados salvos no navegador e evento `provadorvirtual:size-selected` permanecem preservados.
+- Validações locais: `php artisan test --filter=Widget`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.

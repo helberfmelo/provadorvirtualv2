@@ -31,6 +31,7 @@ class UpdateWidgetInstallRequest extends FormRequest
             'theme.font_weight' => ['nullable', 'integer', 'min:400', 'max:900'],
             'theme.button_radius' => ['nullable', 'numeric', 'min:0', 'max:24'],
             'theme.confetti_enabled' => ['nullable', 'boolean'],
+            'theme.presentation_mode' => ['nullable', 'string', Rule::in(['drawer', 'modal'])],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

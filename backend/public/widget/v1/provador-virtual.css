@@ -97,6 +97,23 @@
   flex-direction: column;
 }
 
+.pv-recommendation-modal-backdrop {
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+}
+
+.pv-recommendation-modal {
+  width: min(880px, calc(100vw - 56px));
+  height: min(760px, calc(100vh - 56px));
+  height: min(760px, calc(100dvh - 56px));
+  border-radius: var(--pv-radius);
+}
+
+.pv-recommendation-modal .pv-drawer-header {
+  border-radius: var(--pv-radius) var(--pv-radius) 0 0;
+}
+
 .pv-modal {
   width: min(560px, 100%);
   max-height: min(720px, calc(100vh - 36px));
@@ -923,6 +940,23 @@
 
   .pv-drawer {
     width: 100%;
+  }
+
+  .pv-recommendation-modal-backdrop {
+    align-items: stretch;
+    justify-content: stretch;
+    padding: 0;
+  }
+
+  .pv-recommendation-modal {
+    width: 100%;
+    height: 100vh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .pv-recommendation-modal .pv-drawer-header {
+    border-radius: 0;
   }
 
   .pv-modal {

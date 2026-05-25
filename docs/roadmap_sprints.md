@@ -1270,3 +1270,24 @@ Validação:
 - commit, push e Actions/deploy.
 
 Status: implementado na Sprint 91 com validação local completa (`php artisan test` com 79 testes e 635 assertions, `npm run build`) e validação de produção em `https://provadorvirtual.online` por `scripts/validate-production.ps1`, cobrindo páginas públicas, `/checkout`, `/termos`, `/privacidade`, rotas SaaS/app, widget, health, ops, recomendação, esquecimento LGPD, CORS, login demo e go-live readiness. O script retornou `PRODUCTION VALIDATION OK` e go-live `ready_with_warnings` antes e depois do deploy do commit `61e8fac`, publicado com sucesso no run `26413377677`; as pendências restantes são externas/operacionais: transação real Mercado Pago de baixo valor com webhook/cron, validação de renovação anual sem dupla cobrança, credenciais oficiais BigShop e finalização Pagar.me quando as informações chegarem.
+
+### Sprint 92 - Modo modal central do provador
+
+Objetivo: permitir que o lojista escolha se o fluxo do provador abre no drawer lateral atual ou em um modal central semelhante ao padrão Sizebay, mantendo a dinâmica e as funcionalidades sem mudança de regra.
+
+Entregas:
+
+- adicionar a opção visual `drawer` ou `modal` na personalização do widget em `/app/widget`;
+- salvar a preferência no tema da instalação do widget, editável a qualquer momento pelo portal da empresa;
+- manter `drawer` como padrão para instalações existentes;
+- fazer o widget público abrir o mesmo fluxo de recomendação em modal central grande no desktop quando configurado;
+- fazer o modal ocupar a tela toda no mobile;
+- preservar botões, etapas, recomendação parcial, resultado, feedback, tabela de medidas, eventos e dados salvos.
+
+Validação:
+
+- testes backend de configuração do widget;
+- teste de asset do widget;
+- build frontend;
+- `git diff --check`;
+- commit, push e Actions/deploy.

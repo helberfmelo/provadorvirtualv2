@@ -379,15 +379,31 @@
       sent: false,
     };
 
-    activeBackdrop = createBackdrop('', 'pv-drawer-backdrop');
+    activeBackdrop = createBackdrop('', recommendationBackdropClass());
     activeBackdrop.innerHTML = drawerFrameHtml();
     renderDrawer(activeBackdrop);
     scheduleAutoRecommendation(activeBackdrop);
   }
 
+  function presentationMode() {
+    var mode = config.theme && config.theme.presentation_mode ? String(config.theme.presentation_mode).toLowerCase() : 'drawer';
+
+    return mode === 'modal' ? 'modal' : 'drawer';
+  }
+
+  function recommendationBackdropClass() {
+    return presentationMode() === 'modal'
+      ? 'pv-drawer-backdrop pv-recommendation-modal-backdrop'
+      : 'pv-drawer-backdrop';
+  }
+
   function drawerFrameHtml() {
+    var frameClass = presentationMode() === 'modal'
+      ? 'pv-drawer pv-recommendation-modal'
+      : 'pv-drawer';
+
     return [
-      '<section class="pv-drawer" role="dialog" aria-modal="true" aria-labelledby="pv-title">',
+      '<section class="' + frameClass + '" role="dialog" aria-modal="true" aria-labelledby="pv-title">',
       '<header class="pv-drawer-header">',
       '<div>',
       '<span class="pv-kicker">Provador Virtual</span>',

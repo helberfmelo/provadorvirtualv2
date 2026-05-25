@@ -29,7 +29,8 @@ class WidgetInstallApiTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.public_key', 'pv_demo_luna')
             ->assertJsonPath('data.platform', 'custom')
-            ->assertJsonPath('data.is_active', true);
+            ->assertJsonPath('data.is_active', true)
+            ->assertJsonPath('data.theme.presentation_mode', 'drawer');
 
         $this->assertStringContainsString('provador-virtual.js', $response->json('data.snippet'));
         $this->assertStringContainsString('data-merchant-id', $response->json('data.snippet'));
@@ -42,6 +43,7 @@ class WidgetInstallApiTest extends TestCase
                     'primary' => '#101820',
                     'secondary' => '#ff4d5e',
                     'accent' => '#17a398',
+                    'presentation_mode' => 'modal',
                 ],
                 'is_active' => false,
             ])
@@ -50,7 +52,13 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.allowed_domains.0', 'provadorvirtual.online')
             ->assertJsonPath('data.allowed_domains.1', 'localhost')
             ->assertJsonPath('data.theme.primary', '#101820')
+            ->assertJsonPath('data.theme.presentation_mode', 'modal')
             ->assertJsonPath('data.is_active', false);
+
+        $this->assertStringContainsString('presentation_mode', $this->withHeaders($headers)
+            ->getJson('/api/v1/widget-install')
+            ->assertOk()
+            ->json('data.snippet'));
     }
 
     public function test_bigshop_contract_keeps_widget_platform_locked(): void

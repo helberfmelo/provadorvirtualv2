@@ -399,6 +399,7 @@ class SaasAdminController extends Controller
             'font_weight' => '800',
             'button_radius' => '8',
             'confetti_enabled' => true,
+            'presentation_mode' => 'drawer',
         ];
     }
 }

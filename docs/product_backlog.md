@@ -27,6 +27,7 @@ Atualizado em: 2026-05-25
 - `DONE` Widget com botões `Descubra seu tamanho` e `Tabela de Medidas`.
 - `DONE` Widget reusa medidas salvas localmente com aviso ao comprador.
 - `DONE` Tela de instalação do widget.
+- `DONE` Opção visual do widget entre drawer lateral e modal central configurável no portal da empresa.
 - `DONE` Guia claro de onde instalar container/script do widget na página de produto.
 - `DONE` Catálogo inicial de integrações.
 - `DONE` Importacao CSV de produtos.

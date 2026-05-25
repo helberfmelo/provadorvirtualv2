@@ -99,6 +99,7 @@ class BigShopActivationService
                     'secondary' => '#ff4d5e',
                     'accent' => '#ff7a1a',
                     'confetti_enabled' => true,
+                    'presentation_mode' => 'drawer',
                 ],
                 'is_active' => true,
             ]

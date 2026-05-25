@@ -29,6 +29,9 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('scheduleAutoRecommendation', $scriptContents);
         $this->assertStringContainsString('pv_shopper_profile_v2_table_', $scriptContents);
         $this->assertStringContainsString('confetti_enabled', $scriptContents);
+        $this->assertStringContainsString('presentation_mode', $scriptContents);
+        $this->assertStringContainsString('presentationMode', $scriptContents);
+        $this->assertStringContainsString('pv-recommendation-modal', $scriptContents);
         $this->assertStringContainsString('widget_v2_staged', $scriptContents);
         $this->assertStringContainsString('v2_sprint_68', $scriptContents);
         $this->assertStringContainsString('triggerCelebration', $scriptContents);
@@ -48,6 +51,8 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('loading="eager"', $scriptContents);
         $this->assertStringContainsString('.pv-trigger', $cssContents);
         $this->assertStringContainsString('.pv-drawer', $cssContents);
+        $this->assertStringContainsString('.pv-recommendation-modal', $cssContents);
+        $this->assertStringContainsString('.pv-recommendation-modal-backdrop', $cssContents);
         $this->assertStringContainsString('.pv-confetti-layer', $cssContents);
         $this->assertStringContainsString('.pv-recommendation-inline', $cssContents);
         $this->assertStringContainsString('.pv-stepper button', $cssContents);

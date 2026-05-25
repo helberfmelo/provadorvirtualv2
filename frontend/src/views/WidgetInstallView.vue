@@ -21,6 +21,7 @@ type WidgetInstall = {
     font_weight?: string
     button_radius?: string
     confetti_enabled?: boolean | string
+    presentation_mode?: 'drawer' | 'modal' | string
   }
   is_active: boolean
   script_url: string
@@ -62,6 +63,7 @@ const form = reactive({
     font_weight: '800',
     button_radius: '8',
     confetti_enabled: true,
+    presentation_mode: 'drawer',
   },
 })
 
@@ -88,6 +90,11 @@ const platformOptions = computed(() => {
     { value: 'custom', label: 'Personalizada' },
   ]
 })
+
+const presentationModeOptions = [
+  { value: 'drawer', label: 'Drawer lateral', icon: 'fa-table-columns' },
+  { value: 'modal', label: 'Modal central', icon: 'fa-window-maximize' },
+]
 
 const isBigShopContract = computed(() => {
   return auth.activeCompany?.platform === 'bigshop'
@@ -149,6 +156,7 @@ function fillForm(data: WidgetInstall) {
   form.theme.font_size = data.theme?.font_size || '14'
   form.theme.font_weight = data.theme?.font_weight || '800'
   form.theme.button_radius = data.theme?.button_radius || '8'
+  form.theme.presentation_mode = data.theme?.presentation_mode === 'modal' ? 'modal' : 'drawer'
   form.theme.confetti_enabled = data.theme?.confetti_enabled === undefined
     || data.theme?.confetti_enabled === null
     || data.theme?.confetti_enabled === true
@@ -235,6 +243,23 @@ async function copySnippet() {
             <input v-model="form.is_active" type="checkbox" />
           </label>
         </div>
+
+        <fieldset class="mode-selector">
+          <legend>Abertura do provador</legend>
+          <div class="segmented-control">
+            <button
+              v-for="mode in presentationModeOptions"
+              :key="mode.value"
+              type="button"
+              :class="{ active: form.theme.presentation_mode === mode.value }"
+              @click="form.theme.presentation_mode = mode.value"
+            >
+              <i :class="['fa-solid', mode.icon]" aria-hidden="true"></i>
+              {{ mode.label }}
+            </button>
+          </div>
+          <small>O modal central fica amplo no desktop e ocupa a tela toda no celular.</small>
+        </fieldset>
 
         <label>
           Domínios liberados
@@ -333,6 +358,10 @@ async function copySnippet() {
           <div class="preview-widget-buttons">
             <button type="button">Descubra seu tamanho</button>
             <button type="button">Tabela de Medidas</button>
+          </div>
+          <div :class="['preview-launch-frame', form.theme.presentation_mode === 'modal' ? 'modal' : 'drawer']">
+            <span>{{ form.theme.presentation_mode === 'modal' ? 'Modal central' : 'Drawer lateral' }}</span>
+            <div></div>
           </div>
           <div class="preview-size-table">
             <div><strong>P</strong><span>84 - 90</span><span>66 - 72</span></div>

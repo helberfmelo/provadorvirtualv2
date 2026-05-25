@@ -144,6 +144,8 @@ O widget também expõe `window.ProvadorVirtual.diagnostics()` para depuração 
 
 O drawer do widget usa as cores configuradas no tema da loja para cabeçalho, CTAs e barra de precisão. Desde a Sprint 75, as silhuetas de formato corporal são assets públicos herdados do v1 em `/widget/v1/assets/body-shapes/` e renderizados como imagens reais, evitando falhas de máscara CSS em navegadores mobile. Desde a Sprint 78, essas imagens usam carregamento imediato dentro do drawer para evitar placeholders vazios em navegadores mobile.
 
+Status Sprint 92: o tema do widget aceita `presentation_mode` com os valores `drawer` e `modal`. O padrão continua `drawer` para instalações existentes. Quando o lojista escolhe `modal` em `/app/widget`, o mesmo fluxo de recomendação abre em um modal central grande no desktop e ocupa a tela toda no mobile, sem alterar etapas, eventos, recomendação, feedback, tabela de medidas ou persistência local.
+
 ## Guias por plataforma
 
 ### BigShop
