@@ -116,7 +116,7 @@ class TransactionalEmailDispatchTest extends TestCase
             'lead_name' => 'Owner Teste',
             'lead_company' => 'Loja Email Ltda',
             'lead_email' => 'owner@example.com',
-            'amount_cents' => 148086,
+            'amount_cents' => 398886,
             'provider' => 'pagarme',
             'payment_method' => 'pix',
             'status' => $status,

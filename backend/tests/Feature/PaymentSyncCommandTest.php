@@ -40,7 +40,7 @@ class PaymentSyncCommandTest extends TestCase
             'lead_name' => 'Admin Sync',
             'lead_company' => 'Loja Sync Ltda',
             'lead_email' => 'admin.sync@example.com',
-            'amount_cents' => 148086,
+            'amount_cents' => 398886,
             'provider' => 'pagarme',
             'provider_order_code' => 'PV-SYNC-PAID',
             'provider_order_id' => 'or_sync_paid',

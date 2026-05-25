@@ -617,6 +617,20 @@ a {
   margin-top: auto;
 }
 
+.pricing-link {
+  display: inline-flex;
+  justify-content: center;
+  width: fit-content;
+  color: #0f172a;
+  font-size: 0.88rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.pricing-link:hover {
+  color: #ff4d5e;
+}
+
 .pricing-strip .highlight {
   border-color: #fed7aa;
   background: #fff7ed;
@@ -3330,6 +3344,10 @@ td small {
   }
 
   .pricing-strip .btn {
+    width: 100%;
+  }
+
+  .pricing-link {
     width: 100%;
   }
 

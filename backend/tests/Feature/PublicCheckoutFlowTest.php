@@ -52,7 +52,7 @@ class PublicCheckoutFlowTest extends TestCase
 
             return $request->url() === 'https://api.pagar.me/core/v5/orders'
                 && data_get($payload, 'payments.0.payment_method') === 'pix'
-                && data_get($payload, 'items.0.amount') === 216486
+                && data_get($payload, 'items.0.amount') === 512772
                 && data_get($payload, 'customer.address.zip_code') === '01001000'
                 && str_starts_with((string) data_get($payload, 'code'), 'PV-');
         });
@@ -100,10 +100,28 @@ class PublicCheckoutFlowTest extends TestCase
 
             return $request->url() === 'https://api.mercadopago.com/v1/payments'
                 && data_get($payload, 'payment_method_id') === 'pix'
-                && data_get($payload, 'transaction_amount') === 2164.86
+                && data_get($payload, 'transaction_amount') === 5127.72
                 && data_get($payload, 'payer.address.zip_code') === '01001000'
                 && data_get($payload, 'metadata.platform') === 'provadorvirtual';
         });
+    }
+
+    public function test_public_checkout_config_exposes_monthly_and_annual_prices(): void
+    {
+        $this->configureMercadoPago();
+
+        $this->getJson('/api/v1/public/checkout/config')
+            ->assertOk()
+            ->assertJsonPath('plans.0.code', 'annual')
+            ->assertJsonPath('plans.1.code', 'monthly')
+            ->assertJsonPath('pricing.default.monthly.monthly_cents', 48980)
+            ->assertJsonPath('pricing.default.annual.monthly_cents', 44980)
+            ->assertJsonPath('pricing.default.annual.card_total_cents', 539760)
+            ->assertJsonPath('pricing.default.annual.savings_percent', 8.2)
+            ->assertJsonPath('pricing.bigshop.monthly.monthly_cents', 38980)
+            ->assertJsonPath('pricing.bigshop.annual.monthly_cents', 34990)
+            ->assertJsonPath('pricing.bigshop.annual.card_total_cents', 419880)
+            ->assertJsonPath('pricing.bigshop.annual.savings_percent', 10.2);
     }
 
     public function test_bigshop_platform_receives_discounted_annual_price(): void
@@ -134,7 +152,7 @@ class PublicCheckoutFlowTest extends TestCase
         ])->assertCreated();
 
         Http::assertSent(function ($request): bool {
-            return data_get($request->data(), 'items.0.amount') === 148086
+            return data_get($request->data(), 'items.0.amount') === 398886
                 && data_get($request->data(), 'metadata.merchant_company_id') === '1';
         });
 
@@ -142,6 +160,36 @@ class PublicCheckoutFlowTest extends TestCase
             'name' => 'Loja Checkout Teste',
             'platform' => 'bigshop',
         ]);
+    }
+
+    public function test_monthly_plan_uses_monthly_price_by_platform(): void
+    {
+        $this->configurePagarme();
+
+        Http::fake([
+            'https://api.pagar.me/core/v5/orders' => Http::response([
+                'id' => 'or_pv_monthly',
+                'status' => 'pending',
+                'charges' => [
+                    [
+                        'id' => 'ch_pv_monthly',
+                        'status' => 'pending',
+                        'payment_method' => 'pix',
+                    ],
+                ],
+            ]),
+        ]);
+
+        $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'plan_code' => 'monthly',
+            'platform' => 'bigshop',
+        ])->assertCreated();
+
+        Http::assertSent(function ($request): bool {
+            return data_get($request->data(), 'items.0.amount') === 38980
+                && data_get($request->data(), 'items.0.description') === 'Provador Virtual Mensal - 1 mes';
+        });
     }
 
     public function test_checkout_does_not_accept_boleto(): void

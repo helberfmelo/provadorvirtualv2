@@ -224,7 +224,7 @@ class PagarMeCheckoutService implements CheckoutPaymentProvider
                 [
                     'code' => $session->plan_code,
                     'amount' => $session->amount_cents,
-                    'description' => $session->plan_name.' - 12 meses',
+                    'description' => $this->paymentDescription($session),
                     'quantity' => 1,
                 ],
             ],
@@ -268,7 +268,7 @@ class PagarMeCheckoutService implements CheckoutPaymentProvider
                     'additional_information' => [
                         ['name' => 'Plano', 'value' => Str::limit($session->plan_name, 50, '')],
                         ['name' => 'Empresa', 'value' => Str::limit($session->lead_company, 50, '')],
-                        ['name' => 'Periodo', 'value' => '12 meses'],
+                        ['name' => 'Periodo', 'value' => $this->periodLabel($session)],
                     ],
                 ],
             ],
@@ -305,6 +305,18 @@ class PagarMeCheckoutService implements CheckoutPaymentProvider
         $this->dispatchStatusEmail($freshSession);
 
         return $freshSession;
+    }
+
+    private function paymentDescription(CheckoutSession $session): string
+    {
+        return $session->plan_name.' - '.$this->periodLabel($session);
+    }
+
+    private function periodLabel(CheckoutSession $session): string
+    {
+        $months = (int) data_get($session->metadata, 'plan.interval_months', 12);
+
+        return $months === 1 ? '1 mes' : "{$months} meses";
     }
 
     private function applyStatus(CheckoutSession $session, string $status, array $payload): void

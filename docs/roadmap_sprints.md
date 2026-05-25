@@ -1183,6 +1183,8 @@ Validação:
 - `git diff --check`;
 - commit, push e Actions/deploy.
 
+Status: implementado na Sprint 87 com catálogo único de preços no backend, landing/checkout atualizados, testes de checkout cobrindo os novos valores e build frontend aprovado.
+
 ### Sprint 88 - Termos, privacidade, aceite e aviso de cookies
 
 Objetivo: reforçar a camada legal operacional e salvar prova técnica do aceite no checkout.

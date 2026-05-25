@@ -235,7 +235,7 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         $payer = $this->payerPayload($buyerData);
         $payload = [
             'transaction_amount' => $amount,
-            'description' => $session->plan_name.' - 12 meses',
+            'description' => $this->paymentDescription($session),
             'external_reference' => $session->public_reference,
             'notification_url' => $this->notificationUrl(),
             'statement_descriptor' => 'PROVADORVIRT',
@@ -295,6 +295,13 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
                 'federal_unit' => mb_strtoupper(trim((string) ($buyerData['company_address_state'] ?? ''))),
             ],
         ]);
+    }
+
+    private function paymentDescription(CheckoutSession $session): string
+    {
+        $months = (int) data_get($session->metadata, 'plan.interval_months', 12);
+
+        return $session->plan_name.' - '.($months === 1 ? '1 mes' : "{$months} meses");
     }
 
     private function splitName(string $name): array

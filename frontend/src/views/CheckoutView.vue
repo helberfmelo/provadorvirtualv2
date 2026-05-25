@@ -7,18 +7,31 @@ import { createMercadoPagoCardForm, tokenizePagarMeCard, type MercadoPagoCardFor
 type Plan = {
   code: string
   name: string
+  billing_cycle: 'monthly' | 'annual'
+  interval_months: number
   price_cents: number
   currency: string
   description: string
 }
 
+type PricingCycle = {
+  monthly_cents: number
+  card_total_cents: number
+  pix_total_cents: number
+  period_total_cents: number
+  monthly_equivalent_cents: number
+  annualized_monthly_total_cents: number
+  savings_cents: number
+  savings_percent: number
+  max_installments: number
+}
+
 type PricingVariant = {
   label: string
-  monthly_cents: number
-  annual_card_cents: number
-  annual_pix_cents: number
+  monthly: PricingCycle
+  annual: PricingCycle
   pix_discount_percent: number
-  max_installments: number
+  max_installments?: number
 }
 
 const router = useRouter()
@@ -81,21 +94,30 @@ const card = reactive({
 })
 
 const selectedPlan = computed(() => plans.value.find((plan) => plan.code === form.plan_code))
+const allowedPlanCodes = computed(() => plans.value.map((plan) => plan.code))
 const canUseCreditCard = computed(() => Boolean(checkoutConfig.value?.credit_card_enabled))
 const checkoutProvider = computed(() => checkoutConfig.value?.provider || checkoutConfig.value?.active_provider || '')
 const isMercadoPago = computed(() => checkoutProvider.value === 'mercado_pago')
 const activePricing = computed(() => pricing.value[form.platform === 'bigshop' ? 'bigshop' : 'default'])
-const payableCents = computed(() => {
+const activeCyclePricing = computed(() => {
   const values = activePricing.value
+  if (!values) {
+    return null
+  }
+
+  return form.plan_code === 'monthly' ? values.monthly : values.annual
+})
+const payableCents = computed(() => {
+  const values = activeCyclePricing.value
   if (!values) {
     return 0
   }
 
-  return form.payment_method === 'pix' ? values.annual_pix_cents : values.annual_card_cents
+  return form.payment_method === 'pix' ? values.pix_total_cents : values.card_total_cents
 })
-const monthlyCents = computed(() => activePricing.value?.monthly_cents || 0)
-const annualCardCents = computed(() => activePricing.value?.annual_card_cents || 0)
-const maxInstallments = computed(() => Math.max(1, Math.min(10, Number(activePricing.value?.max_installments || 10))))
+const monthlyCents = computed(() => activeCyclePricing.value?.monthly_cents || 0)
+const periodCardCents = computed(() => activeCyclePricing.value?.card_total_cents || 0)
+const maxInstallments = computed(() => Math.max(1, Math.min(10, Number(activeCyclePricing.value?.max_installments || 10))))
 const installmentOptions = computed(() => Array.from({ length: maxInstallments.value }, (_, index) => index + 1))
 const selectedInstallments = computed(() => {
   const value = Number(form.installments)
@@ -104,9 +126,12 @@ const selectedInstallments = computed(() => {
 const hasSelectedInstallments = computed(() => form.payment_method === 'credit_card' && selectedInstallments.value > 0)
 const selectedInstallmentCents = computed(() => selectedInstallments.value > 0 ? installmentCents(selectedInstallments.value) : 0)
 const pixDiscountCents = computed(() => {
-  const values = activePricing.value
-  return values ? values.annual_card_cents - values.annual_pix_cents : 0
+  const values = activeCyclePricing.value
+  return values ? values.card_total_cents - values.pix_total_cents : 0
 })
+const isAnnualPlan = computed(() => form.plan_code === 'annual')
+const cycleLabel = computed(() => isAnnualPlan.value ? 'Plano anual' : 'Plano mensal')
+const periodTotalLabel = computed(() => isAnnualPlan.value ? 'Total anual' : 'Total mensal')
 
 onMounted(async () => {
   await loadConfig()
@@ -119,7 +144,8 @@ async function loadConfig() {
     checkoutConfig.value = data.checkout
     plans.value = data.plans
     pricing.value = data.pricing || {}
-    form.plan_code = data.plans?.[0]?.code || 'annual'
+    const queryPlan = String(route.query.plan || '')
+    form.plan_code = data.plans?.some((plan: Plan) => plan.code === queryPlan) ? queryPlan : 'annual'
     form.payment_method = data.checkout?.credit_card_enabled ? 'credit_card' : 'pix'
     form.installments = ''
     installmentsTouched.value = false
@@ -233,12 +259,12 @@ async function prepareMercadoPagoCardForm() {
   await nextTick()
   syncMercadoPagoDocumentFields()
 
-  const key = `${checkoutConfig.value.public_key || ''}:${annualCardCents.value}`
+  const key = `${checkoutConfig.value.public_key || ''}:${periodCardCents.value}:${form.plan_code}`
   if (mercadoPagoCardForm.value && mercadoPagoCardFormKey.value === key) {
     return
   }
 
-  mercadoPagoCardForm.value = await createMercadoPagoCardForm(checkoutConfig.value, annualCardCents.value)
+  mercadoPagoCardForm.value = await createMercadoPagoCardForm(checkoutConfig.value, periodCardCents.value)
   mercadoPagoCardFormKey.value = key
   setupMercadoPagoInstallments()
 }
@@ -343,7 +369,7 @@ function updateAdminCpf(event: Event) {
 }
 
 function installmentCents(installments: number) {
-  return Math.ceil(annualCardCents.value / Math.max(1, installments))
+  return Math.ceil(periodCardCents.value / Math.max(1, installments))
 }
 
 function installmentLabel(installments: number) {
@@ -353,6 +379,27 @@ function installmentLabel(installments: number) {
 
 function price(cents: number) {
   return (cents / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+}
+
+function savingsPercent(value: number | undefined) {
+  const percent = Number(value || 0)
+  return percent.toLocaleString('pt-BR', { maximumFractionDigits: 1 })
+}
+
+function selectPlan(planCode: string) {
+  if (!allowedPlanCodes.value.includes(planCode)) {
+    return
+  }
+
+  form.plan_code = planCode
+  form.installments = ''
+  installmentsTouched.value = false
+  mercadoPagoCardForm.value = null
+  mercadoPagoCardFormKey.value = ''
+
+  if (form.payment_method === 'credit_card' && isMercadoPago.value) {
+    prepareMercadoPagoCardForm()
+  }
 }
 </script>
 
@@ -373,7 +420,7 @@ function price(cents: number) {
       <section class="panel-main admin-form">
         <div class="subsection-heading">
           <h2>{{ selectedPlan?.name }}</h2>
-          <span>Plano anual único</span>
+          <span>{{ cycleLabel }}</span>
         </div>
 
         <div class="annual-plan-summary">
@@ -382,7 +429,35 @@ function price(cents: number) {
             <span>{{ activePricing?.label }}</span>
           </div>
           <p>{{ selectedPlan?.description }}</p>
-          <small>Cartão em até {{ maxInstallments }}x sem juros ou Pix à vista com {{ activePricing?.pix_discount_percent || 5 }}% de desconto.</small>
+          <small v-if="isAnnualPlan">
+            {{ periodTotalLabel }} {{ price(periodCardCents) }}. Economia de {{ savingsPercent(activeCyclePricing?.savings_percent) }}%
+            em relação ao mensal.
+          </small>
+          <small v-else>Pagamento mensal de {{ price(periodCardCents) }}. A recorrência automática no cartão será vinculada a este ciclo.</small>
+        </div>
+
+        <div class="plan-choice-grid">
+          <label
+            v-for="plan in plans"
+            :key="plan.code"
+            :class="{ active: form.plan_code === plan.code }"
+          >
+            <input
+              type="radio"
+              name="plan_code"
+              :value="plan.code"
+              :checked="form.plan_code === plan.code"
+              @change="selectPlan(plan.code)"
+            />
+            <strong>{{ plan.billing_cycle === 'annual' ? 'Anual' : 'Mensal' }}</strong>
+            <span>
+              {{ price(plan.billing_cycle === 'annual' ? (activePricing?.annual.monthly_cents || 0) : (activePricing?.monthly.monthly_cents || 0)) }}/mês
+            </span>
+            <small v-if="plan.billing_cycle === 'annual'">
+              Total {{ price(activePricing?.annual.card_total_cents || 0) }} · economize {{ savingsPercent(activePricing?.annual.savings_percent) }}%
+            </small>
+            <small v-else>Sem fidelidade anual · {{ price(activePricing?.monthly.card_total_cents || 0) }} por mês</small>
+          </label>
         </div>
 
         <div class="form-grid">
@@ -574,10 +649,13 @@ function price(cents: number) {
 
         <template v-if="form.payment_method === 'pix'">
           <div class="checkout-summary">
-            <span>Total no Pix <small>5% off</small></span>
+            <span>
+              Total no Pix
+              <small v-if="pixDiscountCents > 0">5% off</small>
+            </span>
             <strong>{{ price(payableCents) }}</strong>
           </div>
-          <div class="checkout-summary muted">
+          <div v-if="pixDiscountCents > 0" class="checkout-summary muted">
             <span>Desconto Pix</span>
             <strong>{{ price(pixDiscountCents) }}</strong>
           </div>
@@ -586,11 +664,11 @@ function price(cents: number) {
         <template v-else-if="hasSelectedInstallments">
           <div class="checkout-summary card-installment-summary" :class="{ single: selectedInstallments === 1 }">
             <span>{{ selectedInstallments === 1 ? 'Pagamento no cartão' : `${selectedInstallments}x sem juros` }}</span>
-            <strong>{{ selectedInstallments === 1 ? price(annualCardCents) : price(selectedInstallmentCents) }}</strong>
+            <strong>{{ selectedInstallments === 1 ? price(periodCardCents) : price(selectedInstallmentCents) }}</strong>
           </div>
           <div v-if="selectedInstallments > 1" class="checkout-summary muted">
-            <span>Total anual</span>
-            <strong>{{ price(annualCardCents) }}</strong>
+            <span>{{ periodTotalLabel }}</span>
+            <strong>{{ price(periodCardCents) }}</strong>
           </div>
         </template>
 

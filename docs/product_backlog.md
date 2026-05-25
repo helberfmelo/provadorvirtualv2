@@ -134,7 +134,7 @@ Atualizado em: 2026-05-23
 - `DONE` Checkout transparente Mercado Pago com Pix, cartão tokenizado pelo MercadoPago.js, webhook e sincronização pendente.
 - `DONE` Painel SaaS `/saas/checkout` para escolher `mercado_pago` ou `pagarme`.
 - `DONE` Persistência de `checkout_sessions` e `payment_events`.
-- `TODO` Atualizar regra comercial para plano mensal e anual por plataforma, com mensal em destaque no anual, total anual e economia percentual.
+- `DONE` Atualizar regra comercial para plano mensal e anual por plataforma, com mensal em destaque no anual, total anual e economia percentual.
 - `TODO` Implementar recorrência automática no cartão para plano mensal e, quando tecnicamente seguro, para renovação anual.
 - `TODO` Criar opção discreta no portal da empresa para cancelar somente a renovação automática, sem cancelar pagamentos já capturados ou parcelas em andamento.
 - `TODO` Salvar prova técnica de aceite dos termos no checkout.

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\WidgetInstall;
 use App\Services\CheckoutPaymentManager;
 use App\Services\TransactionalEmailService;
+use App\Support\CheckoutPlanCatalog;
 use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -240,53 +241,17 @@ class PublicCheckoutController extends Controller
 
     private function plans(): array
     {
-        return [
-            'annual' => [
-                'code' => 'annual',
-                'name' => 'Provador Virtual Anual',
-                'price_cents' => 18990,
-                'currency' => 'BRL',
-                'description' => 'Plano anual único com widget, tabela de medidas, recomendação inteligente, integrações padrão e suporte de ativação.',
-            ],
-        ];
+        return CheckoutPlanCatalog::plans();
     }
 
     private function pricingConfig(): array
     {
-        return [
-            'default' => $this->pricingVariant('Demais plataformas', 18990),
-            'bigshop' => $this->pricingVariant('Cliente BigShop', 12990),
-        ];
+        return CheckoutPlanCatalog::pricingConfig();
     }
 
     private function pricingFor(array $data): array
     {
-        $platform = $data['platform'] === 'bigshop' ? 'bigshop' : 'default';
-        $variant = $this->pricingConfig()[$platform];
-        $paymentMethod = $data['payment_method'] === 'credit_card' ? 'credit_card' : 'pix';
-
-        return [
-            ...$variant,
-            'platform_price_key' => $platform,
-            'payment_method' => $paymentMethod,
-            'payable_cents' => $paymentMethod === 'pix'
-                ? $variant['annual_pix_cents']
-                : $variant['annual_card_cents'],
-        ];
-    }
-
-    private function pricingVariant(string $label, int $monthlyCents): array
-    {
-        $annualCardCents = $monthlyCents * 12;
-
-        return [
-            'label' => $label,
-            'monthly_cents' => $monthlyCents,
-            'annual_card_cents' => $annualCardCents,
-            'annual_pix_cents' => (int) round($annualCardCents * 0.95),
-            'pix_discount_percent' => 5,
-            'max_installments' => 10,
-        ];
+        return CheckoutPlanCatalog::pricingFor($data);
     }
 
     private function resolveCheckoutUser(array $data): User

@@ -3,8 +3,10 @@ const widgetPreviewUrl = `${import.meta.env.BASE_URL}images/widget-preview.jpg`
 const productImageUrl = `${import.meta.env.BASE_URL}images/demo-product.jpg`
 const brandLogoUrl = `${import.meta.env.BASE_URL}images/brand/logo_provador_virtual.png`
 const whatsappUrl = 'https://wa.me/5531993157573'
-const checkoutDefault = { path: '/checkout', query: { platform: 'custom' } }
-const checkoutBigShop = { path: '/checkout', query: { platform: 'bigshop' } }
+const checkoutDefault = { path: '/checkout', query: { platform: 'custom', plan: 'annual' } }
+const checkoutDefaultMonthly = { path: '/checkout', query: { platform: 'custom', plan: 'monthly' } }
+const checkoutBigShop = { path: '/checkout', query: { platform: 'bigshop', plan: 'annual' } }
+const checkoutBigShopMonthly = { path: '/checkout', query: { platform: 'bigshop', plan: 'monthly' } }
 const currentYear = new Date().getFullYear()
 </script>
 
@@ -102,30 +104,36 @@ const currentYear = new Date().getFullYear()
 
   <section id="planos" class="landing-section">
     <div class="landing-heading">
-      <span class="eyebrow">Plano único</span>
+      <span class="eyebrow">Planos</span>
       <h2>O provador mais moderno, com IA para vender mais na loja online</h2>
-      <p>Assinatura anual com pagamento em até 10x sem juros no cartão ou Pix à vista com 5% de desconto.</p>
+      <p>Escolha mensal sem fidelidade ou anual com economia clara, sempre com o valor mensal em destaque.</p>
     </div>
 
     <div class="pricing-strip">
       <article>
-        <span>Demais plataformas</span>
-        <strong>R$ 189,90/mês</strong>
+        <span>Qualquer plataforma</span>
+        <strong>R$ 449,80/mês</strong>
         <p>Para lojas em Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou instalação personalizada.</p>
-        <small>Total anual em até 10x sem juros no cartão. Pix à vista com 5% de desconto.</small>
+        <small>Anual: R$ 5.397,60 no ano · economia de 8,2% sobre o mensal de R$ 489,80.</small>
         <RouterLink :to="checkoutDefault" class="btn btn-secondary">
           <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
-          Contratar este plano
+          Contratar anual
+        </RouterLink>
+        <RouterLink :to="checkoutDefaultMonthly" class="pricing-link">
+          Ver opção mensal
         </RouterLink>
       </article>
       <article class="highlight">
-        <span>BigShop</span>
-        <strong>R$ 129,90/mês</strong>
+        <span>Cliente BigShop</span>
+        <strong>R$ 349,90/mês</strong>
         <p>Preço especial exclusivo para lojas BigShop, com instalação guiada apenas para BigShop.</p>
-        <small>Total anual em até 10x sem juros no cartão. Pix à vista com 5% de desconto.</small>
+        <small>Anual: R$ 4.198,80 no ano · economia de 10,2% sobre o mensal de R$ 389,80.</small>
         <RouterLink :to="checkoutBigShop" class="btn btn-primary">
           <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-          Contratar BigShop
+          Contratar anual BigShop
+        </RouterLink>
+        <RouterLink :to="checkoutBigShopMonthly" class="pricing-link">
+          Ver opção mensal
         </RouterLink>
       </article>
     </div>
@@ -187,7 +195,7 @@ const currentYear = new Date().getFullYear()
     <div>
       <span class="eyebrow">Provador Virtual</span>
       <h2>Pronto para vender moda com menos dúvida de tamanho?</h2>
-      <p>Teste a experiência em uma loja fictícia realista ou contrate o plano anual para ativar sua empresa.</p>
+      <p>Teste a experiência em uma loja fictícia realista ou escolha o plano mensal ou anual para ativar sua empresa.</p>
       <div class="hero-actions">
         <RouterLink to="/produto-teste" class="btn btn-secondary">
           <i class="fa-solid fa-shirt" aria-hidden="true"></i>

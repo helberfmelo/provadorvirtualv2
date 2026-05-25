@@ -845,3 +845,14 @@
 - `docs/README.md` e `docs/sprint_governance.md` passaram a exigir que todo commit de sprint inicie com `Sprint <numero> - `.
 - `docs/roadmap_sprints.md` recebeu o roadmap das Sprints 86 a 91 para planos mensal/anual, aceite legal, cookies, recorrência, cancelamento de renovação, boleto e QA final.
 - `docs/product_backlog.md` e `docs/current_platform_state.md` foram atualizados para refletir a nova trilha comercial.
+- Commit `6c1186c` enviado para `main`; o run `26410963870` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+
+## 2026-05-25 - Sprint 87 Planos mensal/anual e nova matriz de preços
+
+- Criado `CheckoutPlanCatalog` como fonte única para planos e preços do checkout.
+- API pública `/api/v1/public/checkout/config` passou a retornar os planos `annual` e `monthly`, preço mensal por plataforma, total anual, total Pix quando aplicável, limite de parcelas e percentual de economia.
+- Valores atuais implementados: qualquer plataforma mensal `R$ 489,80`, BigShop mensal `R$ 389,80`, qualquer plataforma anual `R$ 449,80/mes` e BigShop anual `R$ 349,90/mes`.
+- Landing pública e checkout passaram a exibir mensal/anual com o valor mensal em destaque, total anual e economia percentual.
+- Checkout aceita query `plan=annual` ou `plan=monthly`, recalcula total/parcelas conforme ciclo e mantém cartão como meio inicial quando disponível.
+- Descrições enviadas às operadoras passaram a respeitar o período contratado, evitando texto fixo de 12 meses para plano mensal.
+- Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=PaymentSyncCommandTest`, `php artisan test --filter=TransactionalEmailDispatchTest` e `npm run build`.
