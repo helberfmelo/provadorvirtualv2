@@ -1455,4 +1455,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy, incluindo redirects legados para a raiz.
 
-Status: em implementação na Sprint 99.
+Status: implementado na Sprint 99 no commit `360ed12`, publicado com sucesso no run `26419953084`. Validações locais passaram com `npm run build`, `php artisan test` com 85 testes e 690 assertions e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo redirects de `/provadorvirtual_v2/`, `/provadorvirtual_v2/login` e `/provadorvirtual_v2/app/produtos/novo` para as URLs limpas da raiz.

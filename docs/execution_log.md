@@ -993,3 +993,6 @@
 - As rotas antigas de frontend em `/provadorvirtual_v2` passam a redirecionar para a URL limpa da raiz; API, widget, `public/` e `up` continuam preservados no caminho técnico.
 - O frontend também possui fallback de canonicalização para limpar `/provadorvirtual_v2` caso uma cópia de SPA antiga ainda seja servida.
 - O smoke de deploy e `scripts/validate-production.ps1` foram ampliados para validar os redirects legados para a raiz.
+- Validações locais passaram com `npm run build`, `php artisan test` com 85 testes e 690 assertions, e `git diff --check`.
+- Commit `360ed12` enviado para `main`; o run `26419953084` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público com checagem de URL efetiva.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo redirects de `/provadorvirtual_v2/`, `/provadorvirtual_v2/login` e `/provadorvirtual_v2/app/produtos/novo` para a raiz limpa.

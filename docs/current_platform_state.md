@@ -200,6 +200,8 @@ Atualizado em: 2026-05-25
 - Sprint 97 enviada ao GitHub no commit `c188d4e`; o run `26418672266` finalizou com sucesso e a validação de produção confirmou `/app/widget`.
 - Sprint 98 ajusta o checkout público para organizar Nome/CPF e E-mail/Telefone em duas linhas e ocultar `5% off` do Pix mensal.
 - Sprint 98 enviada ao GitHub no commit `1e0af18`; o run `26419066028` finalizou com sucesso e a validação de produção confirmou `/checkout`.
+- Sprint 99 adiciona retorno no cabeçalho público para usuários autenticados voltarem ao SaaS ou ao Portal da Empresa e canonicaliza rotas antigas de frontend em `/provadorvirtual_v2`.
+- Sprint 99 enviada ao GitHub no commit `360ed12`; o run `26419953084` finalizou com sucesso e a validação de produção confirmou páginas, APIs, widget e redirects legados para a raiz.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
