@@ -972,3 +972,5 @@
 - O campo `Domínios liberados` ganhou tooltip explicando que a lista protege o provador contra uso não autorizado da chave pública em outras lojas.
 - As cores da personalização passaram a ficar uma abaixo da outra, com campo hexadecimal em largura legível.
 - Validações locais passaram com `npm run build`, `php artisan test --filter=WidgetInstallApiTest`, `php artisan test` com 85 testes e 690 assertions, e `git diff --check`.
+- Commit `c188d4e` enviado para `main`; o run `26418672266` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/widget`.

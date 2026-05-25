@@ -1409,4 +1409,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente; publicação e validação de produção em andamento.
+Status: implementado na Sprint 97 no commit `c188d4e`, publicado com sucesso no run `26418672266`. Validações locais passaram com build frontend, `WidgetInstallApiTest`, suíte backend completa com 85 testes e 690 assertions e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/widget`.
