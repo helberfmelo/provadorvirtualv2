@@ -184,6 +184,7 @@ Atualizado em: 2026-05-25
 - Sprint 89 enviada ao GitHub no commit `aec5520`; o run `26412440589` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Sprint 90 adiciona boleto habilitável pelo SaaS: `/saas/checkout` controla a exibição, o checkout público mantém boleto oculto por padrão e Mercado Pago gera pagamento `bolbradesco` quando habilitado.
 - Sprint 90 enviada ao GitHub no commit `6ddf1c5`; o run `26412934331` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Sprint 91 valida o pacote comercial completo: `php artisan test` passou com 79 testes/635 assertions, `npm run build` passou e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK` em produção, com go-live `ready_with_warnings` por pendências externas já conhecidas.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -192,7 +193,7 @@ Atualizado em: 2026-05-25
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
-- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório e recorrência mensal no cartão. A trilha iniciada na Sprint 86 segue para validação final e validação futura de recorrência anual.
+- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão e cancelamento de renovação futura pelo portal. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
 - Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.
@@ -236,4 +237,4 @@ Atualizado em: 2026-05-25
 
 ## Próxima ação recomendada
 
-Executar uma transação Mercado Pago Pix/cartão de baixo valor e acompanhar webhook/cron; depois seguir com BigShop real e finalizar Pagar.me quando as pendências chegarem.
+Executar uma transação Mercado Pago Pix/cartão de baixo valor e acompanhar webhook/cron; depois validar recorrência anual com a operadora, seguir com BigShop real e finalizar Pagar.me quando as pendências chegarem.

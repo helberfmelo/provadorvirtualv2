@@ -27,6 +27,10 @@ Status Sprint 88: checkout público exige aceite dos termos e política de priva
 
 Status Sprint 89: plano mensal no cartão cria assinatura Mercado Pago e salva `billing_subscriptions`. O cancelamento pelo portal desativa somente a renovação futura na operadora e preserva pagamentos já aprovados, parcelas em andamento e o checkout pago.
 
+Status Sprint 90: boleto fica desabilitado por padrão e só aparece no checkout quando o SaaS habilita em `/saas/checkout`; pagamentos por boleto são registrados como pendentes até confirmação da operadora.
+
+Status Sprint 91: pacote comercial validado em produção com `scripts/validate-production.ps1`, incluindo termos, privacidade, checkout, LGPD de esquecimento de perfil, CORS e go-live readiness. Pendências restantes dependem de testes externos reais, não de lacuna documental conhecida.
+
 ## Segredos
 
 Nunca commitar:

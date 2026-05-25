@@ -893,3 +893,12 @@
 - Checkout Vue ganhou aba `Boleto`, resumo sem desconto Pix e tela de sucesso com link/linha digitável e aviso de liberação após compensação.
 - Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=SaasCheckoutSettingsApiTest`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.
 - Commit `6ddf1c5` enviado para `main`; o run `26412934331` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+
+## 2026-05-25 - Sprint 91 QA final do pacote comercial
+
+- Revalidada a trilha comercial criada nas Sprints 86 a 90: planos mensal/anual, preços por plataforma, aceite legal, termos, privacidade, recorrência mensal no cartão, cancelamento de renovação futura e boleto controlado pelo SaaS.
+- Suíte backend completa passou com `php artisan test`: 79 testes e 635 assertions.
+- Build frontend passou com `npm run build`.
+- Validação de produção passou com `.\scripts\validate-production.ps1` em `https://provadorvirtual.online`, cobrindo site, checkout, termos, privacidade, rotas SaaS/app, widget JS/CSS, health, ops, recomendação, sinal de aprendizado, esquecimento LGPD, CORS, login demo e go-live readiness.
+- Resultado de produção: `PRODUCTION VALIDATION OK`; go-live readiness retornou `ready_with_warnings`, mantendo apenas pendências externas conhecidas.
+- Pendências externas mantidas: transação real Mercado Pago Pix/cartão de baixo valor com webhook/cron, validação de renovação anual sem dupla cobrança ou conflito com parcelamento, credenciais oficiais BigShop/piloto real e finalização Pagar.me quando chegarem os dados operacionais.

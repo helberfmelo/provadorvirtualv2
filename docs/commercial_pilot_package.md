@@ -30,6 +30,7 @@ Publicado e validado em produção no run `26340033238`.
 - Política de privacidade: `https://provadorvirtual.online/privacidade`
 - Termos: `https://provadorvirtual.online/termos`
 - Checkout salva aceite legal versionado, com IP/data/hora/usuário/empresa e contexto do plano contratado.
+- Sprint 91 validou o pacote comercial em produção com `scripts/validate-production.ps1`, retornando `PRODUCTION VALIDATION OK` e go-live `ready_with_warnings` apenas por pendências externas.
 
 ## Onboarding do cliente
 
@@ -67,6 +68,7 @@ Validação local/operacional:
 ## Pendências para piloto real
 
 - Transação Mercado Pago Pix/cartão de baixo valor com webhook e cron.
+- Validação de recorrência anual com a operadora, sem dupla cobrança e sem conflito com parcelamento.
 - Ativação BigShop um clique com payload assinado real.
 - Probe e sync em loja BigShop piloto com produto, grade e tabela.
 - Teste de widget em página real de cliente com cache frio e mobile.

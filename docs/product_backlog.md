@@ -140,6 +140,7 @@ Atualizado em: 2026-05-25
 - `TODO` Validar renovação automática anual quando a operadora permitir sem risco de dupla cobrança ou conflito com parcelamento anual.
 - `DONE` Salvar prova técnica de aceite dos termos no checkout.
 - `DONE` Permitir boleto no checkout somente quando habilitado no painel SaaS.
+- `DONE` Validar o pacote comercial completo em local e produção, incluindo planos, aceite, termos, privacidade, recorrência mensal, cancelamento de renovação futura e boleto habilitável.
 - `DONE` Registrar variáveis Mercado Pago em `PRODUCTION_ENV` sem versionar valores reais.
 - `TODO` Executar transação real Mercado Pago de baixo valor e confirmar webhook/cron.
 - `TODO` Finalizar Pagar.me quando as informações pendentes chegarem.

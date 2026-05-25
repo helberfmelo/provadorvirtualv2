@@ -1,6 +1,6 @@
 # Roadmap e Sprints
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-25
 
 Este roadmap busca um produto enxuto, robusto e comercialmente usavel. Não e MVP mínimo; e uma primeira versao consistente.
 
@@ -1268,3 +1268,5 @@ Validação:
 - build frontend;
 - `scripts/validate-production.ps1` após deploy;
 - commit, push e Actions/deploy.
+
+Status: implementado na Sprint 91 com validação local completa (`php artisan test` com 79 testes e 635 assertions, `npm run build`) e validação de produção em `https://provadorvirtual.online` por `scripts/validate-production.ps1`, cobrindo páginas públicas, `/checkout`, `/termos`, `/privacidade`, rotas SaaS/app, widget, health, ops, recomendação, esquecimento LGPD, CORS, login demo e go-live readiness. O script retornou `PRODUCTION VALIDATION OK` e go-live `ready_with_warnings`; as pendências restantes são externas/operacionais: transação real Mercado Pago de baixo valor com webhook/cron, validação de renovação anual sem dupla cobrança, credenciais oficiais BigShop e finalização Pagar.me quando as informações chegarem.

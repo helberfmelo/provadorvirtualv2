@@ -297,8 +297,14 @@ Rodar após deploy:
 .\scripts\validate-production.ps1
 ```
 
-O script usa a URL pública, valida páginas, APIs, recomendação, CORS e o endpoint
-protegido de go-live com o usuário demo.
+O script usa a URL pública, valida páginas públicas, checkout, termos, privacidade,
+rotas SaaS/app, widget, APIs, recomendação, CORS e o endpoint protegido de go-live
+com o usuário demo.
+
+Status Sprint 91: validação executada em produção com `PRODUCTION VALIDATION OK` e
+go-live readiness `ready_with_warnings`; os warnings restantes são operacionais
+externos, como transação real Mercado Pago, cron/webhook, BigShop real e validação
+de recorrência anual.
 
 ## Rollback
 
