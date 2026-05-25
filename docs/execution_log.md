@@ -804,3 +804,5 @@
 - `backend/.env`, `docs/credentials.local.md` e o secret GitHub Actions `PRODUCTION_ENV` foram atualizados com Mercado Pago sem exibir valores sensíveis.
 - Validações focadas passaram: `PublicCheckoutFlowTest`, `SaasCheckoutSettingsApiTest`, `PaymentSyncCommandTest` e `GoLiveReadinessApiTest`.
 - Validação local completa passou com `php artisan test`, `npm run build`, `vendor/bin/pint --dirty`, `git diff --check` e Playwright mobile mockado do checkout Mercado Pago sem overflow horizontal.
+- Commit `e9ab2f9` enviado para `main`; o run `26384825165` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Smoke pós-deploy confirmou que `/api/v1/public/checkout/config` em produção responde com operadora `mercado_pago`, métodos `pix,credit_card`, cartão habilitado e chave pública presente sem expor valores sensíveis.

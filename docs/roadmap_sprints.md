@@ -1103,4 +1103,4 @@ Entregas:
 - documentar variáveis `MERCADO_PAGO_*` e registrar que os valores reais herdados do NoAzul ficam apenas em `docs/credentials.local.md`, `.env` remoto/local ou secret seguro;
 - cobrir checkout Mercado Pago, webhook, seleção SaaS e sync de pagamentos em testes.
 
-Status: em implementação nesta sprint; publicar somente após testes locais, commit, push e GitHub Actions/deploy acompanhados até sucesso.
+Status: implementado no commit `e9ab2f9` e publicado com sucesso no run `26384825165`, com testes locais completos, build frontend, deploy remoto/raiz, smoke público e smoke pós-deploy do endpoint `/api/v1/public/checkout/config` retornando Mercado Pago como operadora ativa.
