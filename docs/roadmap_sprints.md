@@ -1387,4 +1387,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente; publicação e validação de produção em andamento.
+Status: implementado na Sprint 96 no commit `f44d281`, publicado com sucesso no run `26416798463`. Validações locais passaram com 85 testes backend e 690 assertions, build frontend, Pint e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, agora cobrindo também `/app/widget`.

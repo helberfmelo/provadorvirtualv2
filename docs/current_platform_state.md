@@ -195,6 +195,7 @@ Atualizado em: 2026-05-25
 - Sprint 95 simplifica o checkout para coletar somente CNPJ da empresa, registra tentativas recusadas pela operadora com motivo, adiciona `/saas/pedidos` com detalhe completo e move dados cadastrais da empresa para o primeiro acesso ao portal.
 - Sprint 95 enviada ao GitHub no commit `1c029ae`; o run `26415840565` finalizou com sucesso e a validação de produção confirmou `/saas/checkout`, `/saas/pedidos` e o pacote público/API principal.
 - Sprint 96 reorganiza `/app/widget` em blocos de instalação, domínios e personalização, e faz preview, snippet, guia e matriz de dados mudarem conforme a plataforma selecionada.
+- Sprint 96 enviada ao GitHub no commit `f44d281`; o run `26416798463` finalizou com sucesso e a validação de produção confirmou `/app/widget` junto do pacote público/API principal.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
