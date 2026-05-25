@@ -879,3 +879,5 @@
 - Portal da empresa ganhou seção discreta `Preferências do plano` no dashboard, com checkbox `Renovação automática`; ao desmarcar, o backend chama `PUT /preapproval/{id}` com `status=canceled`.
 - Cancelar a renovação futura marca `auto_renewal_enabled=false`, `cancel_requested_at` e mantém `checkout_sessions.status=paid`, sem estornar pagamentos aprovados nem parcelas em andamento.
 - Renovação anual automática ficou documentada como pendência operacional: o anual continua como pagamento normal no cartão/Pix até validação segura sem dupla cobrança ou conflito com parcelamento anual.
+- Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=BillingSubscriptionApiTest`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.
+- Commit `aec5520` enviado para `main`; o run `26412440589` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
