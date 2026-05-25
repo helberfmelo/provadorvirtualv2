@@ -1044,4 +1044,18 @@ Entregas:
 - trocar as silhuetas do drawer para carregamento imediato e validar imagens reais no mobile;
 - revisar header, menu drawer, vitrine, página de produto, widget e footer em viewport mobile.
 
+Status: implementado no commit `003c996` e publicado com sucesso no run `26381419082`, com deploy remoto, smoke público, verificação de assets do widget e Playwright mobile em produção.
+
+### Sprint 79 - Copy comercial e benefícios mobile
+
+Objetivo: ajustar a mensagem comercial do plano único e refinar a leitura mobile dos cards de benefícios da landing.
+
+Entregas:
+
+- remover menção a BigShop do headline principal da seção de planos;
+- reposicionar a mensagem para o valor do produto: provador moderno com IA para vender mais na loja online;
+- corrigir a responsividade específica de `.landing-benefits.metric-grid`, que mantinha 3 colunas no mobile por especificidade;
+- transformar os cards de benefícios em linhas compactas com ícone destacado, título e texto legíveis no celular;
+- validar build do frontend, checagem de diff e Playwright mobile da landing.
+
 Status: implementado localmente nesta sprint; commit, push, GitHub Actions/deploy e smokes de produção devem ser registrados no fechamento operacional.

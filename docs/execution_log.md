@@ -750,3 +750,13 @@
 - A página `/produto-teste/:slug` mostra alerta de produto fictício, bloqueia a seleção manual como decisão de compra e marca o tamanho somente quando o widget aplica a recomendação.
 - Silhuetas do widget passaram para `loading="eager"` dentro do drawer, mantendo assets PNG reais do v1 e evitando atraso de carregamento em mobile.
 - Playwright local mobile validou menu, vitrine, produto, ausência de overflow horizontal, quatro etapas em uma linha, imagens de silhueta com `naturalWidth=116` e handoff `Usar tamanho M` fechando o widget e marcando `M` na página.
+- Commit `003c996` enviado para `main`; o run `26381419082` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou que o JS público contém `provadorvirtual:size-selected`, `suppressDrawerOpenUntil`, `loading="eager"` e `Usar tamanho`; Playwright mobile em produção validou menu, demo, silhuetas e aplicação do tamanho recomendado.
+
+## 2026-05-25 - Sprint 79 Copy comercial e benefícios mobile
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` e da governança de commit/push/Actions confirmada antes de encerrar a sprint.
+- Headline da seção de planos alterado de `Preço direto, com desconto para clientes BigShop` para uma mensagem focada no melhor e mais moderno provador com IA para aumentar vendas na loja online.
+- A regra mobile específica de `.landing-benefits.metric-grid` passou a sobrescrever a grade desktop, evitando cards estreitos em 3 colunas no celular.
+- Cards da seção `O que o lojista e o comprador sentem na prática` passaram a usar layout mobile em linha, com ícone em destaque, título e descrição legíveis.
+- Playwright local mobile validou headline sem `BigShop`, uma coluna de cards, ausência de overflow horizontal e seis cards renderizados corretamente.

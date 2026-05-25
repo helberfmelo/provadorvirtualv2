@@ -103,7 +103,7 @@ const currentYear = new Date().getFullYear()
   <section id="planos" class="landing-section">
     <div class="landing-heading">
       <span class="eyebrow">Plano único</span>
-      <h2>Preço direto, com desconto para clientes BigShop</h2>
+      <h2>O provador mais moderno, com IA para vender mais na loja online</h2>
       <p>Assinatura anual com pagamento em até 12x no cartão ou Pix à vista com 5% de desconto.</p>
     </div>
 

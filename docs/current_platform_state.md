@@ -168,7 +168,8 @@ Atualizado em: 2026-05-24
 - Sprint 75 enviada ao GitHub no commit `2a92a0b`; o run `26377480787` finalizou com sucesso, refinando o widget mobile, aumentando logo/menu e corrigindo as silhuetas para renderizar como imagens PNG reais.
 - Sprint 76 enviada ao GitHub no commit `6c835c8`; o run `26378458765` finalizou com sucesso, removendo a escala redundante de nota de 1 a 5 do feedback final do widget.
 - Sprint 77 enviada ao GitHub no commit `2a5c055`; o run `26378864592` finalizou com sucesso, posicionando o aviso de salvamento local somente na primeira etapa do widget, no fim do corpo rolável, em itálico e com fonte menor.
-- Sprint 78 ajustou a loja teste mobile e o handoff do widget: tocar no tamanho recomendado fecha o drawer, emite `provadorvirtual:size-selected` e a página `/produto-teste/:slug` marca o tamanho recomendado.
+- Sprint 78 enviada ao GitHub no commit `003c996`; o run `26381419082` finalizou com sucesso, ajustando a loja teste mobile e o handoff do widget: tocar no tamanho recomendado fecha o drawer, emite `provadorvirtual:size-selected` e a página `/produto-teste/:slug` marca o tamanho recomendado.
+- Sprint 79 ajusta a landing pública para reforçar o valor do provador com IA para vender mais na loja online e melhora os cards de benefícios no mobile.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -187,6 +188,7 @@ Atualizado em: 2026-05-24
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
 - Diretriz obrigatória de telas: `docs/portal_ui_guidelines.md`.
 - Checkout público: `/checkout` e `/checkout/sucesso`.
+- Site público raiz: landing comercial do Provador Virtual, com plano único, CTA para loja teste/checkout e cards de benefícios otimizados para mobile.
 - APIs protegidas: produtos, variações, tabelas, templates, widget-install e integrações, com middleware de permissão por módulo e escopo da empresa ativa.
 - Importacoes protegidas: preview, commit e histórico em `/api/v1/imports`.
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`.

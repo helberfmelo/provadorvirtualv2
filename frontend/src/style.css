@@ -3026,6 +3026,15 @@ td small {
     width: 100%;
   }
 
+  .landing-benefits.metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .landing-benefits .metric-card {
+    min-height: 0;
+  }
+
   .footer-grid {
     gap: 20px;
     padding-top: 34px;
@@ -3132,5 +3141,44 @@ td small {
   .landing-cta p {
     font-size: 1rem;
     line-height: 1.6;
+  }
+
+  .landing-benefits.metric-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .landing-benefits .metric-card {
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 3px 12px;
+    align-items: start;
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .landing-benefits .metric-card i {
+    display: inline-grid;
+    grid-row: 1 / span 2;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border-radius: 8px;
+    color: #fff;
+    background: linear-gradient(135deg, #ff4d5e, #ff7a1a);
+    font-size: 1rem;
+  }
+
+  .landing-benefits .metric-card strong,
+  .landing-benefits .metric-card span {
+    grid-column: 2;
+  }
+
+  .landing-benefits .metric-card strong {
+    line-height: 1.22;
+  }
+
+  .landing-benefits .metric-card span {
+    font-size: 0.94rem;
+    line-height: 1.42;
   }
 }
