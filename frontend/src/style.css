@@ -1428,6 +1428,12 @@ a {
   gap: 10px;
 }
 
+.checkout-result-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
 .copy-feedback {
   width: fit-content;
   padding: 7px 10px;

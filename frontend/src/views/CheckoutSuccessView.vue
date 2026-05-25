@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { api } from '../services/api'
 
@@ -9,6 +9,9 @@ const error = ref('')
 const session = ref<any>(null)
 const payment = ref<any>(null)
 const copied = ref('')
+const orderLabel = computed(() => session.value?.company?.access_code || session.value?.reference || '-')
+const paymentStatusLabel = computed(() => translatePaymentStatus(payment.value?.status || session.value?.status || session.value?.company?.status))
+const paymentMethodLabel = computed(() => translatePaymentMethod(session.value?.payment_method || payment.value?.method))
 
 onMounted(async () => {
   const reference = String(route.query.ref || '')
@@ -55,6 +58,40 @@ async function copyPaymentCode(value: string | undefined | null, type: string) {
     }
   }, 2200)
 }
+
+function translatePaymentStatus(status: string | undefined | null) {
+  const normalized = String(status || '').toLowerCase()
+
+  const labels: Record<string, string> = {
+    checkout_created: 'Pagamento iniciado',
+    pending: 'Aguardando pagamento',
+    pending_payment: 'Aguardando pagamento',
+    approved: 'Pago',
+    paid: 'Pago',
+    active: 'Pago',
+    rejected: 'Não aprovado',
+    failed: 'Não aprovado',
+    cancelled: 'Cancelado',
+    canceled: 'Cancelado',
+    expired: 'Expirado',
+  }
+
+  return labels[normalized] || 'Aguardando pagamento'
+}
+
+function translatePaymentMethod(method: string | undefined | null) {
+  const normalized = String(method || '').toLowerCase()
+
+  const labels: Record<string, string> = {
+    pix: 'Pix',
+    boleto: 'Boleto',
+    bolbradesco: 'Boleto',
+    credit_card: 'Cartão de crédito',
+    card: 'Cartão de crédito',
+  }
+
+  return labels[normalized] || 'Pagamento'
+}
 </script>
 
 <template>
@@ -67,20 +104,16 @@ async function copyPaymentCode(value: string | undefined | null, type: string) {
       <template v-else-if="session">
         <div class="summary-strip">
           <span>
-            <strong>{{ session.company?.access_code }}</strong>
-            <small>Código da empresa</small>
+            <strong>{{ orderLabel }}</strong>
+            <small>Pedido</small>
           </span>
           <span>
-            <strong>{{ session.company?.status }}</strong>
-            <small>Status da empresa</small>
+            <strong>{{ paymentStatusLabel }}</strong>
+            <small>Status do pagamento</small>
           </span>
           <span>
-            <strong>{{ session.provider_label || session.provider }}</strong>
-            <small>Operadora</small>
-          </span>
-          <span>
-            <strong>{{ session.payment_method }}</strong>
-            <small>Meio</small>
+            <strong>{{ paymentMethodLabel }}</strong>
+            <small>Forma de pagamento</small>
           </span>
         </div>
 
@@ -143,7 +176,7 @@ async function copyPaymentCode(value: string | undefined | null, type: string) {
           </RouterLink>
         </div>
 
-        <div class="action-row">
+        <div class="action-row checkout-result-actions">
           <RouterLink to="/login" class="btn btn-primary">
             <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>
             Acessar painel

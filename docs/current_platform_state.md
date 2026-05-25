@@ -206,6 +206,7 @@ Atualizado em: 2026-05-25
 - Sprint 100 enviada ao GitHub no commit `c0415bd`; o run `26421412473` finalizou com sucesso e a validação de produção confirmou `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados para URLs limpas.
 - Sprint 101 corrige a causa real da falha Pix Mercado Pago: `date_of_expiration` passa a usar milissegundos e timezone `America/Sao_Paulo`, preservando a mensagem técnica e o UUID de rastreio apenas no SaaS.
 - Sprint 101 enviada ao GitHub no commit `17fe291`; o run `26422281931` finalizou com sucesso e a validação de produção confirmou `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados.
+- Sprint 102 ajusta `/checkout/sucesso`: o resumo público usa `Pedido`, `Status do pagamento` e `Forma de pagamento`, remove a operadora, traduz status técnicos e separa os botões finais.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -228,7 +229,7 @@ Atualizado em: 2026-05-25
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
 - Diretriz obrigatória de telas: `docs/portal_ui_guidelines.md`.
-- Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão, links para termos/privacidade, modal amigável de falha por meio de pagamento e conclusão específica para Pix, boleto e cartão.
+- Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão, links para termos/privacidade, modal amigável de falha por meio de pagamento e conclusão específica para Pix, boleto e cartão. A conclusão pública mostra pedido, status do pagamento em português e forma de pagamento, sem expor a operadora.
 - Site público raiz: landing comercial do Provador Virtual, com planos mensal/anual por plataforma, CTA para loja teste/checkout e cards de benefícios otimizados para mobile. A cópia pública usa `provador` em vez de `widget` para evitar jargão técnico. Quando há sessão autenticada, o cabeçalho mostra retorno para `Voltar ao SaaS` ou `Voltar ao portal`, conforme o papel carregado por `/me`.
 - APIs protegidas: produtos, variações, tabelas, templates, widget-install e integrações, com middleware de permissão por módulo e escopo da empresa ativa.
 - Importacoes protegidas: preview, commit e histórico em `/api/v1/imports`.

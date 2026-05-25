@@ -1023,3 +1023,12 @@
 - Validações locais passaram com `npm run build`, `php artisan test --filter=PublicCheckoutFlowTest` com 17 testes e 94 assertions, `php artisan test` com 87 testes e 704 assertions e `vendor/bin/pint --dirty`.
 - Commit `17fe291` enviado para `main`; o run `26422281931` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/checkout`, `/saas/pedidos`, rotas públicas, SaaS, portal, widget, APIs e redirects legados.
+
+## 2026-05-25 - Sprint 102 Ajusta resumo da conclusão de pagamento
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- A tela `/checkout/sucesso` passa a mostrar `Pedido` no lugar de `Código da empresa`.
+- O resumo remove a operadora e usa `Status do pagamento` e `Forma de pagamento`.
+- Status e formas de pagamento passam a ser exibidos em português, como `Aguardando pagamento`, `Pago`, `Não aprovado`, `Pix`, `Boleto` e `Cartão de crédito`.
+- Os botões `Acessar painel` e `Voltar ao site` ganharam espaçamento real no bloco final.
+- Validações locais passaram com `npm run build` e `git diff --check`.

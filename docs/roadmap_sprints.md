@@ -1510,3 +1510,26 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 101 no commit `17fe291`, publicado com sucesso no run `26422281931`. Validações locais passaram com `PublicCheckoutFlowTest` com 17 testes e 94 assertions, `npm run build`, `php artisan test` com 87 testes e 704 assertions, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados.
+
+### Sprint 102 - Ajusta resumo da conclusão de pagamento
+
+Objetivo: deixar a tela `/checkout/sucesso` mais clara para o cliente depois que o Pix ou outro pagamento é iniciado.
+
+Entregas:
+
+- trocar o rótulo `Código da empresa` por `Pedido`;
+- trocar `Status da empresa` por `Status do pagamento`;
+- traduzir status técnicos como `pending`, `pending_payment`, `approved`, `rejected` e `checkout_created`;
+- remover a operadora do resumo público da conclusão;
+- trocar `Meio` por `Forma de pagamento`;
+- traduzir formas de pagamento para `Pix`, `Boleto` e `Cartão de crédito`;
+- separar visualmente os botões `Acessar painel` e `Voltar ao site`.
+
+Validação:
+
+- `npm run build`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: em implementação na Sprint 102. Validação local passou com `npm run build` e `git diff --check`.
