@@ -1363,4 +1363,4 @@ Validação:
 - `git diff --check`;
 - commit, push e Actions/deploy.
 
-Status: implementado localmente na Sprint 95. Validações locais passaram com 85 testes backend e 678 assertions, além do build frontend. Publicação e validação de produção serão registradas após o push e conclusão do workflow.
+Status: implementado na Sprint 95 no commit `1c029ae`, publicado com sucesso no run `26415840565`. Validações locais passaram com 85 testes backend e 678 assertions, além do build frontend. Validação de produção passou com `scripts/validate-production.ps1`, agora cobrindo também `/saas/checkout` e `/saas/pedidos`.

@@ -193,6 +193,7 @@ Atualizado em: 2026-05-25
 - Sprint 94 limpa a redundância do topo da loja teste: a marca fica apenas no header, o H1 passa a orientar o teste da recomendação e o CTA `Teste o provador` some quando a própria experiência já está aberta.
 - Sprint 94 enviada ao GitHub no commit `c0985fd`; o run `26414805731` finalizou com sucesso e a validação de produção confirmou a nova cópia no topo da loja teste.
 - Sprint 95 simplifica o checkout para coletar somente CNPJ da empresa, registra tentativas recusadas pela operadora com motivo, adiciona `/saas/pedidos` com detalhe completo e move dados cadastrais da empresa para o primeiro acesso ao portal.
+- Sprint 95 enviada ao GitHub no commit `1c029ae`; o run `26415840565` finalizou com sucesso e a validação de produção confirmou `/saas/checkout`, `/saas/pedidos` e o pacote público/API principal.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

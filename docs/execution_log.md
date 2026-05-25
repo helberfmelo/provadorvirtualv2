@@ -949,3 +949,5 @@
 - Pagar.me foi ajustada para usar o nome interno da sessão quando o checkout não envia razão social e para omitir endereço quando ele ainda não foi preenchido.
 - Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=SaasCheckoutOrdersApiTest`, `php artisan test --filter=MerchantCompanyProfileApiTest`, `npm run build`, `vendor/bin/pint --dirty` e `php artisan test`.
 - A suíte backend completa passou com 85 testes e 678 assertions; o build frontend passou com `vue-tsc --noEmit && vite build`.
+- Commit `1c029ae` enviado para `main`; o run `26415840565` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`. O script foi ampliado para cobrir também `/saas/checkout` e `/saas/pedidos`, e a repetição limpa após a janela de throttle confirmou essas rotas novas.
