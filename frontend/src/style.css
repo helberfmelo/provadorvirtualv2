@@ -1183,6 +1183,10 @@ a {
 }
 
 .payment-tabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   min-height: 40px;
   padding: 8px 12px;
   border: 1px solid #d1d5db;
@@ -1193,10 +1197,29 @@ a {
   font-weight: 800;
 }
 
+.payment-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 18px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #047857;
+  background: #d1fae5;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  white-space: nowrap;
+}
+
 .payment-tabs button.active {
   color: #fff;
   border-color: #0f172a;
   background: #0f172a;
+}
+
+.payment-tabs button.active .payment-tab-badge {
+  color: #0f172a;
+  background: #fff;
 }
 
 .payment-tabs button:disabled {
@@ -1218,6 +1241,30 @@ a {
 .checkout-summary strong {
   color: #0f172a;
   font-size: 1.35rem;
+}
+
+.checkout-summary span {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkout-summary small {
+  padding: 2px 6px;
+  border-radius: 999px;
+  color: #047857;
+  background: #d1fae5;
+  font-size: 0.68rem;
+  font-weight: 900;
+}
+
+.card-installment-summary strong {
+  font-size: clamp(1.55rem, 3vw, 2.1rem);
+}
+
+.card-installment-summary.single strong {
+  font-size: 1.55rem;
 }
 
 .checkout-summary.muted {
@@ -1265,6 +1312,10 @@ a {
 
 .mercado-card-fields .wide {
   grid-column: 1 / -1;
+}
+
+.mercado-card-fields .mp-hidden-control {
+  display: none;
 }
 
 .mp-secure-field {

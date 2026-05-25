@@ -1104,3 +1104,19 @@ Entregas:
 - cobrir checkout Mercado Pago, webhook, seleção SaaS e sync de pagamentos em testes.
 
 Status: implementado no commit `e9ab2f9` e publicado com sucesso no run `26384825165`, com testes locais completos, build frontend, deploy remoto/raiz, smoke público e smoke pós-deploy do endpoint `/api/v1/public/checkout/config` retornando Mercado Pago como operadora ativa.
+
+### Sprint 83 - Checkout cartão primeiro e parcelas
+
+Objetivo: deixar o checkout público mais natural para contratação imediata por cartão, preservando Pix como alternativa com desconto.
+
+Entregas:
+
+- abrir o checkout com cartão selecionado quando disponível;
+- mostrar Pix como segunda aba com tag pequena `5% off`;
+- limitar o parcelamento a até 10x sem juros;
+- mostrar no select o valor de cada parcela para cada quantidade escolhida;
+- exigir escolha explícita das parcelas antes de exibir o total do cartão;
+- destacar o valor da parcela e deixar o total anual menos proeminente, exceto em 1x;
+- ocultar selects técnicos do Mercado Pago que o comprador não precisa escolher.
+
+Status: em implementação nesta sprint; publicar somente após testes locais, commit, push e GitHub Actions/deploy acompanhados até sucesso.

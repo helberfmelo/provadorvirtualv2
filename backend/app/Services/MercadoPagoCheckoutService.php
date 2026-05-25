@@ -262,7 +262,7 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
                 'token' => $token,
                 'payment_method_id' => $paymentMethodId,
                 'issuer_id' => trim((string) ($buyerData['issuer_id'] ?? '')) ?: null,
-                'installments' => max(1, min(12, (int) ($buyerData['installments'] ?? 1))),
+                'installments' => max(1, min(10, (int) ($buyerData['installments'] ?? 1))),
             ]);
         }
 

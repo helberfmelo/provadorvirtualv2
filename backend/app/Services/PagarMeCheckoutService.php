@@ -256,7 +256,7 @@ class PagarMeCheckoutService implements CheckoutPaymentProvider
                 'payment_method' => 'credit_card',
                 'credit_card' => [
                     'operation_type' => 'auth_and_capture',
-                    'installments' => max(1, (int) ($buyerData['installments'] ?? 1)),
+                    'installments' => max(1, min(10, (int) ($buyerData['installments'] ?? 1))),
                     'statement_descriptor' => 'PROVADORVIRT',
                     'card_token' => trim((string) ($buyerData['card_token'] ?? '')),
                 ],

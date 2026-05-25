@@ -806,3 +806,12 @@
 - Validação local completa passou com `php artisan test`, `npm run build`, `vendor/bin/pint --dirty`, `git diff --check` e Playwright mobile mockado do checkout Mercado Pago sem overflow horizontal.
 - Commit `e9ab2f9` enviado para `main`; o run `26384825165` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Smoke pós-deploy confirmou que `/api/v1/public/checkout/config` em produção responde com operadora `mercado_pago`, métodos `pix,credit_card`, cartão habilitado e chave pública presente sem expor valores sensíveis.
+
+## 2026-05-25 - Sprint 83 Checkout cartão primeiro e parcelas
+
+- Checkout público passou a abrir com `Cartão` como opção inicial quando a operadora ativa suporta cartão.
+- Aba `Pix` passou a exibir tag discreta `5% off`.
+- Parcelamento foi limitado a até 10x sem juros no frontend e backend, para Mercado Pago e Pagar.me.
+- Select de parcelas mostra `Nx de R$ ... sem juros`; selects técnicos do Mercado Pago que o cliente não precisa escolher foram ocultados.
+- Resumo do cartão não exibe total anual antes da escolha de parcelas; após a escolha, destaca o valor da parcela e deixa o total anual em segundo plano. Em 1x, o valor principal já é o total.
+- Validações locais: `npm run build`, `vendor/bin/pint --dirty`, `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=SaasCheckoutSettingsApiTest`, `php artisan test`, `git diff --check` e auditoria mobile Playwright mockada em 390px sem overflow horizontal.

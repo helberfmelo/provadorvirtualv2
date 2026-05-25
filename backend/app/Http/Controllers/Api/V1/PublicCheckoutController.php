@@ -234,7 +234,7 @@ class PublicCheckoutController extends Controller
             'issuer_id' => ['nullable', 'string', 'max:80'],
             'card_brand' => ['nullable', 'string', 'max:80'],
             'card_last_four_digits' => ['nullable', 'string', 'max:4'],
-            'installments' => ['nullable', 'integer', 'min:1', 'max:12'],
+            'installments' => ['nullable', 'integer', 'min:1', 'max:10'],
         ]);
     }
 
@@ -285,7 +285,7 @@ class PublicCheckoutController extends Controller
             'annual_card_cents' => $annualCardCents,
             'annual_pix_cents' => (int) round($annualCardCents * 0.95),
             'pix_discount_percent' => 5,
-            'max_installments' => 12,
+            'max_installments' => 10,
         ];
     }
 

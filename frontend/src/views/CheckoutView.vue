@@ -32,6 +32,8 @@ const plans = ref<Plan[]>([])
 const pricing = ref<Record<string, PricingVariant>>({})
 const mercadoPagoCardForm = ref<any>(null)
 const mercadoPagoCardFormKey = ref('')
+const installmentsTouched = ref(false)
+let mercadoPagoInstallmentObserver: MutationObserver | null = null
 const platformOptions = [
   { value: 'bigshop', label: 'BigShop' },
   { value: 'shopify', label: 'Shopify' },
@@ -48,7 +50,7 @@ const allowedPlatforms = platformOptions.map((platform) => platform.value)
 
 const form = reactive({
   plan_code: 'annual',
-  payment_method: 'pix',
+  payment_method: 'credit_card',
   platform: 'bigshop',
   company_name: '',
   company_legal_name: '',
@@ -67,7 +69,7 @@ const form = reactive({
   admin_phone: '',
   password: '',
   password_confirmation: '',
-  installments: '12',
+  installments: '',
 })
 
 const card = reactive({
@@ -93,7 +95,14 @@ const payableCents = computed(() => {
 })
 const monthlyCents = computed(() => activePricing.value?.monthly_cents || 0)
 const annualCardCents = computed(() => activePricing.value?.annual_card_cents || 0)
-const cardInstallmentCents = computed(() => Math.ceil((activePricing.value?.annual_card_cents || 0) / Number(form.installments || 12)))
+const maxInstallments = computed(() => Math.max(1, Math.min(10, Number(activePricing.value?.max_installments || 10))))
+const installmentOptions = computed(() => Array.from({ length: maxInstallments.value }, (_, index) => index + 1))
+const selectedInstallments = computed(() => {
+  const value = Number(form.installments)
+  return Number.isFinite(value) && value >= 1 && value <= maxInstallments.value ? value : 0
+})
+const hasSelectedInstallments = computed(() => form.payment_method === 'credit_card' && selectedInstallments.value > 0)
+const selectedInstallmentCents = computed(() => selectedInstallments.value > 0 ? installmentCents(selectedInstallments.value) : 0)
 const pixDiscountCents = computed(() => {
   const values = activePricing.value
   return values ? values.annual_card_cents - values.annual_pix_cents : 0
@@ -111,6 +120,9 @@ async function loadConfig() {
     plans.value = data.plans
     pricing.value = data.pricing || {}
     form.plan_code = data.plans?.[0]?.code || 'annual'
+    form.payment_method = data.checkout?.credit_card_enabled ? 'credit_card' : 'pix'
+    form.installments = ''
+    installmentsTouched.value = false
     const queryPlatform = String(route.query.platform || '')
     if (allowedPlatforms.includes(queryPlatform)) {
       form.platform = queryPlatform
@@ -119,6 +131,10 @@ async function loadConfig() {
     error.value = requestError.response?.data?.message || 'Não foi possível iniciar o checkout.'
   } finally {
     loading.value = false
+  }
+
+  if (form.payment_method === 'credit_card' && isMercadoPago.value) {
+    await prepareMercadoPagoCardForm()
   }
 }
 
@@ -158,6 +174,10 @@ async function submitCheckout() {
     let cardTokenPayload: Record<string, string | null> = {}
 
     if (form.payment_method === 'credit_card') {
+      if (!hasSelectedInstallments.value) {
+        throw new Error('Escolha o número de parcelas para continuar.')
+      }
+
       if (isMercadoPago.value) {
         const cardData = await mercadoPagoCardData()
         cardTokenPayload = {
@@ -165,7 +185,7 @@ async function submitCheckout() {
           payment_method_id: cardData.paymentMethodId,
           issuer_id: cardData.issuerId || null,
         }
-        form.installments = String(cardData.installments || form.installments || '1')
+        form.installments = String(selectedInstallments.value || cardData.installments || '1')
       } else {
         const token = await tokenizePagarMeCard(checkoutConfig.value, card)
         cardTokenPayload = {
@@ -178,7 +198,7 @@ async function submitCheckout() {
 
     const payload = {
       ...form,
-      installments: Number(form.installments || 12),
+      installments: form.payment_method === 'credit_card' ? selectedInstallments.value : null,
       ...cardTokenPayload,
     }
 
@@ -197,6 +217,8 @@ async function selectPaymentMethod(method: 'pix' | 'credit_card') {
   }
 
   form.payment_method = method
+  form.installments = ''
+  installmentsTouched.value = false
 
   if (method === 'credit_card' && isMercadoPago.value) {
     await prepareMercadoPagoCardForm()
@@ -218,6 +240,7 @@ async function prepareMercadoPagoCardForm() {
 
   mercadoPagoCardForm.value = await createMercadoPagoCardForm(checkoutConfig.value, annualCardCents.value)
   mercadoPagoCardFormKey.value = key
+  setupMercadoPagoInstallments()
 }
 
 async function mercadoPagoCardData(): Promise<MercadoPagoCardFormData> {
@@ -245,8 +268,87 @@ function syncMercadoPagoDocumentFields() {
   }
 }
 
+function setupMercadoPagoInstallments() {
+  const select = document.getElementById('mp-installments') as HTMLSelectElement | null
+  if (!select) {
+    return
+  }
+
+  select.removeEventListener('change', handleInstallmentSelection)
+  select.addEventListener('change', handleInstallmentSelection)
+  mercadoPagoInstallmentObserver?.disconnect()
+  mercadoPagoInstallmentObserver = new MutationObserver(() => normalizeMercadoPagoInstallmentOptions())
+  mercadoPagoInstallmentObserver.observe(select, { childList: true, subtree: true })
+  normalizeMercadoPagoInstallmentOptions()
+}
+
+function normalizeMercadoPagoInstallmentOptions() {
+  const select = document.getElementById('mp-installments') as HTMLSelectElement | null
+  if (!select) {
+    return
+  }
+
+  if (select.options.length === 0) {
+    form.installments = ''
+    return
+  }
+
+  Array.from(select.options).forEach((option) => {
+    const installments = Number(option.value)
+    if (option.value && installments > maxInstallments.value) {
+      option.remove()
+      return
+    }
+
+    if (option.value && installments >= 1) {
+      const label = installmentLabel(installments)
+      if (option.textContent !== label) {
+        option.textContent = label
+      }
+    }
+  })
+
+  if (!Array.from(select.options).some((option) => option.value === '')) {
+    select.insertBefore(new Option('Escolha as parcelas', '', true, !installmentsTouched.value), select.firstChild)
+  }
+
+  const placeholder = Array.from(select.options).find((option) => option.value === '')
+  if (placeholder && placeholder.textContent !== 'Escolha as parcelas') {
+    placeholder.textContent = 'Escolha as parcelas'
+  }
+
+  if (!installmentsTouched.value) {
+    select.value = ''
+    form.installments = ''
+  }
+}
+
+function handleInstallmentSelection(event: Event) {
+  const select = event.target as HTMLSelectElement
+  const installments = Number(select.value)
+
+  if (!Number.isFinite(installments) || installments < 1) {
+    form.installments = ''
+    installmentsTouched.value = false
+    return
+  }
+
+  const normalized = Math.min(installments, maxInstallments.value)
+  form.installments = String(normalized)
+  installmentsTouched.value = true
+}
+
 function updateAdminCpf(event: Event) {
   form.admin_cpf = (event.target as HTMLInputElement).value
+}
+
+function installmentCents(installments: number) {
+  return Math.ceil(annualCardCents.value / Math.max(1, installments))
+}
+
+function installmentLabel(installments: number) {
+  const suffix = installments > 1 ? ' sem juros' : ''
+  return `${installments}x de ${price(installmentCents(installments))}${suffix}`
 }
 
 function price(cents: number) {
@@ -280,7 +382,7 @@ function price(cents: number) {
             <span>{{ activePricing?.label }}</span>
           </div>
           <p>{{ selectedPlan?.description }}</p>
-          <small>Cartão em até 12x ou Pix à vista com {{ activePricing?.pix_discount_percent || 5 }}% de desconto.</small>
+          <small>Cartão em até {{ maxInstallments }}x sem juros ou Pix à vista com {{ activePricing?.pix_discount_percent || 5 }}% de desconto.</small>
         </div>
 
         <div class="form-grid">
@@ -387,9 +489,6 @@ function price(cents: number) {
         </div>
 
         <div class="payment-tabs">
-          <button type="button" :class="{ active: form.payment_method === 'pix' }" @click="selectPaymentMethod('pix')">
-            Pix
-          </button>
           <button
             type="button"
             :disabled="!canUseCreditCard"
@@ -397,6 +496,10 @@ function price(cents: number) {
             @click="selectPaymentMethod('credit_card')"
           >
             Cartão
+          </button>
+          <button type="button" :class="{ active: form.payment_method === 'pix' }" @click="selectPaymentMethod('pix')">
+            Pix
+            <span class="payment-tab-badge">5% off</span>
           </button>
         </div>
 
@@ -423,9 +526,10 @@ function price(cents: number) {
           </label>
           <label>
             Parcelas
-            <select v-model="form.installments">
-              <option v-for="item in 12" :key="item" :value="String(item)">
-                {{ item }}x de {{ price(Math.ceil((activePricing?.annual_card_cents || 0) / item)) }}
+            <select v-model="form.installments" required @change="handleInstallmentSelection">
+              <option value="">Escolha as parcelas</option>
+              <option v-for="item in installmentOptions" :key="item" :value="String(item)">
+                {{ installmentLabel(item) }}
               </option>
             </select>
           </label>
@@ -448,15 +552,15 @@ function price(cents: number) {
             CVV
             <div id="mp-security-code" class="mp-secure-field"></div>
           </label>
-          <label>
+          <label class="mp-hidden-control">
             Bandeira
             <select id="mp-issuer"></select>
           </label>
-          <label>
+          <label class="wide">
             Parcelas
-            <select id="mp-installments" v-model="form.installments"></select>
+            <select id="mp-installments" v-model="form.installments" required @change="handleInstallmentSelection"></select>
           </label>
-          <label>
+          <label class="mp-hidden-control">
             Documento
             <select id="mp-identification-type" aria-label="Tipo de documento">
               <option value="CPF">CPF</option>
@@ -468,13 +572,31 @@ function price(cents: number) {
           </label>
         </div>
 
-        <div class="checkout-summary">
-          <span>{{ form.payment_method === 'pix' ? 'Total no Pix' : `${form.installments}x no cartão` }}</span>
-          <strong>{{ form.payment_method === 'pix' ? price(payableCents) : price(cardInstallmentCents) }}</strong>
-        </div>
-        <div class="checkout-summary muted">
-          <span>{{ form.payment_method === 'pix' ? 'Desconto Pix' : 'Total anual' }}</span>
-          <strong>{{ form.payment_method === 'pix' ? price(pixDiscountCents) : price(activePricing?.annual_card_cents || 0) }}</strong>
+        <template v-if="form.payment_method === 'pix'">
+          <div class="checkout-summary">
+            <span>Total no Pix <small>5% off</small></span>
+            <strong>{{ price(payableCents) }}</strong>
+          </div>
+          <div class="checkout-summary muted">
+            <span>Desconto Pix</span>
+            <strong>{{ price(pixDiscountCents) }}</strong>
+          </div>
+        </template>
+
+        <template v-else-if="hasSelectedInstallments">
+          <div class="checkout-summary card-installment-summary" :class="{ single: selectedInstallments === 1 }">
+            <span>{{ selectedInstallments === 1 ? 'Pagamento no cartão' : `${selectedInstallments}x sem juros` }}</span>
+            <strong>{{ selectedInstallments === 1 ? price(annualCardCents) : price(selectedInstallmentCents) }}</strong>
+          </div>
+          <div v-if="selectedInstallments > 1" class="checkout-summary muted">
+            <span>Total anual</span>
+            <strong>{{ price(annualCardCents) }}</strong>
+          </div>
+        </template>
+
+        <div v-else class="checkout-summary muted">
+          <span>Escolha as parcelas</span>
+          <strong>Até {{ maxInstallments }}x sem juros</strong>
         </div>
 
         <button class="btn btn-primary" type="submit" :disabled="submitting">
