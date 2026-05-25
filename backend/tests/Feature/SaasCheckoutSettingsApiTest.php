@@ -25,18 +25,22 @@ class SaasCheckoutSettingsApiTest extends TestCase
             ->getJson('/api/v1/saas/checkout-settings')
             ->assertOk()
             ->assertJsonPath('data.payment_provider', 'mercado_pago')
+            ->assertJsonPath('data.boleto_enabled', false)
             ->assertJsonPath('data.active_provider_configured', true)
             ->assertJsonPath('data.providers.0.key', 'mercado_pago');
 
         $this->withHeaders($headers)
             ->patchJson('/api/v1/saas/checkout-settings', [
                 'payment_provider' => 'pagarme',
+                'boleto_enabled' => true,
             ])
             ->assertOk()
             ->assertJsonPath('data.payment_provider', 'pagarme')
+            ->assertJsonPath('data.boleto_enabled', true)
             ->assertJsonPath('data.active_provider_configured', false);
 
         $this->assertSame('pagarme', SaasSetting::getValue('checkout.payment_provider'));
+        $this->assertTrue(SaasSetting::getValue('checkout.boleto_enabled'));
     }
 
     public function test_merchant_cannot_manage_checkout_settings(): void

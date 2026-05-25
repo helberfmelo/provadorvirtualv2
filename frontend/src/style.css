@@ -2784,6 +2784,38 @@ textarea {
   background: #fffbeb;
 }
 
+.settings-check {
+  display: grid !important;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px !important;
+  align-items: start;
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.settings-check input {
+  width: 18px;
+  min-height: 18px;
+  margin-top: 2px;
+}
+
+.settings-check strong,
+.settings-check small {
+  display: block;
+}
+
+.settings-check strong {
+  color: #0f172a;
+}
+
+.settings-check small {
+  color: #6b7280;
+  line-height: 1.45;
+}
+
 .platform-card {
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr) auto;

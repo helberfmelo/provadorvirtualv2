@@ -409,6 +409,14 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
             ]);
         }
 
+        if ($paymentMethod === 'boleto') {
+            return $this->cleanArray([
+                ...$payload,
+                'payment_method_id' => 'bolbradesco',
+                'date_of_expiration' => now()->addDays(3)->toIso8601String(),
+            ]);
+        }
+
         return $this->cleanArray([
             ...$payload,
             'payment_method_id' => 'pix',
@@ -778,9 +786,12 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
     private function paymentSnapshot(array $payload, ?string $fallbackMethod = null): array
     {
         $paymentMethodId = Str::lower((string) ($this->extractString($payload, ['payment_method_id']) ?: ''));
-        $method = $paymentMethodId === 'pix'
-            ? 'pix'
-            : $this->normalizePaymentMethod((string) ($fallbackMethod ?: ($paymentMethodId ? 'credit_card' : 'pix')));
+        $paymentTypeId = Str::lower((string) ($this->extractString($payload, ['payment_type_id']) ?: ''));
+        $method = match (true) {
+            $paymentMethodId === 'pix' => 'pix',
+            $paymentMethodId === 'bolbradesco' || $paymentTypeId === 'ticket' => 'boleto',
+            default => $this->normalizePaymentMethod((string) ($fallbackMethod ?: ($paymentMethodId ? 'credit_card' : 'pix'))),
+        };
 
         return $this->cleanArray([
             'method' => $method,
@@ -798,6 +809,21 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
                 'qr_code_base64' => $this->extractString($payload, ['point_of_interaction.transaction_data.qr_code_base64']),
                 'ticket_url' => $this->extractString($payload, ['point_of_interaction.transaction_data.ticket_url']),
                 'expires_at' => $this->extractString($payload, ['date_of_expiration', 'point_of_interaction.transaction_data.expiration_date']),
+            ] : null,
+            'boleto' => $method === 'boleto' ? [
+                'ticket_url' => $this->extractString($payload, [
+                    'transaction_details.external_resource_url',
+                    'point_of_interaction.transaction_data.ticket_url',
+                ]),
+                'digitable_line' => $this->extractString($payload, [
+                    'transaction_details.digitable_line',
+                    'point_of_interaction.transaction_data.digitable_line',
+                ]),
+                'barcode' => $this->extractString($payload, [
+                    'barcode.content',
+                    'point_of_interaction.transaction_data.barcode.content',
+                ]),
+                'expires_at' => $this->extractString($payload, ['date_of_expiration']),
             ] : null,
         ]);
     }
@@ -819,7 +845,9 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
 
     private function resolveExpiresAt(array $payload, array $snapshot): ?CarbonImmutable
     {
-        $value = data_get($snapshot, 'pix.expires_at') ?: $this->extractString($payload, ['date_of_expiration']);
+        $value = data_get($snapshot, 'pix.expires_at')
+            ?: data_get($snapshot, 'boleto.expires_at')
+            ?: $this->extractString($payload, ['date_of_expiration']);
 
         if (! $value) {
             return null;
@@ -1005,6 +1033,7 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
     {
         return match (Str::lower(trim($value))) {
             'credit_card', 'visa', 'master', 'mastercard', 'amex', 'elo', 'hipercard' => 'credit_card',
+            'boleto', 'bolbradesco', 'ticket' => 'boleto',
             default => 'pix',
         };
     }

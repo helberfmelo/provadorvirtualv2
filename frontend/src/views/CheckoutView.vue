@@ -34,6 +34,8 @@ type PricingVariant = {
   max_installments?: number
 }
 
+type PaymentMethod = 'pix' | 'credit_card' | 'boleto'
+
 const router = useRouter()
 const route = useRoute()
 const loading = ref(true)
@@ -97,6 +99,7 @@ const card = reactive({
 const selectedPlan = computed(() => plans.value.find((plan) => plan.code === form.plan_code))
 const allowedPlanCodes = computed(() => plans.value.map((plan) => plan.code))
 const canUseCreditCard = computed(() => Boolean(checkoutConfig.value?.credit_card_enabled))
+const canUseBoleto = computed(() => Boolean(checkoutConfig.value?.boleto_enabled || checkoutConfig.value?.payment_methods?.includes('boleto')))
 const checkoutProvider = computed(() => checkoutConfig.value?.provider || checkoutConfig.value?.active_provider || '')
 const isMercadoPago = computed(() => checkoutProvider.value === 'mercado_pago')
 const activePricing = computed(() => pricing.value[form.platform === 'bigshop' ? 'bigshop' : 'default'])
@@ -133,6 +136,13 @@ const pixDiscountCents = computed(() => {
 const isAnnualPlan = computed(() => form.plan_code === 'annual')
 const cycleLabel = computed(() => isAnnualPlan.value ? 'Plano anual' : 'Plano mensal')
 const periodTotalLabel = computed(() => isAnnualPlan.value ? 'Total anual' : 'Total mensal')
+const paymentMethodLabel = computed(() => {
+  if (form.payment_method === 'credit_card') {
+    return 'Cartão'
+  }
+
+  return form.payment_method === 'boleto' ? 'Boleto' : 'Pix'
+})
 
 onMounted(async () => {
   await loadConfig()
@@ -147,7 +157,11 @@ async function loadConfig() {
     pricing.value = data.pricing || {}
     const queryPlan = String(route.query.plan || '')
     form.plan_code = data.plans?.some((plan: Plan) => plan.code === queryPlan) ? queryPlan : 'annual'
-    form.payment_method = data.checkout?.credit_card_enabled ? 'credit_card' : 'pix'
+    form.payment_method = data.checkout?.credit_card_enabled
+      ? 'credit_card'
+      : data.checkout?.payment_methods?.includes('pix')
+        ? 'pix'
+        : 'boleto'
     form.installments = ''
     installmentsTouched.value = false
     const queryPlatform = String(route.query.platform || '')
@@ -238,8 +252,12 @@ async function submitCheckout() {
   }
 }
 
-async function selectPaymentMethod(method: 'pix' | 'credit_card') {
+async function selectPaymentMethod(method: PaymentMethod) {
   if (method === 'credit_card' && !canUseCreditCard.value) {
+    return
+  }
+
+  if (method === 'boleto' && !canUseBoleto.value) {
     return
   }
 
@@ -531,7 +549,7 @@ function selectPlan(planCode: string) {
       <section class="panel-main admin-form">
         <div class="subsection-heading">
           <h2>Acesso e pagamento</h2>
-          <span>{{ form.payment_method === 'credit_card' ? 'Cartão' : 'Pix' }}</span>
+          <span>{{ paymentMethodLabel }}</span>
         </div>
 
         <div class="form-grid">
@@ -576,6 +594,9 @@ function selectPlan(planCode: string) {
           <button type="button" :class="{ active: form.payment_method === 'pix' }" @click="selectPaymentMethod('pix')">
             Pix
             <span class="payment-tab-badge">5% off</span>
+          </button>
+          <button v-if="canUseBoleto" type="button" :class="{ active: form.payment_method === 'boleto' }" @click="selectPaymentMethod('boleto')">
+            Boleto
           </button>
         </div>
 
@@ -659,6 +680,20 @@ function selectPlan(planCode: string) {
           <div v-if="pixDiscountCents > 0" class="checkout-summary muted">
             <span>Desconto Pix</span>
             <strong>{{ price(pixDiscountCents) }}</strong>
+          </div>
+        </template>
+
+        <template v-else-if="form.payment_method === 'boleto'">
+          <div class="checkout-summary">
+            <span>
+              Total no boleto
+              <small>compensação bancária</small>
+            </span>
+            <strong>{{ price(periodCardCents) }}</strong>
+          </div>
+          <div class="checkout-summary muted">
+            <span>Liberação</span>
+            <strong>após confirmação</strong>
           </div>
         </template>
 

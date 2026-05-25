@@ -14,6 +14,8 @@ class CheckoutPaymentManager
 {
     public const SETTING_PAYMENT_PROVIDER = 'checkout.payment_provider';
 
+    public const SETTING_BOLETO_ENABLED = 'checkout.boleto_enabled';
+
     public const PROVIDER_PAGARME = 'pagarme';
 
     public const PROVIDER_MERCADO_PAGO = 'mercado_pago';
@@ -41,6 +43,18 @@ class CheckoutPaymentManager
         return $normalized;
     }
 
+    public function boletoEnabled(): bool
+    {
+        return (bool) SaasSetting::getValue(self::SETTING_BOLETO_ENABLED, false);
+    }
+
+    public function setBoletoEnabled(bool $enabled): bool
+    {
+        SaasSetting::setValue(self::SETTING_BOLETO_ENABLED, $enabled);
+
+        return $enabled;
+    }
+
     public function provider(?string $provider = null): CheckoutPaymentProvider
     {
         return match ($this->normalizeProviderKey($provider ?: $this->currentProviderKey())) {
@@ -53,11 +67,16 @@ class CheckoutPaymentManager
     public function configuration(): array
     {
         $provider = $this->provider();
+        $configuration = $provider->configuration();
+        $paymentMethods = $this->paymentMethodsForProvider($provider->key(), $configuration);
 
         return [
-            ...$provider->configuration(),
+            ...$configuration,
+            'payment_methods' => $paymentMethods,
             'active_provider' => $provider->key(),
             'available_providers' => $this->availableProviders(),
+            'boleto_enabled' => in_array('boleto', $paymentMethods, true),
+            'boleto_configured' => $this->boletoEnabled(),
         ];
     }
 
@@ -69,10 +88,17 @@ class CheckoutPaymentManager
                 'label' => $provider->label(),
                 'configured' => $this->providerConfigured($provider->key()),
                 'credit_card_enabled' => (bool) data_get($provider->configuration(), 'credit_card_enabled', false),
-                'payment_methods' => data_get($provider->configuration(), 'payment_methods', []),
+                'payment_methods' => $this->paymentMethodsForProvider($provider->key(), $provider->configuration()),
             ])
             ->values()
             ->all();
+    }
+
+    public function allowedPaymentMethods(?string $provider = null): array
+    {
+        $provider = $this->provider($provider);
+
+        return $this->paymentMethodsForProvider($provider->key(), $provider->configuration());
     }
 
     public function createOrder(CheckoutSession $session, array $buyerData): CheckoutSession
@@ -137,6 +163,17 @@ class CheckoutPaymentManager
     public function activeProviderConfigured(): bool
     {
         return $this->providerConfigured($this->currentProviderKey());
+    }
+
+    private function paymentMethodsForProvider(string $providerKey, array $configuration): array
+    {
+        $methods = array_values(array_filter((array) data_get($configuration, 'payment_methods', [])));
+
+        if ($this->boletoEnabled() && $providerKey === self::PROVIDER_MERCADO_PAGO) {
+            $methods[] = 'boleto';
+        }
+
+        return array_values(array_unique($methods));
     }
 
     public function normalizeProviderKey(string $provider): string

@@ -233,8 +233,8 @@ Chaves comuns:
 - Backend nunca recebe PAN/CVV; recebe apenas token de cartão da operadora.
 - Checkout público oferece planos mensal e anual por plataforma. Valores atuais: qualquer plataforma mensal `R$ 489,80`, BigShop mensal `R$ 389,80`, qualquer plataforma anual `R$ 449,80/mes` e BigShop anual `R$ 349,90/mes`; nos anuais, o total anual e a economia percentual são retornados pela API.
 - Cartão permanece priorizado quando disponível; o anual pode parcelar em até 10x sem juros e Pix à vista mantém desconto operacional quando aplicável.
-- Boleto não e oferecido no checkout atual; a trilha comercial iniciada na Sprint 86 prevê habilitação controlada pelo SaaS.
-- Pix retorna QR Code/copia e cola/ticket na tela `/checkout/sucesso`.
+- Boleto fica oculto por padrão e depende de `saas_settings.checkout.boleto_enabled`; quando habilitado com Mercado Pago, usa `payment_method_id=bolbradesco`.
+- Pix retorna QR Code/copia e cola/ticket na tela `/checkout/sucesso`; boleto retorna link/linha digitável quando a operadora envia esses dados.
 - Empresa nasce como `pending_payment` e e ativada por retorno imediato pago, webhook ou sincronização.
 - O comando `php artisan pv:payments-sync --limit=50` consulta pagamentos pendentes nas operadoras e ativa empresas pagas quando webhook falhar ou atrasar.
 - O scheduler executa o monitor de pagamentos a cada 5 minutos.

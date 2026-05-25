@@ -25,6 +25,7 @@ Publicado e validado em produção no run `26340033238`.
 - Produto teste: `https://provadorvirtual.online/produto-teste`
 - Checkout: `https://provadorvirtual.online/checkout` com planos mensal e anual. Qualquer plataforma: `R$ 489,80/mes` no mensal ou `R$ 449,80/mes` no anual; BigShop: `R$ 389,80/mes` no mensal ou `R$ 349,90/mes` no anual. O anual mostra total do período e economia percentual.
 - No plano mensal pago por cartão, a renovação automática é criada no Mercado Pago. O cliente pode desabilitar apenas a renovação futura pelo dashboard do portal.
+- Boleto fica oculto por padrão e pode ser habilitado em `/saas/checkout` quando a operação quiser aceitar compensação bancária.
 - WhatsApp especialista: `https://wa.me/5531993157573`
 - Política de privacidade: `https://provadorvirtual.online/privacidade`
 - Termos: `https://provadorvirtual.online/termos`

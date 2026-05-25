@@ -254,7 +254,7 @@ class PublicCheckoutController extends Controller
 
         return $request->validate([
             'plan_code' => ['required', 'string', Rule::in(array_keys($this->plans()))],
-            'payment_method' => ['required', 'string', 'in:credit_card,pix'],
+            'payment_method' => ['required', 'string', Rule::in($this->checkoutPayments->allowedPaymentMethods())],
             'platform' => ['nullable', 'string', Rule::in(PlatformCatalog::keys())],
             'company_name' => ['required', 'string', 'max:255'],
             'company_legal_name' => ['required', 'string', 'max:255'],

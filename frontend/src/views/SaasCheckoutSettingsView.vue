@@ -9,9 +9,11 @@ const auth = useAuthStore()
 const settings = ref<CheckoutSettings>({
   payment_provider: 'mercado_pago',
   active_provider_configured: false,
+  boleto_enabled: false,
   providers: [],
 })
 const selectedProvider = ref('mercado_pago')
+const boletoEnabled = ref(false)
 const loading = ref(false)
 const saving = ref(false)
 const error = ref('')
@@ -33,6 +35,7 @@ async function loadSettings() {
     const { data } = await api.get('/saas/checkout-settings')
     settings.value = data.data
     selectedProvider.value = data.data.payment_provider
+    boletoEnabled.value = Boolean(data.data.boleto_enabled)
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível carregar as configurações do checkout.'
   } finally {
@@ -48,10 +51,12 @@ async function saveSettings() {
   try {
     const { data } = await api.patch('/saas/checkout-settings', {
       payment_provider: selectedProvider.value,
+      boleto_enabled: boletoEnabled.value,
     })
     settings.value = data.data
     selectedProvider.value = data.data.payment_provider
-    saved.value = 'Operadora do checkout atualizada.'
+    boletoEnabled.value = Boolean(data.data.boleto_enabled)
+    saved.value = 'Configurações do checkout atualizadas.'
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível salvar a operadora do checkout.'
   } finally {
@@ -108,6 +113,14 @@ function methodLabel(provider: CheckoutProviderOption) {
           </label>
         </div>
 
+        <label class="settings-check">
+          <input v-model="boletoEnabled" type="checkbox" :disabled="!canEdit || loading || saving" />
+          <span>
+            <strong>Habilitar boleto</strong>
+            <small>Mostra boleto no checkout público quando Mercado Pago estiver ativo.</small>
+          </span>
+        </label>
+
         <div class="action-row compact">
           <button class="btn btn-primary" type="submit" :disabled="!canEdit || saving || loading">
             <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
@@ -130,6 +143,10 @@ function methodLabel(provider: CheckoutProviderOption) {
           <span class="pending">
             <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
             Pagar.me permanece disponível para finalizar quando as chaves e regras pendentes chegarem.
+          </span>
+          <span :class="settings.boleto_enabled ? 'passed' : 'pending'">
+            <i class="fa-solid fa-barcode" aria-hidden="true"></i>
+            Boleto fica oculto por padrão e aparece somente quando habilitado no SaaS.
           </span>
           <span :class="settings.active_provider_configured ? 'passed' : 'warning'">
             <i class="fa-solid fa-key" aria-hidden="true"></i>

@@ -38,9 +38,13 @@ class SaasCheckoutController extends Controller
                     'pagarme',
                 ]),
             ],
+            'boleto_enabled' => ['sometimes', 'boolean'],
         ]);
 
         $this->checkoutPayments->setCurrentProvider((string) $data['payment_provider']);
+        if (array_key_exists('boleto_enabled', $data)) {
+            $this->checkoutPayments->setBoletoEnabled((bool) $data['boleto_enabled']);
+        }
 
         return [
             'data' => $this->serialize(),
@@ -54,6 +58,7 @@ class SaasCheckoutController extends Controller
         return [
             'payment_provider' => $activeProvider,
             'active_provider_configured' => $this->checkoutPayments->activeProviderConfigured(),
+            'boleto_enabled' => $this->checkoutPayments->boletoEnabled(),
             'providers' => $this->checkoutPayments->availableProviders(),
             'checkout' => $this->checkoutPayments->configuration(),
         ];

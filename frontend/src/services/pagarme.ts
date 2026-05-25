@@ -11,6 +11,8 @@ export type PublicCheckoutConfig = {
   }>
   payment_methods: string[]
   credit_card_enabled: boolean
+  boleto_enabled?: boolean
+  boleto_configured?: boolean
   public_key: string | null
   sdk_url?: string | null
   tokenization?: string | null

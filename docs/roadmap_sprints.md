@@ -1248,6 +1248,8 @@ Validação:
 - `git diff --check`;
 - commit, push e Actions/deploy.
 
+Status: implementado na Sprint 90 com toggle `Habilitar boleto` em `/saas/checkout`, método `boleto` oculto por padrão na API pública, criação de pagamento Mercado Pago com `payment_method_id=bolbradesco` quando habilitado e tela de sucesso com link/linha digitável.
+
 ### Sprint 91 - QA final do pacote comercial
 
 Objetivo: validar o conjunto novo de planos, aceite, recorrência, cancelamento de renovação e boleto em local e produção.

@@ -270,6 +270,58 @@ class PublicCheckoutFlowTest extends TestCase
             ->assertJsonValidationErrors('payment_method');
     }
 
+    public function test_mercado_pago_boleto_is_available_only_when_saas_enables_it(): void
+    {
+        $this->configureMercadoPago();
+        SaasSetting::setValue('checkout.boleto_enabled', true);
+
+        Http::fake([
+            'https://api.mercadopago.com/v1/payments' => Http::response([
+                'id' => 778899,
+                'status' => 'pending',
+                'status_detail' => 'pending_waiting_payment',
+                'payment_method_id' => 'bolbradesco',
+                'payment_type_id' => 'ticket',
+                'date_of_expiration' => now()->addDays(3)->toIso8601String(),
+                'transaction_details' => [
+                    'external_resource_url' => 'https://www.mercadopago.com.br/payments/778899/ticket',
+                    'digitable_line' => '23791.11111 22222.222222 33333.333333 1 99990000048980',
+                ],
+            ]),
+        ]);
+
+        $this->getJson('/api/v1/public/checkout/config')
+            ->assertOk()
+            ->assertJsonPath('checkout.boleto_enabled', true)
+            ->assertJsonPath('checkout.payment_methods.2', 'boleto');
+
+        $response = $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'plan_code' => 'monthly',
+            'payment_method' => 'boleto',
+        ])
+            ->assertCreated()
+            ->assertJsonPath('status', 'checkout_created')
+            ->assertJsonPath('payment.boleto.ticket_url', 'https://www.mercadopago.com.br/payments/778899/ticket')
+            ->assertJsonPath('payment.boleto.digitable_line', '23791.11111 22222.222222 33333.333333 1 99990000048980');
+
+        $this->assertNotEmpty($response->json('reference'));
+        $this->assertDatabaseHas('checkout_sessions', [
+            'provider' => 'mercado_pago',
+            'provider_order_id' => '778899',
+            'payment_method' => 'boleto',
+            'amount_cents' => 48980,
+        ]);
+
+        Http::assertSent(function ($request): bool {
+            $payload = $request->data();
+
+            return $request->url() === 'https://api.mercadopago.com/v1/payments'
+                && data_get($payload, 'payment_method_id') === 'bolbradesco'
+                && data_get($payload, 'transaction_amount') === 489.8;
+        });
+    }
+
     public function test_checkout_requires_terms_acceptance(): void
     {
         $this->configurePagarme();

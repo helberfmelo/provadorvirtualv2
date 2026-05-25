@@ -46,7 +46,11 @@ class CheckoutPlanCatalog
         $platform = ($data['platform'] ?? null) === 'bigshop' ? 'bigshop' : 'default';
         $variant = self::pricingConfig()[$platform];
         $cycle = $variant[$planCode] ?? $variant[self::PLAN_ANNUAL];
-        $paymentMethod = ($data['payment_method'] ?? null) === 'credit_card' ? 'credit_card' : 'pix';
+        $paymentMethod = match ($data['payment_method'] ?? null) {
+            'credit_card' => 'credit_card',
+            'boleto' => 'boleto',
+            default => 'pix',
+        };
         $payableCents = $paymentMethod === 'pix' ? $cycle['pix_total_cents'] : $cycle['card_total_cents'];
 
         return [

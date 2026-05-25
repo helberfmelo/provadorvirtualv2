@@ -881,3 +881,14 @@
 - Renovação anual automática ficou documentada como pendência operacional: o anual continua como pagamento normal no cartão/Pix até validação segura sem dupla cobrança ou conflito com parcelamento anual.
 - Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=BillingSubscriptionApiTest`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.
 - Commit `aec5520` enviado para `main`; o run `26412440589` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+
+## 2026-05-25 - Sprint 90 Boleto habilitável pelo SaaS
+
+- Documentação oficial Mercado Pago conferida para meios de pagamento: boleto no Brasil é método do tipo `ticket`, com integração por Checkout Transparente e `payment_method_id=bolbradesco`.
+- `checkout.boleto_enabled` foi adicionado às configurações SaaS e fica desabilitado por padrão.
+- Tela `/saas/checkout` ganhou checkbox `Habilitar boleto`, salvando junto com a operadora ativa.
+- API pública `/api/v1/public/checkout/config` passa a incluir `boleto` em `payment_methods` somente quando o SaaS habilita e a operadora ativa é Mercado Pago.
+- Validação do checkout rejeita boleto por padrão e aceita `payment_method=boleto` apenas quando habilitado.
+- Mercado Pago cria boleto por `/v1/payments` com `payment_method_id=bolbradesco`, vencimento operacional de 3 dias e snapshot com `ticket_url`, linha digitável/código de barras e expiração quando retornados.
+- Checkout Vue ganhou aba `Boleto`, resumo sem desconto Pix e tela de sucesso com link/linha digitável e aviso de liberação após compensação.
+- Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=SaasCheckoutSettingsApiTest`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.

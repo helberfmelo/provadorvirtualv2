@@ -177,6 +177,7 @@ Provider recomendado: OpenAI por alinhamento com os projetos recentes. Gemini po
 - Checkout público deve exigir aceite dos termos e da política de privacidade, salvar prova técnica com IP, user-agent, usuário, empresa, data/hora, versões legais e contexto do pedido.
 - Plano mensal pago por cartão deve usar recorrência automática com renovação mensal, salvando assinatura local e permitindo que a empresa desabilite apenas renovações futuras no painel.
 - Renovação anual automática só deve ser habilitada quando a operadora permitir confirmar o comportamento sem dupla cobrança inicial e sem conflito com parcelamento do período anual.
+- Boleto deve ficar oculto por padrão e só aparecer no checkout público quando o SaaS habilitar explicitamente esse meio de pagamento.
 - Site e sistema devem exibir aviso discreto de cookies técnicos/localStorage até o usuário confirmar.
 - Painel deve mostrar bloqueio funcional quando assinatura estiver inativa.
 

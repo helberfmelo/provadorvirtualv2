@@ -89,6 +89,7 @@ export type CheckoutProviderOption = {
 export type CheckoutSettings = {
   payment_provider: string
   active_provider_configured: boolean
+  boleto_enabled: boolean
   providers: CheckoutProviderOption[]
 }
 

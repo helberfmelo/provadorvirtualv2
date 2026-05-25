@@ -67,6 +67,16 @@ onMounted(async () => {
           <small>O acesso da empresa será liberado automaticamente quando a operadora confirmar o pagamento.</small>
         </div>
 
+        <div v-if="payment?.boleto?.ticket_url || payment?.boleto?.digitable_line || payment?.boleto?.barcode" class="payment-box">
+          <strong>Boleto bancário</strong>
+          <textarea v-if="payment.boleto.digitable_line || payment.boleto.barcode" :value="payment.boleto.digitable_line || payment.boleto.barcode" rows="3" readonly></textarea>
+          <a v-if="payment.boleto.ticket_url" class="btn btn-secondary" :href="payment.boleto.ticket_url" target="_blank" rel="noopener">
+            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            Abrir boleto
+          </a>
+          <small>O acesso da empresa será liberado automaticamente quando a operadora confirmar a compensação do boleto.</small>
+        </div>
+
         <div class="action-row">
           <RouterLink to="/login" class="btn btn-primary">
             <i class="fa-solid fa-right-to-bracket" aria-hidden="true"></i>

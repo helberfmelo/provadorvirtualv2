@@ -139,7 +139,7 @@ Atualizado em: 2026-05-25
 - `DONE` Criar opção discreta no portal da empresa para cancelar somente a renovação automática, sem cancelar pagamentos já capturados ou parcelas em andamento.
 - `TODO` Validar renovação automática anual quando a operadora permitir sem risco de dupla cobrança ou conflito com parcelamento anual.
 - `DONE` Salvar prova técnica de aceite dos termos no checkout.
-- `TODO` Permitir boleto no checkout somente quando habilitado no painel SaaS.
+- `DONE` Permitir boleto no checkout somente quando habilitado no painel SaaS.
 - `DONE` Registrar variáveis Mercado Pago em `PRODUCTION_ENV` sem versionar valores reais.
 - `TODO` Executar transação real Mercado Pago de baixo valor e confirmar webhook/cron.
 - `TODO` Finalizar Pagar.me quando as informações pendentes chegarem.
