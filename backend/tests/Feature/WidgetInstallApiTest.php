@@ -30,10 +30,14 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.public_key', 'pv_demo_luna')
             ->assertJsonPath('data.platform', 'custom')
             ->assertJsonPath('data.is_active', true)
-            ->assertJsonPath('data.theme.presentation_mode', 'drawer');
+            ->assertJsonPath('data.theme.presentation_mode', 'drawer')
+            ->assertJsonPath('data.platform_guide.key', 'custom')
+            ->assertJsonPath('data.platform_guide.guide.placement_label', 'Página de produto')
+            ->assertJsonPath('data.platform_guides.0.key', 'bigshop');
 
         $this->assertStringContainsString('provador-virtual.js', $response->json('data.snippet'));
         $this->assertStringContainsString('data-merchant-id', $response->json('data.snippet'));
+        $this->assertStringContainsString('data-platform="custom"', $response->json('data.snippet'));
 
         $this->withHeaders($headers)
             ->patchJson('/api/v1/widget-install', [
@@ -53,12 +57,28 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.allowed_domains.1', 'localhost')
             ->assertJsonPath('data.theme.primary', '#101820')
             ->assertJsonPath('data.theme.presentation_mode', 'modal')
-            ->assertJsonPath('data.is_active', false);
+            ->assertJsonPath('data.is_active', false)
+            ->assertJsonPath('data.platform_guide.key', 'bigshop');
 
-        $this->assertStringContainsString('presentation_mode', $this->withHeaders($headers)
+        $bigShopSnippet = $this->withHeaders($headers)
             ->getJson('/api/v1/widget-install')
             ->assertOk()
-            ->json('data.snippet'));
+            ->json('data.snippet');
+
+        $this->assertStringContainsString('presentation_mode', $bigShopSnippet);
+        $this->assertStringContainsString('data-platform="bigshop"', $bigShopSnippet);
+        $this->assertStringContainsString('BIGSHOP_PRODUCT_ID', $bigShopSnippet);
+
+        $shopifyResponse = $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'platform' => 'shopify',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'shopify')
+            ->assertJsonPath('data.platform_guide.key', 'shopify');
+
+        $this->assertStringContainsString('{{ product.id }}', $shopifyResponse->json('data.snippet'));
+        $this->assertStringContainsString('Template Liquid de produto', $shopifyResponse->json('data.platform_guide.guide.placement_label'));
     }
 
     public function test_bigshop_contract_keeps_widget_platform_locked(): void

@@ -951,3 +951,13 @@
 - A suíte backend completa passou com 85 testes e 678 assertions; o build frontend passou com `vue-tsc --noEmit && vite build`.
 - Commit `1c029ae` enviado para `main`; o run `26415840565` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`. O script foi ampliado para cobrir também `/saas/checkout` e `/saas/pedidos`, e a repetição limpa após a janela de throttle confirmou essas rotas novas.
+
+## 2026-05-25 - Sprint 96 Widget instalação por plataforma e visual organizado
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- Consulta técnica feita em referências primárias de Shopify, WooCommerce, VTEX, Nuvemshop e Adobe Commerce para orientar os snippets e pontos de instalação por plataforma.
+- API `/api/v1/widget-install` passou a retornar `platform_guide` e `platform_guides` com snippet, passos, ponto de instalação, dados suportados e exemplo de `reload` por plataforma.
+- Tela `/app/widget` foi reorganizada em blocos de instalação, domínios e personalização; preview, código e guia lateral agora mudam conforme a plataforma selecionada.
+- Snippets e exemplos foram personalizados para BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom.
+- `scripts/validate-production.ps1` passou a cobrir também `/app/widget`.
+- Validações locais passaram com `php -l backend/app/Http/Resources/WidgetInstallResource.php`, `php artisan test --filter=WidgetInstallApiTest`, `php artisan test` com 85 testes e 690 assertions, `npm run build`, `vendor/bin/pint --dirty`, `git diff --check`, `GET http://127.0.0.1:5173/app/widget` e leitura autenticada local de `/api/v1/widget-install`.

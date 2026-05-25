@@ -3,6 +3,21 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
+type PlatformGuide = {
+  key: string
+  name: string
+  icon: string
+  summary: string
+  install_mode: string
+  guide: {
+    steps: string[]
+    data_support: Record<string, string>
+    placement_label: string
+    snippet: string
+    reload_snippet: string
+  }
+}
+
 type WidgetInstall = {
   id: number
   merchant_id: number
@@ -27,6 +42,8 @@ type WidgetInstall = {
   script_url: string
   css_url: string
   snippet: string
+  platform_guide?: PlatformGuide
+  platform_guides?: PlatformGuide[]
   sample_product?: {
     id: number
     name: string
@@ -74,22 +91,38 @@ const domains = computed(() => form.allowed_domains
   .filter(Boolean))
 
 const platformOptions = computed(() => {
+  const guides = install.value?.platform_guides?.length
+    ? install.value.platform_guides
+    : [
+        { key: 'bigshop', name: 'BigShop', icon: 'fa-bolt', summary: 'Integração nativa BigShop.' },
+        { key: 'shopify', name: 'Shopify', icon: 'fa-bag-shopping', summary: 'Template Liquid de produto.' },
+        { key: 'woocommerce', name: 'WooCommerce', icon: 'fa-cart-shopping', summary: 'Hook ou template WooCommerce.' },
+        { key: 'nuvemshop', name: 'Nuvemshop', icon: 'fa-cloud', summary: 'Layout da página de produto.' },
+        { key: 'vtex', name: 'VTEX', icon: 'fa-layer-group', summary: 'Bloco ou app de storefront.' },
+        { key: 'tray', name: 'Tray', icon: 'fa-store', summary: 'Template de produto Tray.' },
+        { key: 'loja_integrada', name: 'Loja Integrada', icon: 'fa-shop', summary: 'HTML/JS do tema.' },
+        { key: 'magento', name: 'Magento', icon: 'fa-cubes', summary: 'Bloco catalog_product_view.' },
+        { key: 'opencart', name: 'OpenCart', icon: 'fa-box-open', summary: 'Template product.twig.' },
+        { key: 'custom', name: 'Personalizada', icon: 'fa-code', summary: 'Snippet universal.' },
+      ]
+
   if (isBigShopContract.value) {
-    return [{ value: 'bigshop', label: 'BigShop' }]
+    return guides
+      .filter((guide) => guide.key === 'bigshop')
+      .map((guide) => ({
+        value: guide.key,
+        label: guide.name,
+        icon: guide.icon,
+        summary: guide.summary,
+      }))
   }
 
-  return [
-    { value: 'bigshop', label: 'BigShop' },
-    { value: 'shopify', label: 'Shopify' },
-    { value: 'woocommerce', label: 'WooCommerce' },
-    { value: 'nuvemshop', label: 'Nuvemshop' },
-    { value: 'vtex', label: 'VTEX' },
-    { value: 'tray', label: 'Tray' },
-    { value: 'loja_integrada', label: 'Loja Integrada' },
-    { value: 'magento', label: 'Magento' },
-    { value: 'opencart', label: 'OpenCart' },
-    { value: 'custom', label: 'Personalizada' },
-  ]
+  return guides.map((guide) => ({
+    value: guide.key,
+    label: guide.name,
+    icon: guide.icon,
+    summary: guide.summary,
+  }))
 })
 
 const presentationModeOptions = [
@@ -115,6 +148,42 @@ const installationSteps = computed(() => {
   }
 
   return steps
+})
+
+const currentPlatformGuide = computed(() => {
+  return install.value?.platform_guides?.find((guide) => guide.key === form.platform)
+    || install.value?.platform_guide
+    || null
+})
+
+const currentSnippet = computed(() => currentPlatformGuide.value?.guide.snippet || install.value?.snippet || '')
+
+const currentInstallationSteps = computed(() => {
+  return currentPlatformGuide.value?.guide.steps?.length
+    ? currentPlatformGuide.value.guide.steps
+    : installationSteps.value
+})
+
+const currentReloadSnippet = computed(() => {
+  return currentPlatformGuide.value?.guide.reload_snippet
+    || `window.ProvadorVirtual?.reload({
+  productId: 'ID_DO_PRODUTO',
+  variantId: 'ID_DA_VARIACAO',
+  sku: 'SKU_DA_VARIACAO'
+})`
+})
+
+const currentDataSupport = computed(() => {
+  return Object.entries(currentPlatformGuide.value?.guide.data_support || {})
+    .map(([field, description]) => ({ field, description }))
+})
+
+const platformInstallMode = computed(() => {
+  if (currentPlatformGuide.value?.install_mode === 'one_click') {
+    return 'Instalação assistida'
+  }
+
+  return 'Instalação por tema'
 })
 
 const previewStyle = computed(() => ({
@@ -188,11 +257,11 @@ async function saveInstall() {
 }
 
 async function copySnippet() {
-  if (!install.value) {
+  if (!currentSnippet.value) {
     return
   }
 
-  await navigator.clipboard.writeText(install.value.snippet)
+  await navigator.clipboard.writeText(currentSnippet.value)
   copied.value = true
   window.setTimeout(() => {
     copied.value = false
@@ -261,7 +330,7 @@ function removeConfettiPreview() {
           Ajuste botões, cores, domínios e código para exibir o provador na página de produto.
         </p>
       </div>
-      <button class="btn btn-secondary" type="button" :disabled="!install" @click="copySnippet">
+      <button class="btn btn-secondary" type="button" :disabled="!currentSnippet" @click="copySnippet">
         <i class="fa-solid fa-copy" aria-hidden="true"></i>
         {{ copied ? 'Copiado' : 'Copiar código' }}
       </button>
@@ -269,125 +338,165 @@ function removeConfettiPreview() {
 
     <div v-if="loading" class="empty-state">Carregando provador...</div>
 
-    <div v-else class="install-grid">
-      <form class="panel-main admin-form" @submit.prevent="saveInstall">
-        <div class="form-grid">
-          <label>
-            Plataforma
-            <select v-model="form.platform" :disabled="isBigShopContract">
-              <option v-for="platform in platformOptions" :key="platform.value" :value="platform.value">
-                {{ platform.label }}
-              </option>
-            </select>
-            <small v-if="isBigShopContract">Plano BigShop permite instalação somente na BigShop.</small>
-          </label>
-          <label>
-            Chave pública
-            <input :value="install?.public_key" readonly />
-          </label>
-          <label class="toggle-line">
-            Ativo
-            <input v-model="form.is_active" type="checkbox" />
-          </label>
-        </div>
-
-        <fieldset class="mode-selector">
-          <legend>Abertura do provador</legend>
-          <div class="segmented-control">
-            <button
-              v-for="mode in presentationModeOptions"
-              :key="mode.value"
-              type="button"
-              :class="{ active: form.theme.presentation_mode === mode.value }"
-              @click="form.theme.presentation_mode = mode.value"
-            >
-              <i :class="['fa-solid', mode.icon]" aria-hidden="true"></i>
-              {{ mode.label }}
-            </button>
+    <div v-else class="install-grid widget-install-layout">
+      <form class="panel-main admin-form widget-config-form" @submit.prevent="saveInstall">
+        <section class="widget-config-section">
+          <div class="subsection-heading">
+            <h2>Instalação</h2>
+            <span>{{ platformInstallMode }}</span>
           </div>
-          <small>O modal central fica amplo no desktop e ocupa a tela toda no celular.</small>
-        </fieldset>
 
-        <label>
-          Domínios liberados
-          <textarea v-model="form.allowed_domains" rows="5"></textarea>
-        </label>
+          <div class="widget-install-summary">
+            <label class="widget-field-platform">
+              Plataforma
+              <select v-model="form.platform" :disabled="isBigShopContract">
+                <option v-for="platform in platformOptions" :key="platform.value" :value="platform.value">
+                  {{ platform.label }}
+                </option>
+              </select>
+              <small v-if="isBigShopContract">Plano BigShop permite instalação somente na BigShop.</small>
+            </label>
+            <label class="widget-field-key">
+              Chave pública
+              <input :value="install?.public_key" readonly />
+            </label>
+            <label class="settings-check widget-inline-toggle">
+              <input v-model="form.is_active" type="checkbox" />
+              <span>
+                <strong>Widget ativo</strong>
+                <small>Controla a exibição pública na loja.</small>
+              </span>
+            </label>
+          </div>
 
-        <div class="color-grid">
-          <label>
-            Primaria
-            <span class="swatch-field">
-              <input v-model="form.theme.primary" type="color" />
-              <input v-model="form.theme.primary" maxlength="7" />
-            </span>
-          </label>
-          <label>
-            Secundaria
-            <span class="swatch-field">
-              <input v-model="form.theme.secondary" type="color" />
-              <input v-model="form.theme.secondary" maxlength="7" />
-            </span>
-          </label>
-          <label>
-            Destaque
-            <span class="swatch-field">
-              <input v-model="form.theme.accent" type="color" />
-              <input v-model="form.theme.accent" maxlength="7" />
-            </span>
-          </label>
-          <label>
-            Fundo
-            <span class="swatch-field">
-              <input v-model="form.theme.background" type="color" />
-              <input v-model="form.theme.background" maxlength="7" />
-            </span>
-          </label>
-          <label>
-            Texto
-            <span class="swatch-field">
-              <input v-model="form.theme.text" type="color" />
-              <input v-model="form.theme.text" maxlength="7" />
-            </span>
-          </label>
-        </div>
+          <div v-if="currentPlatformGuide" class="widget-platform-guide">
+            <i :class="['fa-solid', currentPlatformGuide.icon]" aria-hidden="true"></i>
+            <div>
+              <strong>{{ currentPlatformGuide.name }}</strong>
+              <span>{{ currentPlatformGuide.summary }}</span>
+            </div>
+            <em>{{ currentPlatformGuide.guide.placement_label }}</em>
+          </div>
+        </section>
 
-        <div class="form-grid">
+        <section class="widget-config-section">
+          <div class="subsection-heading">
+            <h2>Domínios</h2>
+            <span>{{ domains.length || 0 }} liberado{{ domains.length === 1 ? '' : 's' }}</span>
+          </div>
           <label>
-            Fonte
-            <select v-model="form.theme.font_family">
-              <option value="Manrope, Inter, Arial, sans-serif">Manrope</option>
-              <option value="Inter, Arial, sans-serif">Inter</option>
-              <option value="Arial, sans-serif">Arial</option>
-              <option value="Georgia, serif">Georgia</option>
-            </select>
+            Domínios liberados
+            <textarea
+              v-model="form.allowed_domains"
+              rows="4"
+              placeholder="loja.com.br&#10;www.loja.com.br"
+            ></textarea>
+            <small>Informe um domínio por linha, sem caminho da página.</small>
           </label>
-          <label>
-            Tamanho da fonte
-            <input v-model="form.theme.font_size" type="number" min="11" max="22" />
-          </label>
-          <label>
-            Peso
-            <select v-model="form.theme.font_weight">
-              <option value="400">Regular</option>
-              <option value="600">Semibold</option>
-              <option value="700">Bold</option>
-              <option value="800">Extra bold</option>
-            </select>
-          </label>
-          <label>
-            Raio dos botões
-            <input v-model="form.theme.button_radius" type="number" min="0" max="24" />
-          </label>
-          <label class="toggle-line">
-            Animação de confetes
+        </section>
+
+        <section class="widget-config-section">
+          <div class="subsection-heading">
+            <h2>Personalização</h2>
+            <span>Botões, abertura e celebração</span>
+          </div>
+
+          <fieldset class="mode-selector widget-mode-selector">
+            <legend>Abertura do provador</legend>
+            <div class="segmented-control">
+              <button
+                v-for="mode in presentationModeOptions"
+                :key="mode.value"
+                type="button"
+                :class="{ active: form.theme.presentation_mode === mode.value }"
+                @click="form.theme.presentation_mode = mode.value"
+              >
+                <i :class="['fa-solid', mode.icon]" aria-hidden="true"></i>
+                {{ mode.label }}
+              </button>
+            </div>
+            <small>O modal central fica amplo no desktop e ocupa a tela toda no celular.</small>
+          </fieldset>
+
+          <div class="widget-color-grid">
+            <label>
+              Primária
+              <span class="swatch-field">
+                <input v-model="form.theme.primary" type="color" />
+                <input v-model="form.theme.primary" maxlength="7" />
+              </span>
+            </label>
+            <label>
+              Secundária
+              <span class="swatch-field">
+                <input v-model="form.theme.secondary" type="color" />
+                <input v-model="form.theme.secondary" maxlength="7" />
+              </span>
+            </label>
+            <label>
+              Destaque
+              <span class="swatch-field">
+                <input v-model="form.theme.accent" type="color" />
+                <input v-model="form.theme.accent" maxlength="7" />
+              </span>
+            </label>
+            <label>
+              Fundo
+              <span class="swatch-field">
+                <input v-model="form.theme.background" type="color" />
+                <input v-model="form.theme.background" maxlength="7" />
+              </span>
+            </label>
+            <label>
+              Texto
+              <span class="swatch-field">
+                <input v-model="form.theme.text" type="color" />
+                <input v-model="form.theme.text" maxlength="7" />
+              </span>
+            </label>
+          </div>
+
+          <div class="widget-type-grid">
+            <label class="widget-field-font">
+              Fonte
+              <select v-model="form.theme.font_family">
+                <option value="Manrope, Inter, Arial, sans-serif">Manrope</option>
+                <option value="Inter, Arial, sans-serif">Inter</option>
+                <option value="Arial, sans-serif">Arial</option>
+                <option value="Georgia, serif">Georgia</option>
+              </select>
+            </label>
+            <label>
+              Tamanho
+              <input v-model="form.theme.font_size" type="number" min="11" max="22" />
+            </label>
+            <label>
+              Peso
+              <select v-model="form.theme.font_weight">
+                <option value="400">Regular</option>
+                <option value="600">Semibold</option>
+                <option value="700">Bold</option>
+                <option value="800">Extra bold</option>
+              </select>
+            </label>
+            <label>
+              Raio
+              <input v-model="form.theme.button_radius" type="number" min="0" max="24" />
+            </label>
+          </div>
+
+          <label class="settings-check widget-confetti-toggle">
             <input
               v-model="form.theme.confetti_enabled"
               type="checkbox"
               @change="handleConfettiChange"
             />
-            <small>Ao ativar, o cliente vê essa celebração quando chega ao resultado completo.</small>
+            <span>
+              <strong>Animação de confetes</strong>
+              <small>Ao ativar, o cliente vê essa celebração quando chega ao resultado completo.</small>
+            </span>
           </label>
-        </div>
+        </section>
 
         <div class="action-row compact">
           <button class="btn btn-primary" type="submit" :disabled="saving">
@@ -397,56 +506,74 @@ function removeConfettiPreview() {
         </div>
       </form>
 
-      <aside class="install-preview">
-        <div class="subsection-heading">
-          <h2>Visualizador</h2>
-          <span>Provador e tabela</span>
-        </div>
-        <div class="widget-style-preview" :style="previewStyle">
-          <div class="preview-product-line">
-            <strong>Vestido Midi Aurora</strong>
-            <span>Selecione seu tamanho</span>
-          </div>
-          <div class="preview-widget-buttons">
-            <button type="button">Descubra seu tamanho</button>
-            <button type="button">Tabela de Medidas</button>
-          </div>
-          <div :class="['preview-launch-frame', form.theme.presentation_mode === 'modal' ? 'modal' : 'drawer']">
+      <aside class="widget-install-aside">
+        <section class="panel-main widget-preview-panel">
+          <div class="subsection-heading">
+            <h2>Visualizador</h2>
             <span>{{ form.theme.presentation_mode === 'modal' ? 'Modal central' : 'Drawer lateral' }}</span>
-            <div></div>
           </div>
-          <div class="preview-size-table">
-            <div><strong>P</strong><span>84 - 90</span><span>66 - 72</span></div>
-            <div><strong>M</strong><span>90 - 96</span><span>72 - 78</span></div>
-            <div><strong>G</strong><span>96 - 104</span><span>78 - 86</span></div>
+          <div class="widget-style-preview" :style="previewStyle">
+            <div class="preview-product-line">
+              <strong>Vestido Midi Aurora</strong>
+              <span>Selecione seu tamanho</span>
+            </div>
+            <div class="preview-widget-buttons">
+              <button type="button">Descubra seu tamanho</button>
+              <button type="button">Tabela de Medidas</button>
+            </div>
+            <div :class="['preview-launch-frame', form.theme.presentation_mode === 'modal' ? 'modal' : 'drawer']">
+              <span>{{ form.theme.presentation_mode === 'modal' ? 'Modal central' : 'Drawer lateral' }}</span>
+              <div></div>
+            </div>
+            <div class="preview-size-table">
+              <div><strong>P</strong><span>84 - 90</span><span>66 - 72</span></div>
+              <div><strong>M</strong><span>90 - 96</span><span>72 - 78</span></div>
+              <div><strong>G</strong><span>96 - 104</span><span>78 - 86</span></div>
+            </div>
+            <a href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>
           </div>
-          <a href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>
-        </div>
+        </section>
 
-        <div class="subsection-heading">
-          <h2>Código</h2>
-          <span>{{ install?.sample_product?.sku || 'produto' }}</span>
-        </div>
-        <pre><code>{{ install?.snippet }}</code></pre>
+        <section class="panel-main widget-code-panel">
+          <div class="subsection-heading">
+            <h2>Código</h2>
+            <span>{{ currentPlatformGuide?.name || 'Plataforma' }}</span>
+          </div>
+          <pre class="widget-code-block"><code>{{ currentSnippet }}</code></pre>
+          <button class="btn btn-secondary compact-copy" type="button" :disabled="!currentSnippet" @click="copySnippet">
+            <i class="fa-solid fa-copy" aria-hidden="true"></i>
+            {{ copied ? 'Copiado' : 'Copiar snippet' }}
+          </button>
+        </section>
 
-        <div class="subsection-heading">
-          <h2>Onde instalar</h2>
-          <span>Página de produto</span>
-        </div>
-        <ul class="placement-steps">
-          <li v-for="step in installationSteps" :key="step">{{ step }}</li>
-        </ul>
-        <pre class="guide-snippet compact-snippet"><code>window.ProvadorVirtual?.reload({
-  productId: 'ID_DO_PRODUTO',
-  variantId: 'ID_DA_GRADE',
-  sku: 'SKU_DA_GRADE'
-})</code></pre>
+        <section class="panel-main widget-guide-panel">
+          <div class="subsection-heading">
+            <h2>Onde instalar</h2>
+            <span>{{ currentPlatformGuide?.guide.placement_label || 'Página de produto' }}</span>
+          </div>
+          <ol class="placement-steps">
+            <li v-for="step in currentInstallationSteps" :key="step">{{ step }}</li>
+          </ol>
 
-        <div class="check-list">
-          <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Produto ativo</span>
-          <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Tabela vinculada</span>
-          <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Provador público</span>
-        </div>
+          <div class="subsection-heading compact-heading">
+            <h2>Atualização da variação</h2>
+            <span>reload</span>
+          </div>
+          <pre class="guide-snippet compact-snippet"><code>{{ currentReloadSnippet }}</code></pre>
+
+          <div v-if="currentDataSupport.length" class="widget-data-support">
+            <span v-for="support in currentDataSupport" :key="support.field">
+              <strong>{{ support.field }}</strong>
+              {{ support.description }}
+            </span>
+          </div>
+
+          <div class="check-list">
+            <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Produto ativo</span>
+            <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Tabela vinculada</span>
+            <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Provador público</span>
+          </div>
+        </section>
       </aside>
     </div>
   </section>

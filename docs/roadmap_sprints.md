@@ -1364,3 +1364,27 @@ Validação:
 - commit, push e Actions/deploy.
 
 Status: implementado na Sprint 95 no commit `1c029ae`, publicado com sucesso no run `26415840565`. Validações locais passaram com 85 testes backend e 678 assertions, além do build frontend. Validação de produção passou com `scripts/validate-production.ps1`, agora cobrindo também `/saas/checkout` e `/saas/pedidos`.
+
+### Sprint 96 - Widget instalação por plataforma e visual organizado
+
+Objetivo: melhorar a disposição da tela `/app/widget` e fazer o código de instalação mudar conforme a plataforma escolhida pela empresa.
+
+Entregas:
+
+- reorganizar a personalização em blocos visuais de instalação, domínios e aparência;
+- manter preview, snippet e guia de instalação em painéis laterais mais legíveis;
+- expor pela API `platform_guide` e `platform_guides` com snippet, passos, ponto de instalação, dados suportados e exemplo de reload;
+- personalizar snippet e instruções para BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom;
+- permitir que a troca de plataforma no portal atualize imediatamente código, guia e matriz de dados;
+- ampliar `scripts/validate-production.ps1` para cobrir `/app/widget`.
+
+Validação:
+
+- `php artisan test --filter=WidgetInstallApiTest`;
+- `npm run build`;
+- `php -l backend/app/Http/Resources/WidgetInstallResource.php`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente; publicação e validação de produção em andamento.

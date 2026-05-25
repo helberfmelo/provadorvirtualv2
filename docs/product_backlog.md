@@ -41,6 +41,7 @@ Atualizado em: 2026-05-25
 - `DONE` Código de acesso da empresa no formato `aaaa + id`.
 - `DONE` Busca de empresa por código ou CNPJ.
 - `DONE` Personalizador visual do widget com preview.
+- `DONE` Tela do widget reorganizada com instalação, domínios, personalização, preview, código e guia por plataforma.
 
 ## Integrações
 
@@ -55,7 +56,7 @@ Atualizado em: 2026-05-25
 - `DONE` Preparar instalação nativa BigShop model3 pro com configuração por loja e fallback da tabela de medidas nativa.
 - `TODO` Cadastrar `BIGSHOP_ACTIVATION_SECRET` para teste real.
 - `DONE` Base do guia/snippet custom no painel.
-- `DONE` Guias e snippets para Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom.
+- `DONE` Guias e snippets personalizados para Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom.
 - `DONE` Checklist visual por plataforma no portal.
 - `DONE` Validação de domínio/snippet instalado por URL pública.
 - `DONE` Matriz de dados suportados por plataforma.

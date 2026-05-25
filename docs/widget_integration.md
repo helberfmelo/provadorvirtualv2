@@ -1,6 +1,6 @@
 # Widget e Integração Universal
 
-Atualizado em: 2026-05-24
+Atualizado em: 2026-05-25
 
 ## Objetivo
 
@@ -148,7 +148,11 @@ Status Sprint 92: o tema do widget aceita `presentation_mode` com os valores `dr
 
 Status Sprint 93: a opção `theme.confetti_enabled` continua controlando a celebração por loja. Em `/app/widget`, ao marcar `Animação de confetes`, o portal dispara uma prévia com a mesma classe `.pv-confetti-layer`, 42 peças, cores e keyframes do widget público, para a empresa ver exatamente o efeito que o comprador verá ao chegar ao resultado completo. Publicado no run `26414392783` e validado em produção.
 
+Status Sprint 96: `/api/v1/widget-install` passa a retornar `platform_guide` e `platform_guides` com snippet, ponto de instalação, passos, matriz de dados e exemplo de `reload` por plataforma. A tela `/app/widget` foi reorganizada em blocos de instalação, domínios e personalização, com preview, código e guia lateral atualizados automaticamente conforme a plataforma escolhida. A validação de produção passa a cobrir também `/app/widget`.
+
 ## Guias por plataforma
+
+Referências técnicas primárias consultadas para manter os guias alinhados com as plataformas: Shopify Liquid `product.selected_or_first_available_variant` (`https://shopify.dev/docs/api/liquid/objects/product`), WooCommerce template/hook de variações (`https://woocommerce.github.io/code-reference/files/woocommerce-templates-single-product-add-to-cart-variation-add-to-cart-button.html`), VTEX Product Context (`https://developers.vtex.com/docs/guides/vtex-product-context`), Nuvemshop `LS.registerOnChangeVariant` (`https://tiendanube.github.io/api-documentation/v1/intro`) e Adobe Commerce product layouts (`https://developer.adobe.com/commerce/frontend-core/guide/layouts/product-layouts`).
 
 ### BigShop
 
@@ -175,6 +179,7 @@ Inserir no template de produto:
 - `product.id` em `data-product-id`;
 - variant atual em `data-variant-id`;
 - `product.selected_or_first_available_variant.sku` em `data-sku`.
+- quando o tema trocar variante sem recarregar a página, chamar `window.ProvadorVirtual.reload(...)` no evento de mudança de variante.
 
 ### Nuvemshop
 
@@ -182,7 +187,48 @@ Inserir no template de produto:
 
 - id do produto;
 - id/SKU da variante selecionada;
-- atualizar atributo quando a variante mudar.
+- atualizar atributo quando a variante mudar;
+- usar `LS.registerOnChangeVariant(callback)` quando disponível para recarregar o provador com a variante escolhida.
+
+### VTEX
+
+Inserir em bloco/app de storefront ou no template da PDP:
+
+- usar `productContext.product.productId` como produto;
+- usar `productContext.selectedItem.itemId` como variação/SKU selecionado;
+- recarregar o provador quando o SKU selector mudar.
+
+### Tray
+
+Inserir no template de produto:
+
+- posicionar o container perto de `productHelper.variants()` e antes de `productHelper.form()` quando o tema usar esses helpers;
+- usar `product.id` e id/reference da variação selecionada;
+- se o tema expuser a variação apenas por JS, preencher os atributos e chamar `reload`.
+
+### Loja Integrada
+
+Inserir pelo editor do tema ou HTML/JS personalizado da página de produto:
+
+- mapear produto, variação e SKU a partir das variáveis do tema ou do DOM;
+- manter o container perto do seletor de tamanho;
+- chamar `reload` quando o comprador trocar a variação.
+
+### Magento / Adobe Commerce
+
+Inserir via layout XML/bloco de produto:
+
+- usar `catalog_product_view`/template de produto;
+- usar `$block->getProduct()` para produto e SKU base;
+- em produto configurável, atualizar variante simples por JS quando a opção mudar.
+
+### OpenCart
+
+Inserir no template `catalog/view/theme/{tema}/template/product/product.twig`:
+
+- usar `product_id` como produto;
+- usar `model`/SKU como identificador;
+- em opções/tamanhos, recarregar o provador quando `#product input` ou `#product select` mudar.
 
 ### Custom
 

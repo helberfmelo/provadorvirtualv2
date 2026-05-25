@@ -2560,6 +2560,215 @@ textarea {
   line-height: 1.5;
 }
 
+.widget-install-layout {
+  grid-template-columns: minmax(430px, 0.86fr) minmax(0, 1.14fr);
+  gap: 22px;
+}
+
+.widget-config-form {
+  gap: 0;
+  overflow: hidden;
+}
+
+.widget-config-section {
+  display: grid;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.widget-config-section:first-child {
+  padding-top: 0;
+}
+
+.widget-config-section:last-of-type {
+  border-bottom: 0;
+}
+
+.widget-config-section .subsection-heading,
+.widget-preview-panel .subsection-heading,
+.widget-code-panel .subsection-heading,
+.widget-guide-panel .subsection-heading {
+  align-items: center;
+}
+
+.widget-config-section .subsection-heading h2,
+.widget-preview-panel .subsection-heading h2,
+.widget-code-panel .subsection-heading h2,
+.widget-guide-panel .subsection-heading h2 {
+  font-size: 1.05rem;
+}
+
+.widget-install-summary {
+  display: grid;
+  grid-template-columns: minmax(170px, 0.9fr) minmax(170px, 1fr) minmax(150px, 0.86fr);
+  gap: 12px;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.widget-install-summary label,
+.widget-install-summary input,
+.widget-install-summary select {
+  min-width: 0;
+}
+
+.widget-field-platform select,
+.widget-field-key input {
+  min-height: 44px;
+}
+
+.widget-inline-toggle {
+  height: 100%;
+  margin: 0;
+}
+
+.widget-platform-guide {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fff7ed;
+}
+
+.widget-platform-guide > i {
+  display: inline-grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: 8px;
+  color: #fff;
+  background: #0f172a;
+}
+
+.widget-platform-guide strong,
+.widget-platform-guide span {
+  display: block;
+  min-width: 0;
+}
+
+.widget-platform-guide strong {
+  color: #0f172a;
+}
+
+.widget-platform-guide span {
+  margin-top: 3px;
+  color: #4b5563;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.widget-platform-guide em {
+  justify-self: end;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #92400e;
+  background: #ffedd5;
+  font-size: 0.74rem;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.widget-mode-selector {
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.widget-color-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.widget-type-grid {
+  display: grid;
+  grid-template-columns: minmax(170px, 1.1fr) minmax(92px, 0.55fr) minmax(136px, 0.8fr) minmax(92px, 0.55fr);
+  gap: 12px;
+  min-width: 0;
+}
+
+.widget-type-grid label,
+.widget-type-grid input,
+.widget-type-grid select,
+.widget-color-grid label,
+.widget-color-grid input {
+  min-width: 0;
+}
+
+.widget-confetti-toggle {
+  margin-top: 0;
+  background: #f9fafb;
+}
+
+.widget-install-aside {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.widget-preview-panel,
+.widget-code-panel,
+.widget-guide-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.widget-code-block {
+  max-height: 360px;
+  margin: 0;
+  overflow: auto;
+  padding: 16px;
+  border-radius: 8px;
+  color: #e5e7eb;
+  background: #111827;
+  font-size: 0.84rem;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.compact-copy {
+  justify-self: end;
+}
+
+.compact-heading {
+  margin-top: 2px;
+}
+
+.widget-data-support {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.widget-data-support span {
+  display: grid;
+  gap: 3px;
+  min-height: 58px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #4b5563;
+  background: #f9fafb;
+  font-size: 0.84rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.widget-data-support strong {
+  color: #0f172a;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
 .widget-style-preview {
   display: grid;
   gap: 14px;
@@ -3704,6 +3913,10 @@ td small {
   .integration-actions,
   .smart-catalog-panel,
   .install-grid,
+  .widget-install-summary,
+  .widget-color-grid,
+  .widget-type-grid,
+  .widget-data-support,
   .integrations-grid,
   .import-grid,
   .saas-grid,
@@ -3715,6 +3928,20 @@ td small {
   .order-json-grid,
   .legal-grid {
     grid-template-columns: 1fr;
+  }
+
+  .widget-platform-guide {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .widget-platform-guide em {
+    grid-column: 1 / -1;
+    justify-self: start;
+    white-space: normal;
+  }
+
+  .compact-copy {
+    justify-self: stretch;
   }
 
   .landing-split.reverse .landing-media {
