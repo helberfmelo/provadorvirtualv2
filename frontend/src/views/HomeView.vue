@@ -104,7 +104,7 @@ const currentYear = new Date().getFullYear()
     <div class="landing-heading">
       <span class="eyebrow">Plano único</span>
       <h2>O provador mais moderno, com IA para vender mais na loja online</h2>
-      <p>Assinatura anual com pagamento em até 12x no cartão ou Pix à vista com 5% de desconto.</p>
+      <p>Assinatura anual com pagamento em até 10x sem juros no cartão ou Pix à vista com 5% de desconto.</p>
     </div>
 
     <div class="pricing-strip">
@@ -112,7 +112,7 @@ const currentYear = new Date().getFullYear()
         <span>Demais plataformas</span>
         <strong>R$ 189,90/mês</strong>
         <p>Para lojas em Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou instalação personalizada.</p>
-        <small>Total anual em até 12x no cartão. Pix à vista com 5% de desconto.</small>
+        <small>Total anual em até 10x sem juros no cartão. Pix à vista com 5% de desconto.</small>
         <RouterLink :to="checkoutDefault" class="btn btn-secondary">
           <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
           Contratar este plano
@@ -122,7 +122,7 @@ const currentYear = new Date().getFullYear()
         <span>BigShop</span>
         <strong>R$ 129,90/mês</strong>
         <p>Preço especial exclusivo para lojas BigShop, com instalação guiada apenas para BigShop.</p>
-        <small>Integração mais simples do ecossistema, sem liberar outras plataformas no painel.</small>
+        <small>Total anual em até 10x sem juros no cartão. Pix à vista com 5% de desconto.</small>
         <RouterLink :to="checkoutBigShop" class="btn btn-primary">
           <i class="fa-solid fa-bolt" aria-hidden="true"></i>
           Contratar BigShop

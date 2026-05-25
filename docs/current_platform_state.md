@@ -224,4 +224,4 @@ Atualizado em: 2026-05-25
 
 ## Próxima ação recomendada
 
-Cadastrar/confirmar Mercado Pago em `PRODUCTION_ENV`, selecionar `Mercado Pago` em `/saas/checkout`, executar uma transação Pix/cartão de baixo valor e acompanhar webhook/cron; depois seguir com BigShop real e finalizar Pagar.me quando as pendências chegarem.
+Executar uma transação Mercado Pago Pix/cartão de baixo valor e acompanhar webhook/cron; depois seguir com BigShop real e finalizar Pagar.me quando as pendências chegarem.

@@ -134,7 +134,7 @@ Atualizado em: 2026-05-23
 - `DONE` Checkout transparente Mercado Pago com Pix, cartão tokenizado pelo MercadoPago.js, webhook e sincronização pendente.
 - `DONE` Painel SaaS `/saas/checkout` para escolher `mercado_pago` ou `pagarme`.
 - `DONE` Persistência de `checkout_sessions` e `payment_events`.
-- `DONE` Regra comercial atual: plano anual único, cartão até 12x, Pix com 5% de desconto, sem boleto.
+- `DONE` Regra comercial atual: plano anual único, cartão até 10x sem juros, Pix com 5% de desconto, sem boleto.
 - `DONE` Preço padrão `R$ 189,90/mes` e preço BigShop `R$ 129,90/mes`.
 - `DONE` Registrar variáveis Mercado Pago em `PRODUCTION_ENV` sem versionar valores reais.
 - `TODO` Executar transação real Mercado Pago de baixo valor e confirmar webhook/cron.

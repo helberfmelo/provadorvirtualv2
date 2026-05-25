@@ -227,7 +227,8 @@ Chaves comuns:
 - Mercado Pago e a operadora ativa de produção: cartão usa MercadoPago.js/CardForm no navegador, Pix usa `POST /v1/payments` e webhook em `POST /api/v1/webhooks/mercado-pago`.
 - Pagar.me permanece preservada como operadora alternativa: cartão e tokenizado no navegador com `PAGARME_PUBLIC_KEY`, backend cria pedido em `POST /orders` Core v5 e webhook segue em `POST /api/v1/webhooks/pagarme`.
 - Backend nunca recebe PAN/CVV; recebe apenas token de cartão da operadora.
-- Pix retorna QR Code/copia e cola/ticket na tela `/checkout/sucesso`; boleto não e oferecido no checkout atual.
+- Checkout público oferece cartão em até 10x sem juros ou Pix à vista com 5% de desconto; boleto não e oferecido no checkout atual.
+- Pix retorna QR Code/copia e cola/ticket na tela `/checkout/sucesso`.
 - Empresa nasce como `pending_payment` e e ativada por retorno imediato pago, webhook ou sincronização.
 - O comando `php artisan pv:payments-sync --limit=50` consulta pagamentos pendentes nas operadoras e ativa empresas pagas quando webhook falhar ou atrasar.
 - O scheduler executa o monitor de pagamentos a cada 5 minutos.

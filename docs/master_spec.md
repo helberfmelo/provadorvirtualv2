@@ -168,7 +168,7 @@ Provider recomendado: OpenAI por alinhamento com os projetos recentes. Gemini po
 ## Regras comerciais iniciais
 
 - Sem comeco gratuito no checkout público atual.
-- Plano comercial público único: anual, `R$ 189,90/mes`, cartão em até 12x ou Pix a vista com 5% de desconto.
+- Plano comercial público único: anual, `R$ 189,90/mes`, cartão em até 10x sem juros ou Pix a vista com 5% de desconto.
 - Cliente BigShop tem preço especial: `R$ 129,90/mes` no plano anual.
 - Painel deve mostrar bloqueio funcional quando assinatura estiver inativa.
 

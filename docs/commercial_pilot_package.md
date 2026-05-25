@@ -23,7 +23,7 @@ Publicado e validado em produção no run `26340033238`.
 
 - Site público: `https://provadorvirtual.online/`
 - Produto teste: `https://provadorvirtual.online/produto-teste`
-- Checkout: `https://provadorvirtual.online/checkout`
+- Checkout: `https://provadorvirtual.online/checkout` com cartão em até 10x sem juros ou Pix à vista com 5% de desconto.
 - WhatsApp especialista: `https://wa.me/5531993157573`
 - Política de privacidade: `https://provadorvirtual.online/privacidade`
 - Termos: `https://provadorvirtual.online/termos`
@@ -63,7 +63,7 @@ Validação local/operacional:
 
 ## Pendências para piloto real
 
-- Transação Pagar.me Pix/cartão de baixo valor com webhook e cron.
+- Transação Mercado Pago Pix/cartão de baixo valor com webhook e cron.
 - Ativação BigShop um clique com payload assinado real.
 - Probe e sync em loja BigShop piloto com produto, grade e tabela.
 - Teste de widget em página real de cliente com cache frio e mobile.
@@ -79,7 +79,6 @@ Demo assistida pode seguir quando:
 
 Campanha pública deve aguardar:
 
-- chaves reais Pagar.me em produção;
 - cron cPanel gerando log recente;
-- transação real aprovada;
+- transação real Mercado Pago aprovada;
 - piloto BigShop real, quando a venda envolver BigShop um clique.

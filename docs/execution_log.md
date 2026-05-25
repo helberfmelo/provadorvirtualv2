@@ -199,7 +199,7 @@
 - Criada landing pública v2 com estrutura inspirada no v1 e cores do v2.
 - Checkout público passou para plano anual único, sem boleto, com BigShop como primeira plataforma.
 - Preço padrão: `R$ 189,90/mes`; preço BigShop: `R$ 129,90/mes`.
-- Cartão em até 12x; Pix a vista com 5% de desconto.
+- Cartão em até 10x sem juros; Pix a vista com 5% de desconto.
 - Workflow passou a publicar build estática na raiz e manter backend/app em `/provadorvirtual_v2/`.
 - Validações locais: `php artisan test`, `npm run build`, `npx vite build --outDir dist-root` e `git diff --check`.
 - Run `26336510709` publicou app e raiz, mas falhou no passo `Ensure master admin` por `ssh: connect ... Connection refused` logo após os deploys remotos.
@@ -817,3 +817,10 @@
 - Validações locais: `npm run build`, `vendor/bin/pint --dirty`, `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=SaasCheckoutSettingsApiTest`, `php artisan test`, `git diff --check` e auditoria mobile Playwright mockada em 390px sem overflow horizontal.
 - Commit `7eadd35` enviado para `main`; o run `26386034325` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Smoke pós-deploy confirmou Mercado Pago ativo, cartão habilitado, métodos `pix,credit_card` e `max_installments=10` nas tabelas de preço pública.
+
+## 2026-05-25 - Sprint 84 Cópia comercial de pagamento
+
+- Landing pública atualizada para informar cartão em até 10x sem juros ou Pix à vista com 5% de desconto no título da seção de planos e nos cards de preço padrão/BigShop.
+- Defaults de e-mails transacionais `aguardando_pagamento`, `erro_pagamento` e `renovacao_plano` passaram a citar Pix com 5% de desconto e cartão em até 10x sem juros.
+- Criada migration para atualizar somente templates transacionais que ainda estejam exatamente no texto padrão antigo, preservando personalizações do SaaS.
+- Spec, backlog, arquitetura e pacote comercial revisados para não manterem a regra antiga de parcelamento como orientação atual.

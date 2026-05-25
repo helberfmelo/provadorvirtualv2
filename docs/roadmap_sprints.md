@@ -301,7 +301,7 @@ Entregas:
 - select de plataforma com BigShop como primeira opção;
 - preço padrão `R$ 189,90/mes` no anual;
 - preço BigShop `R$ 129,90/mes` no anual;
-- cartão em até 12x e Pix a vista com 5% de desconto;
+- cartão em até 10x sem juros e Pix a vista com 5% de desconto;
 - boleto removido;
 - plataforma salva na empresa e no widget;
 - testes de preço por plataforma e bloqueio de boleto.
@@ -1120,3 +1120,15 @@ Entregas:
 - ocultar selects técnicos do Mercado Pago que o comprador não precisa escolher.
 
 Status: implementado no commit `7eadd35` e publicado com sucesso no run `26386034325`, com build frontend, suíte backend completa, Pint, checagem de diff, auditoria mobile mockada e smoke pós-deploy confirmando `max_installments=10`.
+
+### Sprint 84 - Cópia comercial de pagamento
+
+Objetivo: alinhar todos os textos atuais que explicam a condição de pagamento para cartão em até 10x sem juros ou Pix com 5% de desconto.
+
+Entregas:
+
+- atualizar a landing pública na seção de planos e nos cards de preço;
+- atualizar defaults de e-mails transacionais e migrar templates padrão existentes sem sobrescrever personalizações;
+- revisar spec, backlog, arquitetura e pacote comercial para remover a regra antiga de parcelamento da orientação atual.
+
+Status: em implementação nesta sprint; publicar somente após testes locais, commit, push e GitHub Actions/deploy acompanhados até sucesso.
