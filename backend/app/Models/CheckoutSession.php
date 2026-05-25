@@ -49,4 +49,9 @@ class CheckoutSession extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function acceptance()
+    {
+        return $this->hasOne(CheckoutAcceptance::class);
+    }
 }

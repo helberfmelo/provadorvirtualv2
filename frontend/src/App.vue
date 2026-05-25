@@ -15,6 +15,7 @@ const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const navOpen = ref(false)
+const cookieNoticeVisible = ref(false)
 const brandLogoUrl = `${import.meta.env.BASE_URL}images/brand/logo_provador_virtual.png`
 
 const canSeeSaas = computed(() => ['admin', 'support'].includes(auth.user?.role || ''))
@@ -66,6 +67,7 @@ const visibleWorkLinks = computed(() => (
 
 onMounted(() => {
   auth.loadMe().catch(() => undefined)
+  cookieNoticeVisible.value = !hasCookieNoticeAcceptance()
 })
 
 watch(() => route.fullPath, () => {
@@ -91,6 +93,17 @@ async function switchCompany(event: Event) {
   }
 
   navOpen.value = false
+}
+
+function hasCookieNoticeAcceptance() {
+  return localStorage.getItem('pv_cookie_notice_ok') === '1'
+    || document.cookie.split(';').some((item) => item.trim().startsWith('pv_cookie_notice_ok=1'))
+}
+
+function acceptCookieNotice() {
+  localStorage.setItem('pv_cookie_notice_ok', '1')
+  document.cookie = 'pv_cookie_notice_ok=1; Max-Age=31536000; Path=/; SameSite=Lax'
+  cookieNoticeVisible.value = false
 }
 </script>
 
@@ -236,5 +249,13 @@ async function switchCompany(event: Event) {
     </main>
 
     <SaveFeedbackModal />
+
+    <div v-if="cookieNoticeVisible" class="cookie-notice" role="dialog" aria-live="polite" aria-label="Aviso de privacidade">
+      <p>
+        Usamos cookies técnicos, localStorage e registros operacionais para login, segurança, checkout,
+        preferências do provador e melhoria do serviço. Ao continuar, você concorda com esse uso.
+      </p>
+      <button class="btn btn-secondary" type="button" @click="acceptCookieNotice">OK</button>
+    </div>
   </div>
 </template>

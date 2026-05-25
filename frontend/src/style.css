@@ -1289,6 +1289,60 @@ a {
   font-size: 1.05rem;
 }
 
+.terms-acceptance {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #4b5563;
+  background: #fff;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.terms-acceptance input {
+  width: 18px;
+  min-height: 18px;
+  margin-top: 2px;
+}
+
+.terms-acceptance a {
+  color: #0f172a;
+  font-weight: 900;
+}
+
+.cookie-notice {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 90;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  width: min(620px, calc(100vw - 36px));
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.16);
+}
+
+.cookie-notice p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.cookie-notice button {
+  min-height: 38px;
+  padding: 8px 14px;
+}
+
 .checkout-result {
   max-width: 820px;
   margin: 0 auto;
@@ -3437,6 +3491,12 @@ td small {
 
   .payment-tabs button {
     min-height: 46px;
+  }
+
+  .cookie-notice {
+    right: 14px;
+    bottom: 14px;
+    grid-template-columns: 1fr;
   }
 
   .mercado-card-fields {

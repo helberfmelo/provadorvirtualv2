@@ -178,6 +178,7 @@ Atualizado em: 2026-05-25
 - Sprint 85 enviada ao GitHub no commit `84ca5e6`; o run `26386718075` finalizou com sucesso, corrigindo os campos seguros reais do Mercado Pago no checkout mobile para 44px sem overflow horizontal.
 - Sprint 86 registra o roadmap comercial de planos mensal/anual, recorrência, aceite legal, cookies e boleto, e torna obrigatório iniciar cada título de commit com `Sprint <numero> - `.
 - Sprint 87 atualiza a matriz de planos para mensal/anual por plataforma, com preços `489,80`, `389,80`, `449,80` e `349,90`, total anual e percentual de economia retornados pela API.
+- Sprint 88 reforça `/termos` e `/privacidade`, exige aceite no checkout, salva prova técnica em `checkout_acceptances` com IP/data/hora/usuário/empresa/versões legais e adiciona aviso inferior de cookies/localStorage com persistência no navegador.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -186,7 +187,7 @@ Atualizado em: 2026-05-25
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
-- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual e Pix como alternativa à vista com tag `5% off`; a regra comercial atual já tem planos mensal/anual por plataforma e a trilha iniciada na Sprint 86 segue para recorrência, aceite legal e boleto controlado pelo SaaS.
+- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual e Pix como alternativa à vista com tag `5% off`; a regra comercial atual já tem planos mensal/anual por plataforma e aceite legal obrigatório. A trilha iniciada na Sprint 86 segue para recorrência e boleto controlado pelo SaaS.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
 - Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.
@@ -199,7 +200,7 @@ Atualizado em: 2026-05-25
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
 - Diretriz obrigatória de telas: `docs/portal_ui_guidelines.md`.
-- Checkout público: `/checkout` e `/checkout/sucesso`.
+- Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão e links para termos/privacidade.
 - Site público raiz: landing comercial do Provador Virtual, com planos mensal/anual por plataforma, CTA para loja teste/checkout e cards de benefícios otimizados para mobile. A cópia pública usa `provador` em vez de `widget` para evitar jargão técnico.
 - APIs protegidas: produtos, variações, tabelas, templates, widget-install e integrações, com middleware de permissão por módulo e escopo da empresa ativa.
 - Importacoes protegidas: preview, commit e histórico em `/api/v1/imports`.
@@ -214,7 +215,7 @@ Atualizado em: 2026-05-25
 - BigShop público assinado: ativação em `/api/v1/public/bigshop/activate`.
 - APIs públicas: health, produto demo e recomendações do widget.
 - APIs públicas inteligentes: `/api/v1/public/recommendations/{id}/signal` e `/api/v1/public/shopper-profiles/forget`.
-- APIs públicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}`, `/api/v1/webhooks/mercado-pago` e `/api/v1/webhooks/pagarme`.
+- APIs públicas de checkout: `/api/v1/public/checkout/config`, `/api/v1/public/checkout`, `/api/v1/public/checkout/{reference}`, `/api/v1/webhooks/mercado-pago` e `/api/v1/webhooks/pagarme`. O `POST /public/checkout` exige `accepted_terms=true` e grava a prova técnica do aceite.
 - APIs públicas de empresa: `/api/v1/public/company-access`.
 - APIs SaaS de e-mail: `/api/v1/saas/email-settings` e `/api/v1/saas/transactional-emails`.
 - API SaaS de checkout: `/api/v1/saas/checkout-settings`.

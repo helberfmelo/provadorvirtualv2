@@ -1,6 +1,6 @@
 # Pacote Comercial e Piloto Assistido
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-25
 
 ## Objetivo
 
@@ -27,6 +27,7 @@ Publicado e validado em produção no run `26340033238`.
 - WhatsApp especialista: `https://wa.me/5531993157573`
 - Política de privacidade: `https://provadorvirtual.online/privacidade`
 - Termos: `https://provadorvirtual.online/termos`
+- Checkout salva aceite legal versionado, com IP/data/hora/usuário/empresa e contexto do plano contratado.
 
 ## Onboarding do cliente
 

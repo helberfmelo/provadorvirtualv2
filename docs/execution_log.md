@@ -856,3 +856,15 @@
 - Checkout aceita query `plan=annual` ou `plan=monthly`, recalcula total/parcelas conforme ciclo e mantém cartão como meio inicial quando disponível.
 - Descrições enviadas às operadoras passaram a respeitar o período contratado, evitando texto fixo de 12 meses para plano mensal.
 - Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test --filter=PaymentSyncCommandTest`, `php artisan test --filter=TransactionalEmailDispatchTest` e `npm run build`.
+- Validação completa local passou com `php artisan test`, `vendor/bin/pint --dirty` e `git diff --check`.
+- Commit `e21a2f3` enviado para `main`; o run `26411375635` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+
+## 2026-05-25 - Sprint 88 Termos, privacidade, aceite e cookies
+
+- Conferidas fontes oficiais da LGPD/ANPD sobre direitos dos titulares, cookies e papéis de controlador/operador antes da revisão legal operacional.
+- Páginas `/termos` e `/privacidade` foram ampliadas e versionadas em `2026-05-25`, cobrindo contratação, cobrança, recorrência, pagamentos, integrações, IA, responsabilidades, LGPD, cookies/localStorage, retenção, segurança e direitos dos titulares.
+- Checkout público passou a exigir `accepted_terms=true`; o box já vem marcado e aponta para termos e política de privacidade em nova aba.
+- Criada a tabela `checkout_acceptances` e o modelo `CheckoutAcceptance` para salvar prova técnica do aceite com checkout, usuário, empresa, e-mail, documento, versões legais, data/hora, IP, user-agent e contexto comercial do pedido.
+- Sessões de checkout passaram a carregar metadados `legal_acceptance` com versões dos documentos e horário de aceite.
+- App Vue ganhou aviso discreto no rodapé sobre cookies técnicos, localStorage e registros operacionais, com botão `OK` e persistência por cookie/localStorage para não reaparecer.
+- Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test`, `npm run build`, `php -l` nos novos/alterados arquivos PHP, `vendor/bin/pint --dirty` e `git diff --check`.

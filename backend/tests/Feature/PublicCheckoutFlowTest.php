@@ -46,6 +46,13 @@ class PublicCheckoutFlowTest extends TestCase
             'name' => 'Loja Checkout Teste',
             'status' => 'pending_payment',
         ]);
+        $this->assertDatabaseHas('checkout_acceptances', [
+            'lead_email' => 'admin.checkout@example.com',
+            'company_document' => '11222333000181',
+            'accepted_terms' => true,
+            'terms_version' => '2026-05-25',
+            'privacy_version' => '2026-05-25',
+        ]);
 
         Http::assertSent(function ($request): bool {
             $payload = $request->data();
@@ -201,6 +208,17 @@ class PublicCheckoutFlowTest extends TestCase
             'payment_method' => 'boleto',
         ])->assertUnprocessable()
             ->assertJsonValidationErrors('payment_method');
+    }
+
+    public function test_checkout_requires_terms_acceptance(): void
+    {
+        $this->configurePagarme();
+
+        $this->postJson('/api/v1/public/checkout', [
+            ...$this->payload(),
+            'accepted_terms' => false,
+        ])->assertUnprocessable()
+            ->assertJsonValidationErrors('accepted_terms');
     }
 
     public function test_same_user_can_contract_more_than_one_company(): void
@@ -361,6 +379,7 @@ class PublicCheckoutFlowTest extends TestCase
             'admin_phone' => '11999990000',
             'password' => 'checkout123',
             'password_confirmation' => 'checkout123',
+            'accepted_terms' => true,
         ];
     }
 

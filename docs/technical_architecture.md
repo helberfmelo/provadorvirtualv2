@@ -190,6 +190,7 @@ Tabelas propostas:
 - `ai_usage_logs`
 - `audit_logs`
 - `checkout_sessions`
+- `checkout_acceptances`
 - `payment_events`
 - `saas_settings`
 - `email_settings`

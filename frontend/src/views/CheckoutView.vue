@@ -83,6 +83,7 @@ const form = reactive({
   password: '',
   password_confirmation: '',
   installments: '',
+  accepted_terms: true,
 })
 
 const card = reactive({
@@ -676,6 +677,17 @@ function selectPlan(planCode: string) {
           <span>Escolha as parcelas</span>
           <strong>Até {{ maxInstallments }}x sem juros</strong>
         </div>
+
+        <label class="terms-acceptance">
+          <input v-model="form.accepted_terms" type="checkbox" required />
+          <span>
+            Declaro que li e aceito os
+            <RouterLink to="/termos" target="_blank">termos de uso</RouterLink>
+            e a
+            <RouterLink to="/privacidade" target="_blank">política de privacidade</RouterLink>,
+            incluindo cobrança recorrente quando aplicável.
+          </span>
+        </label>
 
         <button class="btn btn-primary" type="submit" :disabled="submitting">
           <i class="fa-solid fa-lock" aria-hidden="true"></i>

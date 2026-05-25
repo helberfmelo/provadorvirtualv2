@@ -1,6 +1,6 @@
 # Product Backlog
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-25
 
 ## Agora
 
@@ -137,7 +137,7 @@ Atualizado em: 2026-05-23
 - `DONE` Atualizar regra comercial para plano mensal e anual por plataforma, com mensal em destaque no anual, total anual e economia percentual.
 - `TODO` Implementar recorrência automática no cartão para plano mensal e, quando tecnicamente seguro, para renovação anual.
 - `TODO` Criar opção discreta no portal da empresa para cancelar somente a renovação automática, sem cancelar pagamentos já capturados ou parcelas em andamento.
-- `TODO` Salvar prova técnica de aceite dos termos no checkout.
+- `DONE` Salvar prova técnica de aceite dos termos no checkout.
 - `TODO` Permitir boleto no checkout somente quando habilitado no painel SaaS.
 - `DONE` Registrar variáveis Mercado Pago em `PRODUCTION_ENV` sem versionar valores reais.
 - `TODO` Executar transação real Mercado Pago de baixo valor e confirmar webhook/cron.

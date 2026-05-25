@@ -1,6 +1,6 @@
 # Hardening, LGPD e Observabilidade
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-25
 
 ## Objetivo
 
@@ -19,6 +19,16 @@ Implementado:
 - auditoria de login e logout;
 - comandos de anonimização e limpeza de logs;
 - smoke de deploy incluindo status operacional.
+
+## Status Sprint 88
+
+Implementado:
+
+- `/termos` e `/privacidade` versionados em `2026-05-25`, com escopo do SaaS, checkout, recorrência, pagamentos, integrações, IA, cookies/localStorage e LGPD;
+- checkout público exige aceite legal e grava prova técnica em `checkout_acceptances`;
+- prova técnica inclui sessão de checkout, usuário, empresa, e-mail, documento, versões legais, data/hora, IP, user-agent e metadados do plano/meio de pagamento;
+- aviso inferior de cookies/localStorage é exibido no site e sistema até o usuário clicar em `OK`;
+- aceite do aviso é salvo em cookie e localStorage para reduzir repetição da mensagem.
 
 ## CORS do widget
 

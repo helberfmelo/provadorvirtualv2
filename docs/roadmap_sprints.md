@@ -1204,6 +1204,8 @@ Validação:
 - inspeção visual mobile/desktop das páginas legais e modal de cookies;
 - commit, push e Actions/deploy.
 
+Status: implementado na Sprint 88 com páginas legais versionadas, aceite obrigatório no checkout, registro em `checkout_acceptances`, metadados legais na sessão de checkout e aviso de cookies/localStorage persistido no navegador.
+
 ### Sprint 89 - Recorrência de cartão e cancelamento de renovação
 
 Objetivo: implementar renovação automática para pagamento mensal no cartão e disponibilizar cancelamento discreto da renovação no painel sem cancelar cobranças ou parcelas já em andamento.

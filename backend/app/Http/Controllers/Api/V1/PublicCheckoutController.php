@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Models\CheckoutAcceptance;
 use App\Models\CheckoutSession;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
@@ -21,6 +22,10 @@ use RuntimeException;
 
 class PublicCheckoutController extends Controller
 {
+    private const TERMS_VERSION = '2026-05-25';
+
+    private const PRIVACY_VERSION = '2026-05-25';
+
     public function __construct(private readonly CheckoutPaymentManager $checkoutPayments) {}
 
     public function config(): array
@@ -42,7 +47,9 @@ class PublicCheckoutController extends Controller
 
         try {
             $provider = $this->checkoutPayments->currentProviderKey();
-            $session = DB::transaction(function () use ($data, $plan, $pricing, $provider): CheckoutSession {
+            $session = DB::transaction(function () use ($data, $plan, $pricing, $provider, $request): CheckoutSession {
+                $acceptedAt = now();
+
                 $merchant = Merchant::query()->create([
                     'name' => $data['company_name'],
                     'slug' => $this->uniqueMerchantSlug($data['company_name']),
@@ -121,6 +128,33 @@ class PublicCheckoutController extends Controller
                         'pricing' => $pricing,
                         'platform' => $company->platform,
                         'company_access_code' => $company->access_code,
+                        'legal_acceptance' => [
+                            'terms_version' => self::TERMS_VERSION,
+                            'privacy_version' => self::PRIVACY_VERSION,
+                            'accepted_at' => $acceptedAt->toISOString(),
+                        ],
+                    ],
+                ]);
+
+                CheckoutAcceptance::query()->create([
+                    'checkout_session_id' => $session->id,
+                    'merchant_id' => $merchant->id,
+                    'merchant_company_id' => $company->id,
+                    'user_id' => $user->id,
+                    'lead_email' => $data['admin_email'],
+                    'company_document' => $data['company_document'],
+                    'terms_version' => self::TERMS_VERSION,
+                    'privacy_version' => self::PRIVACY_VERSION,
+                    'accepted_terms' => true,
+                    'accepted_at' => $acceptedAt,
+                    'ip_address' => $request->ip(),
+                    'user_agent' => $request->userAgent(),
+                    'metadata' => [
+                        'plan_code' => $plan['code'],
+                        'billing_cycle' => $plan['billing_cycle'] ?? $plan['code'],
+                        'platform' => $company->platform,
+                        'payment_method' => $data['payment_method'],
+                        'amount_cents' => $pricing['payable_cents'],
                     ],
                 ]);
 
@@ -236,6 +270,7 @@ class PublicCheckoutController extends Controller
             'card_brand' => ['nullable', 'string', 'max:80'],
             'card_last_four_digits' => ['nullable', 'string', 'max:4'],
             'installments' => ['nullable', 'integer', 'min:1', 'max:10'],
+            'accepted_terms' => ['required', 'accepted'],
         ]);
     }
 

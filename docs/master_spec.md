@@ -174,6 +174,8 @@ Provider recomendado: OpenAI por alinhamento com os projetos recentes. Gemini po
   - qualquer plataforma anual: `R$ 449,80/mes`, com total anual e economia versus mensal;
   - cliente BigShop anual: `R$ 349,90/mes`, com total anual e economia versus mensal.
 - Em todo plano anual, o preço em destaque deve ser o valor mensal equivalente; o total anual e o percentual de economia devem aparecer próximos ao destaque.
+- Checkout público deve exigir aceite dos termos e da política de privacidade, salvar prova técnica com IP, user-agent, usuário, empresa, data/hora, versões legais e contexto do pedido.
+- Site e sistema devem exibir aviso discreto de cookies técnicos/localStorage até o usuário confirmar.
 - Painel deve mostrar bloqueio funcional quando assinatura estiver inativa.
 
 ## Criterios de pronto do release inicial

@@ -1,6 +1,6 @@
 # Segurança, Privacidade e Compliance
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-25
 
 ## Principios
 
@@ -22,6 +22,8 @@ Dados do widget podem ser pessoais. Regras:
 - termos e política devem explicar finalidade.
 
 Status Sprint 36: `shopper_profiles` salva medidas somente com consentimento operacional no widget. O navegador guarda `profile_id` e token local; o banco guarda apenas hash do token. O comprador pode limpar o perfil pelo widget, e `pv:privacy-anonymize` também remove medidas/preferencias antigas.
+
+Status Sprint 88: checkout público exige aceite dos termos e política de privacidade. O aceite é versionado e registrado em `checkout_acceptances` com IP, user-agent, usuário, empresa, documento, e-mail, data/hora e contexto do plano/meio de pagamento. O site e o sistema exibem aviso inferior sobre cookies técnicos, localStorage e registros operacionais, com aceite persistido no navegador.
 
 ## Segredos
 
@@ -72,6 +74,7 @@ Auditar:
 - mudanca de plano/status;
 - uso de IA;
 - falhas de webhook.
+- aceite legal no checkout.
 
 Status Sprint 10: `audit_logs` registra ações em tabelas de medidas, widget e integrações com hash de IP/user-agent e metadata sem secrets.
 
