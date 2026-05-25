@@ -40,6 +40,8 @@ Antes de desenvolver qualquer sprint, ajuste, correção ou deploy, reler nesta 
 
 Nenhuma sprint deve começar sem essa releitura. Depois de executar uma sprint, é obrigatório fazer commit, push, acompanhar GitHub Actions/deploy até o status final e somente então passar para a próxima sprint.
 
+Todo commit criado para uma sprint deve ter o título iniciado exatamente com `Sprint <numero> - `. Exemplo: `Sprint 86 - Atualiza governança comercial`.
+
 ## Fontes estudadas
 
 - `D:\Projetos\bigshop\bigshop_helpdesk`

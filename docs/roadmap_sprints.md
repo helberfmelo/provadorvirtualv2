@@ -1145,3 +1145,118 @@ Entregas:
 - validar em Playwright mobile com SDK mockado inserindo iframes propositalmente gigantes.
 
 Status: implementado no commit `84ca5e6` e publicado com sucesso no run `26386718075`, com build local, checagem de diff, Playwright mobile mockado e smoke Playwright mobile em produção confirmando campos Mercado Pago em 44px.
+
+### Sprint 86 - Governança e roadmap comercial de planos
+
+Objetivo: registrar como obrigatória a regra de título de commit por sprint e planejar o pacote comercial de planos, recorrência, aceite legal, cookies e boleto antes das alterações funcionais.
+
+Entregas:
+
+- tornar explícito que todo commit de sprint deve iniciar com `Sprint <numero> - `;
+- registrar o roadmap completo das sprints 87 a 91;
+- confirmar que a implementação seguirá commit, push e conferência de Actions/deploy antes de avançar de uma sprint para a próxima.
+
+Validação:
+
+- `git diff --check`;
+- commit e push com prefixo obrigatório;
+- conferência do workflow remoto.
+
+### Sprint 87 - Planos mensal/anual e nova matriz de preços
+
+Objetivo: atualizar todos os preços do site, checkout e sistema para suportar mensal e anual por plataforma, preservando o destaque correto do valor mensal.
+
+Entregas:
+
+- plano mensal para qualquer plataforma: `R$ 489,80/mês`;
+- plano mensal para cliente BigShop: `R$ 389,80/mês`;
+- plano anual para qualquer plataforma: destaque de `R$ 449,80/mês`, com total anual e percentual de economia;
+- plano anual para cliente BigShop: destaque de `R$ 349,90/mês`, com total anual e percentual de economia;
+- API pública de checkout retornando planos mensal/anual, preços por plataforma, total anual, economia percentual e meios de pagamento permitidos;
+- landing pública e checkout exibindo mensal e anual sem manter valores antigos;
+- testes cobrindo preços, totais, economia e seleção por plataforma/ciclo.
+
+Validação:
+
+- testes backend do checkout;
+- build frontend;
+- `git diff --check`;
+- commit, push e Actions/deploy.
+
+### Sprint 88 - Termos, privacidade, aceite e aviso de cookies
+
+Objetivo: reforçar a camada legal operacional e salvar prova técnica do aceite no checkout.
+
+Entregas:
+
+- páginas `/termos` e `/privacidade` completas, em PT-BR, com escopo do SaaS, limites de responsabilidade, LGPD, dados do lojista, dados do consumidor, IA, integrações, pagamentos, recorrência, boleto e cookies;
+- box de aceite dos termos já marcado no checkout, com link para termos e privacidade;
+- persistência de aceite com IP, user-agent, usuário, e-mail, empresa, data/hora, versão de termos/privacidade e contexto do checkout;
+- aviso discreto no rodapé da tela sobre cookies/localStorage necessários e operacionais, com botão `OK` e gravação em cookie/localStorage para não reaparecer;
+- testes de validação do aceite e armazenamento dos metadados.
+
+Validação:
+
+- testes backend focados em checkout/legal;
+- build frontend;
+- inspeção visual mobile/desktop das páginas legais e modal de cookies;
+- commit, push e Actions/deploy.
+
+### Sprint 89 - Recorrência de cartão e cancelamento de renovação
+
+Objetivo: implementar renovação automática para pagamento mensal no cartão e disponibilizar cancelamento discreto da renovação no painel sem cancelar cobranças ou parcelas já em andamento.
+
+Entregas:
+
+- criação de assinatura Mercado Pago por `/preapproval` para plano mensal no cartão, com status autorizado e recorrência mensal;
+- registro local da assinatura, status, provedor, ID remoto, ciclo, próxima cobrança, aceite de recorrência e histórico de eventos;
+- webhook/sincronização para eventos de assinatura e pagamentos autorizados;
+- opção discreta no portal da empresa para desabilitar a renovação automática;
+- chamada à operadora para cancelar/pausar a assinatura remota, preservando pagamentos já capturados ou parcelas existentes;
+- para anual, registrar a renovação automática somente quando tecnicamente suportada sem duplicar cobrança inicial; se a operadora não permitir de forma segura com parcelamento anual, manter a renovação anual como pendência operacional documentada.
+
+Validação:
+
+- testes backend com `Http::fake` para criar, consultar e cancelar assinatura;
+- testes de permissão da rota do portal;
+- build frontend;
+- commit, push e Actions/deploy.
+
+### Sprint 90 - Boleto habilitável pelo SaaS
+
+Objetivo: oferecer boleto no checkout somente quando o SaaS habilitar esse meio de pagamento.
+
+Entregas:
+
+- configuração em `/saas/checkout` para habilitar/desabilitar boleto;
+- API pública de checkout retornando boleto apenas quando habilitado e suportado pela operadora ativa;
+- checkout com aba de boleto, instrução de pagamento diferido e vencimento;
+- integração Mercado Pago para boleto, salvando URL de instruções, linha digitável/código de barras quando retornados e status aguardando pagamento;
+- tela de sucesso exibindo instruções de boleto;
+- testes garantindo boleto oculto por padrão e disponível quando habilitado.
+
+Validação:
+
+- testes backend de configuração e checkout;
+- build frontend;
+- `git diff --check`;
+- commit, push e Actions/deploy.
+
+### Sprint 91 - QA final do pacote comercial
+
+Objetivo: validar o conjunto novo de planos, aceite, recorrência, cancelamento de renovação e boleto em local e produção.
+
+Entregas:
+
+- revisão final de documentação técnica, comercial, LGPD e runbooks;
+- validação local do checkout nos ciclos mensal/anual, plataformas padrão/BigShop e meios cartão/Pix/boleto;
+- validação de telas públicas, portal da empresa e SaaS em mobile;
+- execução do script de produção após deploy;
+- registro das pendências externas reais, como teste financeiro real e eventuais limitações da operadora.
+
+Validação:
+
+- suíte backend completa quando viável;
+- build frontend;
+- `scripts/validate-production.ps1` após deploy;
+- commit, push e Actions/deploy.

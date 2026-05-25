@@ -837,3 +837,11 @@
 - Auditoria Playwright mobile local em 390px mockou o SDK com iframes de 260px e confirmou campos em 44px, iframes em 22px, aba `Cartão` ativa, 10 parcelas carregadas e ausência de overflow horizontal.
 - Commit `84ca5e6` enviado para `main`; o run `26386718075` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Smoke Playwright mobile em produção em `https://provadorvirtual.online/checkout?platform=bigshop` confirmou os três campos seguros reais do Mercado Pago em 44px, iframes em 22px, `Cartão` ativo, regra CSS publicada e ausência de overflow horizontal.
+
+## 2026-05-25 - Sprint 86 Governança e roadmap comercial de planos
+
+- Releitura obrigatória de toda a documentação do projeto concluída, incluindo `docs/credentials.local.md` sem expor valores sensíveis.
+- Confirmado que a governança já exigia commit, push e conferência de Actions/deploy a cada sprint, mas ainda não explicitava o prefixo obrigatório no título do commit.
+- `docs/README.md` e `docs/sprint_governance.md` passaram a exigir que todo commit de sprint inicie com `Sprint <numero> - `.
+- `docs/roadmap_sprints.md` recebeu o roadmap das Sprints 86 a 91 para planos mensal/anual, aceite legal, cookies, recorrência, cancelamento de renovação, boleto e QA final.
+- `docs/product_backlog.md` e `docs/current_platform_state.md` foram atualizados para refletir a nova trilha comercial.

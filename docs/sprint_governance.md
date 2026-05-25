@@ -40,6 +40,7 @@ Não iniciar a sprint seguinte enquanto a sprint atual não tiver commit, push e
 Ao final de sprint concluida:
 
 - sempre fazer commit;
+- o titulo de todo commit feito para uma sprint deve iniciar exatamente com `Sprint <numero> - `;
 - sempre fazer push;
 - sempre acompanhar Actions até status final;
 - sempre conferir se o deploy remoto passou depois do push;

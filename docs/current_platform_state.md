@@ -176,6 +176,7 @@ Atualizado em: 2026-05-25
 - Sprint 83 enviada ao GitHub no commit `7eadd35`; o run `26386034325` finalizou com sucesso, priorizando cartão no checkout público, limitando parcelas a 10x sem juros e deixando Pix como alternativa com tag `5% off`.
 - Sprint 84 enviada ao GitHub no commit `fe2ab48`; o run `26386407174` finalizou com sucesso, atualizando a cópia pública e transacional para cartão em até 10x sem juros ou Pix à vista com 5% de desconto.
 - Sprint 85 enviada ao GitHub no commit `84ca5e6`; o run `26386718075` finalizou com sucesso, corrigindo os campos seguros reais do Mercado Pago no checkout mobile para 44px sem overflow horizontal.
+- Sprint 86 registra o roadmap comercial de planos mensal/anual, recorrência, aceite legal, cookies e boleto, e torna obrigatório iniciar cada título de commit com `Sprint <numero> - `.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -184,7 +185,7 @@ Atualizado em: 2026-05-25
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
-- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros e Pix como alternativa à vista com tag `5% off`.
+- Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros e Pix como alternativa à vista com tag `5% off`; a trilha iniciada na Sprint 86 substituirá a regra de plano anual único por planos mensal/anual com recorrência e boleto controlado pelo SaaS.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
 - Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.

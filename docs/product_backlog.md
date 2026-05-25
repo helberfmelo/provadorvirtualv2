@@ -134,8 +134,11 @@ Atualizado em: 2026-05-23
 - `DONE` Checkout transparente Mercado Pago com Pix, cartão tokenizado pelo MercadoPago.js, webhook e sincronização pendente.
 - `DONE` Painel SaaS `/saas/checkout` para escolher `mercado_pago` ou `pagarme`.
 - `DONE` Persistência de `checkout_sessions` e `payment_events`.
-- `DONE` Regra comercial atual: plano anual único, cartão até 10x sem juros, Pix com 5% de desconto, sem boleto.
-- `DONE` Preço padrão `R$ 189,90/mes` e preço BigShop `R$ 129,90/mes`.
+- `TODO` Atualizar regra comercial para plano mensal e anual por plataforma, com mensal em destaque no anual, total anual e economia percentual.
+- `TODO` Implementar recorrência automática no cartão para plano mensal e, quando tecnicamente seguro, para renovação anual.
+- `TODO` Criar opção discreta no portal da empresa para cancelar somente a renovação automática, sem cancelar pagamentos já capturados ou parcelas em andamento.
+- `TODO` Salvar prova técnica de aceite dos termos no checkout.
+- `TODO` Permitir boleto no checkout somente quando habilitado no painel SaaS.
 - `DONE` Registrar variáveis Mercado Pago em `PRODUCTION_ENV` sem versionar valores reais.
 - `TODO` Executar transação real Mercado Pago de baixo valor e confirmar webhook/cron.
 - `TODO` Finalizar Pagar.me quando as informações pendentes chegarem.
