@@ -9,6 +9,7 @@
   var config = readConfig(script);
   var root = null;
   var activeBackdrop = null;
+  var suppressDrawerOpenUntil = 0;
   var profileStorageKey = 'pv_shopper_profile_v2';
   var profileStoragePrefix = 'pv_shopper_profile_v2_table_';
   var state = initialState();
@@ -256,11 +257,15 @@
   function emitConfigEvent(result) {
     var detail = Object.assign({}, identityPayload(), result || {});
 
+    emitWidgetEvent('provadorvirtual:config', detail);
+  }
+
+  function emitWidgetEvent(name, detail) {
     try {
-      window.dispatchEvent(new CustomEvent('provadorvirtual:config', { detail: detail }));
+      window.dispatchEvent(new CustomEvent(name, { detail: detail }));
     } catch (error) {
       var event = document.createEvent('CustomEvent');
-      event.initCustomEvent('provadorvirtual:config', false, false, detail);
+      event.initCustomEvent(name, false, false, detail);
       window.dispatchEvent(event);
     }
   }
@@ -302,7 +307,14 @@
     discoverButton.className = 'pv-trigger pv-trigger-primary';
     discoverButton.type = 'button';
     discoverButton.innerHTML = '<span aria-hidden="true">PV</span><span>Descubra seu tamanho</span>';
-    discoverButton.addEventListener('click', openRecommendationDrawer);
+    discoverButton.addEventListener('click', function (event) {
+      if (Date.now() < suppressDrawerOpenUntil) {
+        event.preventDefault();
+        return;
+      }
+
+      openRecommendationDrawer();
+    });
 
     var tableButton = document.createElement('button');
     tableButton.className = 'pv-trigger pv-trigger-secondary';
@@ -521,7 +533,7 @@
     if (state.recommendation && state.recommendation.recommended_size) {
       return [
         '<div class="pv-recommendation-inline" data-pv-recommendation-banner>',
-        '<span>Recomendamos o tamanho <strong>' + escapeHtml(state.recommendation.recommended_size) + '</strong>.</span>',
+        '<span>Recomendamos o tamanho <button type="button" class="pv-inline-size-button" data-pv-select-recommended-size>' + escapeHtml(state.recommendation.recommended_size) + '</button>.</span>',
         state.precision < 100 ? '<small>Continue preenchendo para aumentar a precis&atilde;o.</small>' : '<small>Voc&ecirc; chegou &agrave; precis&atilde;o m&aacute;xima.</small>',
         '</div>',
       ].join('');
@@ -551,7 +563,8 @@
       '<button type="button" class="pv-back-link" data-pv-back>&larr; Ajustar dados</button>',
       '<div class="pv-result-card">',
       '<span>Tamanho recomendado</span>',
-      '<strong>' + escapeHtml(data.recommended_size || '-') + '</strong>',
+      '<button type="button" class="pv-result-size" data-pv-select-recommended-size>' + escapeHtml(data.recommended_size || '-') + '</button>',
+      '<small>Toque no tamanho para aplicar na p&aacute;gina do produto.</small>',
       '<small>' + Math.round(data.confidence || 0) + '% de confian&ccedil;a</small>',
       data.shopper_profile && data.shopper_profile.message ? '<small>' + escapeHtml(data.shopper_profile.message) + '</small>' : '',
       notes ? '<ul>' + notes + '</ul>' : '',
@@ -710,7 +723,7 @@
       var image = config.assetBaseUrl + '/' + option[3];
       return [
         '<button type="button" class="pv-shape-card pv-shape-card-' + (isMale ? 'male' : 'female') + active + '" data-pv-shape="' + option[0] + '" aria-pressed="' + (active ? 'true' : 'false') + '">',
-        '<img class="pv-shape-image" src="' + escapeHtml(image) + '" alt="" loading="lazy" decoding="async" aria-hidden="true" />',
+        '<img class="pv-shape-image" src="' + escapeHtml(image) + '" alt="" loading="eager" decoding="async" aria-hidden="true" />',
         '<strong>' + option[1] + '</strong>',
         '<small>' + option[2] + '</small>',
         '</button>',
@@ -736,7 +749,7 @@
 
     if (state.recommendation && state.recommendation.recommended_size) {
       disabled = false;
-      label = 'Seu tamanho &eacute; ' + escapeHtml(state.recommendation.recommended_size || '-');
+      label = 'Usar tamanho ' + escapeHtml(state.recommendation.recommended_size || '-');
     }
 
     footer.innerHTML = [
@@ -748,6 +761,11 @@
     var footerButton = footer.querySelector('[data-pv-footer-action]');
     if (footerButton) {
       footerButton.addEventListener('click', function () {
+        var pointerHandledAt = Number(backdrop.dataset.pvPointerHandledAt || 0);
+        if (pointerHandledAt && Date.now() - pointerHandledAt < 650) {
+          return;
+        }
+
         collectCurrentInputs(backdrop);
         handleFooterAction(backdrop);
       });
@@ -795,7 +813,7 @@
       return 'Calculando tamanho';
     }
 
-    return 'Seu tamanho &eacute; ' + escapeHtml(state.recommendation.recommended_size || '-');
+    return 'Usar tamanho ' + escapeHtml(state.recommendation.recommended_size || '-');
   }
 
   function footerButtonClass() {
@@ -811,14 +829,62 @@
     }
 
     if (state.recommendation && state.recommendation.recommended_size) {
-      updateRecommendationBanner(backdrop);
+      selectRecommendedSize(backdrop);
       return;
     }
 
     refreshRecommendation(backdrop, { reason: 'footer' });
   }
 
+  function selectRecommendedSize(backdrop) {
+    if (!state.recommendation || !state.recommendation.recommended_size) {
+      return;
+    }
+
+    collectCurrentInputs(backdrop);
+
+    var size = String(state.recommendation.recommended_size || '');
+    var detail = Object.assign({}, identityPayload(), {
+      selected_size: size,
+      recommended_size: size,
+      confidence: state.recommendation.confidence || null,
+      precision: state.precision,
+      recommendation: state.recommendation,
+    });
+
+    suppressDrawerOpenUntil = Date.now() + 900;
+    closeBackdrop(backdrop);
+    emitWidgetEvent('provadorvirtual:size-selected', detail);
+  }
+
   function wireDrawer(backdrop) {
+    if (!backdrop.dataset.pvPointerDelegated) {
+      backdrop.dataset.pvPointerDelegated = 'true';
+      backdrop.addEventListener('pointerup', function (event) {
+        if (event.pointerType === 'mouse') {
+          return;
+        }
+
+        var target = event.target && event.target.nodeType === 1 ? event.target : event.target.parentElement;
+        var footerActionButton = target && target.closest ? target.closest('[data-pv-footer-action]') : null;
+        var selectSizeButton = target && target.closest ? target.closest('[data-pv-select-recommended-size]') : null;
+
+        if (footerActionButton && backdrop.contains(footerActionButton)) {
+          backdrop.dataset.pvPointerHandledAt = String(Date.now());
+          event.preventDefault();
+          collectCurrentInputs(backdrop);
+          handleFooterAction(backdrop);
+          return;
+        }
+
+        if (selectSizeButton && backdrop.contains(selectSizeButton)) {
+          backdrop.dataset.pvPointerHandledAt = String(Date.now());
+          event.preventDefault();
+          selectRecommendedSize(backdrop);
+        }
+      });
+    }
+
     if (!backdrop.dataset.pvDelegated) {
       backdrop.dataset.pvDelegated = 'true';
       backdrop.addEventListener('click', function (event) {
@@ -827,6 +893,13 @@
         var recommendButton = target && target.closest ? target.closest('[data-pv-recommend]') : null;
         var stepButton = target && target.closest ? target.closest('[data-pv-step]') : null;
         var finalButton = target && target.closest ? target.closest('[data-pv-final]') : null;
+        var selectSizeButton = target && target.closest ? target.closest('[data-pv-select-recommended-size]') : null;
+        var pointerHandledAt = Number(backdrop.dataset.pvPointerHandledAt || 0);
+
+        if (pointerHandledAt && Date.now() - pointerHandledAt < 650 && (footerActionButton || selectSizeButton)) {
+          event.preventDefault();
+          return;
+        }
 
         if (footerActionButton && backdrop.contains(footerActionButton)) {
           event.preventDefault();
@@ -849,6 +922,12 @@
           return;
         }
 
+        if (selectSizeButton && backdrop.contains(selectSizeButton)) {
+          event.preventDefault();
+          selectRecommendedSize(backdrop);
+          return;
+        }
+
         if (recommendButton && backdrop.contains(recommendButton)) {
           event.preventDefault();
           collectCurrentInputs(backdrop);
@@ -859,13 +938,13 @@
 
     backdrop.querySelectorAll('[data-pv-close]').forEach(function (button) {
       button.addEventListener('click', function () {
-        closeActiveBackdrop();
+        closeBackdrop(backdrop);
       });
     });
 
     backdrop.addEventListener('click', function (event) {
       if (event.target === backdrop) {
-        closeActiveBackdrop();
+        closeBackdrop(backdrop);
       }
     });
 
@@ -1434,14 +1513,18 @@
     return backdrop;
   }
 
-  function closeActiveBackdrop() {
-    if (activeBackdrop && activeBackdrop.parentNode) {
-      collectCurrentInputs(activeBackdrop);
+  function closeBackdrop(backdrop) {
+    var targetBackdrop = backdrop || activeBackdrop;
+
+    if (targetBackdrop && targetBackdrop.parentNode) {
+      collectCurrentInputs(targetBackdrop);
       persistJourneyOnClose();
-      activeBackdrop.parentNode.removeChild(activeBackdrop);
+      targetBackdrop.parentNode.removeChild(targetBackdrop);
     }
 
-    activeBackdrop = null;
+    if (!backdrop || backdrop === activeBackdrop || (activeBackdrop && !activeBackdrop.parentNode)) {
+      activeBackdrop = null;
+    }
   }
 
   function tableModalHtml() {

@@ -93,13 +93,15 @@ O feedback final fica visível no próprio resultado e salva `was_helpful`, `sel
 
 Regra Sprint 67: o fluxo do drawer é obrigatoriamente sequencial. A etapa 1 pode pré-preencher dados salvos do navegador, mas a barra de precisão deve considerar somente altura, peso e idade nessa tela. O confete só pode disparar quando a precisão real chegar a 100%, nunca em recomendação básica ou por dados ocultos de etapas futuras.
 
-Regra Sprint 68: a recomendação parcial volta a ficar disponível ao longo da jornada, como no v1. O widget não recomenda nada com apenas altura ou apenas peso; com altura + peso, já chama a API e mostra o tamanho recomendado no rodapé fixo. O botão dentro do corpo das etapas continua sendo `Aumentar precisão`, enquanto o rodapé mostra a barra `Nível de precisão da IA` e, quando houver retorno da API, `Seu tamanho é X`.
+Regra Sprint 68/78: a recomendação parcial volta a ficar disponível ao longo da jornada, como no v1. O widget não recomenda nada com apenas altura ou apenas peso; com altura + peso, já chama a API e mostra o tamanho recomendado no rodapé fixo. O botão dentro do corpo das etapas continua sendo `Aumentar precisão`, enquanto o rodapé mostra a barra `Nível de precisão da IA` e, quando houver retorno da API, `Usar tamanho X`.
 
 Os passos 1, 2, 3 e 4 são clicáveis para avançar e voltar, mas respeitam bloqueios de dados: `Corpo` exige altura + peso, `Detalhes` exige gênero + formato corporal, e `Resultado` exige todas as medidas detalhadas da tabela. O confete só dispara ao entrar no resultado com 100% depois de preencher as medidas detalhadas. A opção `theme.confetti_enabled` permite desligar a celebração por loja; quando não configurada, o padrão é ativado.
 
 As medidas salvas no navegador passam a usar chave por tabela de medidas (`pv_shopper_profile_v2_table_{id}`), além do fallback legado. Assim, produtos que compartilham a mesma tabela reabrem com dados e progresso preenchidos, mas continuam editáveis. Se o consumidor fechar o widget depois de uma recomendação e alterar algum dado, o widget salva o novo snapshot de forma silenciosa para manter o aprendizado atualizado. O aviso `Ao usar o Provador Virtual...` aparece somente na etapa 1, no fim do corpo rolável do widget, em itálico e com fonte menor que os demais microtextos.
 
 Regra Sprint 76: o resultado final deve manter apenas a pergunta objetiva `Essa recomendação ajudou?`, com botões `Sim, ajudou` e `Não ajudou`, tamanho escolhido e comentário opcional. Não exibir escala redundante de nota de 1 a 5 no widget.
+
+Regra Sprint 78: qualquer clique/toque no tamanho recomendado, seja no banner de recomendação parcial, no rodapé fixo ou no resultado, fecha o drawer e emite `provadorvirtual:size-selected` com `selected_size`, `recommended_size`, `confidence`, `precision` e o payload completo da recomendação. A loja pode ouvir esse evento para marcar o tamanho correspondente na página de produto. O widget também bloqueia o clique fantasma de touch que poderia reabrir o drawer imediatamente após aplicar o tamanho.
 
 ## Evolucao inteligente prevista
 
@@ -140,7 +142,7 @@ O widget expõe `window.ProvadorVirtual.reload(...)` para lojas que alteram tama
 
 O widget também expõe `window.ProvadorVirtual.diagnostics()` para depuração controlada. Em modo debug, falhas de carregamento emitem `provadorvirtual:config` com `api_base`, `request_url`, `error_name`, `error_message`, `http_status` e trecho do `response_body`, quando disponível.
 
-O drawer do widget usa as cores configuradas no tema da loja para cabeçalho, CTAs e barra de precisão. Desde a Sprint 75, as silhuetas de formato corporal são assets públicos herdados do v1 em `/widget/v1/assets/body-shapes/` e renderizados como imagens reais, evitando falhas de máscara CSS em navegadores mobile.
+O drawer do widget usa as cores configuradas no tema da loja para cabeçalho, CTAs e barra de precisão. Desde a Sprint 75, as silhuetas de formato corporal são assets públicos herdados do v1 em `/widget/v1/assets/body-shapes/` e renderizados como imagens reais, evitando falhas de máscara CSS em navegadores mobile. Desde a Sprint 78, essas imagens usam carregamento imediato dentro do drawer para evitar placeholders vazios em navegadores mobile.
 
 ## Guias por plataforma
 

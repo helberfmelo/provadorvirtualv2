@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
 import { api } from '../services/api'
 
@@ -66,6 +66,7 @@ const selectedVariantId = ref<number | null>(null)
 const loading = ref(true)
 const productLoading = ref(false)
 const error = ref('')
+const widgetSelectionMessage = ref('')
 
 const selectedVariant = computed(() => {
   return payload.value?.variants.find((variant) => variant.id === selectedVariantId.value)
@@ -75,14 +76,19 @@ const activeSlug = computed(() => String(route.params.slug || ''))
 const displayPrice = computed(() => selectedVariant.value?.price ?? payload.value?.variants[0]?.price ?? 0)
 const stockStatusText = computed(() => {
   if (!selectedVariant.value) {
-    return 'Selecione um tamanho para ver a disponibilidade'
+    return 'O tamanho recomendado será marcado depois do teste.'
   }
 
-  return `${selectedVariant.value.stock_quantity} peças no tamanho selecionado`
+  return `${selectedVariant.value.stock_quantity} peças fictícias no tamanho recomendado.`
 })
 
 onMounted(async () => {
+  window.addEventListener('provadorvirtual:size-selected', handleWidgetSizeSelected as EventListener)
   await loadStorefront()
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('provadorvirtual:size-selected', handleWidgetSizeSelected as EventListener)
 })
 
 watch(activeSlug, async () => {
@@ -118,6 +124,7 @@ async function loadProductForRoute() {
     const { data } = await api.get<ProductPayload>(`/demo/storefront/${activeSlug.value}`)
     payload.value = data
     selectedVariantId.value = null
+    widgetSelectionMessage.value = ''
     await nextTick()
     loadWidget()
   } catch (requestError: any) {
@@ -127,9 +134,36 @@ async function loadProductForRoute() {
   }
 }
 
-function selectVariant(variantId: number) {
+function selectVariant(variantId: number, source: 'manual' | 'widget' = 'manual') {
   selectedVariantId.value = variantId
+  if (source === 'widget') {
+    const variant = payload.value?.variants.find((item) => item.id === variantId)
+    widgetSelectionMessage.value = variant
+      ? `Tamanho ${variant.size_label} aplicado pelo Provador Virtual.`
+      : 'Tamanho recomendado aplicado pelo Provador Virtual.'
+    return
+  }
   nextTick(() => loadWidget())
+}
+
+function handleDemoSizeClick() {
+  widgetSelectionMessage.value = 'Na loja teste, os tamanhos são apenas ilustrativos. Clique em "PV Descubra seu tamanho" para ver o widget escolher por você.'
+}
+
+function handleWidgetSizeSelected(event: CustomEvent) {
+  if (!payload.value) {
+    return
+  }
+
+  const selectedSize = String(event.detail?.selected_size || event.detail?.recommended_size || '').trim().toLowerCase()
+  if (!selectedSize) {
+    return
+  }
+
+  const variant = payload.value.variants.find((item) => item.size_label.trim().toLowerCase() === selectedSize)
+  if (variant) {
+    selectVariant(variant.id, 'widget')
+  }
 }
 
 function loadWidget() {
@@ -194,8 +228,26 @@ function price(value: string | number | null | undefined) {
       <div>
         <span class="eyebrow">{{ storefront.store.name }}</span>
         <h1>Loja teste do Provador Virtual</h1>
-        <p>Escolha um produto e teste a recomendação de tamanho e a tabela de medidas como em uma loja real.</p>
+        <p>Esta vitrine é uma demonstração. Os produtos não estão à venda; escolha um item apenas para abrir o widget e ver como a recomendação de tamanho funciona.</p>
       </div>
+    </div>
+
+    <div class="demo-guide">
+      <article>
+        <span>1</span>
+        <strong>Entre em um produto</strong>
+        <small>Use qualquer item da vitrine fictícia.</small>
+      </article>
+      <article>
+        <span>2</span>
+        <strong>Clique no Provador Virtual</strong>
+        <small>O botão principal fica perto dos tamanhos.</small>
+      </article>
+      <article>
+        <span>3</span>
+        <strong>Veja o tamanho aplicado</strong>
+        <small>Ao aceitar a recomendação, o tamanho fica marcado na página.</small>
+      </article>
     </div>
 
     <div class="product-card-grid">
@@ -209,7 +261,7 @@ function price(value: string | number | null | undefined) {
         <span>{{ product.category }} - {{ product.gender === 'female' ? 'Feminino' : 'Masculino' }}</span>
         <strong>{{ product.name }}</strong>
         <small>{{ product.description }}</small>
-        <em>{{ price(product.price_from) }}</em>
+        <em>Produto fictício · preço ilustrativo {{ price(product.price_from) }}</em>
       </RouterLink>
     </div>
   </section>
@@ -225,14 +277,28 @@ function price(value: string | number | null | undefined) {
           <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
           Voltar para loja teste
         </RouterLink>
-        <span class="store-badge">{{ payload.product.company.name || 'Loja teste' }}</span>
+        <span class="store-badge">Demonstração · não está à venda</span>
       </div>
+
+      <div class="product-demo-alert">
+        <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+        <div>
+          <strong>Produto fictício para testar o widget.</strong>
+          <span>Não escolha tamanho manualmente: clique em <b>PV Descubra seu tamanho</b> e deixe o Provador Virtual recomendar.</span>
+        </div>
+      </div>
+
       <h1>{{ payload.product.name }}</h1>
       <p>{{ payload.product.description }}</p>
 
       <div class="price-row">
         <strong>{{ price(displayPrice) }}</strong>
-        <span>{{ stockStatusText }}</span>
+        <span>Preço e estoque são ilustrativos. {{ stockStatusText }}</span>
+      </div>
+
+      <div class="demo-size-header">
+        <strong>Tamanhos ilustrativos</strong>
+        <span>O widget seleciona o tamanho recomendado aqui depois do teste.</span>
       </div>
 
       <div class="size-picker" aria-label="Escolha de tamanho">
@@ -240,17 +306,22 @@ function price(value: string | number | null | undefined) {
           v-for="variant in payload.variants"
           :key="variant.id"
           type="button"
+          class="demo-size-option"
           :class="{ active: selectedVariantId === variant.id }"
-          @click="selectVariant(variant.id)"
+          aria-disabled="true"
+          @click="handleDemoSizeClick"
         >
           {{ variant.size_label }}
         </button>
       </div>
 
+      <p v-if="widgetSelectionMessage" class="demo-selection-message">{{ widgetSelectionMessage }}</p>
+
       <div class="tester">
         <div>
           <span class="eyebrow">Provador Virtual</span>
-          <h2>Encontre o tamanho antes de comprar</h2>
+          <h2>Clique aqui para testar a recomendação</h2>
+          <p>Preencha altura e peso no widget. Quando aparecer o tamanho recomendado, toque em <b>Usar tamanho</b> para voltar à página com ele marcado.</p>
         </div>
 
         <div id="provador-virtual-container"></div>

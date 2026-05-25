@@ -1029,3 +1029,19 @@ Entregas:
 - validar sintaxe do widget, teste de asset, build do frontend e checagem de diff.
 
 Status: implementado no commit `2a5c055` e publicado com sucesso no run `26378864592`, com deploy remoto, smoke público, verificação dos assets públicos e Playwright mobile em produção.
+
+### Sprint 78 - Handoff do tamanho recomendado e demo mobile
+
+Objetivo: deixar a loja teste mobile autoexplicativa e fazer o tamanho recomendado voltar para a página do produto sem fricção.
+
+Entregas:
+
+- tornar o tamanho recomendado acionável no banner parcial, no rodapé fixo e no resultado do widget;
+- fechar o drawer ao aceitar a recomendação e emitir `provadorvirtual:size-selected` para a loja aplicar a variação correspondente;
+- bloquear clique fantasma de touch para impedir que o drawer reabra imediatamente no mobile;
+- deixar `/produto-teste` e `/produto-teste/:slug` explícitos como demonstração sem venda real, com instruções para clicar no widget;
+- impedir que o clique manual nos tamanhos fictícios pareça uma compra real, mantendo seleção apenas quando o widget aplicar a recomendação;
+- trocar as silhuetas do drawer para carregamento imediato e validar imagens reais no mobile;
+- revisar header, menu drawer, vitrine, página de produto, widget e footer em viewport mobile.
+
+Status: implementado localmente nesta sprint; commit, push, GitHub Actions/deploy e smokes de produção devem ser registrados no fechamento operacional.

@@ -20,7 +20,11 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('data-pv-footer-action', $scriptContents);
         $this->assertStringContainsString('data-pv-step', $scriptContents);
         $this->assertStringContainsString('data-pv-final', $scriptContents);
-        $this->assertStringContainsString('Seu tamanho &eacute;', $scriptContents);
+        $this->assertStringContainsString('Usar tamanho', $scriptContents);
+        $this->assertStringContainsString('provadorvirtual:size-selected', $scriptContents);
+        $this->assertStringContainsString('data-pv-select-recommended-size', $scriptContents);
+        $this->assertStringContainsString('suppressDrawerOpenUntil', $scriptContents);
+        $this->assertStringContainsString('closeBackdrop(backdrop)', $scriptContents);
         $this->assertStringContainsString('Aumentar precis&atilde;o', $scriptContents);
         $this->assertStringContainsString('scheduleAutoRecommendation', $scriptContents);
         $this->assertStringContainsString('pv_shopper_profile_v2_table_', $scriptContents);
@@ -41,7 +45,7 @@ class WidgetAssetTest extends TestCase
         $this->assertStringNotContainsString('data-pv-rating', $scriptContents);
         $this->assertStringNotContainsString('Salvar minhas medidas neste navegador para pr&oacute;ximas recomenda&ccedil;&otilde;es.', $scriptContents);
         $this->assertStringContainsString('<img class="pv-shape-image"', $scriptContents);
-        $this->assertStringContainsString('loading="lazy"', $scriptContents);
+        $this->assertStringContainsString('loading="eager"', $scriptContents);
         $this->assertStringContainsString('.pv-trigger', $cssContents);
         $this->assertStringContainsString('.pv-drawer', $cssContents);
         $this->assertStringContainsString('.pv-confetti-layer', $cssContents);
@@ -52,6 +56,8 @@ class WidgetAssetTest extends TestCase
         $this->assertStringNotContainsString('.pv-rating', $cssContents);
         $this->assertStringContainsString('object-fit: contain;', $cssContents);
         $this->assertStringContainsString('.pv-main-button-subtle', $cssContents);
+        $this->assertStringContainsString('.pv-result-size', $cssContents);
+        $this->assertStringContainsString('.pv-inline-size-button', $cssContents);
         $this->assertStringContainsString('.pv-browser-note', $cssContents);
         $this->assertStringContainsString('font-size: 11px;', $cssContents);
         $this->assertStringContainsString('font-style: italic;', $cssContents);

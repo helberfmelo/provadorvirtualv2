@@ -33,7 +33,7 @@ const workViewKey = computed(() => {
 })
 
 const publicLinks = computed<NavLink[]>(() => [
-  { to: '/produto-teste', label: 'Produto teste', icon: 'fa-bag-shopping', show: true },
+  { to: '/produto-teste', label: 'Teste o widget', icon: 'fa-wand-magic-sparkles', show: true },
   { to: '/checkout', label: 'Contratar', icon: 'fa-credit-card', show: !auth.isAuthenticated },
   { to: '/login', label: 'Entrar', icon: 'fa-right-to-bracket', show: !auth.isAuthenticated },
 ])
@@ -115,13 +115,18 @@ async function switchCompany(event: Event) {
       <div v-if="navOpen" class="nav-scrim" @click="navOpen = false"></div>
 
       <nav v-if="!isWorkRoute" id="main-navigation" class="nav public-nav" :class="{ open: navOpen }" aria-label="Principal">
+        <div class="public-nav-header">
+          <img :src="brandLogoUrl" alt="Provador Virtual" />
+          <span>Menu</span>
+        </div>
         <RouterLink
           v-for="link in publicLinks.filter((item) => item.show)"
           :key="link.to"
           :to="link.to"
           @click="navOpen = false"
         >
-          {{ link.label }}
+          <i class="fa-solid" :class="link.icon" aria-hidden="true"></i>
+          <span>{{ link.label }}</span>
         </RouterLink>
         <button v-if="auth.isAuthenticated" class="nav-button" type="button" title="Sair" @click="logout">
           <i class="fa-solid fa-right-from-bracket" aria-hidden="true"></i>
