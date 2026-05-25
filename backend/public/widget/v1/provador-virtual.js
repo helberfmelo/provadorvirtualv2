@@ -413,6 +413,7 @@
     html += browserStorageNoticeHtml();
 
     content.innerHTML = html;
+    content.scrollTop = 0;
     updateFooter(backdrop);
     wireDrawer(backdrop);
   }
@@ -472,8 +473,6 @@
       '<section class="pv-step-panel">',
       '<button type="button" class="pv-back-link" data-pv-back>&larr; Voltar</button>',
       '<h3>G&ecirc;nero e formato do corpo</h3>',
-      '<p>Essas informa&ccedil;&otilde;es ajudam a IA a interpretar melhor as faixas da tabela.</p>',
-      recommendationBannerHtml(),
       '<label class="pv-field pv-field-full">G&ecirc;nero<select data-pv-input="gender">' + genderOptions(state.form.gender || '') + '</select></label>',
       stepTipHtml('Selecione a silhueta que melhor descreve seu corpo. Os desenhos mudam conforme o g&ecirc;nero informado.'),
       '<div class="pv-shape-grid">',
@@ -722,7 +721,7 @@
       var image = config.assetBaseUrl + '/' + option[3];
       return [
         '<button type="button" class="pv-shape-card pv-shape-card-' + (isMale ? 'male' : 'female') + active + '" data-pv-shape="' + option[0] + '" aria-pressed="' + (active ? 'true' : 'false') + '">',
-        '<span class="pv-shape-image" style="--pv-shape-image:url(' + escapeHtml(image) + ')" aria-hidden="true"></span>',
+        '<img class="pv-shape-image" src="' + escapeHtml(image) + '" alt="" loading="lazy" decoding="async" aria-hidden="true" />',
         '<strong>' + option[1] + '</strong>',
         '<small>' + option[2] + '</small>',
         '</button>',

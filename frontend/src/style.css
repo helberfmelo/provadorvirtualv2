@@ -120,6 +120,10 @@ a {
   cursor: pointer;
 }
 
+.menu-toggle i {
+  font-size: 1.08rem;
+}
+
 .nav-scrim {
   display: none;
 }
@@ -2644,15 +2648,15 @@ td small {
 
 @media (max-width: 860px) {
   .topbar {
-    padding: 12px 18px;
+    padding: 10px 12px;
   }
 
   .brand {
-    max-width: calc(100% - 58px);
+    max-width: calc(100% - 64px);
   }
 
   .brand-logo {
-    width: min(178px, calc(100vw - 108px));
+    width: min(224px, calc(100vw - 86px));
   }
 
   .brand-context {
@@ -2663,6 +2667,13 @@ td small {
     position: relative;
     z-index: 42;
     display: grid;
+    width: 48px;
+    height: 48px;
+    font-size: 1.25rem;
+  }
+
+  .menu-toggle i {
+    font-size: 1.25rem;
   }
 
   .nav-scrim {
