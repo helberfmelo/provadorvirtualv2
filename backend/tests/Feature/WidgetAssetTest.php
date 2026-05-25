@@ -36,6 +36,7 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('diagnostics', $scriptContents);
         $this->assertStringContainsString('browserStorageNoticeHtml', $scriptContents);
         $this->assertStringContainsString('Ao usar o Provador Virtual', $scriptContents);
+        $this->assertMatchesRegularExpression('/state\.step === 1\)\s*\{\s*html \+= stepOneHtml\(\);\s*html \+= browserStorageNoticeHtml\(\);/', $scriptContents);
         $this->assertStringNotContainsString('Nota da recomenda&ccedil;&atilde;o', $scriptContents);
         $this->assertStringNotContainsString('data-pv-rating', $scriptContents);
         $this->assertStringNotContainsString('Salvar minhas medidas neste navegador para pr&oacute;ximas recomenda&ccedil;&otilde;es.', $scriptContents);
@@ -52,6 +53,7 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('object-fit: contain;', $cssContents);
         $this->assertStringContainsString('.pv-main-button-subtle', $cssContents);
         $this->assertStringContainsString('.pv-browser-note', $cssContents);
+        $this->assertStringContainsString('font-size: 11px;', $cssContents);
         $this->assertStringContainsString('font-style: italic;', $cssContents);
 
         foreach ([

@@ -727,3 +727,13 @@
 - Mantida a avaliação principal com `Sim, ajudou` e `Não ajudou`, tamanho escolhido e comentário.
 - Widget deixou de enviar `rating` no feedback novo; o endpoint público segue aceitando `rating` opcional para compatibilidade com integrações antigas.
 - Removidos estilos CSS da escala de nota e atualizada a cobertura do `WidgetAssetTest`.
+- Commit `6c835c8` enviado para `main`; o run `26378458765` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Pós-deploy confirmou que o JS público não contém `Nota da recomendação` nem `data-pv-rating`, e que o CSS público não contém `.pv-rating`.
+
+## 2026-05-24 - Sprint 77 Posicionar aviso de salvamento na etapa inicial
+
+- Releitura obrigatória dos documentos listados em `docs/README.md` e da governança de commit/push/Actions confirmada antes de encerrar a sprint.
+- Aviso `Ao usar o Provador Virtual, você concorda em salvar seus dados neste navegador.` passou a ser renderizado somente na etapa 1 do drawer.
+- Aviso mantido no fim do corpo rolável da primeira etapa, com `font-style: italic`, `font-size: 11px`, peso normal e alinhamento central.
+- Teste `WidgetAssetTest` atualizado para proteger a chamada do aviso dentro do bloco `state.step === 1` e o novo tamanho da fonte.
+- Validações locais: `node --check backend/public/widget/v1/provador-virtual.js`, `php artisan test --filter=WidgetAssetTest`, `vendor/bin/pint --dirty`, `npm run build`, `git diff --check` e Playwright mobile confirmando o aviso no passo 1 com `11px` e ausência no passo 2.

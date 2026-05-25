@@ -97,7 +97,7 @@ Regra Sprint 68: a recomendação parcial volta a ficar disponível ao longo da 
 
 Os passos 1, 2, 3 e 4 são clicáveis para avançar e voltar, mas respeitam bloqueios de dados: `Corpo` exige altura + peso, `Detalhes` exige gênero + formato corporal, e `Resultado` exige todas as medidas detalhadas da tabela. O confete só dispara ao entrar no resultado com 100% depois de preencher as medidas detalhadas. A opção `theme.confetti_enabled` permite desligar a celebração por loja; quando não configurada, o padrão é ativado.
 
-As medidas salvas no navegador passam a usar chave por tabela de medidas (`pv_shopper_profile_v2_table_{id}`), além do fallback legado. Assim, produtos que compartilham a mesma tabela reabrem com dados e progresso preenchidos, mas continuam editáveis. Se o consumidor fechar o widget depois de uma recomendação e alterar algum dado, o widget salva o novo snapshot de forma silenciosa para manter o aprendizado atualizado.
+As medidas salvas no navegador passam a usar chave por tabela de medidas (`pv_shopper_profile_v2_table_{id}`), além do fallback legado. Assim, produtos que compartilham a mesma tabela reabrem com dados e progresso preenchidos, mas continuam editáveis. Se o consumidor fechar o widget depois de uma recomendação e alterar algum dado, o widget salva o novo snapshot de forma silenciosa para manter o aprendizado atualizado. O aviso `Ao usar o Provador Virtual...` aparece somente na etapa 1, no fim do corpo rolável do widget, em itálico e com fonte menor que os demais microtextos.
 
 Regra Sprint 76: o resultado final deve manter apenas a pergunta objetiva `Essa recomendação ajudou?`, com botões `Sim, ajudou` e `Não ajudou`, tamanho escolhido e comentário opcional. Não exibir escala redundante de nota de 1 a 5 no widget.
 

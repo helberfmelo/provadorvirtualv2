@@ -1014,4 +1014,18 @@ Entregas:
 - remover estilos e testes ligados à escala de nota;
 - atualizar documentação do contrato atual do widget.
 
-Status: implementado nesta sprint; publicação remota verificada após o push.
+Status: implementado no commit `6c835c8` e publicado com sucesso no run `26378458765`, com deploy remoto, smoke público e verificação dos assets públicos do widget.
+
+### Sprint 77 - Posicionar aviso de salvamento na etapa inicial
+
+Objetivo: manter a frase de consentimento operacional visível somente quando o consumidor informa as medidas básicas, deixando as demais etapas mais limpas.
+
+Entregas:
+
+- exibir `Ao usar o Provador Virtual, você concorda em salvar seus dados neste navegador.` somente na etapa 1;
+- manter o aviso no fim do corpo rolável do widget, abaixo do conteúdo da etapa inicial;
+- deixar o aviso em itálico, centralizado e com fonte menor;
+- cobrir a regra de renderização e o novo tamanho no `WidgetAssetTest`;
+- validar sintaxe do widget, teste de asset, build do frontend e checagem de diff.
+
+Status: implementado nesta sprint; commit, push e publicação remota conferidos no fechamento operacional.

@@ -400,6 +400,7 @@
 
     if (state.step === 1) {
       html += stepOneHtml();
+      html += browserStorageNoticeHtml();
     } else if (state.step === 2) {
       html += stepTwoHtml();
     } else if (state.step === 3) {
@@ -407,8 +408,6 @@
     } else {
       html += resultStepHtml();
     }
-
-    html += browserStorageNoticeHtml();
 
     content.innerHTML = html;
     content.scrollTop = 0;
