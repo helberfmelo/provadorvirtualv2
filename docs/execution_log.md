@@ -1008,3 +1008,5 @@
 - Ao trocar de cartão para Pix/boleto ou ao mudar plano, o CardForm do Mercado Pago é desmontado e o DOM do formulário é recriado por método de pagamento para evitar tokenização indevida no submit Pix.
 - A tela `/checkout/sucesso` ganhou ações completas por método: Pix com QR Code, copia e cola e botão de copiar; boleto com abrir, baixar e copiar código de barras; cartão aprovado com bloco de sucesso; sessão falhada com mensagem e código do erro.
 - Validações locais passaram com `npm run build`, `php artisan test --filter=PublicCheckoutFlowTest` com 16 testes e 90 assertions, `php artisan test` com 86 testes e 700 assertions, `vendor/bin/pint --dirty` e `git diff --check`.
+- Commit `c0415bd` enviado para `main`; o run `26421412473` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/checkout`, `/saas/pedidos`, rotas públicas, SaaS, portal, widget, APIs e redirects legados para URLs limpas.

@@ -203,6 +203,7 @@ Atualizado em: 2026-05-25
 - Sprint 99 adiciona retorno no cabeçalho público para usuários autenticados voltarem ao SaaS ou ao Portal da Empresa e canonicaliza rotas antigas de frontend em `/provadorvirtual_v2`.
 - Sprint 99 enviada ao GitHub no commit `360ed12`; o run `26419953084` finalizou com sucesso e a validação de produção confirmou páginas, APIs, widget e redirects legados para a raiz.
 - Sprint 100 corrige a conclusão do checkout: Pix mostra QR Code/copia e cola, boleto mostra abrir/baixar/copiar código de barras, cartão aprovado mostra sucesso e falhas da operadora viram modal amigável com código técnico.
+- Sprint 100 enviada ao GitHub no commit `c0415bd`; o run `26421412473` finalizou com sucesso e a validação de produção confirmou `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados para URLs limpas.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -257,4 +258,4 @@ Atualizado em: 2026-05-25
 
 ## Próxima ação recomendada
 
-Executar uma transação Mercado Pago Pix/cartão de baixo valor e acompanhar webhook/cron; depois validar recorrência anual com a operadora, seguir com BigShop real e finalizar Pagar.me quando as pendências chegarem.
+Executar uma transação Mercado Pago Pix/cartão de baixo valor com conta/CPF/e-mail de comprador diferente da conta recebedora, acompanhar webhook/cron; depois validar recorrência anual com a operadora, seguir com BigShop real e finalizar Pagar.me quando as pendências chegarem.

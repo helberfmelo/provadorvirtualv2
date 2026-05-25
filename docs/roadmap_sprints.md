@@ -1482,4 +1482,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: em implementação na Sprint 100. Validações locais já passaram com `npm run build`, `PublicCheckoutFlowTest` com 16 testes e 90 assertions, `php artisan test` com 86 testes e 700 assertions e `vendor/bin/pint --dirty`.
+Status: implementado na Sprint 100 no commit `c0415bd`, publicado com sucesso no run `26421412473`. Validações locais passaram com `npm run build`, `PublicCheckoutFlowTest` com 16 testes e 90 assertions, `php artisan test` com 86 testes e 700 assertions, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/checkout`, `/checkout/sucesso` por pacote público, `/saas/pedidos`, APIs, widget e redirects legados.
