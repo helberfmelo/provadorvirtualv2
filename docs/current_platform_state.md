@@ -179,6 +179,7 @@ Atualizado em: 2026-05-25
 - Sprint 86 registra o roadmap comercial de planos mensal/anual, recorrência, aceite legal, cookies e boleto, e torna obrigatório iniciar cada título de commit com `Sprint <numero> - `.
 - Sprint 87 atualiza a matriz de planos para mensal/anual por plataforma, com preços `489,80`, `389,80`, `449,80` e `349,90`, total anual e percentual de economia retornados pela API.
 - Sprint 88 reforça `/termos` e `/privacidade`, exige aceite no checkout, salva prova técnica em `checkout_acceptances` com IP/data/hora/usuário/empresa/versões legais e adiciona aviso inferior de cookies/localStorage com persistência no navegador.
+- Sprint 88 enviada ao GitHub no commit `ae0dc2b`; o run `26411780677` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

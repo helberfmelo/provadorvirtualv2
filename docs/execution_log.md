@@ -868,3 +868,4 @@
 - Sessões de checkout passaram a carregar metadados `legal_acceptance` com versões dos documentos e horário de aceite.
 - App Vue ganhou aviso discreto no rodapé sobre cookies técnicos, localStorage e registros operacionais, com botão `OK` e persistência por cookie/localStorage para não reaparecer.
 - Validações locais: `php artisan test --filter=PublicCheckoutFlowTest`, `php artisan test`, `npm run build`, `php -l` nos novos/alterados arquivos PHP, `vendor/bin/pint --dirty` e `git diff --check`.
+- Commit `ae0dc2b` enviado para `main`; o run `26411780677` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
