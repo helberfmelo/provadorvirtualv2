@@ -1553,4 +1553,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: em implementação na Sprint 103. Validação local inicial passou com `npm run build`.
+Status: implementado na Sprint 103 no commit `0fb2dfe`, publicado com sucesso no run `26424134815`. Validação local passou com `npm run build` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/`, `/checkout`, `/app/widget`, APIs, widget e redirects legados.

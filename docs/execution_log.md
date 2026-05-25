@@ -1042,4 +1042,6 @@
 - Os cards anuais passam a mostrar apenas a tag `Economize 8,2%` para qualquer plataforma e `Economize 10,2%` para Cliente BigShop.
 - O texto auxiliar dos cards anuais foi simplificado para não explicar o cálculo da economia.
 - A faixa BigShop passa a perguntar `Ainda não tem uma loja online ou quer mudar para uma plataforma mais inteligente?`.
-- Validação local inicial passou com `npm run build`.
+- Validações locais passaram com `npm run build` e `git diff --check`.
+- Commit `0fb2dfe` enviado para `main`; o run `26424134815` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/`, `/checkout`, `/app/widget`, rotas públicas, SaaS, portal, widget, APIs e redirects legados.

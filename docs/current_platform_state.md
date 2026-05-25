@@ -209,6 +209,7 @@ Atualizado em: 2026-05-25
 - Sprint 102 ajusta `/checkout/sucesso`: o resumo público usa `Pedido`, `Status do pagamento` e `Forma de pagamento`, remove a operadora, traduz status técnicos e separa os botões finais.
 - Sprint 102 enviada ao GitHub no commit `84c383a`; o run `26423505273` finalizou com sucesso e a validação de produção confirmou `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados.
 - Sprint 103 ajusta a landing pública: a seção de planos remove a explicação interna sobre destaque mensal, mostra tags `Economize 8,2%` e `Economize 10,2%` nos cards anuais e atualiza a chamada BigShop para lojas novas ou migração para uma plataforma mais inteligente.
+- Sprint 103 enviada ao GitHub no commit `0fb2dfe`; o run `26424134815` finalizou com sucesso e a validação de produção confirmou `/`, `/checkout`, `/app/widget`, APIs, widget e redirects legados.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
