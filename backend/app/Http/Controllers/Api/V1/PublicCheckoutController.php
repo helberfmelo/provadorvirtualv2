@@ -396,6 +396,7 @@ class PublicCheckoutController extends Controller
         return $normalized === ''
             || Str::startsWith($normalized, ['|', ';'])
             || Str::contains($normalized, ['internal_error', 'bad_request', 'invalid_', 'idempotency'])
+            || Str::contains($normalized, ['date_of_expiration', 'must be valid date', 'yyyy-mm-dd'])
             || (bool) preg_match('/\d{2}-\d{2}-\d{4}t\d{2}:\d{2}:\d{2}utc;[0-9a-f-]{32,36}/i', $message);
     }
 

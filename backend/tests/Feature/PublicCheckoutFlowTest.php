@@ -200,6 +200,7 @@ class PublicCheckoutFlowTest extends TestCase
                 && Str::isUuid($idempotencyKey)
                 && data_get($payload, 'payment_method_id') === 'pix'
                 && data_get($payload, 'transaction_amount') === 5127.72
+                && (bool) preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000[+-]\d{2}:\d{2}$/', (string) data_get($payload, 'date_of_expiration'))
                 && data_get($payload, 'payer.address.zip_code') === '01001000'
                 && data_get($payload, 'metadata.platform') === 'provadorvirtual';
         });
@@ -241,6 +242,36 @@ class PublicCheckoutFlowTest extends TestCase
             data_get($session->metadata, 'failure.technical_message'),
         );
         $this->assertSame('3e640a80-db11-4831-bf3f-34b1c503bf20', data_get($session->metadata, 'failure.error_code'));
+    }
+
+    public function test_mercado_pago_date_error_keeps_technical_message_private(): void
+    {
+        $this->configureMercadoPago();
+
+        Http::fake([
+            'https://api.mercadopago.com/v1/payments' => Http::response([
+                'message' => "The following parameters must be valid date and format (yyyy-MM-dd'T'HH:mm:ssz): date_of_expiration",
+                'error' => 'bad_request',
+                'cause' => [
+                    [
+                        'code' => 23,
+                        'data' => '25-05-2026T22:18:11UTC;36945685-bd43-480e-9677-7d65c8de861b',
+                        'description' => '',
+                    ],
+                ],
+            ], 400),
+        ]);
+
+        $this->postJson('/api/v1/public/checkout', $this->payload())
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Não conseguimos gerar o Pix agora. Confira os dados informados e tente novamente em instantes.')
+            ->assertJsonPath('error_code', '36945685-bd43-480e-9677-7d65c8de861b');
+
+        $session = CheckoutSession::query()->firstOrFail();
+        $this->assertSame(
+            "The following parameters must be valid date and format (yyyy-MM-dd'T'HH:mm:ssz): date_of_expiration | 25-05-2026T22:18:11UTC;36945685-bd43-480e-9677-7d65c8de861b",
+            data_get($session->metadata, 'failure.technical_message'),
+        );
     }
 
     public function test_public_checkout_config_exposes_monthly_and_annual_prices(): void
@@ -448,6 +479,7 @@ class PublicCheckoutFlowTest extends TestCase
 
             return $request->url() === 'https://api.mercadopago.com/v1/payments'
                 && data_get($payload, 'payment_method_id') === 'bolbradesco'
+                && (bool) preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.000[+-]\d{2}:\d{2}$/', (string) data_get($payload, 'date_of_expiration'))
                 && data_get($payload, 'transaction_amount') === 489.8;
         });
     }

@@ -1010,3 +1010,14 @@
 - Validações locais passaram com `npm run build`, `php artisan test --filter=PublicCheckoutFlowTest` com 16 testes e 90 assertions, `php artisan test` com 86 testes e 700 assertions, `vendor/bin/pint --dirty` e `git diff --check`.
 - Commit `c0415bd` enviado para `main`; o run `26421412473` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/checkout`, `/saas/pedidos`, rotas públicas, SaaS, portal, widget, APIs e redirects legados para URLs limpas.
+
+## 2026-05-25 - Sprint 101 Corrige vencimento Pix Mercado Pago
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- A falha Pix real foi isolada com testes controlados na API Mercado Pago: CPF/e-mail e valor anual geravam QR Code quando o payload não enviava `date_of_expiration`.
+- O campo recusado era `date_of_expiration`; a API retornava `The following parameters must be valid date and format (yyyy-MM-dd'T'HH:mm:ssz): date_of_expiration` junto do UUID de rastreio em `cause.data`.
+- Pix e boleto passam a enviar vencimento em `America/Sao_Paulo` com milissegundos e offset, por exemplo `2026-05-26T19:22:16.000-03:00`.
+- A extração de erro do Mercado Pago agora preserva a mensagem principal e o UUID técnico de `cause.data`, sem promover `description` vazio ou lixo opaco como motivo público.
+- O checkout público continua exibindo mensagem amigável quando a operadora devolver erro técnico de data.
+- Pagamentos diagnósticos criados durante a investigação foram conferidos como `cancelled/by_collector`.
+- Validações locais passaram com `npm run build`, `php artisan test --filter=PublicCheckoutFlowTest` com 17 testes e 94 assertions, `php artisan test` com 87 testes e 704 assertions e `vendor/bin/pint --dirty`.

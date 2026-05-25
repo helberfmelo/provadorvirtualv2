@@ -415,14 +415,14 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
             return $this->cleanArray([
                 ...$payload,
                 'payment_method_id' => 'bolbradesco',
-                'date_of_expiration' => now()->addDays(3)->toIso8601String(),
+                'date_of_expiration' => $this->expirationDateForMercadoPago(3),
             ]);
         }
 
         return $this->cleanArray([
             ...$payload,
             'payment_method_id' => 'pix',
-            'date_of_expiration' => now()->addDay()->toIso8601String(),
+            'date_of_expiration' => $this->expirationDateForMercadoPago(1),
         ]);
     }
 
@@ -1009,12 +1009,19 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
             return $fallback;
         }
 
+        $topLevelMessage = $this->extractString($payload, ['message', 'error', 'status_detail']);
         $messages = $this->flattenMessages($payload['cause'] ?? $payload['errors'] ?? []);
-        if ($messages !== []) {
-            return implode(' | ', array_slice(array_unique($messages), 0, 3));
+        $messages = array_values(array_filter(array_unique($messages), fn ($message) => filled($message)));
+
+        if ($topLevelMessage) {
+            return implode(' | ', array_slice(array_unique([$topLevelMessage, ...$messages]), 0, 3));
         }
 
-        return $this->extractString($payload, ['message', 'error', 'status_detail']) ?: $fallback;
+        if ($messages !== []) {
+            return implode(' | ', array_slice($messages, 0, 3));
+        }
+
+        return $fallback;
     }
 
     private function flattenMessages(mixed $value): array
@@ -1028,15 +1035,46 @@ class MercadoPagoCheckoutService implements CheckoutPaymentProvider
         }
 
         $messages = [];
-        foreach ($value as $item) {
-            if (is_array($item) && is_string($item['description'] ?? null)) {
-                $messages[] = trim($item['description']);
+
+        if (! array_is_list($value)) {
+            foreach (['message', 'description', 'detail'] as $field) {
+                if (is_string($value[$field] ?? null) && trim($value[$field]) !== '') {
+                    $messages[] = trim($value[$field]);
+                }
             }
 
-            $messages = [...$messages, ...$this->flattenMessages($item)];
+            if (is_string($value['data'] ?? null)
+                && preg_match('/\d{2}-\d{2}-\d{4}T\d{2}:\d{2}:\d{2}UTC;[0-9a-f-]{32,36}/i', $value['data'])) {
+                $messages[] = trim($value['data']);
+            }
+
+            foreach ($value as $item) {
+                if (is_array($item)) {
+                    $messages = [...$messages, ...$this->flattenMessages($item)];
+                }
+            }
+
+            return $messages;
+        }
+
+        foreach ($value as $item) {
+            if (is_array($item)) {
+                $messages = [...$messages, ...$this->flattenMessages($item)];
+
+                continue;
+            }
+
+            if (is_string($item) && trim($item) !== '') {
+                $messages[] = trim($item);
+            }
         }
 
         return $messages;
+    }
+
+    private function expirationDateForMercadoPago(int $days): string
+    {
+        return now('America/Sao_Paulo')->addDays($days)->format('Y-m-d\TH:i:s.000P');
     }
 
     private function extractString(array $payload, array $paths): ?string

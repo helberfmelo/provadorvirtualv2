@@ -1483,3 +1483,30 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 100 no commit `c0415bd`, publicado com sucesso no run `26421412473`. Validações locais passaram com `npm run build`, `PublicCheckoutFlowTest` com 16 testes e 90 assertions, `php artisan test` com 86 testes e 700 assertions, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/checkout`, `/checkout/sucesso` por pacote público, `/saas/pedidos`, APIs, widget e redirects legados.
+
+### Sprint 101 - Corrige vencimento Pix Mercado Pago
+
+Objetivo: corrigir a causa real da falha Pix em produção e preservar diagnóstico técnico útil para suporte sem expor erro de operadora ao cliente.
+
+Entregas:
+
+- identificar que o Mercado Pago recusava `date_of_expiration` por formato inválido no Pix/boleto;
+- formatar vencimento de Pix e boleto como `yyyy-MM-ddTHH:mm:ss.000-03:00`, com timezone `America/Sao_Paulo`;
+- manter mensagens técnicas de data como erro privado em `metadata.failure.technical_message`;
+- preservar o código de rastreio UUID da operadora quando vier em `cause.data`;
+- manter a tela pública com mensagem amigável para erros técnicos;
+- cobrir Pix e boleto em testes para garantir o formato aceito pelo Mercado Pago.
+
+Validação:
+
+- testes controlados na API Mercado Pago confirmando que Pix mínimo, Pix no mesmo valor anual e Pix com novo formato de vencimento geram QR Code;
+- cancelamento conferido para os pagamentos diagnósticos criados;
+- `npm run build`;
+- `php artisan test --filter=PublicCheckoutFlowTest`;
+- `php artisan test`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: em implementação na Sprint 101. Validações locais já passaram com `PublicCheckoutFlowTest` com 17 testes e 94 assertions, `npm run build`, `php artisan test` com 87 testes e 704 assertions e `vendor/bin/pint --dirty`.

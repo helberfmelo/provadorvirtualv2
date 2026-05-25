@@ -291,6 +291,9 @@ function looksLikeTechnicalError(message: string) {
     || normalized.includes('internal_error')
     || normalized.includes('bad_request')
     || normalized.includes('idempotency')
+    || normalized.includes('date_of_expiration')
+    || normalized.includes('must be valid date')
+    || normalized.includes('yyyy-mm-dd')
     || /\d{2}-\d{2}-\d{4}t\d{2}:\d{2}:\d{2}utc;[0-9a-f-]{32,36}/i.test(message)
 }
 
