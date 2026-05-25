@@ -174,6 +174,7 @@ Atualizado em: 2026-05-25
 - Sprint 81 enviada ao GitHub no commit `b82316b`; o run `26383644699` finalizou com sucesso, corrigindo sobreposição do header mobile, refinando drawers e compactando a UI mobile do portal.
 - Sprint 82 enviada ao GitHub no commit `e9ab2f9`; o run `26384825165` finalizou com sucesso, implementando checkout transparente Mercado Pago, seleção de operadora em `/saas/checkout`, Pagar.me preservada como alternativa pendente e chaves de produção do NoAzul registradas apenas em referência local ignorada pelo Git/secret seguro.
 - Sprint 83 enviada ao GitHub no commit `7eadd35`; o run `26386034325` finalizou com sucesso, priorizando cartão no checkout público, limitando parcelas a 10x sem juros e deixando Pix como alternativa com tag `5% off`.
+- Sprint 84 enviada ao GitHub no commit `fe2ab48`; o run `26386407174` finalizou com sucesso, atualizando a cópia pública e transacional para cartão em até 10x sem juros ou Pix à vista com 5% de desconto.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
@@ -183,6 +184,7 @@ Atualizado em: 2026-05-25
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
 - Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros e Pix como alternativa à vista com tag `5% off`.
+- Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
 - Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.
 

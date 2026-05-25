@@ -1319,16 +1319,26 @@ a {
 }
 
 .mp-secure-field {
+  display: flex;
+  align-items: center;
   width: 100%;
+  height: 44px;
   min-height: 44px;
+  max-height: 44px;
   padding: 10px 12px;
+  overflow: hidden;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   background: #fff;
 }
 
 .mp-secure-field iframe {
+  display: block;
   width: 100% !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  border: 0 !important;
 }
 
 .shop-heading {

@@ -1131,4 +1131,17 @@ Entregas:
 - atualizar defaults de e-mails transacionais e migrar templates padrão existentes sem sobrescrever personalizações;
 - revisar spec, backlog, arquitetura e pacote comercial para remover a regra antiga de parcelamento da orientação atual.
 
-Status: em implementação nesta sprint; publicar somente após testes locais, commit, push e GitHub Actions/deploy acompanhados até sucesso.
+Status: implementado no commit `fe2ab48` e publicado com sucesso no run `26386407174`, com build/testes locais, checagem de diff, deploy remoto, smoke público e verificação da cópia de pagamento em produção.
+
+### Sprint 85 - Checkout mobile Mercado Pago
+
+Objetivo: corrigir os campos seguros do Mercado Pago que ficaram grandes demais no checkout mobile, preservando a tokenização segura por iframe.
+
+Entregas:
+
+- travar altura, min-height e max-height dos invólucros `.mp-secure-field` em 44px;
+- conter o `iframe` interno do MercadoPago.js em 22px para impedir expansão por estilo inline no Android;
+- manter a experiência de toque confortável, sem overflow horizontal e com cartão como aba inicial;
+- validar em Playwright mobile com SDK mockado inserindo iframes propositalmente gigantes.
+
+Status: em implementação nesta sprint; publicar somente após `git diff --check`, commit, push e GitHub Actions/deploy acompanhados até sucesso.

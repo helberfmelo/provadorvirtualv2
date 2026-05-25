@@ -824,3 +824,14 @@
 - Defaults de e-mails transacionais `aguardando_pagamento`, `erro_pagamento` e `renovacao_plano` passaram a citar Pix com 5% de desconto e cartão em até 10x sem juros.
 - Criada migration para atualizar somente templates transacionais que ainda estejam exatamente no texto padrão antigo, preservando personalizações do SaaS.
 - Spec, backlog, arquitetura e pacote comercial revisados para não manterem a regra antiga de parcelamento como orientação atual.
+- Validações locais passaram com build frontend, testes backend focados, Pint e `git diff --check`.
+- Commit `fe2ab48` enviado para `main`; o run `26386407174` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Smoke pós-deploy confirmou a cópia pública com `10x sem juros`, Pix com `5% de desconto` e ausência da regra antiga de 12x na landing em produção.
+
+## 2026-05-25 - Sprint 85 Checkout mobile Mercado Pago
+
+- Releitura obrigatória dos documentos do projeto e da governança de commit/push/Actions confirmada antes da correção.
+- Corrigida a altura dos campos seguros do Mercado Pago no checkout mobile: os invólucros `Número`, `Validade` e `CVV` agora têm altura fixa de 44px, alvo de toque preservado e overflow controlado.
+- O `iframe` interno do MercadoPago.js passou a ser restringido para 22px de altura visual, evitando que estilos inline do SDK estiquem os campos no Android.
+- Validação local passou com `npm run build`.
+- Auditoria Playwright mobile local em 390px mockou o SDK com iframes de 260px e confirmou campos em 44px, iframes em 22px, aba `Cartão` ativa, 10 parcelas carregadas e ausência de overflow horizontal.
