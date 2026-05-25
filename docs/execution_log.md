@@ -1034,3 +1034,12 @@
 - Validações locais passaram com `npm run build` e `git diff --check`.
 - Commit `84c383a` enviado para `main`; o run `26423505273` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/checkout`, `/saas/pedidos`, rotas públicas, SaaS, portal, widget, APIs e redirects legados.
+
+## 2026-05-25 - Sprint 103 Ajusta copy e economia dos planos
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- A seção pública de planos remove a frase `sempre com o valor mensal em destaque`, mantendo a copy focada na escolha mensal ou anual.
+- Os cards anuais passam a mostrar apenas a tag `Economize 8,2%` para qualquer plataforma e `Economize 10,2%` para Cliente BigShop.
+- O texto auxiliar dos cards anuais foi simplificado para não explicar o cálculo da economia.
+- A faixa BigShop passa a perguntar `Ainda não tem uma loja online ou quer mudar para uma plataforma mais inteligente?`.
+- Validação local inicial passou com `npm run build`.

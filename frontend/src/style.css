@@ -604,11 +604,32 @@ a {
   min-height: 264px;
 }
 
-.pricing-strip article > span {
+.pricing-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.pricing-card-top > span {
   color: #ff4d5e;
   font-weight: 900;
   text-transform: uppercase;
   font-size: 0.8rem;
+}
+
+.pricing-card-top em {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  color: #065f46;
+  background: #d1fae5;
+  font-size: 0.8rem;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .pricing-strip strong {

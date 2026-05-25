@@ -106,15 +106,18 @@ const currentYear = new Date().getFullYear()
     <div class="landing-heading">
       <span class="eyebrow">Planos</span>
       <h2>O provador mais moderno, com IA para vender mais na loja online</h2>
-      <p>Escolha mensal sem fidelidade ou anual com economia clara, sempre com o valor mensal em destaque.</p>
+      <p>Escolha mensal sem fidelidade ou anual com economia clara.</p>
     </div>
 
     <div class="pricing-strip">
       <article>
-        <span>Qualquer plataforma</span>
+        <div class="pricing-card-top">
+          <span>Qualquer plataforma</span>
+          <em>Economize 8,2%</em>
+        </div>
         <strong>R$ 449,80/mês</strong>
         <p>Para lojas em Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou instalação personalizada.</p>
-        <small>Anual: R$ 5.397,60 no ano · economia de 8,2% sobre o mensal de R$ 489,80.</small>
+        <small>Anual: R$ 5.397,60 no ano.</small>
         <RouterLink :to="checkoutDefault" class="btn btn-secondary">
           <i class="fa-solid fa-cart-shopping" aria-hidden="true"></i>
           Contratar anual
@@ -124,10 +127,13 @@ const currentYear = new Date().getFullYear()
         </RouterLink>
       </article>
       <article class="highlight">
-        <span>Cliente BigShop</span>
+        <div class="pricing-card-top">
+          <span>Cliente BigShop</span>
+          <em>Economize 10,2%</em>
+        </div>
         <strong>R$ 349,90/mês</strong>
         <p>Preço especial exclusivo para lojas BigShop, com instalação guiada apenas para BigShop.</p>
-        <small>Anual: R$ 4.198,80 no ano · economia de 10,2% sobre o mensal de R$ 389,80.</small>
+        <small>Anual: R$ 4.198,80 no ano.</small>
         <RouterLink :to="checkoutBigShop" class="btn btn-primary">
           <i class="fa-solid fa-bolt" aria-hidden="true"></i>
           Contratar anual BigShop
@@ -182,7 +188,7 @@ const currentYear = new Date().getFullYear()
   <section class="landing-section bigshop-store-band">
     <div class="landing-heading">
       <span class="eyebrow">BigShop</span>
-      <h2>Ainda não tem uma loja online?</h2>
+      <h2>Ainda não tem uma loja online ou quer mudar para uma plataforma mais inteligente?</h2>
       <p>Crie agora sua loja na BigShop e já comece com o caminho mais simples para usar o Provador Virtual.</p>
       <a href="https://bigshop.com.br" target="_blank" rel="noopener" class="btn btn-primary">
         <i class="fa-solid fa-store" aria-hidden="true"></i>

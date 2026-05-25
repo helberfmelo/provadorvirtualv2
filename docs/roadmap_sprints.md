@@ -1533,3 +1533,24 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 102 no commit `84c383a`, publicado com sucesso no run `26423505273`. Validação local passou com `npm run build` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/checkout`, `/saas/pedidos`, APIs, widget e redirects legados.
+
+### Sprint 103 - Ajusta copy e economia dos planos
+
+Objetivo: refinar a comunicação dos planos na landing pública, destacando a economia anual sem explicar cálculo comercial para o cliente.
+
+Entregas:
+
+- remover da seção de planos a frase `sempre com o valor mensal em destaque`;
+- adicionar tag `Economize 8,2%` no card anual de qualquer plataforma;
+- adicionar tag `Economize 10,2%` no card anual de cliente BigShop;
+- simplificar o texto auxiliar anual dos cards, removendo a explicação do comparativo com mensal;
+- trocar o título da faixa BigShop para `Ainda não tem uma loja online ou quer mudar para uma plataforma mais inteligente?`.
+
+Validação:
+
+- `npm run build`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: em implementação na Sprint 103. Validação local inicial passou com `npm run build`.
