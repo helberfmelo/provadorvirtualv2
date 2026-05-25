@@ -1335,4 +1335,4 @@ Validação:
 - verificação de produção pós-deploy;
 - commit, push e Actions/deploy.
 
-Status: implementado na Sprint 94 com cópia mais objetiva no topo da loja teste e ocultação do CTA redundante na própria rota. Validações locais passaram com `npm run build`, `php artisan test --filter=DemoProductTest`, `git diff --check` e conferência do build sem a frase antiga `Loja teste do Provador Virtual`.
+Status: implementado na Sprint 94 no commit `c0985fd`, publicado com sucesso no run `26414805731`. Validações locais passaram com `npm run build`, `php artisan test --filter=DemoProductTest`, `git diff --check` e conferência do build sem a frase antiga `Loja teste do Provador Virtual`. Validação de produção passou com `scripts/validate-production.ps1`; os assets publicados confirmaram a nova headline, ausência do texto antigo, CTA público oculto na rota da loja teste e CSS `.shop-heading-meta`.

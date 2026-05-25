@@ -191,6 +191,7 @@ Atualizado em: 2026-05-25
 - Sprint 93 adiciona prévia real da animação de confetes no portal: ao marcar `Animação de confetes` em `/app/widget`, a empresa vê a mesma celebração usada na loja, mantendo `theme.confetti_enabled` como controle do disparo no resultado completo.
 - Sprint 93 enviada ao GitHub no commit `7093036`; o run `26414392783` finalizou com sucesso e a validação de produção confirmou os assets publicados da prévia de confetes.
 - Sprint 94 limpa a redundância do topo da loja teste: a marca fica apenas no header, o H1 passa a orientar o teste da recomendação e o CTA `Teste o provador` some quando a própria experiência já está aberta.
+- Sprint 94 enviada ao GitHub no commit `c0985fd`; o run `26414805731` finalizou com sucesso e a validação de produção confirmou a nova cópia no topo da loja teste.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.

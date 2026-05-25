@@ -934,3 +934,5 @@
 - A informação operacional da vitrine foi movida para badges discretos: `Vitrine fictícia` e quantidade de produtos para teste.
 - O CTA público `Teste o provador` fica oculto enquanto o usuário já está em `/produto-teste` ou `/produto-teste/:slug`, evitando link redundante para a mesma experiência.
 - Validações locais: `npm run build`, `php artisan test --filter=DemoProductTest`, `git diff --check` e conferência do build confirmando a nova chamada e ausência da frase antiga `Loja teste do Provador Virtual`.
+- Commit `c0985fd` enviado para `main`; o run `26414805731` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`; verificação dos assets publicados confirmou `Teste a recomendação de tamanho`, `Demonstração interativa`, ausência de `Loja teste do Provador Virtual`, regra de CTA sensível à rota e CSS `.shop-heading-meta`.
