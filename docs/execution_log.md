@@ -912,3 +912,5 @@
 - O widget público passa a abrir o mesmo fluxo de recomendação em modal central amplo no desktop quando `presentation_mode=modal`; no mobile, o modal ocupa a tela toda.
 - A mudança é visual: etapas, recomendação parcial, tabela de medidas, resultado, feedback, dados salvos no navegador e evento `provadorvirtual:size-selected` permanecem preservados.
 - Validações locais: `php artisan test --filter=Widget`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.
+- Commit `3436cc5` enviado para `main`; o run `26413966332` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`; verificação dos assets públicos confirmou `presentation_mode`, `pv-recommendation-modal` e regra mobile `height: 100dvh`.

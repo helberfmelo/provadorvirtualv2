@@ -1291,3 +1291,5 @@ Validação:
 - build frontend;
 - `git diff --check`;
 - commit, push e Actions/deploy.
+
+Status: implementado na Sprint 92 no commit `3436cc5`, publicado com sucesso no run `26413966332`. Validações locais passaram com `php artisan test --filter=Widget`, `php artisan test`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1` e assets públicos confirmando o modo modal.
