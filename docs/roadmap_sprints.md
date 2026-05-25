@@ -1313,4 +1313,4 @@ Validação:
 - `git diff --check`;
 - commit, push e Actions/deploy.
 
-Status: implementado na Sprint 93 com prévia de confetes no portal, reaproveitando a mesma animação visual do widget público. Validações locais passaram com `npm run build`, `php artisan test --filter=Widget` e `git diff --check`.
+Status: implementado na Sprint 93 no commit `7093036`, publicado com sucesso no run `26414392783`. Validações locais passaram com `npm run build`, `php artisan test --filter=Widget` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`; os assets publicados confirmaram `portal-confetti-preview`, o label `Animação de confetes`, `.pv-confetti-layer` e `@keyframes pv-confetti-fall`.

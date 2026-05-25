@@ -189,6 +189,7 @@ Atualizado em: 2026-05-25
 - Sprint 92 adiciona opção visual do provador entre drawer lateral e modal central. A preferência fica em `theme.presentation_mode`, é alterável em `/app/widget` e não muda a dinâmica de recomendação.
 - Sprint 92 enviada ao GitHub no commit `3436cc5`; o run `26413966332` finalizou com sucesso e a validação de produção confirmou os assets públicos do modo modal.
 - Sprint 93 adiciona prévia real da animação de confetes no portal: ao marcar `Animação de confetes` em `/app/widget`, a empresa vê a mesma celebração usada na loja, mantendo `theme.confetti_enabled` como controle do disparo no resultado completo.
+- Sprint 93 enviada ao GitHub no commit `7093036`; o run `26414392783` finalizou com sucesso e a validação de produção confirmou os assets publicados da prévia de confetes.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` passa a ser o site público comercial; `/provadorvirtual_v2/` permanece como app/backend e rollback.
