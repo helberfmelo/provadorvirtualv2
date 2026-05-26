@@ -472,7 +472,6 @@
     return [
       '<section class="pv-step-panel">',
       '<h3>Suas medidas</h3>',
-      '<p>Comece com altura e peso. A idade &eacute; opcional.</p>',
       note,
       recommendationBannerHtml(),
       '<div class="pv-grid">',

@@ -1576,3 +1576,22 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 104 no commit `9256077`, publicado com sucesso no run `26424515050`. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/produto-teste`, widget JS/CSS, APIs e redirects legados.
+
+### Sprint 105 - Mantem aviso unico nas medidas
+
+Objetivo: deixar a primeira etapa do provador com apenas um texto instrutivo antes dos campos.
+
+Entregas:
+
+- remover a frase `Comece com altura e peso. A idade é opcional.`;
+- manter apenas `Preencha altura e peso para ver o tamanho inicial.` como aviso antes dos campos de medidas.
+
+Validação:
+
+- `node --check backend/public/widget/v1/provador-virtual.js`;
+- `npm run build`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: em implementação na Sprint 105. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.

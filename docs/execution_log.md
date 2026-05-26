@@ -1057,3 +1057,10 @@
 - Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.
 - Commit `9256077` enviado para `main`; o run `26424515050` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/produto-teste`, widget JS/CSS, rotas públicas, SaaS, portal, APIs e redirects legados.
+
+## 2026-05-25 - Sprint 105 Mantem aviso unico nas medidas
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- A etapa `Suas medidas` remove a frase `Comece com altura e peso. A idade é opcional.`.
+- O estado inicial passa a mostrar apenas `Preencha altura e peso para ver o tamanho inicial.` antes dos campos.
+- Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.
