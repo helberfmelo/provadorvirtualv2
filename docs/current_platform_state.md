@@ -213,6 +213,7 @@ Atualizado em: 2026-05-25
 - Sprint 104 enxuga a etapa inicial do provador público, remove texto redundante sobre altura/peso, compacta blocos informativos e corrige tooltips com acentuação exibida corretamente.
 - Sprint 104 enviada ao GitHub no commit `9256077`; o run `26424515050` finalizou com sucesso e a validação de produção confirmou `/produto-teste`, widget JS/CSS, APIs e redirects legados.
 - Sprint 105 remove a frase auxiliar da etapa `Suas medidas` e mantém apenas o aviso `Preencha altura e peso para ver o tamanho inicial.` antes dos campos.
+- Sprint 105 enviada ao GitHub no commit `8a04ed6`; o run `26425163585` finalizou com sucesso e a validação de produção confirmou o JS do widget publicado com aviso único.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.

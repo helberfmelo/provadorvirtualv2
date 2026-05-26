@@ -1064,3 +1064,5 @@
 - A etapa `Suas medidas` remove a frase `Comece com altura e peso. A idade é opcional.`.
 - O estado inicial passa a mostrar apenas `Preencha altura e peso para ver o tamanho inicial.` antes dos campos.
 - Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.
+- Commit `8a04ed6` enviado para `main`; o run `26425163585` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`; o JS publicado confirma o aviso único e a remoção da frase antiga.

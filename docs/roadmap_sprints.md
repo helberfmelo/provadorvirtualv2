@@ -1594,4 +1594,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: em implementação na Sprint 105. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.
+Status: implementado na Sprint 105 no commit `8a04ed6`, publicado com sucesso no run `26425163585`. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`; o JS publicado contém `Preencha altura e peso para ver o tamanho inicial.` e não contém mais `Comece com altura e peso`.
