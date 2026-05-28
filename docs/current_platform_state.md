@@ -219,6 +219,7 @@ Atualizado em: 2026-05-28
 - Sprint 107 registra a Zak/loja BigShop `124` como cliente piloto real em local e producao, com token criptografado e sem segredos versionados; o benchmark completo do portal Sizebay da Zak fica em `docs/sizebay_zak_hyper_benchmark.md`.
 - Sprint 107 enviada ao GitHub no commit `931d09e`; o run `26602780031` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 108 corrige a personalização de botões com base na galeria correta `https://sizebay-buttons-gallery.vercel.app/`: `/app/widget` passa a listar 10 modelos próprios inspirados nos cards públicos da galeria, com cores de fundo/texto, prévia e animações equivalentes no widget.
+- Sprint 108 enviada ao GitHub no commit `482631e`; o run `26603841134` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/widget`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.

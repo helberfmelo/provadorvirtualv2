@@ -1102,4 +1102,5 @@
 - Os valores antigos `gradient`, `clean`, `outline` e `soft` continuam aceitos no backend/widget para compatibilidade, enquanto o portal converte seleções antigas para a galeria nova.
 - Documentação atualizada em `widget_integration`, `sizebay_benchmark`, `sizebay_zak_hyper_benchmark`, `current_platform_state` e `roadmap_sprints`.
 - Validações locais passaram com `php -l`, `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit` com 87 testes e 727 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, `git diff --check` e renderização Puppeteer dos 10 modelos sem botões vazios ou sobrepostos.
-- Commit, push, Actions/deploy e validação de produção pendentes.
+- Commit `482631e` enviado para `main`; o run `26603841134` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo páginas públicas, SaaS, portal, `/app/widget`, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
