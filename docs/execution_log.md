@@ -1187,4 +1187,6 @@
 - `/app/analytics` mostra uma lista limpa de sugestões de tabela baseadas em pedidos, devoluções, trocas e feedback.
 - O Assistente de IA recebe contexto de aprendizado compatível com tipo, gênero e modelagem; `/app/assistente` exibe os insights usados antes de criar o rascunho.
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter RecommendationApiTest`, `--filter AnalyticsApiTest`, `--filter AiMeasurementAssistantTest`, PHPUnit completo com 92 testes e 850 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
-- Commit, push, Actions/deploy e validação de produção pendentes.
+- Commit `8277337` enviado para `main`; o run `26609097848` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- `scripts/validate-production.ps1` passou a cobrir `/app/analytics` e `/app/assistente`, além das rotas já monitoradas.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/analytics`, `/app/assistente`, `/app/widget`, páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.

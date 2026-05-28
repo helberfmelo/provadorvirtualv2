@@ -84,6 +84,8 @@ Assert-Page "/saas/pedidos"
 Assert-Page "/saas/emails"
 Assert-Page "/saas/emails/configuracoes"
 Assert-Page "/app"
+Assert-Page "/app/analytics"
+Assert-Page "/app/assistente"
 Assert-Page "/app/widget"
 Assert-Page "/app/produtos"
 Assert-Page "/app/produtos/novo"
@@ -212,7 +214,16 @@ Assert-True ($allowedOrigin -eq "https://provadorvirtual.online") "header CORS p
 "CORS allowed origin OK"
 
 $loginBody = @{ email = $Email; password = $Password } | ConvertTo-Json
-$login = Invoke-RestMethod -Method Post -Uri "$ApiBase/auth/login" -Headers @{ Accept = "application/json" } -ContentType "application/json" -Body $loginBody
+try {
+    $login = Invoke-RestMethod -Method Post -Uri "$ApiBase/auth/login" -Headers @{ Accept = "application/json" } -ContentType "application/json" -Body $loginBody
+} catch {
+    if ($_.Exception.Response -and ([int] $_.Exception.Response.StatusCode) -eq 429) {
+        Start-Sleep -Seconds 65
+        $login = Invoke-RestMethod -Method Post -Uri "$ApiBase/auth/login" -Headers @{ Accept = "application/json" } -ContentType "application/json" -Body $loginBody
+    } else {
+        throw
+    }
+}
 Assert-True ([string]::IsNullOrWhiteSpace($login.token) -eq $false) "login demo nao retornou token"
 "Auth login OK"
 

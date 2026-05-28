@@ -601,7 +601,7 @@ Status Sprint 113: o cadastro de modelagens foi implementado e publicado em `/ap
 
 ### P3 - Analytics e IA
 
-- KPIs de pedidos/devolucoes/trocas, taxa de retorno e insights por tabela implementados localmente na Sprint 115.
+- KPIs de pedidos/devolucoes/trocas, taxa de retorno e insights por tabela implementados e publicados na Sprint 115 (`8277337`, run `26609097848`).
 - Criar KPIs de impressoes, aberturas, recomendacoes, consulta a tabela e taxa de uso.
 - Separar mobile/desktop.
 - Criar ranking de produtos com maior uso/pendencia.
