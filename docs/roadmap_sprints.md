@@ -1778,4 +1778,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente. Validações locais passaram com `php -l`, PHPUnit completo com 90 testes e 777 assertions, `npm --prefix frontend run build` e `vendor/bin/pint --dirty`. Commit, push, Actions/deploy e validação de produção pendentes.
+Status: implementado na Sprint 112 no commit `2872cc7`, publicado com sucesso no run `26606965068`. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter MeasurementTablesApiTest`, PHPUnit completo com 90 testes e 777 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/tabelas-de-medidas`, `/app/tabelas-de-medidas/nova`, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.

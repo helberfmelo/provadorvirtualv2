@@ -589,6 +589,8 @@ Status Sprint 111: a tela `/app/regras-de-importacao` foi criada com regras visu
 - Melhorar lista de produtos com status de configuracao do provador.
 - Tabelas de medidas evoluidas na Sprint 112 para medida corporal, medida da peca, sistema de tamanho, ranges e medidas compostas.
 
+Status Sprint 112: as tabelas flexiveis foram implementadas e publicadas no commit `2872cc7`, run `26606965068`, com validação de produção OK. A importacao final da Zak segue bloqueada por governança ate validar o mapeamento dos dados reais contra esse modelo flexivel.
+
 ### P2 - Melhorar widget/personalizacao
 
 - A galeria de botoes foi ampliada na Sprint 108 para 10 modelos inspirados na galeria publica correta, com variacoes e animacoes proprias.
