@@ -1078,3 +1078,15 @@
 - Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`. No Windows local, os testes com banco foram executados via PHPUnit direto com `pdo_sqlite`/`sqlite3` carregados por `-d`, pois o `php.ini` atual carrega apenas `pdo_mysql` por padrão.
 - Commit `68b647a` enviado para `main`; o run `26600519176` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/widget`, widget JS/CSS, rotas públicas, SaaS, portal, APIs e redirects legados.
+
+## 2026-05-28 - Sprint 107 Benchmark Zak Sizebay e cadastro BigShop real
+
+- Releitura obrigatoria da documentacao e da governanca de sprint/commit/push concluida antes da implementacao.
+- A Zak foi cadastrada como cliente BigShop no Provador Virtual local e em producao com loja `124`, dominio `zak.com.br`, feed `https://www.zak.com.br/feed.xml` e token salvo criptografado, sem registrar segredo em documento versionado.
+- O portal do cliente Sizebay da Zak foi estudado em modo somente leitura; nenhuma alteracao foi feita na Sizebay e nenhum contato foi realizado.
+- Foram mapeadas as telas de dashboard, produtos, tabelas de medidas, modelagens, marcas, categorias, fontes de dados, sincronizacao, regras de importacao, customizacao de botoes/VFR, relatorios, pedidos e devolucoes.
+- A documentacao Sizebay foi revalidada nas partes de implementacao por script, integracao de produtos por XML/API, order tracking e devolucoes; a galeria publica de botoes tambem entrou no benchmark.
+- Foi criado `docs/sizebay_zak_hyper_benchmark.md` com cadastro Zak, achados do portal, comparacao de modelo de dados, plano seguro de importacao e recomendacoes priorizadas para o Provador Virtual.
+- A validacao BigShop real da Zak mostrou que `Store-Id` e obrigatorio para `products/product_grids`; o cliente BigShop foi ajustado para esse header e para normalizar retorno paginado/envelopado de produtos.
+- A importacao final de tabelas da Zak ficou bloqueada de proposito ate implementarmos dry-run, paginacao completa, `product_grids`, mapeamentos e modelo flexivel de medidas.
+- Validacoes locais passaram com `php -l backend/app/Services/Integrations/BigShopClient.php`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit` com 87 testes e 717 assertions, `vendor/bin/pint --dirty` e `git diff --check`.

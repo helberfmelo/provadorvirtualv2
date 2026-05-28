@@ -22,6 +22,7 @@ Objetivo: registrar o que podemos aprender com a Sizebay e com a loja Zak para d
 - Produto Zak camisa: https://www.zak.com.br/704986-camisa-masculina-bambu-drop-areia-04
 - Produto Zak calca: https://www.zak.com.br/calca-masculina-alfaiataria-genova-chumbo-63
 - Exemplo público adicional encontrado usando Sizebay: https://www.shop2gether.com.br/calca-feminina-crepe-cintura-baixa-alfaiataria-off-white-191348
+- Benchmark aprofundado do portal Sizebay da Zak: `docs/sizebay_zak_hyper_benchmark.md`
 
 ## O que a Sizebay faz bem
 
@@ -45,6 +46,18 @@ Consulta refeita em 2026-05-28 nas páginas públicas de implementação por scr
 - a exibição dos botões depende do produto identificado: produto inexistente não mostra botões, produto normal mostra provador e tabela, acessório mostra apenas tabela.
 
 A folha pública observada na loja Zak usa dois botões lado a lado, texto em caixa alta, fonte Montserrat, ícones antes do texto e visual limpo com pouca interferência na página. Para o v2, a Sprint 106 transforma esse aprendizado em opções próprias, sem copiar assets da Sizebay: `Destaque com brilho`, `Minimal com ícones`, `Contorno leve` e `Pílulas suaves`, todas com cores configuráveis de fundo/texto e animações coerentes com nosso widget.
+
+## Releitura Sprint 107
+
+Em 2026-05-28, o portal do cliente Sizebay da Zak foi estudado em leitura, junto da galeria pública de botões e dos manuais de integração. O documento completo esta em `docs/sizebay_zak_hyper_benchmark.md`.
+
+Principais aprendizados novos:
+
+- a Sizebay separa muito bem produto, tabela, modelagem, marca, categoria, fontes de dados, sincronização, regras, customização e relatórios;
+- a tela de sincronização com erros por produto e a tela de regras de importação são essenciais antes de importar a Zak em massa;
+- a importação BigShop real da Zak exige `Store-Id`, paginação, endpoint `product_grids` e extração de tamanho de `caracteristicas`;
+- nossas tabelas precisam evoluir para medidas corporais, medidas da peça, sistema de tamanho, medidas compostas e ranges;
+- o portal deve continuar limpo, com cards/tabelas compactos, pouca cor, preview no contexto da PDP e ação clara de publicar/desfazer.
 
 ## Contrato técnico observado na documentação
 

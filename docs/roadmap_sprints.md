@@ -1618,3 +1618,27 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 106 no commit `68b647a`, publicado com sucesso no run `26600519176`. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/widget`, widget JS/CSS, APIs públicas, SaaS, portal e redirects legados.
+
+### Sprint 107 - Benchmark Zak Sizebay e cadastro BigShop real
+
+Objetivo: cadastrar a Zak como cliente BigShop local/producao, estudar em profundidade o portal do cliente Sizebay da Zak e transformar os achados em plano pratico para igualar a operacao do Provador Virtual.
+
+Entregas:
+
+- cadastrar a Zak localmente e em producao com loja BigShop `124`, dominio `zak.com.br`, feed `https://www.zak.com.br/feed.xml` e token salvo criptografado;
+- registrar apenas dados nao sensiveis em documentacao versionada, mantendo tokens/senhas fora do Git;
+- estudar o portal Sizebay da Zak em modo somente leitura, incluindo dashboard, produtos, tabelas, modelagens, marcas, categorias, fontes de dados, sync, regras, customizacao, relatorios, pedidos e devolucoes;
+- estudar a documentacao Sizebay de script, XML/API de produtos, order tracking e devolucoes, alem da galeria publica de botoes;
+- documentar `docs/sizebay_zak_hyper_benchmark.md` com mapa do portal, comparacao de dados, plano seguro de importacao Zak e backlog priorizado;
+- ajustar o cliente BigShop para usar `Store-Id` e aceitar retorno paginado/envelopado de produtos.
+
+Validação:
+
+- `vendor/bin/phpunit --filter=BigShopIntegrationTest`;
+- `vendor/bin/phpunit`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- validação de produção após deploy.
+
+Status: implementado localmente na Sprint 107. Validações locais passaram com `php -l backend/app/Services/Integrations/BigShopClient.php`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit`, `vendor/bin/pint --dirty` e `git diff --check`. Deploy e validação de produção entram no fechamento do push desta sprint.

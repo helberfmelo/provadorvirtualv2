@@ -36,7 +36,7 @@ class BigShopIntegrationTest extends TestCase
             ->assertJsonPath('data.endpoints_count', 3);
 
         Http::assertSent(fn ($request): bool => $request->hasHeader('x-api', 'token-bigshop')
-            && $request->hasHeader('store-id', 'store-123'));
+            && $request->hasHeader('Store-Id', 'store-123'));
 
         $this->assertDatabaseHas('platform_connections', [
             'platform' => 'bigshop',
@@ -57,25 +57,29 @@ class BigShopIntegrationTest extends TestCase
 
         Http::fake([
             'https://api.bigshop.test/v3/products*' => Http::response([
-                'data' => [
-                    [
-                        'id' => 'BS-10',
-                        'nome' => 'Vestido BigShop',
-                        'sku' => 'BS-VEST',
-                        'categoria' => 'Vestidos',
-                        'genero' => 'feminino',
-                        'grades' => [
-                            ['id' => 'BS-10-P', 'tamanho' => 'P', 'sku' => 'BS-VEST-P', 'preco' => '209.90', 'estoque' => 4],
-                            ['id' => 'BS-10-M', 'tamanho' => 'M', 'sku' => 'BS-VEST-M', 'preco' => '209.90', 'estoque' => 7],
-                        ],
-                        'tabela_de_medidas' => [
-                            'nome' => 'Vestido BigShop Medidas',
-                            'rows' => [
-                                ['tamanho' => 'P', 'busto_min' => 84, 'busto_max' => 90, 'cintura_min' => 66, 'cintura_max' => 72],
-                                ['tamanho' => 'M', 'busto_min' => 90, 'busto_max' => 96, 'cintura_min' => 72, 'cintura_max' => 78],
+                [
+                    'current_page' => 1,
+                    'data' => [
+                        [
+                            'id' => 'BS-10',
+                            'nome' => 'Vestido BigShop',
+                            'sku' => 'BS-VEST',
+                            'categoria' => 'Vestidos',
+                            'genero' => 'feminino',
+                            'grades' => [
+                                ['id' => 'BS-10-P', 'tamanho' => 'P', 'sku' => 'BS-VEST-P', 'preco' => '209.90', 'estoque' => 4],
+                                ['id' => 'BS-10-M', 'tamanho' => 'M', 'sku' => 'BS-VEST-M', 'preco' => '209.90', 'estoque' => 7],
+                            ],
+                            'tabela_de_medidas' => [
+                                'nome' => 'Vestido BigShop Medidas',
+                                'rows' => [
+                                    ['tamanho' => 'P', 'busto_min' => 84, 'busto_max' => 90, 'cintura_min' => 66, 'cintura_max' => 72],
+                                    ['tamanho' => 'M', 'busto_min' => 90, 'busto_max' => 96, 'cintura_min' => 72, 'cintura_max' => 78],
+                                ],
                             ],
                         ],
                     ],
+                    'total' => 1,
                 ],
             ]),
         ]);

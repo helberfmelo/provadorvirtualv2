@@ -216,19 +216,20 @@ Atualizado em: 2026-05-28
 - Sprint 105 enviada ao GitHub no commit `8a04ed6`; o run `26425163585` finalizou com sucesso e a validação de produção confirmou o JS do widget publicado com aviso único.
 - Sprint 106 adiciona personalização de botões em `/app/widget`: estilos `Destaque com brilho`, `Minimal com ícones`, `Contorno leve` e `Pílulas suaves`, cores próprias de fundo/texto dos botões, lista vertical de seleção e prévia com as mesmas animações do widget público.
 - Sprint 106 enviada ao GitHub no commit `68b647a`; o run `26600519176` finalizou com sucesso e a validação de produção confirmou `/app/widget`, widget JS/CSS, APIs públicas, SaaS, portal e redirects legados.
+- Sprint 107 registra a Zak/loja BigShop `124` como cliente piloto real em local e producao, com token criptografado e sem segredos versionados; o benchmark completo do portal Sizebay da Zak fica em `docs/sizebay_zak_hyper_benchmark.md`.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
 - `/provadorvirtual_v2/` permanece como caminho técnico de backend, API, widget, assets internos e rollback.
 - Falta chave de IA externa (`OPENAI_API_KEY` ou `GEMINI_API_KEY`) para OCR real de imagem.
-- Falta credencial BigShop real para loja de teste.
+- Credencial BigShop real da Zak foi recebida e cadastrada como piloto; a importacao final da Zak ainda nao deve ser rodada ate concluir dry-run, paginacao completa, `product_grids`, mapeamentos e modelo flexivel de medidas.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
 - Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` apenas no plano anual com desconto real e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão, cancelamento de renovação futura pelo portal e coleta de empresa limitada a CNPJ. Pix e boleto Mercado Pago enviam `date_of_expiration` com milissegundos e timezone `America/Sao_Paulo`. A conclusão exibe Pix com QR Code/copia e cola, boleto com link/download/código de barras, cartão aprovado com sucesso e falhas com mensagem amigável mais código técnico. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
-- Teste real BigShop continua bloqueado até receber/cadastrar credenciais oficiais da loja piloto.
+- Teste real BigShop com Zak ja tem credencial cadastrada; segue bloqueada apenas a importacao final em massa, porque o endpoint real exige `Store-Id`, retorno paginado/envelopado e grade separada em `product_grids`.
 
 ## Superficie atual
 

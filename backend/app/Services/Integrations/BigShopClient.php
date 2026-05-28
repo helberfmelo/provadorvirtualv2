@@ -31,15 +31,7 @@ class BigShopClient
 
         $payload = $this->payload($response);
 
-        if (isset($payload['data']) && is_array($payload['data'])) {
-            return $payload['data'];
-        }
-
-        if (isset($payload['products']) && is_array($payload['products'])) {
-            return $payload['products'];
-        }
-
-        return array_is_list($payload) ? $payload : [];
+        return $this->productsFromPayload($payload);
     }
 
     private function request(PlatformConnection $connection, string $path): Response
@@ -60,10 +52,10 @@ class BigShopClient
             ->timeout(20)
             ->withHeaders([
                 'x-api' => $token,
-                'store-id' => $storeId,
+                'Store-Id' => $storeId,
             ])
             ->get($baseUrl.$path, [
-                'store-id' => $storeId,
+                'Store-Id' => $storeId,
             ]);
     }
 
@@ -81,5 +73,48 @@ class BigShopClient
         $payload = $response->json();
 
         return is_array($payload) ? $payload : [];
+    }
+
+    private function productsFromPayload(array $payload): array
+    {
+        if (isset($payload['data']) && is_array($payload['data'])) {
+            return $payload['data'];
+        }
+
+        if (isset($payload['products']) && is_array($payload['products'])) {
+            return $payload['products'];
+        }
+
+        if (! array_is_list($payload)) {
+            return [];
+        }
+
+        $products = [];
+        $hasPaginatorEnvelope = false;
+
+        foreach ($payload as $entry) {
+            if (! is_array($entry) || ! $this->isPaginatorEnvelope($entry)) {
+                continue;
+            }
+
+            $hasPaginatorEnvelope = true;
+            foreach ($entry['data'] as $product) {
+                $products[] = $product;
+            }
+        }
+
+        return $hasPaginatorEnvelope ? $products : $payload;
+    }
+
+    private function isPaginatorEnvelope(array $entry): bool
+    {
+        return isset($entry['data'])
+            && is_array($entry['data'])
+            && (
+                array_key_exists('current_page', $entry)
+                || array_key_exists('per_page', $entry)
+                || array_key_exists('last_page', $entry)
+                || array_key_exists('total', $entry)
+            );
     }
 }

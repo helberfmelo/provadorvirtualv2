@@ -19,24 +19,25 @@ Antes de desenvolver qualquer sprint, ajuste, correção ou deploy, reler nesta 
 10. `docs/ai_assistant.md`
 11. `docs/v1_intelligence_migration.md`
 12. `docs/sizebay_benchmark.md`
-13. `docs/data_learning_lgpd_outliers.md`
-14. `docs/analytics_admin.md`
-15. `docs/user_access_permissions.md`
-16. `docs/portal_ui_guidelines.md`
-17. `docs/transactional_email_automation.md`
-18. `docs/hardening_lgpd_observability.md`
-19. `docs/go_live_cutover.md`
-20. `docs/bigshop_integration.md`
-21. `docs/bigshop_model3_pro_widget.md`
-22. `docs/bigshop_one_click_contract.md`
-23. `docs/commercial_pilot_package.md`
-24. `docs/deploy_runbook.md`
-25. `docs/sprint_governance.md`
-26. `docs/roadmap_sprints.md`
-27. `docs/intelligent_sizing_roadmap.md`
-28. `docs/product_backlog.md`
-29. `docs/security_compliance.md`
-30. `docs/credentials.local.md`, somente quando a sprint envolver produção, banco, SMTP, deploy, IA ou integrações.
+13. `docs/sizebay_zak_hyper_benchmark.md`
+14. `docs/data_learning_lgpd_outliers.md`
+15. `docs/analytics_admin.md`
+16. `docs/user_access_permissions.md`
+17. `docs/portal_ui_guidelines.md`
+18. `docs/transactional_email_automation.md`
+19. `docs/hardening_lgpd_observability.md`
+20. `docs/go_live_cutover.md`
+21. `docs/bigshop_integration.md`
+22. `docs/bigshop_model3_pro_widget.md`
+23. `docs/bigshop_one_click_contract.md`
+24. `docs/commercial_pilot_package.md`
+25. `docs/deploy_runbook.md`
+26. `docs/sprint_governance.md`
+27. `docs/roadmap_sprints.md`
+28. `docs/intelligent_sizing_roadmap.md`
+29. `docs/product_backlog.md`
+30. `docs/security_compliance.md`
+31. `docs/credentials.local.md`, somente quando a sprint envolver produção, banco, SMTP, deploy, IA ou integrações.
 
 Nenhuma sprint deve começar sem essa releitura. Depois de executar uma sprint, é obrigatório fazer commit, push, acompanhar GitHub Actions/deploy até o status final e somente então passar para a próxima sprint.
 
@@ -52,6 +53,8 @@ Todo commit criado para uma sprint deve ter o título iniciado exatamente com `S
 - `D:\Projetos\bigshop\172.16.151.5`
 - Documentação pública: `https://documenter.getpostman.com/view/4253101/2s93sdYrsi`
 - Documentação pública Sizebay: `https://docs.sizebay.com/`
+- Portal Sizebay do cliente Zak, estudado somente em leitura, registrado em `docs/sizebay_zak_hyper_benchmark.md`
+- Galeria pública de botões Sizebay: `https://sizebay-buttons-gallery.vercel.app/`
 - Captura tecnica pública Zak/Sizebay em `https://www.zak.com.br/`
 
 ## Decisões iniciais

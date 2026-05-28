@@ -1,6 +1,6 @@
 # Integração BigShop
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-28
 
 ## Objetivo
 
@@ -14,9 +14,9 @@ Análise cruzada com `bigshop360` e código BigShop:
 
 - host observado: `https://api.bigshop.com.br`;
 - autenticacao observada: header `x-api`;
-- identificacao de loja: header ou query `store-id`;
+- identificacao de loja: header ou query `Store-Id`; em 2026-05-28 a Zak/loja `124` retornou erro com `store-id` minusculo e respondeu HTTP 200 com `Store-Id`;
 - front também usa endpoint `https://api.bigshop.com.br/v3/front/products`;
-- busca usa `https://api.bigshop.com.br/v3/search/products/{term}` com `store-id`.
+- busca usa `https://api.bigshop.com.br/v3/search/products/{term}` com `Store-Id`.
 
 Rotas observadas/documentadas:
 
@@ -110,6 +110,35 @@ Em 2026-05-23, a loja Luna Moda Festa foi usada como piloto controlado sem regis
 - o XML veio como RSS Google Merchant com namespace `g`;
 - os itens continham `g:id`, `g:item_group_id`, `g:gender`, `g:product_type`, `g:color`, `g:size`, `g:image_link` e `link`;
 - a API V3 respondeu para `getEndPoints`, `products` e `product_grids` com store_id/token informados fora da documentação.
+
+## Validação Zak
+
+Em 2026-05-28, a Zak foi cadastrada como cliente BigShop no Provador Virtual local e em producao, sem registrar token em documento versionado:
+
+- loja BigShop `124`;
+- CNPJ `15.179.121/0006-24`;
+- razao social `RSP COMERCIO DE ROUPAS LTDA EPP`;
+- dominio `zak.com.br`;
+- feed `https://www.zak.com.br/feed.xml`;
+- token salvo criptografado em `platform_connections.access_token_encrypted`;
+- widget configurado para `zak.com.br`, `www.zak.com.br` e `provadorvirtual.online`.
+
+Validacoes de leitura:
+
+- `GET /v3/getEndPoints` respondeu HTTP 200;
+- `GET /v3/products` com `store-id` minusculo respondeu erro `key not found - store-id`;
+- `GET /v3/products` com `Store-Id` respondeu HTTP 200;
+- `GET /v3/product_grids` com `Store-Id` respondeu HTTP 200;
+- o feed publico da Zak respondeu HTTP 200 apos redirecionar para `www.zak.com.br`.
+
+Achados tecnicos:
+
+- `products` retorna envelope paginado, nao apenas uma lista direta de produtos;
+- `product_grids` precisa ser sincronizado em endpoint separado e ligado a produtos por `produtoid`;
+- o tamanho da grade aparece em `caracteristicas` e precisa de extracao especifica;
+- antes de alimentar tabelas finais da Zak, a importacao deve passar por dry-run, mapeamento de marca/categoria/modelagem e revisao de medidas.
+
+Detalhes completos do benchmark Sizebay/Zak: `docs/sizebay_zak_hyper_benchmark.md`.
 
 ## Integração de um clique
 
@@ -218,8 +247,8 @@ Rotas protegidas:
 
 Comportamento:
 
-- probe chama `GET /v3/getEndPoints` com headers `x-api` e `store-id`;
-- sync chama `GET /v3/products`;
+- probe chama `GET /v3/getEndPoints` com headers `x-api` e `Store-Id`;
+- sync chama `GET /v3/products` e normaliza retornos diretos ou envelopes paginados;
 - produtos BigShop são upsertados em `products`;
 - grades são upsertadas em `product_variants`;
 - quando o payload traz `measurement_table`, `tabela_de_medidas` ou `medidas` estruturado, o sistema cria/atualiza `measurement_tables`;
