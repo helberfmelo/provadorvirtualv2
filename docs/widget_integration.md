@@ -134,7 +134,7 @@ Endpoints usados pelo widget:
 
 `recommendations` também aceita `shopper_profile.raw_widget_data` para registrar a jornada completa do widget. Esse campo deve conter apenas dados operacionais da recomendação, sem nome, e-mail, telefone, documento ou outros identificadores pessoais diretos.
 
-`signal` registra eventos `add_to_cart`, `purchase`, `return` e `exchange` para aprendizado estatístico. Plataformas que ainda não tiverem integração automática podem enviar esses sinais depois pelo próprio front ou por conector server-to-server.
+`signal` registra eventos `add_to_cart`, `purchase`, `return` e `exchange` para aprendizado estatístico. Desde a Sprint 115, o payload pode incluir `ordered_size`, `returned_size`, `exchanged_to_size`, `return_reason`, `order_status`, `quantity`, `unit_price`, `source_platform` e `occurred_at`. `order_reference` é aceito apenas para gerar hash interno; a referência bruta não deve aparecer em telas, logs ou documentos. Plataformas que ainda não tiverem integração automática podem enviar esses sinais depois pelo próprio front ou por conector server-to-server.
 
 O widget resolve a base da API a partir do próprio `src`. Quando o script está em uma subpasta, como `/provadorvirtual_v2/widget/v1/provador-virtual.js`, a base padrão da API é calculada diretamente como `/provadorvirtual_v2/public/api/v1`, evitando redirect no preflight CORS do navegador. Em instalações fora desse padrão, `data-api-base-url` pode sobrescrever a base explicitamente.
 

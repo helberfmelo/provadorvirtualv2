@@ -232,6 +232,7 @@ Atualizado em: 2026-05-28
 - Sprint 113 enviada ao GitHub no commit `85f7cec`; o run `26607795341` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/modelagens`, `/app/tabelas-de-medidas`, `/app/produtos`, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 114 separa rascunho e configuração publicada do widget, com `mode=draft/publish/discard`, botões Salvar rascunho/Publicar/Desfazer e preview desktop/mobile em `/app/widget`.
 - Sprint 114 enviada ao GitHub no commit `a6e1ff1`; o run `26608432348` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/widget`, widget, APIs, CORS, login demo e go-live readiness.
+- Sprint 115 usa sinais de pedido, devolução, troca e feedback para gerar insights por tabela de medidas, alimentar o Assistente de IA com contexto de aprendizado e mostrar sugestões limpas em `/app/analytics`.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -260,8 +261,8 @@ Atualizado em: 2026-05-28
 - Site público raiz: landing comercial do Provador Virtual, com planos mensal/anual por plataforma, tags de economia anual nos cards, CTA para loja teste/checkout e cards de benefícios otimizados para mobile. A cópia pública usa `provador` em vez de `widget` para evitar jargão técnico. Quando há sessão autenticada, o cabeçalho mostra retorno para `Voltar ao SaaS` ou `Voltar ao portal`, conforme o papel carregado por `/me`.
 - APIs protegidas: produtos, variações, tabelas, templates, widget-install e integrações, com middleware de permissão por módulo e escopo da empresa ativa. `PATCH /api/v1/integrations/{platform}` também salva `import_rules` para a tela de regras visuais.
 - Importacoes protegidas: preview, commit e histórico em `/api/v1/imports`.
-- Assistente protegido: status e sugestoes em `/api/v1/ai/*`.
-- Analytics/auditoria protegidos: `/api/v1/analytics/*`, `/api/v1/audit-logs` e `/api/v1/saas/*`.
+- Assistente protegido: status e sugestoes em `/api/v1/ai/*`; sugestões de tabela recebem contexto agregado de aprendizado quando existe histórico compatível de tipo, gênero e modelagem.
+- Analytics/auditoria protegidos: `/api/v1/analytics/*`, `/api/v1/audit-logs` e `/api/v1/saas/*`. `/api/v1/analytics/recommendations` inclui KPIs de compra/devolução/troca e insights por tabela de medidas para revisão do lojista.
 - Go-live protegido: `/api/v1/go-live/readiness` e `/app/go-live`.
 - Pacote comercial protegido: `/app/go-live` mostra links de venda, onboarding, automações e pendências reais.
 - Observabilidade pública: `/api/v1/ops/status`.

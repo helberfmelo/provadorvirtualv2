@@ -31,4 +31,9 @@ class RecommendationLearningEvent extends Model
     {
         return $this->belongsTo(ShopperProfile::class);
     }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
 }

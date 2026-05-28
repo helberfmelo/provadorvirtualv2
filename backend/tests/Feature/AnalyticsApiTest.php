@@ -50,6 +50,23 @@ class AnalyticsApiTest extends TestCase
             'rating' => 5,
         ])->assertCreated();
 
+        $this->postJson("/api/v1/public/recommendations/{$recommendationId}/signal", [
+            'signal' => 'purchase',
+            'ordered_size' => 'M',
+            'source' => 'checkout',
+            'source_platform' => 'bigshop',
+            'order_reference' => 'ORDER-ANALYTICS-1',
+        ])->assertCreated();
+
+        $this->postJson("/api/v1/public/recommendations/{$recommendationId}/signal", [
+            'signal' => 'return',
+            'returned_size' => 'M',
+            'return_reason' => 'size_too_small',
+            'source' => 'returns_api',
+            'source_platform' => 'bigshop',
+            'order_reference' => 'ORDER-ANALYTICS-1',
+        ])->assertCreated();
+
         $table = MeasurementTable::query()->where('merchant_id', $merchant->id)->firstOrFail();
 
         $this->withHeaders($headers)
@@ -65,9 +82,14 @@ class AnalyticsApiTest extends TestCase
             ->assertJsonPath('data.summary.positive_feedback_rate', 100)
             ->assertJsonPath('data.summary.products_without_measurement_table', 1)
             ->assertJsonPath('data.summary.shopper_profiles_total', 1)
-            ->assertJsonPath('data.summary.learning_events_total', 2)
+            ->assertJsonPath('data.summary.learning_events_total', 4)
+            ->assertJsonPath('data.summary.commerce_purchases', 1)
+            ->assertJsonPath('data.summary.commerce_returns', 1)
+            ->assertJsonPath('data.summary.commerce_return_rate', 100)
+            ->assertJsonPath('data.summary.measurement_table_insights_review', 1)
             ->assertJsonPath('data.sizes.0.size', 'M')
-            ->assertJsonPath('data.learning_statuses.0.status', 'accepted');
+            ->assertJsonPath('data.learning_statuses.0.status', 'accepted')
+            ->assertJsonPath('data.measurement_table_insights.0.suggested_action', 'review_size_too_small');
 
         $this->withHeaders($headers)
             ->getJson('/api/v1/audit-logs')

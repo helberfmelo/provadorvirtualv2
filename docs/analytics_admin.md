@@ -35,10 +35,13 @@ Resumo entregue por `/analytics/recommendations`:
 - eventos de aprendizado por status;
 - outliers bloqueados;
 - sinais comerciais de carrinho, compra, devolucao e troca.
+- KPIs de compra/devolucao/troca, taxa de retorno e tabelas com revisão sugerida.
 
-Também retorna series diarias, distribuicao por tamanho, produtos com recomendação, produtos sem tabela, status de aprendizado, sinais comerciais e outliers recentes para revisão.
+Também retorna series diarias, distribuicao por tamanho, produtos com recomendação, produtos sem tabela, status de aprendizado, sinais comerciais, insights por tabela de medidas e outliers recentes para revisão.
 
 Status Sprint 36: `/app/analytics` mostra os novos cards de perfis, aprendizado e outliers. Sinais `blocked_outlier` são armazenados para investigacao e não entram direto em refinamento automático.
+
+Status Sprint 115: `/app/analytics` passa a mostrar sugestões por tabela de medidas com base em pedidos, devoluções, trocas e feedback. A referência de pedido é guardada apenas como hash, e os insights indicam revisão humana em vez de alterar tabelas automaticamente.
 
 ## SaaS Admin
 

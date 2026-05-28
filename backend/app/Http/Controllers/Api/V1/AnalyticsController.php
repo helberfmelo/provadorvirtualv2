@@ -10,6 +10,7 @@ use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
 use App\Models\ShopperProfile;
+use App\Services\Recommendation\MeasurementTableInsightService;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class AnalyticsController extends Controller
 {
     use ResolvesMerchant;
 
-    public function recommendations(Request $request): array
+    public function recommendations(Request $request, MeasurementTableInsightService $tableInsights): array
     {
         $merchant = $this->currentMerchant($request);
         $company = $this->currentCompany($request, $merchant);
@@ -65,6 +66,10 @@ class AnalyticsController extends Controller
             ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->where('status', 'active')
             ->get();
+        $commercePurchases = $learningEvents->where('event_type', 'purchase')->count();
+        $commerceReturns = $learningEvents->where('event_type', 'return')->count();
+        $commerceExchanges = $learningEvents->where('event_type', 'exchange')->count();
+        $measurementTableInsights = $tableInsights->insights($merchant, $company);
 
         return [
             'data' => [
@@ -85,6 +90,13 @@ class AnalyticsController extends Controller
                     'learning_review' => $learningEvents->where('status', 'review')->count(),
                     'learning_blocked_outliers' => $learningEvents->where('status', 'blocked_outlier')->count(),
                     'average_outlier_score' => round((float) $learningEvents->avg('outlier_score'), 2),
+                    'commerce_purchases' => $commercePurchases,
+                    'commerce_returns' => $commerceReturns,
+                    'commerce_exchanges' => $commerceExchanges,
+                    'commerce_return_rate' => $commercePurchases > 0 ? round((($commerceReturns + $commerceExchanges) / $commercePurchases) * 100, 1) : null,
+                    'measurement_table_insights_review' => collect($measurementTableInsights)
+                        ->whereNotIn('suggested_action', ['stable', 'collect_more_data'])
+                        ->count(),
                 ],
                 'daily' => $this->dailySeries($logs),
                 'sizes' => $logs
@@ -127,6 +139,7 @@ class AnalyticsController extends Controller
                     ->map(fn ($group, string $signal): array => ['signal' => $signal, 'count' => $group->count()])
                     ->values()
                     ->all(),
+                'measurement_table_insights' => $measurementTableInsights,
                 'outliers' => $learningEvents
                     ->where('status', 'blocked_outlier')
                     ->sortByDesc('occurred_at')

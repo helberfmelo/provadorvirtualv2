@@ -1175,3 +1175,16 @@
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetInstallApiTest`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetAssetTest`, PHPUnit completo com 91 testes e 825 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
 - Commit `a6e1ff1` enviado para `main`; o run `26608432348` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/widget`, páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 115 Analytics de uso e base de IA
+
+- A sétima demanda da lista pós-benchmark foi iniciada: usar pedidos, devoluções e feedback para alimentar IA e melhorar sugestões de tabela.
+- `POST /api/v1/public/recommendations/{id}/signal` passa a aceitar tamanho comprado/devolvido, tamanho de troca, motivo de devolução, status, quantidade, valor, plataforma de origem e data do evento.
+- Referências de pedido continuam fora da base bruta: o sistema salva apenas `order_reference_hash`.
+- `LearningSignalService` ganhou pesos por tipo de sinal: compra pesa mais que feedback, devolução/troca classificada vira revisão forte e outlier crítico segue com peso zero.
+- Criado `MeasurementTableInsightService`, que agrupa sinais por tabela e sugere ações como revisar peça pequena, peça grande, modelagem, feedback ou coletar mais dados.
+- `/api/v1/analytics/recommendations` expõe KPIs de compras/devoluções/trocas, taxa de retorno e `measurement_table_insights`.
+- `/app/analytics` mostra uma lista limpa de sugestões de tabela baseadas em pedidos, devoluções, trocas e feedback.
+- O Assistente de IA recebe contexto de aprendizado compatível com tipo, gênero e modelagem; `/app/assistente` exibe os insights usados antes de criar o rascunho.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter RecommendationApiTest`, `--filter AnalyticsApiTest`, `--filter AiMeasurementAssistantTest`, PHPUnit completo com 92 testes e 850 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
+- Commit, push, Actions/deploy e validação de produção pendentes.

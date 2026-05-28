@@ -20,6 +20,11 @@ type AnalyticsPayload = {
     learning_review: number
     learning_blocked_outliers: number
     average_outlier_score: number
+    commerce_purchases: number
+    commerce_returns: number
+    commerce_exchanges: number
+    commerce_return_rate: number | null
+    measurement_table_insights_review: number
   }
   daily: { date: string; count: number }[]
   sizes: { size: string; count: number }[]
@@ -33,6 +38,31 @@ type AnalyticsPayload = {
   products_without_measurement_table: { id: number; name: string; sku: string | null; category: string | null }[]
   learning_statuses: { status: string; count: number }[]
   commerce_signals: { signal: string; count: number }[]
+  measurement_table_insights: {
+    measurement_table_id: number
+    table_name: string
+    product_type: string
+    gender: string | null
+    fit_profile: string | null
+    suggested_action: string
+    reason: string
+    priority_score: number
+    confidence: string
+    signals: {
+      total: number
+      accepted: number
+      review: number
+      blocked_outliers: number
+      purchases: number
+      returns: number
+      positive_feedback: number
+      negative_feedback: number
+      size_too_small: number
+      size_too_large: number
+      fit_issue: number
+      return_rate: number | null
+    }
+  }[]
   outliers: {
     id: number
     event_type: string
@@ -101,6 +131,19 @@ function statusLabel(status: string) {
 
   return labels[status] || eventLabel(status)
 }
+
+function actionLabel(action: string) {
+  const labels: Record<string, string> = {
+    review_size_too_small: 'Revisar peça pequena',
+    review_size_too_large: 'Revisar peça grande',
+    review_fit_profile: 'Revisar modelagem',
+    review_feedback: 'Revisar feedback',
+    collect_more_data: 'Coletar dados',
+    stable: 'Referência estável',
+  }
+
+  return labels[action] || eventLabel(action)
+}
 </script>
 
 <template>
@@ -159,6 +202,16 @@ function statusLabel(status: string) {
           <i class="fa-solid fa-database" aria-hidden="true"></i>
           <strong>{{ analytics.summary.learning_events_total }}</strong>
           <span>{{ analytics.summary.learning_accepted }} sinais aproveitados</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+          <strong>{{ percent(analytics.summary.commerce_return_rate) }}</strong>
+          <span>{{ analytics.summary.commerce_returns + analytics.summary.commerce_exchanges }} devoluções/trocas</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>
+          <strong>{{ analytics.summary.measurement_table_insights_review }}</strong>
+          <span>tabelas com revisão sugerida</span>
         </article>
       </div>
 
@@ -270,6 +323,33 @@ function statusLabel(status: string) {
           </div>
         </section>
       </div>
+
+      <section class="panel-main">
+        <div class="subsection-heading">
+          <h2>Sugestões de tabela</h2>
+          <span>{{ analytics.measurement_table_insights.length }} tabelas analisadas</span>
+        </div>
+        <div class="job-list">
+          <div v-if="!analytics.measurement_table_insights.length" class="empty-state">
+            Ainda não há sinais suficientes de pedidos, devoluções ou feedback.
+          </div>
+          <article
+            v-for="insight in analytics.measurement_table_insights"
+            :key="insight.measurement_table_id"
+            class="job-row"
+          >
+            <i class="fa-solid fa-brain" aria-hidden="true"></i>
+            <span>
+              <strong>{{ insight.table_name }}</strong>
+              <small>{{ actionLabel(insight.suggested_action) }} · {{ insight.reason }}</small>
+              <small>
+                {{ insight.signals.total }} sinais · {{ insight.signals.purchases }} pedidos ·
+                {{ insight.signals.returns }} devoluções/trocas · confiança {{ insight.confidence }}
+              </small>
+            </span>
+          </article>
+        </div>
+      </section>
 
       <section class="panel-main">
         <div class="subsection-heading">

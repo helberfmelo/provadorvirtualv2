@@ -4,13 +4,17 @@ namespace App\Services\Ai;
 
 use App\Models\AiUsageLog;
 use App\Models\Merchant;
+use App\Models\MerchantCompany;
 use App\Models\User;
+use App\Services\Recommendation\MeasurementTableInsightService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class MeasurementTableSuggestionService
 {
     private const MEASURES = ['bust', 'waist', 'hip', 'height', 'weight', 'length', 'shoulder'];
+
+    public function __construct(private readonly MeasurementTableInsightService $tableInsights) {}
 
     public function status(): array
     {
@@ -30,11 +34,12 @@ class MeasurementTableSuggestionService
         ];
     }
 
-    public function suggest(Merchant $merchant, User $user, array $input): array
+    public function suggest(Merchant $merchant, User $user, array $input, ?MerchantCompany $company = null): array
     {
         $sourceType = $input['source_type'];
         $content = (string) ($input['content'] ?? '');
         $warnings = [];
+        $learningContext = $this->tableInsights->contextForSuggestion($merchant, $company, $input);
         $provider = 'local_parser';
         $model = 'local-table-parser-v1';
         $status = 'completed';
@@ -54,6 +59,8 @@ class MeasurementTableSuggestionService
             $warnings[] = 'Não encontrei linhas de medida suficientes. Cole uma tabela com cabeçalho e tamanhos.';
         }
 
+        $warnings = array_merge($warnings, $learningContext['warnings']);
+
         $suggestion = $this->buildSuggestion($input, $rows, $warnings);
         $usage = $this->estimatedUsage($content, $suggestion);
         $log = $this->logUsage($merchant, $user, [
@@ -72,6 +79,8 @@ class MeasurementTableSuggestionService
                 'review_required' => true,
                 'source_type' => $sourceType,
                 'filename' => $input['filename'] ?? null,
+                'learning_context_used' => $learningContext['has_signals'],
+                'learning_context_count' => count($learningContext['matching_insights']),
             ],
         ]);
 
@@ -84,6 +93,7 @@ class MeasurementTableSuggestionService
             'confidence' => $this->confidence($rows),
             'warnings' => array_values(array_unique($warnings)),
             'usage' => $usage,
+            'learning_context' => $learningContext,
             'suggestion' => $suggestion,
         ];
     }

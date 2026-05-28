@@ -6,6 +6,8 @@ Objetivo: definir como o v2 deve usar dados de consumidores e lojistas para fica
 
 Status Sprint 36: implementada e publicada no run `26339824157` a primeira base operacional com `shopper_profiles`, `recommendation_learning_events`, consentimento no widget, esquecimento por token local, sinais de feedback/compra/devolucao/troca e `outlier_score` antes de qualquer uso estatístico.
 
+Status Sprint 115: os sinais comerciais passam a carregar contexto seguro de tamanho comprado/devolvido, motivo de devolução, plataforma, quantidade, valor e data do evento. Referências de pedido são persistidas somente como hash. A base gera insights por tabela para Analytics e Assistente de IA, sempre com revisão humana obrigatória.
+
 ## Principios
 
 - O consumidor deve entender quando seus dados anteriores estão sendo usados.
@@ -203,4 +205,4 @@ Esse payload não deve conter nome, e-mail, telefone, documento, endereço ou qu
 - Confirmar se retenção de perfil anônimo deve ficar em 180 dias ou ter prazo por contrato.
 - Criar score de qualidade de tabela.
 - Evoluir relatório de outliers para drill-down por coorte/produto.
-- Integrar pedidos/devolucoes automaticamente por plataforma.
+- Integrar pedidos/devolucoes automaticamente por plataforma e oferecer importação CSV assistida.

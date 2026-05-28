@@ -1842,3 +1842,34 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 114 no commit `a6e1ff1`, publicado com sucesso no run `26608432348`. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetInstallApiTest`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetAssetTest`, PHPUnit completo com 91 testes e 825 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/widget`, páginas públicas, SaaS, portal, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 115 - Analytics de uso e base de IA
+
+Objetivo: usar pedidos, devoluções, trocas e feedback do provador para alimentar a base de aprendizado e melhorar sugestões de tabela sem ajuste automático e sem expor referências de pedido.
+
+Entregas:
+
+- ampliar o endpoint público de sinal comercial para aceitar tamanho comprado, devolvido, tamanho de troca, motivo de devolução, status, quantidade, valor, plataforma de origem e data do evento;
+- manter `order_reference` somente como hash em `recommendation_learning_events.payload`;
+- calibrar pesos de aprendizado: feedback positivo, carrinho, compra, devolução/troca e outliers críticos;
+- criar `MeasurementTableInsightService` para agrupar sinais por tabela de medidas, calcular compras, devoluções/trocas, feedbacks, taxa de retorno, prioridade e ação sugerida;
+- expor `measurement_table_insights` e novos KPIs comerciais em `/api/v1/analytics/recommendations`;
+- mostrar no portal `/app/analytics` uma lista limpa de sugestões de tabela baseadas em pedidos, devoluções e feedback;
+- alimentar o Assistente de IA com contexto de aprendizado compatível com tipo, gênero e modelagem da tabela sugerida;
+- mostrar no `/app/assistente` os insights usados e avisos de revisão para o lojista antes de criar o rascunho.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter RecommendationApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter AnalyticsApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter AiMeasurementAssistantTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter RecommendationApiTest`, `--filter AnalyticsApiTest`, `--filter AiMeasurementAssistantTest`, PHPUnit completo com 92 testes e 850 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Commit, push, Actions/deploy e validação de produção pendentes.

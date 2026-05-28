@@ -7,6 +7,7 @@ use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
 use App\Models\ShopperProfile;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 class LearningSignalService
@@ -84,27 +85,24 @@ class LearningSignalService
             return null;
         }
 
+        $selectedSize = $this->selectedSizeFromCommerceSignal($data);
         $assessment = $this->assess(
             $log->product->measurementTable,
             $log->input_measurements ?? [],
             $log->recommended_size,
-            $data['selected_size'] ?? null,
+            $selectedSize,
             (float) $log->confidence,
             $data['signal'] ?? null,
+            $data['return_reason'] ?? null,
         );
 
         return $this->createEvent($log, $log->session?->shopperProfile, [
             'event_type' => $data['signal'],
             'signal' => $data['signal'],
-            'selected_size' => $data['selected_size'] ?? null,
+            'selected_size' => $selectedSize,
             'assessment' => $assessment,
-            'payload' => [
-                'source' => $data['source'] ?? 'widget',
-                'order_reference_hash' => filled($data['order_reference'] ?? null)
-                    ? hash('sha256', (string) $data['order_reference'])
-                    : null,
-                'notes' => $data['notes'] ?? null,
-            ],
+            'payload' => $this->commercePayload($data),
+            'occurred_at' => $data['occurred_at'] ?? null,
         ]);
     }
 
@@ -127,11 +125,11 @@ class LearningSignalService
             'selected_size' => $data['selected_size'] ?? null,
             'confidence' => $log->confidence,
             'outlier_score' => $assessment['score'],
-            'learning_weight' => $assessment['weight'],
+            'learning_weight' => $this->learningWeight($assessment, $data),
             'status' => $assessment['status'],
             'reason' => $assessment['reason'],
             'payload' => $data['payload'] ?? [],
-            'occurred_at' => now(),
+            'occurred_at' => $this->occurredAt($data['occurred_at'] ?? null),
         ]);
     }
 
@@ -142,6 +140,7 @@ class LearningSignalService
         ?string $selectedSize,
         float $confidence,
         ?string $commerceSignal = null,
+        ?string $returnReason = null,
     ): array {
         $score = 0.0;
         $reasons = [];
@@ -173,7 +172,7 @@ class LearningSignalService
 
         if ($negativeCommerceSignal) {
             $score += 25;
-            $reasons[] = 'sinal comercial exige revisão';
+            $reasons[] = $this->commerceReason($commerceSignal, $returnReason);
         }
 
         $score = round(min(100, $score), 2);
@@ -266,5 +265,83 @@ class LearningSignalService
         }
 
         return abs((int) $recommendedIndex - (int) $selectedIndex);
+    }
+
+    private function selectedSizeFromCommerceSignal(array $data): ?string
+    {
+        return $data['selected_size']
+            ?? $data['ordered_size']
+            ?? $data['returned_size']
+            ?? null;
+    }
+
+    private function commercePayload(array $data): array
+    {
+        return array_filter([
+            'source' => $data['source'] ?? 'widget',
+            'source_platform' => $data['source_platform'] ?? null,
+            'order_reference_hash' => filled($data['order_reference'] ?? null)
+                ? hash('sha256', (string) $data['order_reference'])
+                : null,
+            'ordered_size' => $data['ordered_size'] ?? null,
+            'returned_size' => $data['returned_size'] ?? null,
+            'exchanged_to_size' => $data['exchanged_to_size'] ?? null,
+            'return_reason' => $data['return_reason'] ?? null,
+            'order_status' => $data['order_status'] ?? null,
+            'quantity' => $data['quantity'] ?? null,
+            'unit_price' => $data['unit_price'] ?? null,
+            'notes' => $data['notes'] ?? null,
+        ], fn (mixed $value): bool => $value !== null && $value !== '');
+    }
+
+    private function commerceReason(?string $commerceSignal, ?string $returnReason): string
+    {
+        if ($commerceSignal === 'exchange') {
+            return 'troca exige revisão da grade';
+        }
+
+        return match ($returnReason) {
+            'size_too_small' => 'devolução por peça pequena exige revisar ranges para recomendar tamanho maior',
+            'size_too_large' => 'devolução por peça grande exige revisar ranges para recomendar tamanho menor',
+            'fit_issue' => 'devolução por caimento exige revisar modelagem',
+            'defect' => 'devolução por defeito não deve ajustar tabela automaticamente',
+            'changed_mind' => 'devolução por arrependimento não deve ajustar tabela automaticamente',
+            default => 'sinal comercial exige revisão',
+        };
+    }
+
+    private function learningWeight(array $assessment, array $data): float
+    {
+        if (($assessment['status'] ?? null) === 'blocked_outlier') {
+            return 0.0;
+        }
+
+        $eventType = $data['event_type'] ?? null;
+        $signal = $data['signal'] ?? null;
+        $returnReason = $data['payload']['return_reason'] ?? null;
+
+        $weight = match ($eventType) {
+            'recommendation' => (float) $assessment['weight'],
+            'feedback' => $signal === 'not_helpful' ? 0.5 : 1.0,
+            'add_to_cart' => 0.75,
+            'purchase' => 3.0,
+            'return', 'exchange' => in_array($returnReason, ['size_too_small', 'size_too_large', 'fit_issue'], true) ? 4.0 : 1.5,
+            default => (float) $assessment['weight'],
+        };
+
+        return round($weight, 3);
+    }
+
+    private function occurredAt(?string $value): Carbon
+    {
+        if (! $value) {
+            return now();
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (\Throwable) {
+            return now();
+        }
     }
 }

@@ -35,8 +35,26 @@ type Suggestion = {
   warnings: string[]
 }
 
+type LearningContext = {
+  has_signals: boolean
+  matching_insights: {
+    measurement_table_id: number
+    table_name: string
+    suggested_action: string
+    reason: string
+    signals: {
+      total: number
+      purchases: number
+      returns: number
+      positive_feedback: number
+      negative_feedback: number
+    }
+  }[]
+}
+
 const status = ref<Record<string, string | boolean | null>>({})
 const suggestion = ref<Suggestion | null>(null)
+const learningContext = ref<LearningContext | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const error = ref('')
@@ -87,6 +105,7 @@ async function suggestTable() {
   error.value = ''
   warnings.value = []
   suggestion.value = null
+  learningContext.value = null
 
   try {
     const { data } = await api.post('/ai/measurement-table-suggestions', {
@@ -101,6 +120,7 @@ async function suggestTable() {
     })
 
     suggestion.value = data.data.suggestion
+    learningContext.value = data.data.learning_context || null
     warnings.value = data.data.warnings || []
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível sugerir a tabela.'
@@ -163,6 +183,19 @@ function applySample() {
     'M 94-100 76-82 98-104',
     'G 100-108 82-90 104-112',
   ].join('\n')
+}
+
+function actionLabel(action: string) {
+  const labels: Record<string, string> = {
+    review_size_too_small: 'Revisar peça pequena',
+    review_size_too_large: 'Revisar peça grande',
+    review_fit_profile: 'Revisar modelagem',
+    review_feedback: 'Revisar feedback',
+    collect_more_data: 'Coletar dados',
+    stable: 'Referência estável',
+  }
+
+  return labels[action] || action.replaceAll('_', ' ')
 }
 
 function addRow() {
@@ -315,6 +348,24 @@ function readAsDataUrl(file: File): Promise<string> {
             <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
             {{ warning }}
           </span>
+        </div>
+
+        <div v-if="learningContext?.matching_insights.length" class="job-list">
+          <article
+            v-for="insight in learningContext.matching_insights"
+            :key="insight.measurement_table_id"
+            class="job-row"
+          >
+            <i class="fa-solid fa-brain" aria-hidden="true"></i>
+            <span>
+              <strong>{{ insight.table_name }}</strong>
+              <small>{{ actionLabel(insight.suggested_action) }} · {{ insight.reason }}</small>
+              <small>
+                {{ insight.signals.total }} sinais · {{ insight.signals.purchases }} pedidos ·
+                {{ insight.signals.returns }} devoluções/trocas
+              </small>
+            </span>
+          </article>
         </div>
 
         <div v-if="!suggestion" class="empty-state">Nenhuma sugestão carregada.</div>

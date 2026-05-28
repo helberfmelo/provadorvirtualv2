@@ -289,4 +289,59 @@ class RecommendationApiTest extends TestCase
 
         $this->assertSame(2, RecommendationLearningEvent::query()->where('status', 'blocked_outlier')->count());
     }
+
+    public function test_commerce_signals_store_safe_order_context_for_learning(): void
+    {
+        $this->seed();
+
+        $recommendation = $this->postJson('/api/v1/public/recommendations', [
+            'merchant_id' => 1,
+            'store_id' => 1,
+            'product_id' => 1,
+            'platform' => 'custom',
+            'measurements' => [
+                'bust' => 92,
+                'waist' => 74,
+                'hip' => 100,
+                'height' => 166,
+                'weight' => 62,
+            ],
+        ])->assertCreated();
+
+        $recommendationId = $recommendation->json('recommendation_id');
+
+        $this->postJson("/api/v1/public/recommendations/{$recommendationId}/signal", [
+            'signal' => 'purchase',
+            'ordered_size' => 'M',
+            'source' => 'checkout',
+            'source_platform' => 'bigshop',
+            'order_reference' => 'ORDER-ZAK-123',
+            'order_status' => 'paid',
+            'quantity' => 2,
+            'unit_price' => 149.9,
+        ])->assertCreated()
+            ->assertJsonPath('learning_status', 'accepted');
+
+        $this->postJson("/api/v1/public/recommendations/{$recommendationId}/signal", [
+            'signal' => 'return',
+            'returned_size' => 'M',
+            'return_reason' => 'size_too_small',
+            'source' => 'returns_api',
+            'source_platform' => 'bigshop',
+            'order_reference' => 'ORDER-ZAK-123',
+        ])->assertCreated()
+            ->assertJsonPath('learning_status', 'review');
+
+        $purchase = RecommendationLearningEvent::query()->where('event_type', 'purchase')->firstOrFail();
+        $return = RecommendationLearningEvent::query()->where('event_type', 'return')->firstOrFail();
+
+        $this->assertSame('M', $purchase->selected_size);
+        $this->assertSame(3.0, (float) $purchase->learning_weight);
+        $this->assertSame('bigshop', $purchase->payload['source_platform']);
+        $this->assertArrayHasKey('order_reference_hash', $purchase->payload);
+        $this->assertStringNotContainsString('ORDER-ZAK-123', json_encode($purchase->payload));
+        $this->assertSame('size_too_small', $return->payload['return_reason']);
+        $this->assertSame(4.0, (float) $return->learning_weight);
+        $this->assertStringContainsString('peça pequena', $return->reason);
+    }
 }

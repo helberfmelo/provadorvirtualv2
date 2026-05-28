@@ -23,9 +23,10 @@ class AiMeasurementAssistantController extends Controller
     public function suggest(SuggestMeasurementTableRequest $request): array
     {
         $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
 
         return [
-            'data' => $this->suggestions->suggest($merchant, $request->user(), $request->validated()),
+            'data' => $this->suggestions->suggest($merchant, $request->user(), $request->validated(), $company),
         ];
     }
 }
