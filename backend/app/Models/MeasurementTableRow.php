@@ -14,6 +14,8 @@ class MeasurementTableRow extends Model
     protected function casts(): array
     {
         return [
+            'measurements' => 'array',
+            'composite_measurements' => 'array',
             'metadata' => 'array',
         ];
     }

@@ -587,7 +587,7 @@ Status Sprint 111: a tela `/app/regras-de-importacao` foi criada com regras visu
 - Tela "Regras de importacao" criada na Sprint 111 com construtor visual simples.
 - Criar cadastro de modelagens.
 - Melhorar lista de produtos com status de configuracao do provador.
-- Melhorar tabela de medidas para medida corporal, medida da peca, sistema de tamanho, ranges e medidas compostas.
+- Tabelas de medidas evoluidas na Sprint 112 para medida corporal, medida da peca, sistema de tamanho, ranges e medidas compostas.
 
 ### P2 - Melhorar widget/personalizacao
 

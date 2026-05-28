@@ -27,6 +27,9 @@ class MeasurementTablesApiTest extends TestCase
                 'product_type' => 'pants',
                 'gender' => 'female',
                 'fit_profile' => 'regular',
+                'measurement_target' => 'mixed',
+                'size_system' => 'br_numeric',
+                'range_mode' => 'min_max',
                 'source' => 'manual',
                 'rows' => [
                     [
@@ -35,6 +38,16 @@ class MeasurementTablesApiTest extends TestCase
                         'waist_max' => 72,
                         'hip_min' => 92,
                         'hip_max' => 98,
+                        'length_min' => 98,
+                        'length_max' => 102,
+                        'composite_measurements' => [
+                            'fit_balance' => [
+                                'label' => 'Cintura + quadril',
+                                'formula' => 'waist+hip',
+                                'min' => 158,
+                                'max' => 170,
+                            ],
+                        ],
                     ],
                     [
                         'size_label' => 'M',
@@ -47,7 +60,12 @@ class MeasurementTablesApiTest extends TestCase
             ])
             ->assertCreated()
             ->assertJsonPath('data.name', 'Calca alfaiataria regular')
+            ->assertJsonPath('data.measurement_target', 'mixed')
+            ->assertJsonPath('data.size_system', 'br_numeric')
+            ->assertJsonPath('data.range_mode', 'min_max')
             ->assertJsonCount(2, 'data.rows')
+            ->assertJsonPath('data.rows.0.measurements.length.min', 98)
+            ->assertJsonPath('data.rows.0.composite_measurements.fit_balance.formula', 'waist+hip')
             ->json('data.id');
 
         $this->withHeaders($headers)

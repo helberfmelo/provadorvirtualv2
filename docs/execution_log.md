@@ -1138,3 +1138,14 @@
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter BigShopIntegrationTest`, PHPUnit completo com 90 testes e 772 assertions, `npm --prefix frontend run build` e `vendor/bin/pint --dirty`.
 - Commit `5d938ba` enviado para `main`; o run `26606288957` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 112 Tabelas flexíveis de medidas
+
+- A quarta demanda da lista pós-benchmark foi iniciada: evoluir tabelas para corpo, peça, sistema de tamanho, ranges e medidas compostas.
+- `measurement_tables` ganhou `measurement_target`, `size_system` e `range_mode`.
+- `measurement_table_rows` ganhou `measurements` e `composite_measurements` em JSON, preservando colunas legadas usadas pelo motor atual.
+- O controller passa a montar payload flexível por linha e a guardar a medida composta `fit_balance`.
+- Os resources e o `config-check` do widget expõem os novos campos sem quebrar a resposta antiga.
+- A tela de tabela ganhou base da tabela, sistema, modo de range, coluna de medida composta e listagem com base/sistema.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter MeasurementTablesApiTest`, PHPUnit completo com 90 testes e 777 assertions, `npm --prefix frontend run build` e `vendor/bin/pint --dirty`.
+- Commit, push, Actions/deploy e validação de produção pendentes.

@@ -27,6 +27,21 @@ class MeasurementTableRowResource extends JsonResource
             'length_max' => $this->length_max,
             'shoulder_min' => $this->shoulder_min,
             'shoulder_max' => $this->shoulder_max,
+            'measurements' => $this->measurements ?? $this->legacyMeasurements(),
+            'composite_measurements' => $this->composite_measurements ?? [],
         ];
+    }
+
+    private function legacyMeasurements(): array
+    {
+        return collect([
+            'bust' => ['label' => 'Busto', 'min' => $this->bust_min, 'max' => $this->bust_max],
+            'waist' => ['label' => 'Cintura', 'min' => $this->waist_min, 'max' => $this->waist_max],
+            'hip' => ['label' => 'Quadril', 'min' => $this->hip_min, 'max' => $this->hip_max],
+            'height' => ['label' => 'Altura', 'min' => $this->height_min, 'max' => $this->height_max],
+            'weight' => ['label' => 'Peso', 'min' => $this->weight_min, 'max' => $this->weight_max],
+            'length' => ['label' => 'Comprimento', 'min' => $this->length_min, 'max' => $this->length_max],
+            'shoulder' => ['label' => 'Ombro', 'min' => $this->shoulder_min, 'max' => $this->shoulder_max],
+        ])->filter(fn (array $range): bool => $range['min'] !== null || $range['max'] !== null)->all();
     }
 }

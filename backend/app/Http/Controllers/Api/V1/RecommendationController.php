@@ -45,6 +45,9 @@ class RecommendationController extends Controller
                 'id' => $product->measurementTable->id,
                 'name' => $product->measurementTable->name,
                 'unit' => $product->measurementTable->unit,
+                'measurement_target' => $product->measurementTable->measurement_target ?: 'body',
+                'size_system' => $product->measurementTable->size_system ?: 'br_alpha',
+                'range_mode' => $product->measurementTable->range_mode ?: 'min_max',
                 'rows' => $product->measurementTable->rows->map(fn ($row): array => [
                     'size_label' => $row->size_label,
                     'bust' => [$row->bust_min, $row->bust_max],
@@ -54,6 +57,8 @@ class RecommendationController extends Controller
                     'weight' => [$row->weight_min, $row->weight_max],
                     'length' => [$row->length_min, $row->length_max],
                     'shoulder' => [$row->shoulder_min, $row->shoulder_max],
+                    'measurements' => $row->measurements ?? [],
+                    'composite_measurements' => $row->composite_measurements ?? [],
                 ])->values(),
             ],
             'theme' => WidgetInstall::query()

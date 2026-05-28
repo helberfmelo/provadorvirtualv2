@@ -60,6 +60,9 @@ class MeasurementTableController extends Controller
                 'product_type' => $data['product_type'],
                 'gender' => $data['gender'] ?? null,
                 'fit_profile' => $data['fit_profile'] ?? null,
+                'measurement_target' => $data['measurement_target'] ?? 'body',
+                'size_system' => $data['size_system'] ?? 'br_alpha',
+                'range_mode' => $data['range_mode'] ?? 'min_max',
                 'unit' => $data['unit'] ?? 'cm',
                 'status' => $data['status'] ?? 'active',
                 'source' => $data['source'] ?? 'manual',
@@ -171,7 +174,62 @@ class MeasurementTableController extends Controller
                 'length_max' => $row['length_max'] ?? null,
                 'shoulder_min' => $row['shoulder_min'] ?? null,
                 'shoulder_max' => $row['shoulder_max'] ?? null,
+                'measurements' => $this->measurementsPayload($row),
+                'composite_measurements' => $this->compositeMeasurementsPayload($row),
             ]);
         }
+    }
+
+    private function measurementsPayload(array $row): array
+    {
+        $measurements = is_array($row['measurements'] ?? null) ? $row['measurements'] : [];
+
+        foreach ($this->legacyMeasurementFields() as $key => $label) {
+            $min = $row[$key.'_min'] ?? null;
+            $max = $row[$key.'_max'] ?? null;
+
+            if ($min === null && $max === null && isset($measurements[$key])) {
+                continue;
+            }
+
+            if ($min !== null || $max !== null) {
+                $measurements[$key] = array_filter([
+                    'label' => $label,
+                    'min' => $min,
+                    'max' => $max,
+                ], fn ($value): bool => $value !== null && $value !== '');
+            }
+        }
+
+        return $this->filterMeasurementMap($measurements);
+    }
+
+    private function compositeMeasurementsPayload(array $row): array
+    {
+        $composite = is_array($row['composite_measurements'] ?? null) ? $row['composite_measurements'] : [];
+
+        return $this->filterMeasurementMap($composite);
+    }
+
+    private function filterMeasurementMap(array $measurements): array
+    {
+        return collect($measurements)
+            ->filter(fn (mixed $value): bool => is_array($value))
+            ->map(fn (array $value): array => array_filter($value, fn (mixed $item): bool => $item !== null && $item !== ''))
+            ->filter()
+            ->all();
+    }
+
+    private function legacyMeasurementFields(): array
+    {
+        return [
+            'bust' => 'Busto',
+            'waist' => 'Cintura',
+            'hip' => 'Quadril',
+            'height' => 'Altura',
+            'weight' => 'Peso',
+            'length' => 'Comprimento',
+            'shoulder' => 'Ombro',
+        ];
     }
 }

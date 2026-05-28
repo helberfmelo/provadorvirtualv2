@@ -1752,3 +1752,30 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 111 no commit `5d938ba`, publicado com sucesso no run `26606288957`. Validações locais passaram com `php -l`, PHPUnit com `pdo_sqlite/sqlite3` carregados por `-d`, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 112 - Tabelas flexíveis de medidas
+
+Objetivo: evoluir as tabelas para suportar medida do corpo, medida da peça, sistema de tamanho, ranges explícitos e medidas compostas, preservando compatibilidade com o motor atual de recomendação.
+
+Entregas:
+
+- adicionar `measurement_target`, `size_system` e `range_mode` em `measurement_tables`;
+- adicionar `measurements` e `composite_measurements` JSON em `measurement_table_rows`;
+- manter colunas legadas de busto/cintura/quadril/altura/peso/comprimento/ombro como base do motor atual;
+- sincronizar linhas com payload flexível e medida composta `fit_balance`;
+- expor campos flexíveis nos resources e no `config-check` do widget;
+- atualizar `/app/tabelas-de-medidas/nova` e edição com base da tabela, sistema de tamanho, modo de range e coluna de medida composta;
+- atualizar a listagem de tabelas com base e sistema.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter MeasurementTablesApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Validações locais passaram com `php -l`, PHPUnit completo com 90 testes e 777 assertions, `npm --prefix frontend run build` e `vendor/bin/pint --dirty`. Commit, push, Actions/deploy e validação de produção pendentes.

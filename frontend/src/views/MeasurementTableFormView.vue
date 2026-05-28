@@ -56,6 +56,9 @@ const form = reactive({
   product_type: 'dress',
   gender: 'female',
   fit_profile: 'regular',
+  measurement_target: 'body',
+  size_system: 'br_alpha',
+  range_mode: 'min_max',
   status: 'active',
   source: 'manual',
   notes: '',
@@ -97,9 +100,12 @@ function fillForm(table: MeasurementTable) {
   form.product_type = table.product_type
   form.gender = table.gender ?? 'female'
   form.fit_profile = table.fit_profile ?? 'regular'
+  form.measurement_target = table.measurement_target ?? 'body'
+  form.size_system = table.size_system ?? 'br_alpha'
+  form.range_mode = table.range_mode ?? 'min_max'
   form.status = table.status
   form.source = table.source
-  form.rows = JSON.parse(JSON.stringify(table.rows ?? []))
+  form.rows = (JSON.parse(JSON.stringify(table.rows ?? [])) as MeasurementRow[]).map(withCompositeFields)
 }
 
 function applyTemplate(template: MeasurementTemplate) {
@@ -107,12 +113,15 @@ function applyTemplate(template: MeasurementTemplate) {
   form.product_type = template.product_type
   form.gender = template.gender
   form.fit_profile = template.fit_profile
+  form.measurement_target = 'body'
+  form.size_system = 'br_alpha'
+  form.range_mode = 'min_max'
   form.source = 'template'
   form.notes = [
     template.market_basis,
     template.fields?.length ? `Campos originais: ${template.fields.join(', ')}` : '',
   ].filter(Boolean).join('\n')
-  form.rows = JSON.parse(JSON.stringify(template.rows))
+  form.rows = (JSON.parse(JSON.stringify(template.rows)) as MeasurementRow[]).map(withCompositeFields)
 }
 
 function applySelectedTemplate() {
@@ -152,6 +161,55 @@ function removeRow(index: number) {
   form.rows.splice(index, 1)
 }
 
+function withCompositeFields(row: MeasurementRow): MeasurementRow {
+  const composite = row.composite_measurements?.fit_balance || {}
+
+  return {
+    ...row,
+    composite_min: composite.min ?? null,
+    composite_max: composite.max ?? null,
+  }
+}
+
+function buildMeasurements(row: MeasurementRow) {
+  const labels: Record<string, string> = {
+    bust: 'Busto',
+    waist: 'Cintura',
+    hip: 'Quadril',
+    height: 'Altura',
+    weight: 'Peso',
+    length: 'Comprimento',
+    shoulder: 'Ombro',
+  }
+
+  return Object.fromEntries(Object.entries(labels).flatMap(([field, label]) => {
+    const min = row[`${field}_min` as keyof MeasurementRow]
+    const max = row[`${field}_max` as keyof MeasurementRow]
+
+    return (min !== null && min !== undefined) || (max !== null && max !== undefined)
+      ? [[field, { label, min, max }]]
+      : []
+  }))
+}
+
+function buildCompositeMeasurements(row: MeasurementRow) {
+  if (
+    (row.composite_min === null || row.composite_min === undefined)
+    && (row.composite_max === null || row.composite_max === undefined)
+  ) {
+    return {}
+  }
+
+  return {
+    fit_balance: {
+      label: 'Busto + cintura + quadril',
+      formula: 'bust+waist+hip',
+      min: row.composite_min ?? null,
+      max: row.composite_max ?? null,
+    },
+  }
+}
+
 async function saveTable() {
   saving.value = true
   error.value = ''
@@ -161,12 +219,17 @@ async function saveTable() {
     product_type: form.product_type,
     gender: form.gender,
     fit_profile: form.fit_profile,
+    measurement_target: form.measurement_target,
+    size_system: form.size_system,
+    range_mode: form.range_mode,
     status: form.status,
     source: form.source,
     notes: form.notes || null,
     rows: form.rows.map((row, sort_order) => ({
       ...row,
       sort_order,
+      measurements: buildMeasurements(row),
+      composite_measurements: buildCompositeMeasurements(row),
     })),
   }
 
@@ -262,6 +325,33 @@ async function saveTable() {
             <option value="slim">Slim</option>
             <option value="regular">Regular</option>
             <option value="oversized">Ampla</option>
+            <option value="loose">Solta</option>
+            <option value="comfort">Conforto</option>
+          </select>
+        </label>
+        <label>
+          Base da tabela
+          <select v-model="form.measurement_target">
+            <option value="body">Corpo</option>
+            <option value="garment">Peça</option>
+            <option value="mixed">Corpo + peça</option>
+          </select>
+        </label>
+        <label>
+          Sistema
+          <select v-model="form.size_system">
+            <option value="br_alpha">BR letras</option>
+            <option value="br_numeric">BR numérico</option>
+            <option value="international">Internacional</option>
+            <option value="custom">Personalizado</option>
+          </select>
+        </label>
+        <label>
+          Ranges
+          <select v-model="form.range_mode">
+            <option value="min_max">Mínimo e máximo</option>
+            <option value="exact">Medida exata</option>
+            <option value="tolerance">Tolerância</option>
           </select>
         </label>
         <label>
@@ -292,8 +382,9 @@ async function saveTable() {
               <th>Quadril</th>
               <th>Altura</th>
               <th>Peso</th>
-              <th>Comp.</th>
+              <th>Comprimento</th>
               <th>Ombro</th>
+              <th>Composta</th>
               <th></th>
             </tr>
           </thead>
@@ -327,6 +418,10 @@ async function saveTable() {
               <td class="range-cell">
                 <input v-model.number="row.shoulder_min" class="table-input mini" type="number" min="0" />
                 <input v-model.number="row.shoulder_max" class="table-input mini" type="number" min="0" />
+              </td>
+              <td class="range-cell">
+                <input v-model.number="row.composite_min" class="table-input mini" type="number" min="0" />
+                <input v-model.number="row.composite_max" class="table-input mini" type="number" min="0" />
               </td>
               <td class="row-actions">
                 <button type="button" title="Remover linha" @click="removeRow(index)">

@@ -45,6 +45,10 @@ export type MeasurementRow = {
   length_max?: number | null
   shoulder_min?: number | null
   shoulder_max?: number | null
+  composite_min?: number | null
+  composite_max?: number | null
+  measurements?: Record<string, { label?: string; min?: number | null; max?: number | null; value?: number | null }>
+  composite_measurements?: Record<string, { label?: string; formula?: string; min?: number | null; max?: number | null; value?: number | null }>
 }
 
 export type MeasurementTable = {
@@ -53,6 +57,9 @@ export type MeasurementTable = {
   product_type: string
   gender: string | null
   fit_profile: string | null
+  measurement_target: 'body' | 'garment' | 'mixed'
+  size_system: 'br_alpha' | 'br_numeric' | 'international' | 'custom'
+  range_mode: 'min_max' | 'exact' | 'tolerance'
   status: string
   source: string
   rows_count?: number

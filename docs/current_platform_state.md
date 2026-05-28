@@ -226,19 +226,20 @@ Atualizado em: 2026-05-28
 - Sprint 110 enviada ao GitHub no commit `efe87b8`; o run `26605323289` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 111 cria `/app/regras-de-importacao`: regras visuais por conexão para categoria, marca, gênero, faixa etária, status e modelagem, salvas em `platform_connections.import_rules` e usadas por dry-run/sync BigShop e XML/feed.
 - Sprint 111 enviada ao GitHub no commit `5d938ba`; o run `26606288957` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
+- Sprint 112 evolui tabelas de medidas com `measurement_target`, `size_system`, `range_mode`, JSON flexível por linha e medida composta `fit_balance`, preservando compatibilidade com as colunas usadas pelo motor atual.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
 - `/provadorvirtual_v2/` permanece como caminho técnico de backend, API, widget, assets internos e rollback.
 - Falta chave de IA externa (`OPENAI_API_KEY` ou `GEMINI_API_KEY`) para OCR real de imagem.
-- Credencial BigShop real da Zak foi recebida e cadastrada como piloto; a importacao final da Zak ainda nao deve ser rodada ate concluir mapeamentos e modelo flexivel de medidas. A Sprint 109 criou o dry-run paginado com `product_grids` para revisar os dados antes de qualquer gravação em massa.
+- Credencial BigShop real da Zak foi recebida e cadastrada como piloto; a importacao final da Zak ainda nao deve ser rodada ate validar os mapeamentos e a tabela flexivel em dados reais. A Sprint 109 criou o dry-run paginado com `product_grids` para revisar os dados antes de qualquer gravação em massa.
 - Falta cadastrar `BIGSHOP_ACTIVATION_SECRET` em `PRODUCTION_ENV` para habilitar ativação um clique real.
 - Mercado Pago passa a ser a operadora de produção do checkout transparente; as chaves de referência do NoAzul devem ficar em `PRODUCTION_ENV`, `backend/.env` local ou `docs/credentials.local.md`, nunca versionadas.
 - Pagar.me permanece no painel como alternativa selecionável, mas a finalização dela continua pendente das informações operacionais faltantes.
 - Checkout público prioriza cartão quando disponível, com parcelas até 10x sem juros no anual, Pix como alternativa à vista com tag `5% off` apenas no plano anual com desconto real e boleto somente quando habilitado no SaaS; a regra comercial atual já tem planos mensal/anual por plataforma, aceite legal obrigatório, recorrência mensal no cartão, cancelamento de renovação futura pelo portal e coleta de empresa limitada a CNPJ. Pix e boleto Mercado Pago enviam `date_of_expiration` com milissegundos e timezone `America/Sao_Paulo`. A conclusão exibe Pix com QR Code/copia e cola, boleto com link/download/código de barras, cartão aprovado com sucesso e falhas com mensagem amigável mais código técnico. A trilha iniciada na Sprint 86 foi validada no Sprint 91; recorrência anual segue como validação futura para evitar dupla cobrança.
 - Campos seguros do Mercado Pago no checkout mobile devem permanecer compactos: invólucro de 44px e `iframe` interno contido em 22px.
 - Falta configurar/validar cron no cPanel e executar uma transação real Mercado Pago de baixo valor em produção.
-- Teste real BigShop com Zak ja tem credencial cadastrada; a Sprint 109 cobre `Store-Id`, retorno paginado/envelopado e grade separada em `product_grids` no dry-run. A Sprint 111 cobre mapeamento visual de categoria/marca/genero/faixa etaria/status/modelagem. A importacao final em massa segue bloqueada ate o modelo flexivel de tabelas.
+- Teste real BigShop com Zak ja tem credencial cadastrada; a Sprint 109 cobre `Store-Id`, retorno paginado/envelopado e grade separada em `product_grids` no dry-run. A Sprint 111 cobre mapeamento visual de categoria/marca/genero/faixa etaria/status/modelagem. A Sprint 112 cobre modelo flexivel de tabelas, mas a importacao final em massa segue bloqueada ate validação dos dados reais.
 
 ## Superficie atual
 
@@ -247,6 +248,7 @@ Atualizado em: 2026-05-28
 - CRUDs do SaaS seguem padrão list-first: listagem ocupa a tela e novo/editar abre rota própria.
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
+- Tabelas de medidas: `/app/tabelas-de-medidas` e formulários suportam base corpo/peça/mista, sistema BR letras/BR numérico/internacional/custom, ranges e medida composta por linha, mantendo o formato antigo para recomendação.
 - Diretriz obrigatória de telas: `docs/portal_ui_guidelines.md`.
 - Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão, links para termos/privacidade, modal amigável de falha por meio de pagamento e conclusão específica para Pix, boleto e cartão. A conclusão pública mostra pedido, status do pagamento em português e forma de pagamento, sem expor a operadora.
 - Site público raiz: landing comercial do Provador Virtual, com planos mensal/anual por plataforma, tags de economia anual nos cards, CTA para loja teste/checkout e cards de benefícios otimizados para mobile. A cópia pública usa `provador` em vez de `widget` para evitar jargão técnico. Quando há sessão autenticada, o cabeçalho mostra retorno para `Voltar ao SaaS` ou `Voltar ao portal`, conforme o papel carregado por `/me`.
