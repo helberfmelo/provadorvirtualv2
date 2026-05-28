@@ -579,10 +579,12 @@ Usos praticos da IA:
 
 Status Sprint 109: o dry-run BigShop foi implementado para produtos e `product_grids` paginados, com join por `produtoid`, extracao de tamanho em `caracteristicas`, evento `dry_run_import` e painel de prévia em `/app/integracoes`. A importacao final segue bloqueada ate mapeamentos e modelo flexivel de tabelas.
 
+Status Sprint 111: a tela `/app/regras-de-importacao` foi criada com regras visuais por conexão para categoria, marca, genero, faixa etaria, status e modelagem. As regras passam a alimentar dry-run/sync BigShop e XML/feed.
+
 ### P1 - Igualar operacao da Sizebay no portal do cliente
 
 - Tela "Sincronizacao" criada na Sprint 110 com historico, contadores, filtros e erros por produto.
-- Criar "Regras de importacao" com construtor visual simples.
+- Tela "Regras de importacao" criada na Sprint 111 com construtor visual simples.
 - Criar cadastro de modelagens.
 - Melhorar lista de produtos com status de configuracao do provador.
 - Melhorar tabela de medidas para medida corporal, medida da peca, sistema de tamanho, ranges e medidas compostas.
@@ -606,8 +608,9 @@ Status Sprint 109: o dry-run BigShop foi implementado para produtos e `product_g
 ## Sprint sugerida depois deste benchmark
 
 1. Sprint 109 - Importacao BigShop Zak em dry-run.
-2. Sprint 110 - Modelagens, marcas e categorias normalizadas.
-3. Sprint 111 - Tabela de medidas flexivel.
-4. Sprint 112 - Sync visual com erros e regras de importacao.
-5. Sprint 113 - Publicacao/preview do widget como Sizebay.
-6. Sprint 114 - Analytics de uso e base de IA.
+2. Sprint 110 - Sync visual com erros por produto.
+3. Sprint 111 - Regras visuais de importacao.
+4. Sprint 112 - Tabela de medidas flexivel.
+5. Sprint 113 - Cadastro de modelagens.
+6. Sprint 114 - Publicacao/preview do widget como Sizebay.
+7. Sprint 115 - Analytics de uso e base de IA.

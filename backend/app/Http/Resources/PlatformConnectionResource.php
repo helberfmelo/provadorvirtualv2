@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Services\Imports\ImportRuleMapper;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -17,6 +18,7 @@ class PlatformConnectionResource extends JsonResource
             'api_base_url' => $this->api_base_url,
             'feed_url' => $this->feed_url,
             'feed_format' => $this->feed_format ?: 'google_xml',
+            'import_rules' => app(ImportRuleMapper::class)->normalize($this->import_rules ?? []),
             'status' => $this->status,
             'has_access_token' => filled($this->access_token_encrypted),
             'has_webhook_secret' => filled($this->webhook_secret_encrypted),

@@ -41,6 +41,7 @@ class XmlFeedSyncService
                 'source_format' => $connection->feed_format ?: 'google_xml',
                 'filename' => $feedUrl,
                 'content' => (string) $response->body(),
+                'import_rules' => $connection->import_rules ?? null,
             ]);
 
             $status = in_array($job->status, ['completed', 'completed_with_warnings'], true)

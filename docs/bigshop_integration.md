@@ -152,6 +152,14 @@ Status Sprint 110:
 - a tela mostra status, contadores, amostra de produtos e erros por produto/grade vindos de `integration_events` e `import_jobs`.
 - publicado no commit `efe87b8`, com deploy green no run `26605323289` e validação de produção incluindo `/app/sincronizacao`.
 
+Status Sprint 111:
+
+- `platform_connections.import_rules` guarda regras visuais por conexão;
+- `/app/regras-de-importacao` permite configurar origem, obrigatoriedade, fallback e normalizações para categoria, marca, gênero, faixa etária, status e modelagem;
+- `BigShopDryRunService` exibe campos mapeados e alertas de regra obrigatória sem gravar catálogo;
+- `BigShopSyncService` aplica as regras em produtos, metadados e tabelas criadas pela API;
+- `XmlFeedSyncService` repassa as mesmas regras para importações Google XML/feed.
+
 Detalhes completos do benchmark Sizebay/Zak: `docs/sizebay_zak_hyper_benchmark.md`.
 
 ## Integração de um clique

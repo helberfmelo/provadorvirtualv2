@@ -8,13 +8,17 @@ use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Models\Product;
+use App\Services\Imports\ImportRuleMapper;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BigShopSyncService
 {
-    public function __construct(private readonly BigShopClient $client) {}
+    public function __construct(
+        private readonly BigShopClient $client,
+        private readonly ImportRuleMapper $ruleMapper
+    ) {}
 
     public function probe(Merchant $merchant, PlatformConnection $connection): array
     {
@@ -40,13 +44,18 @@ class BigShopSyncService
     public function syncProducts(Merchant $merchant, MerchantCompany $company, PlatformConnection $connection): array
     {
         $products = $this->client->products($connection);
-        $summary = DB::transaction(function () use ($merchant, $company, $products): array {
+        $importRules = $this->ruleMapper->normalize($connection->import_rules ?? []);
+        $rulesSummary = $this->ruleMapper->summarize($importRules);
+        $summary = DB::transaction(function () use ($merchant, $company, $products, $importRules, $rulesSummary): array {
             $summary = [
                 'products_synced' => 0,
                 'variants_synced' => 0,
                 'measurement_tables_synced' => 0,
                 'products_without_measurement_table' => 0,
                 'products_without_variants' => 0,
+                'import_rules_active' => $rulesSummary['active'],
+                'import_rules_required' => $rulesSummary['required'],
+                'import_rules_with_fallback' => $rulesSummary['with_fallback'],
             ];
 
             foreach ($products as $payload) {
@@ -54,14 +63,14 @@ class BigShopSyncService
                     continue;
                 }
 
-                $table = $this->syncMeasurementTable($merchant, $company, $payload);
+                $table = $this->syncMeasurementTable($merchant, $company, $payload, $importRules);
                 if ($table) {
                     $summary['measurement_tables_synced']++;
                 } else {
                     $summary['products_without_measurement_table']++;
                 }
 
-                $product = $this->syncProduct($merchant, $company, $payload, $table);
+                $product = $this->syncProduct($merchant, $company, $payload, $table, $importRules);
                 $summary['products_synced']++;
 
                 $variants = $this->variants($payload);
@@ -89,11 +98,12 @@ class BigShopSyncService
         return $summary;
     }
 
-    private function syncProduct(Merchant $merchant, MerchantCompany $company, array $payload, ?MeasurementTable $table): Product
+    private function syncProduct(Merchant $merchant, MerchantCompany $company, array $payload, ?MeasurementTable $table, array $importRules): Product
     {
         $externalId = (string) $this->first($payload, ['id', 'external_product_id', 'codigo', 'product_id']);
         $sku = (string) $this->first($payload, ['sku', 'referencia', 'codigo_referencia']);
         $name = (string) ($this->first($payload, ['name', 'nome', 'title', 'titulo']) ?: 'Produto BigShop '.$externalId);
+        $mapped = $this->ruleMapper->mapProduct($payload, $importRules)['values'];
 
         $product = Product::query()
             ->where('merchant_id', $merchant->id)
@@ -117,14 +127,16 @@ class BigShopSyncService
             'sku' => $sku ?: $product->sku,
             'name' => $name,
             'description' => $this->first($payload, ['description', 'descricao', 'descricao1', 'descricao2']),
-            'category' => $this->first($payload, ['category', 'categoria', 'product_type']),
-            'gender' => $this->normalizeGender($this->first($payload, ['gender', 'genero'])),
-            'fit_profile' => $product->fit_profile ?: 'regular',
-            'status' => 'active',
+            'category' => $mapped['category'] ?? $this->first($payload, ['category', 'categoria', 'product_type']),
+            'gender' => $mapped['gender'] ?? $this->normalizeGender($this->first($payload, ['gender', 'genero'])),
+            'fit_profile' => ($mapped['fit_profile'] ?? $product->fit_profile) ?: 'regular',
+            'status' => $mapped['status'] ?? 'active',
             'image_url' => $this->first($payload, ['image_url', 'image', 'imagem', 'foto']),
-            'metadata' => array_merge($product->metadata ?? [], [
+            'metadata' => array_merge($product->metadata ?? [], array_filter([
                 'bigshop_last_sync_at' => now()->toISOString(),
-            ]),
+                'brand' => $mapped['brand'] ?? $this->first($payload, ['brand', 'marca']),
+                'age_group' => $mapped['age_group'] ?? $this->first($payload, ['age_group', 'faixa_etaria']),
+            ], fn ($value): bool => $value !== null && $value !== '')),
         ]);
         $product->save();
 
@@ -150,7 +162,7 @@ class BigShopSyncService
         );
     }
 
-    private function syncMeasurementTable(Merchant $merchant, MerchantCompany $company, array $payload): ?MeasurementTable
+    private function syncMeasurementTable(Merchant $merchant, MerchantCompany $company, array $payload, array $importRules): ?MeasurementTable
     {
         $tablePayload = $this->first($payload, ['measurement_table', 'tabela_de_medidas', 'medidas']);
 
@@ -165,6 +177,7 @@ class BigShopSyncService
 
         $productName = (string) ($this->first($payload, ['name', 'nome', 'title']) ?: 'BigShop');
         $tableName = (string) ($tablePayload['name'] ?? $tablePayload['nome'] ?? 'Tabela BigShop - '.$productName);
+        $mapped = $this->ruleMapper->mapProduct($payload, $importRules)['values'];
         $table = MeasurementTable::query()->updateOrCreate(
             [
                 'merchant_id' => $merchant->id,
@@ -172,9 +185,9 @@ class BigShopSyncService
             ],
             [
                 'merchant_company_id' => $company->id,
-                'product_type' => (string) ($this->first($payload, ['product_type', 'category', 'categoria']) ?: 'clothing'),
-                'gender' => $this->normalizeGender($this->first($payload, ['gender', 'genero'])),
-                'fit_profile' => 'regular',
+                'product_type' => (string) (($mapped['category'] ?? null) ?: $this->first($payload, ['product_type', 'category', 'categoria']) ?: 'clothing'),
+                'gender' => $mapped['gender'] ?? $this->normalizeGender($this->first($payload, ['gender', 'genero'])),
+                'fit_profile' => $mapped['fit_profile'] ?? 'regular',
                 'unit' => 'cm',
                 'status' => 'active',
                 'source' => 'bigshop',

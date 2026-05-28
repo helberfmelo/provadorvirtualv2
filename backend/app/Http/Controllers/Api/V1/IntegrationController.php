@@ -14,6 +14,7 @@ use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Models\WidgetInstall;
 use App\Services\Audit\AuditLogger;
+use App\Services\Imports\ImportRuleMapper;
 use App\Services\Integrations\XmlFeedSyncService;
 use App\Support\ActiveTenant;
 use App\Support\PlatformCatalog;
@@ -77,6 +78,9 @@ class IntegrationController extends Controller
             'api_base_url' => $data['api_base_url'] ?? $connection->api_base_url,
             'feed_url' => $data['feed_url'] ?? $connection->feed_url,
             'feed_format' => $data['feed_format'] ?? $connection->feed_format ?? 'google_xml',
+            'import_rules' => array_key_exists('import_rules', $data)
+                ? app(ImportRuleMapper::class)->normalize($data['import_rules'])
+                : $connection->import_rules,
             'status' => $data['status'] ?? $this->statusFor($data, $connection->status),
             'last_error' => null,
         ]);
@@ -104,6 +108,7 @@ class IntegrationController extends Controller
             'has_access_token' => filled($connection->access_token_encrypted),
             'has_webhook_secret' => filled($connection->webhook_secret_encrypted),
             'has_feed_url' => filled($connection->feed_url),
+            'import_rules_active' => app(ImportRuleMapper::class)->summarize($connection->import_rules ?? [])['active'],
         ], $connection);
 
         return (new PlatformConnectionResource($connection->refresh()))

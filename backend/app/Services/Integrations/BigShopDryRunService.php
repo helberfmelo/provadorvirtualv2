@@ -6,15 +6,20 @@ use App\Models\IntegrationEvent;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
+use App\Services\Imports\ImportRuleMapper;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class BigShopDryRunService
 {
-    public function __construct(private readonly BigShopClient $client) {}
+    public function __construct(
+        private readonly BigShopClient $client,
+        private readonly ImportRuleMapper $ruleMapper
+    ) {}
 
     public function run(Merchant $merchant, MerchantCompany $company, PlatformConnection $connection): array
     {
+        $importRules = $this->ruleMapper->normalize($connection->import_rules ?? []);
         $products = array_values(array_filter(
             $this->client->products($connection),
             fn (mixed $product): bool => is_array($product)
@@ -87,6 +92,7 @@ class BigShopDryRunService
         foreach ($productsById as $productId => $product) {
             $productGrids = $joinedGrids[$productId] ?? [];
             $joinedGridCount += count($productGrids);
+            $ruleMapping = $this->ruleMapper->mapProduct($product, $importRules);
 
             if ($productGrids === []) {
                 $productsWithoutGrids++;
@@ -99,6 +105,16 @@ class BigShopDryRunService
                 $issues[] = $this->issue('warning', 'product_category_missing', $productId, $this->productName($product), 'Produto sem categoria para mapeamento.');
             }
 
+            foreach ($ruleMapping['missing'] as $missing) {
+                $issues[] = $this->issue(
+                    'warning',
+                    'import_rule_missing_'.$missing['field'],
+                    $productId,
+                    $this->productName($product),
+                    $missing['label'].' obrigatória não foi encontrada nem preenchida por fallback.'
+                );
+            }
+
             if (count($sampleProducts) < 8) {
                 $sizes = array_values(array_unique(array_filter(array_column($productGrids, 'size'))));
                 $sampleProducts[] = [
@@ -108,6 +124,8 @@ class BigShopDryRunService
                     'brand' => $this->first($product, ['brand', 'marca']),
                     'category' => $this->first($product, ['category', 'categoria', 'product_type']),
                     'gender' => $this->first($product, ['gender', 'genero']),
+                    'mapped' => $ruleMapping['values'],
+                    'rule_details' => $ruleMapping['details'],
                     'grid_count' => count($productGrids),
                     'sizes' => array_slice($sizes, 0, 10),
                 ];
@@ -116,6 +134,7 @@ class BigShopDryRunService
 
         $errorCount = count(array_filter($issues, fn (array $issue): bool => $issue['severity'] === 'error'));
         $warningCount = count(array_filter($issues, fn (array $issue): bool => $issue['severity'] === 'warning'));
+        $rulesSummary = $this->ruleMapper->summarize($importRules);
         $summary = [
             'dry_run' => true,
             'status' => $errorCount > 0 ? 'warning' : 'ready',
@@ -129,6 +148,9 @@ class BigShopDryRunService
             'grids_without_size' => $gridsWithoutSize,
             'variants_detected' => $joinedGridCount,
             'sizes_detected' => count($detectedSizes),
+            'import_rules_active' => $rulesSummary['active'],
+            'import_rules_required' => $rulesSummary['required'],
+            'import_rules_with_fallback' => $rulesSummary['with_fallback'],
             'errors_count' => $errorCount,
             'warnings_count' => $warningCount,
             'sample_products' => $sampleProducts,

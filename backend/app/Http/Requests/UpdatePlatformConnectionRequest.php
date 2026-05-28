@@ -23,6 +23,14 @@ class UpdatePlatformConnectionRequest extends FormRequest
             'status' => ['nullable', 'string', Rule::in(['draft', 'configured', 'connected', 'disabled', 'error'])],
             'access_token' => ['nullable', 'string', 'max:4000'],
             'webhook_secret' => ['nullable', 'string', 'max:4000'],
+            'import_rules' => ['nullable', 'array'],
+            'import_rules.*' => ['nullable', 'array'],
+            'import_rules.*.enabled' => ['nullable', 'boolean'],
+            'import_rules.*.required' => ['nullable', 'boolean'],
+            'import_rules.*.source_field' => ['nullable', 'string', 'max:120'],
+            'import_rules.*.fallback' => ['nullable', 'string', 'max:120'],
+            'import_rules.*.aliases' => ['nullable', 'array'],
+            'import_rules.*.aliases.*' => ['nullable', 'string', 'max:120'],
         ];
     }
 }

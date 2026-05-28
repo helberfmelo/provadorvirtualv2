@@ -79,6 +79,14 @@ type BigShopDryRunProduct = {
   brand: string | null
   category: string | null
   gender: string | null
+  mapped?: {
+    category?: string | null
+    brand?: string | null
+    gender?: string | null
+    age_group?: string | null
+    status?: string | null
+    fit_profile?: string | null
+  }
   grid_count: number
   sizes: string[]
 }
@@ -812,6 +820,7 @@ function canRunBigShopApiAction() {
                   <th>Produto</th>
                   <th>SKU</th>
                   <th>Categoria</th>
+                  <th>Regras</th>
                   <th>Grades</th>
                   <th>Tamanhos</th>
                 </tr>
@@ -824,6 +833,13 @@ function canRunBigShopApiAction() {
                   </td>
                   <td>{{ product.sku || '-' }}</td>
                   <td>{{ product.category || '-' }}</td>
+                  <td>
+                    <span class="dry-run-rule-tags">
+                      <em>{{ product.mapped?.brand || product.brand || 'marca' }}</em>
+                      <em>{{ product.mapped?.gender || product.gender || 'gênero' }}</em>
+                      <em>{{ product.mapped?.fit_profile || 'modelagem' }}</em>
+                    </span>
+                  </td>
                   <td>{{ product.grid_count }}</td>
                   <td>{{ product.sizes.length ? product.sizes.join(', ') : '-' }}</td>
                 </tr>

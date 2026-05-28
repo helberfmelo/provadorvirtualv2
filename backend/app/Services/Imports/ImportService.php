@@ -15,12 +15,17 @@ use SimpleXMLElement;
 
 class ImportService
 {
+    public function __construct(private readonly ImportRuleMapper $ruleMapper) {}
+
     public function preview(Merchant $merchant, ?MerchantCompany $company, array $input): array
     {
         $rows = $this->parse($input['type'], $input['source_format'], $input['content']);
+        $importRules = array_key_exists('import_rules', $input)
+            ? $this->ruleMapper->normalize($input['import_rules'])
+            : null;
         $preview = $input['type'] === 'measurement_tables'
             ? $this->previewMeasurementTables($rows)
-            : $this->previewProducts($merchant, $rows);
+            : $this->previewProducts($merchant, $rows, $importRules);
 
         return [
             'type' => $input['type'],
@@ -171,7 +176,7 @@ class ImportService
         return $rows;
     }
 
-    private function previewProducts(Merchant $merchant, array $rows): array
+    private function previewProducts(Merchant $merchant, array $rows, ?array $importRules = null): array
     {
         $previewRows = [];
         $products = [];
@@ -181,6 +186,7 @@ class ImportService
             $sku = $this->value($row, ['sku', 'product_sku', 'id', 'external_product_id']);
             $name = $this->value($row, ['name', 'title', 'product_name']);
             $size = $this->value($row, ['size_label', 'size', 'tamanho']);
+            $mapped = $importRules !== null ? $this->ruleMapper->mapProduct($row, $importRules)['values'] : [];
             $errors = [];
 
             if (! $sku && ! $this->value($row, ['external_product_id'])) {
@@ -208,9 +214,10 @@ class ImportService
                     'sku' => $sku,
                     'external_product_id' => $this->value($row, ['external_product_id', 'id']),
                     'name' => $name,
-                    'category' => $this->value($row, ['category', 'product_type']),
-                    'gender' => $this->value($row, ['gender', 'genero']),
-                    'fit_profile' => $this->value($row, ['fit_profile', 'modelagem']),
+                    'category' => $mapped['category'] ?? $this->value($row, ['category', 'product_type']),
+                    'gender' => $mapped['gender'] ?? $this->value($row, ['gender', 'genero']),
+                    'fit_profile' => $mapped['fit_profile'] ?? $this->value($row, ['fit_profile', 'modelagem']),
+                    'status' => $mapped['status'] ?? null,
                     'size_label' => $size,
                     'external_variant_id' => $this->value($row, ['external_variant_id', 'variant_id', 'id_variacao']),
                     'variant_sku' => $this->value($row, ['variant_sku', 'grade_sku']) ?: ($size ? trim($sku.'-'.$size, '-') : null),
@@ -223,8 +230,8 @@ class ImportService
                     'description' => $this->value($row, ['description', 'descricao']),
                     'image_url' => $this->value($row, ['image_url', 'imagem']),
                     'public_url' => $this->value($row, ['public_url', 'link', 'url']),
-                    'age_group' => $this->value($row, ['age_group', 'faixa_etaria']),
-                    'brand' => $this->value($row, ['brand', 'marca']),
+                    'age_group' => $mapped['age_group'] ?? $this->value($row, ['age_group', 'faixa_etaria']),
+                    'brand' => $mapped['brand'] ?? $this->value($row, ['brand', 'marca']),
                 ],
             ];
         }
@@ -332,7 +339,7 @@ class ImportService
                 'category' => $data['category'] ?? $product->category,
                 'gender' => $data['gender'] ?? $product->gender ?? 'unisex',
                 'fit_profile' => $data['fit_profile'] ?? $product->fit_profile ?? 'regular',
-                'status' => 'active',
+                'status' => $data['status'] ?? 'active',
                 'image_url' => $data['image_url'] ?? $product->image_url,
                 'metadata' => array_merge($product->metadata ?? [], array_filter([
                     'last_imported_at' => now()->toISOString(),

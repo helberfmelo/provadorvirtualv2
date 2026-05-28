@@ -1126,3 +1126,14 @@
 - Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter IntegrationsApiTest`, `vendor/bin/phpunit` com 89 testes e 755 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`.
 - Commit `efe87b8` enviado para `main`; o run `26605323289` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, `/app/sincronizacao`, páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 111 Regras visuais de importação
+
+- A terceira demanda da lista pós-benchmark foi iniciada: regras visuais para categoria, marca, gênero, faixa etária, status e modelagem.
+- Criado `platform_connections.import_rules` e `ImportRuleMapper` para manter regras por conexão e normalizar valores antes de sincronizar.
+- O dry-run BigShop passa a devolver campos mapeados, contadores de regras e alertas quando regra obrigatória fica sem origem/fallback.
+- O sync BigShop e o sync XML/feed passam a aplicar o mesmo mapeamento em produtos, metadados e tabelas criadas.
+- O portal ganhou `/app/regras-de-importacao`, menu `Regras`, lista vertical de regras, editor de origem/fallback/normalizações e prévia visual.
+- `scripts/validate-production.ps1` passa a cobrir `/app/regras-de-importacao`.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter BigShopIntegrationTest`, PHPUnit completo com 90 testes e 772 assertions, `npm --prefix frontend run build` e `vendor/bin/pint --dirty`.
+- Commit, push, Actions/deploy e validação de produção pendentes.

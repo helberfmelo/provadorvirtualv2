@@ -16,6 +16,7 @@ class PlatformConnection extends Model
     {
         return [
             'last_sync_at' => 'datetime',
+            'import_rules' => 'array',
         ];
     }
 

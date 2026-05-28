@@ -6,6 +6,7 @@ import CheckoutView from '../views/CheckoutView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
 import GoLiveView from '../views/GoLiveView.vue'
+import ImportRulesView from '../views/ImportRulesView.vue'
 import ImportsView from '../views/ImportsView.vue'
 import IntegrationsView from '../views/IntegrationsView.vue'
 import LoginView from '../views/LoginView.vue'
@@ -60,6 +61,7 @@ const router = createRouter({
     { path: '/app/analytics', component: AnalyticsView },
     { path: '/app/go-live', component: GoLiveView },
     { path: '/app/importacoes', component: ImportsView },
+    { path: '/app/regras-de-importacao', component: ImportRulesView },
     { path: '/app/widget', component: WidgetInstallView },
     { path: '/app/integracoes', component: IntegrationsView },
     { path: '/app/sincronizacao', component: SyncStatusView },

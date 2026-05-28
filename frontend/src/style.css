@@ -4341,6 +4341,22 @@ textarea {
   color: #6b7280;
 }
 
+.dry-run-rule-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.dry-run-rule-tags em {
+  padding: 4px 7px;
+  border-radius: 8px;
+  color: #374151;
+  background: #f3f4f6;
+  font-size: 0.74rem;
+  font-style: normal;
+  font-weight: 800;
+}
+
 .dry-run-issues {
   display: grid;
   gap: 8px;
@@ -4383,6 +4399,122 @@ textarea {
 .dry-run-issues em.error {
   color: #991b1b;
   background: #fef2f2;
+}
+
+.import-rules-page {
+  display: grid;
+  gap: 18px;
+}
+
+.import-rules-sidebar {
+  align-content: start;
+}
+
+.import-rules-sidebar label {
+  display: grid;
+  gap: 7px;
+  padding: 4px 3px 8px;
+}
+
+.import-rules-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.import-rules-summary span {
+  min-width: 0;
+}
+
+.import-rule-row {
+  grid-template-columns: 1fr;
+}
+
+.import-rule-row-title {
+  display: grid !important;
+  grid-template-columns: 26px minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.import-rule-row-title i {
+  color: #0f172a;
+}
+
+.import-rule-row-title em {
+  padding: 4px 7px;
+  border-radius: 8px;
+  color: #92400e;
+  background: #fffbeb;
+  font-size: 0.72rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.import-rule-row-title em.ok {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.import-rule-editor-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+.import-rule-editor-grid .check-line {
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+}
+
+.import-rule-alias-panel {
+  background: #f9fafb;
+}
+
+.alias-list {
+  display: grid;
+  gap: 8px;
+}
+
+.alias-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr) 36px;
+  gap: 8px;
+  align-items: center;
+}
+
+.alias-row i {
+  color: #6b7280;
+  text-align: center;
+}
+
+.alias-row-new {
+  padding-top: 8px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.import-rule-preview .status-pill {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: #6b7280;
+  background: #f3f4f6;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.import-rule-preview .status-pill.ok {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.import-rule-preview .status-pill.warning {
+  color: #92400e;
+  background: #fffbeb;
 }
 
 .sync-page {
@@ -4902,6 +5034,8 @@ td small {
   .company-profile-grid,
   .inline-form,
   .integration-actions,
+  .import-rule-editor-grid,
+  .alias-row,
   .smart-catalog-panel,
   .sync-filters,
   .sync-key-values,

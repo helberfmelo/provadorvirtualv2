@@ -1724,3 +1724,31 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 110 no commit `efe87b8`, publicado com sucesso no run `26605323289`. Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter IntegrationsApiTest`, `vendor/bin/phpunit`, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, `/app/sincronizacao`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 111 - Regras visuais de importação
+
+Objetivo: permitir que a empresa configure visualmente como campos de categoria, marca, gênero, faixa etária, status e modelagem devem ser interpretados antes de rodar importações reais.
+
+Entregas:
+
+- adicionar `platform_connections.import_rules` como JSON versionado por conexão;
+- criar `ImportRuleMapper` para normalizar categoria, marca, gênero, faixa etária, status e modelagem;
+- aplicar as regras no dry-run BigShop, no sync BigShop e no sync XML/feed;
+- incluir campos mapeados e alertas de regra obrigatória na prévia BigShop;
+- criar rota `/app/regras-de-importacao` com lista vertical de regras, editor visual, normalizações e prévia;
+- adicionar menu `Regras` no portal da empresa;
+- ampliar validação de produção para cobrir `/app/regras-de-importacao`.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter BigShopIntegrationTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Validações locais passaram com `php -l`, PHPUnit com `pdo_sqlite/sqlite3` carregados por `-d`, `npm --prefix frontend run build` e `vendor/bin/pint --dirty`. Commit, push, Actions/deploy e validação de produção pendentes.

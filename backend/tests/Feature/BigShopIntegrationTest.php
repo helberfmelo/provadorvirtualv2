@@ -66,6 +66,9 @@ class BigShopIntegrationTest extends TestCase
                             'sku' => 'BS-VEST',
                             'categoria' => 'Vestidos',
                             'genero' => 'feminino',
+                            'marca' => 'Zak',
+                            'status' => 'ativo',
+                            'modelagem' => 'Ampla',
                             'grades' => [
                                 ['id' => 'BS-10-P', 'tamanho' => 'P', 'sku' => 'BS-VEST-P', 'preco' => '209.90', 'estoque' => 4],
                                 ['id' => 'BS-10-M', 'tamanho' => 'M', 'sku' => 'BS-VEST-M', 'preco' => '209.90', 'estoque' => 7],
@@ -93,6 +96,9 @@ class BigShopIntegrationTest extends TestCase
 
         $product = Product::query()->where('external_product_id', 'BS-10')->with('variants')->firstOrFail();
         $this->assertSame('Vestido BigShop', $product->name);
+        $this->assertSame('loose', $product->fit_profile);
+        $this->assertSame('active', $product->status);
+        $this->assertSame('Zak', $product->metadata['brand'] ?? null);
         $this->assertCount(2, $product->variants);
 
         $table = MeasurementTable::query()->where('name', 'Vestido BigShop Medidas')->with('rows')->firstOrFail();
@@ -195,8 +201,12 @@ class BigShopIntegrationTest extends TestCase
             ->assertJsonPath('data.grids_without_product', 1)
             ->assertJsonPath('data.grids_without_size', 1)
             ->assertJsonPath('data.sizes_detected', 2)
+            ->assertJsonPath('data.import_rules_active', 6)
             ->assertJsonPath('data.sample_products.0.sizes.0', 'P')
-            ->assertJsonPath('data.sample_products.0.sizes.1', 'M');
+            ->assertJsonPath('data.sample_products.0.sizes.1', 'M')
+            ->assertJsonPath('data.sample_products.0.mapped.category', 'Vestidos')
+            ->assertJsonPath('data.sample_products.0.mapped.gender', 'female')
+            ->assertJsonPath('data.sample_products.0.mapped.status', 'active');
 
         $this->assertSame($productsBefore, Product::query()->count());
         $this->assertSame($tablesBefore, MeasurementTable::query()->count());
@@ -237,14 +247,14 @@ class BigShopIntegrationTest extends TestCase
             ->assertJsonPath('data.0.has_access_token', true);
     }
 
-    private function configureBigShop(array $headers): void
+    private function configureBigShop(array $headers, array $extra = []): void
     {
         $this->withHeaders($headers)
-            ->patchJson('/api/v1/integrations/bigshop', [
+            ->patchJson('/api/v1/integrations/bigshop', array_merge([
                 'external_store_id' => 'store-123',
                 'api_base_url' => 'https://api.bigshop.test',
                 'access_token' => 'token-bigshop',
-            ])
+            ], $extra))
             ->assertOk();
     }
 

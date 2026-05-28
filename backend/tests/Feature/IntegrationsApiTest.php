@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\IntegrationEvent;
 use App\Models\MeasurementTable;
 use App\Models\MerchantCompany;
+use App\Models\PlatformConnection;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -143,6 +144,52 @@ XML, 200),
             ->assertJsonPath('data.status', 'completed');
 
         $this->assertSame($tableId, $product->refresh()->measurement_table_id);
+    }
+
+    public function test_merchant_can_configure_visual_import_rules(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/integrations/bigshop', [
+                'external_store_id' => 'store-rules',
+                'import_rules' => [
+                    'category' => [
+                        'enabled' => true,
+                        'required' => true,
+                        'source_field' => 'categoria',
+                        'fallback' => 'Moda feminina',
+                    ],
+                    'gender' => [
+                        'enabled' => true,
+                        'required' => true,
+                        'source_field' => 'genero',
+                        'fallback' => 'female',
+                        'aliases' => [
+                            'Feminino' => 'female',
+                        ],
+                    ],
+                    'fit_profile' => [
+                        'enabled' => true,
+                        'required' => true,
+                        'source_field' => 'modelagem',
+                        'fallback' => 'regular',
+                    ],
+                ],
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.import_rules.category.source_field', 'categoria')
+            ->assertJsonPath('data.import_rules.category.fallback', 'Moda feminina')
+            ->assertJsonPath('data.import_rules.gender.aliases.Feminino', 'female')
+            ->assertJsonPath('data.import_rules.fit_profile.fallback', 'regular')
+            ->assertJsonPath('data.import_rules.status.fallback', 'active');
+
+        $connection = PlatformConnection::query()->where('platform', 'bigshop')->firstOrFail();
+
+        $this->assertSame('categoria', $connection->import_rules['category']['source_field']);
+        $this->assertTrue($connection->import_rules['category']['required']);
+        $this->assertSame('active', $connection->import_rules['status']['fallback']);
     }
 
     public function test_xml_feed_sync_command_processes_configured_connections(): void
