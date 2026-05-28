@@ -1066,3 +1066,13 @@
 - Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`.
 - Commit `8a04ed6` enviado para `main`; o run `26425163585` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`; o JS publicado confirma o aviso único e a remoção da frase antiga.
+
+## 2026-05-28 - Sprint 106 Botões personalizados do widget
+
+- Releitura obrigatória da documentação e da governança de sprint/commit/push concluída antes da implementação.
+- Consulta pública Sizebay refeita nas páginas de implementação por script/API e na folha de estilo pública da Zak, confirmando o padrão de botões no ponto de decisão, visual limpo com ícones e exibição condicionada ao produto.
+- O contrato do tema do widget passa a aceitar `button_style`, `button_background` e `button_text`.
+- O widget público ganhou estilos `gradient`, `clean`, `outline` e `soft` para os botões do provador e da tabela, com animações de brilho, elevação, sublinhado e preenchimento.
+- A tela `/app/widget` ganhou lista vertical de estilos personalizados, box de cores de fundo/texto dos botões e prévia em tempo real.
+- Documentação atualizada em `current_platform_state`, `widget_integration`, `sizebay_benchmark` e `roadmap_sprints`.
+- Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`. No Windows local, os testes com banco foram executados via PHPUnit direto com `pdo_sqlite`/`sqlite3` carregados por `-d`, pois o `php.ini` atual carrega apenas `pdo_mysql` por padrão.

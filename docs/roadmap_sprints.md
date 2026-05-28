@@ -1595,3 +1595,26 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 105 no commit `8a04ed6`, publicado com sucesso no run `26425163585`. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `npm run build` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`; o JS publicado contém `Preencha altura e peso para ver o tamanho inicial.` e não contém mais `Comece com altura e peso`.
+
+### Sprint 106 - Botões personalizados do widget
+
+Objetivo: permitir que a empresa escolha o visual dos botões públicos do provador, ajuste cores de fundo/texto e veja a prévia antes de salvar.
+
+Entregas:
+
+- adicionar `theme.button_style`, `theme.button_background` e `theme.button_text` ao contrato do widget;
+- criar estilos públicos `gradient`, `clean`, `outline` e `soft` para os botões `Descubra seu tamanho` e `Tabela de Medidas`;
+- aplicar animações de brilho, elevação, sublinhado e preenchimento respeitando redução de movimento do navegador;
+- criar em `/app/widget` uma lista vertical de estilos e um box de cores dos botões com prévia em tempo real;
+- atualizar testes e documentação do widget.
+
+Validação:
+
+- `node --check backend/public/widget/v1/provador-virtual.js`;
+- `php artisan test --filter=Widget`;
+- `npm run build`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente para commit/push da Sprint 106. Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`.

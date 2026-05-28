@@ -1,6 +1,6 @@
 # Benchmark Sizebay e Zak
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-28
 
 Objetivo: registrar o que podemos aprender com a Sizebay e com a loja Zak para deixar o Provador Virtual v2 simples de integrar, inteligente e comparavel comercialmente.
 
@@ -36,6 +36,15 @@ Objetivo: registrar o que podemos aprender com a Sizebay e com a loja Zak para d
 - Integração de devolucoes para refinar recomendações.
 - Integração de produtos por API, XML Google Shopping ou OnPage.
 - Suporte a plataformas de mercado e plataformas proprietarias.
+
+## Releitura Sprint 106
+
+Consulta refeita em 2026-05-28 nas páginas públicas de implementação por script e API da Sizebay confirmou dois pontos relevantes para a personalização do Provador Virtual:
+
+- o container dos botões deve ficar no ponto de decisão da PDP e o script deve ser carregado de forma não bloqueante;
+- a exibição dos botões depende do produto identificado: produto inexistente não mostra botões, produto normal mostra provador e tabela, acessório mostra apenas tabela.
+
+A folha pública observada na loja Zak usa dois botões lado a lado, texto em caixa alta, fonte Montserrat, ícones antes do texto e visual limpo com pouca interferência na página. Para o v2, a Sprint 106 transforma esse aprendizado em opções próprias, sem copiar assets da Sizebay: `Destaque com brilho`, `Minimal com ícones`, `Contorno leve` e `Pílulas suaves`, todas com cores configuráveis de fundo/texto e animações coerentes com nosso widget.
 
 ## Contrato técnico observado na documentação
 

@@ -30,6 +30,10 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('pv_shopper_profile_v2_table_', $scriptContents);
         $this->assertStringContainsString('confetti_enabled', $scriptContents);
         $this->assertStringContainsString('presentation_mode', $scriptContents);
+        $this->assertStringContainsString('button_style', $scriptContents);
+        $this->assertStringContainsString('button_background', $scriptContents);
+        $this->assertStringContainsString('button_text', $scriptContents);
+        $this->assertStringContainsString('buttonStyle', $scriptContents);
         $this->assertStringContainsString('presentationMode', $scriptContents);
         $this->assertStringContainsString('pv-recommendation-modal', $scriptContents);
         $this->assertStringContainsString('widget_v2_staged', $scriptContents);
@@ -50,6 +54,9 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('<img class="pv-shape-image"', $scriptContents);
         $this->assertStringContainsString('loading="eager"', $scriptContents);
         $this->assertStringContainsString('.pv-trigger', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-clean', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-outline', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-soft', $cssContents);
         $this->assertStringContainsString('.pv-drawer', $cssContents);
         $this->assertStringContainsString('.pv-recommendation-modal', $cssContents);
         $this->assertStringContainsString('.pv-recommendation-modal-backdrop', $cssContents);

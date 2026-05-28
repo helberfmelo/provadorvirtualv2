@@ -8,6 +8,8 @@
   --pv-soft: #f8fafc;
   --pv-bg: #ffffff;
   --pv-text: #111827;
+  --pv-button-bg: var(--pv-secondary);
+  --pv-button-text: #ffffff;
   --pv-radius: 8px;
   --pv-font-size: 14px;
   --pv-font-weight: 800;
@@ -29,7 +31,9 @@
 }
 
 .pv-trigger {
+  position: relative;
   display: inline-flex;
+  overflow: hidden;
   align-items: center;
   justify-content: center;
   gap: 9px;
@@ -43,17 +47,141 @@
   font-weight: var(--pv-font-weight);
   line-height: 1.2;
   white-space: normal;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
+}
+
+.pv-trigger span {
+  position: relative;
+  z-index: 1;
 }
 
 .pv-trigger-primary {
-  color: #fff;
-  background: linear-gradient(135deg, var(--pv-secondary), var(--pv-warm));
+  color: var(--pv-button-text);
+  background: linear-gradient(135deg, var(--pv-button-bg), var(--pv-warm));
+  box-shadow: 0 10px 20px rgba(17, 24, 39, 0.1);
 }
 
 .pv-trigger-secondary {
-  color: var(--pv-primary);
+  color: var(--pv-button-bg);
   background: #fff;
   border-color: var(--pv-border);
+}
+
+.pv-trigger:hover,
+.pv-trigger:focus-visible {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.13);
+}
+
+.pv-trigger-primary::after {
+  position: absolute;
+  inset: -35% auto -35% -55%;
+  width: 42%;
+  content: "";
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateX(-120%) skewX(-18deg);
+  transition: transform 420ms ease;
+}
+
+.pv-trigger-primary:hover::after,
+.pv-trigger-primary:focus-visible::after {
+  transform: translateX(430%) skewX(-18deg);
+}
+
+.pv-trigger-style-clean {
+  gap: 16px;
+}
+
+.pv-trigger-style-clean .pv-trigger {
+  min-height: 32px;
+  padding: 4px 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  color: var(--pv-text);
+  background: transparent;
+  box-shadow: none;
+  text-transform: uppercase;
+}
+
+.pv-trigger-style-clean .pv-trigger span:first-child {
+  color: var(--pv-button-bg);
+  font-size: 1.08em;
+  font-weight: 900;
+}
+
+.pv-trigger-style-clean .pv-trigger::after {
+  position: absolute;
+  right: 0;
+  bottom: -3px;
+  left: 0;
+  height: 2px;
+  content: "";
+  background: var(--pv-button-bg);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.pv-trigger-style-clean .pv-trigger:hover,
+.pv-trigger-style-clean .pv-trigger:focus-visible {
+  color: var(--pv-button-bg);
+  box-shadow: none;
+}
+
+.pv-trigger-style-clean .pv-trigger:hover::after,
+.pv-trigger-style-clean .pv-trigger:focus-visible::after {
+  transform: scaleX(1);
+}
+
+.pv-trigger-style-outline .pv-trigger {
+  color: var(--pv-button-bg);
+  background: #fff;
+  border-color: var(--pv-button-bg);
+  box-shadow: none;
+}
+
+.pv-trigger-style-outline .pv-trigger:hover,
+.pv-trigger-style-outline .pv-trigger:focus-visible {
+  color: var(--pv-button-text);
+  background: var(--pv-button-bg);
+}
+
+.pv-trigger-style-soft .pv-trigger {
+  border-radius: 999px;
+}
+
+.pv-trigger-style-soft .pv-trigger-primary {
+  background: var(--pv-button-bg);
+}
+
+.pv-trigger-style-soft .pv-trigger-secondary {
+  color: var(--pv-button-bg);
+  background: var(--pv-soft);
+  border-color: transparent;
+}
+
+.pv-trigger-style-soft .pv-trigger-secondary:hover,
+.pv-trigger-style-soft .pv-trigger-secondary:focus-visible {
+  color: var(--pv-button-text);
+  background: var(--pv-button-bg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pv-trigger,
+  .pv-trigger::after {
+    transition: none;
+  }
+
+  .pv-trigger:hover,
+  .pv-trigger:focus-visible {
+    transform: none;
+  }
 }
 
 .pv-backdrop {

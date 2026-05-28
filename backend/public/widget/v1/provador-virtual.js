@@ -301,7 +301,7 @@
     applyTheme(root);
 
     var group = document.createElement('div');
-    group.className = 'pv-trigger-group';
+    group.className = 'pv-trigger-group pv-trigger-style-' + buttonStyle();
 
     var discoverButton = document.createElement('button');
     discoverButton.className = 'pv-trigger pv-trigger-primary';
@@ -336,6 +336,8 @@
       background: '--pv-bg',
       text: '--pv-text',
       font_family: '--pv-font-family',
+      button_background: '--pv-button-bg',
+      button_text: '--pv-button-text',
     };
 
     Object.keys(map).forEach(function (key) {
@@ -355,6 +357,13 @@
     if (theme.button_radius !== undefined && theme.button_radius !== null && theme.button_radius !== '') {
       element.style.setProperty('--pv-radius', Number(theme.button_radius) + 'px');
     }
+  }
+
+  function buttonStyle() {
+    var style = config.theme && config.theme.button_style ? String(config.theme.button_style).toLowerCase() : 'gradient';
+    var allowed = ['gradient', 'clean', 'outline', 'soft'];
+
+    return allowed.indexOf(style) >= 0 ? style : 'gradient';
   }
 
   function openRecommendationDrawer() {

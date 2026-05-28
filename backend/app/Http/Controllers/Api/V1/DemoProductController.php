@@ -128,6 +128,9 @@ class DemoProductController extends Controller
             'font_size' => '14',
             'font_weight' => '800',
             'button_radius' => '8',
+            'button_style' => 'gradient',
+            'button_background' => '#ff4d5e',
+            'button_text' => '#ffffff',
             'confetti_enabled' => true,
             'presentation_mode' => 'drawer',
         ];

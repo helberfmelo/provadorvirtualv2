@@ -2847,6 +2847,138 @@ textarea {
   background: #f9fafb;
 }
 
+.widget-button-customizer {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.button-style-list {
+  display: grid;
+  gap: 10px;
+}
+
+.button-style-option {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) minmax(128px, 0.62fr);
+  gap: 12px;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.button-style-option > i {
+  display: inline-grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border-radius: 8px;
+  color: #ff4d5e;
+  background: #fff7ed;
+}
+
+.button-style-option.active {
+  border-color: #ff7a1a;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
+}
+
+.button-style-option.active > i {
+  color: #fff;
+  background: #0f172a;
+}
+
+.button-style-copy {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.button-style-copy strong,
+.button-style-copy small {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.button-style-copy strong {
+  color: #0f172a;
+}
+
+.button-style-copy small {
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.button-option-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: flex-end;
+  min-width: 0;
+}
+
+.button-option-preview span {
+  display: inline-flex;
+  min-height: 26px;
+  align-items: center;
+  padding: 5px 7px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  color: #374151;
+  background: #fff;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.button-color-box {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.button-color-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.button-color-controls label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.button-live-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px;
+  border: 1px dashed #fed7aa;
+  border-radius: var(--pv-preview-radius);
+  color: var(--pv-preview-text);
+  background: var(--pv-preview-bg);
+}
+
 .widget-color-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -2970,25 +3102,181 @@ textarea {
   gap: 8px;
 }
 
-.preview-widget-buttons button {
+.preview-widget-buttons button,
+.button-live-preview button {
+  position: relative;
   min-height: 40px;
+  overflow: hidden;
   padding: 9px 12px;
+  border: 1px solid transparent;
   border-radius: var(--pv-preview-radius);
   font: inherit;
   font-weight: 800;
   cursor: default;
+  line-height: 1.2;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease,
+    background 160ms ease,
+    color 160ms ease;
 }
 
-.preview-widget-buttons button:first-child {
-  border: 0;
-  color: #fff;
-  background: linear-gradient(135deg, var(--pv-preview-secondary), var(--pv-preview-accent));
+.button-live-preview button {
+  cursor: pointer;
 }
 
-.preview-widget-buttons button:last-child {
+.button-live-preview button span {
+  margin-right: 6px;
+  font-weight: 900;
+}
+
+.preview-widget-buttons button:hover,
+.button-live-preview button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 24px rgba(17, 24, 39, 0.13);
+}
+
+.preview-widget-buttons.preview-button-style-gradient button:first-child,
+.button-live-preview.preview-button-style-gradient button:first-child {
+  color: var(--pv-preview-button-text);
+  background: linear-gradient(135deg, var(--pv-preview-button-bg), var(--pv-preview-accent));
+  box-shadow: 0 10px 20px rgba(17, 24, 39, 0.1);
+}
+
+.preview-widget-buttons.preview-button-style-gradient button:first-child::after,
+.button-live-preview.preview-button-style-gradient button:first-child::after {
+  position: absolute;
+  inset: -35% auto -35% -55%;
+  width: 42%;
+  content: "";
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateX(-120%) skewX(-18deg);
+  transition: transform 420ms ease;
+}
+
+.preview-widget-buttons.preview-button-style-gradient button:first-child:hover::after,
+.button-live-preview.preview-button-style-gradient button:first-child:hover::after {
+  transform: translateX(430%) skewX(-18deg);
+}
+
+.preview-widget-buttons.preview-button-style-gradient button:last-child,
+.button-live-preview.preview-button-style-gradient button:last-child {
   border: 1px solid #e5e7eb;
-  color: var(--pv-preview-primary);
+  color: var(--pv-preview-button-bg);
   background: #fff;
+}
+
+.button-option-preview.preview-button-style-gradient span:first-child {
+  border-color: transparent;
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+}
+
+.button-option-preview.preview-button-style-gradient span:last-child {
+  color: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-clean,
+.button-live-preview.preview-button-style-clean,
+.button-option-preview.preview-button-style-clean {
+  gap: 16px;
+}
+
+.preview-widget-buttons.preview-button-style-clean button,
+.button-live-preview.preview-button-style-clean button {
+  min-height: 32px;
+  padding: 4px 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  box-shadow: none;
+  text-transform: uppercase;
+}
+
+.preview-widget-buttons.preview-button-style-clean button::after,
+.button-live-preview.preview-button-style-clean button::after {
+  position: absolute;
+  right: 0;
+  bottom: -3px;
+  left: 0;
+  height: 2px;
+  content: "";
+  background: var(--pv-preview-button-bg);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 180ms ease;
+}
+
+.preview-widget-buttons.preview-button-style-clean button:hover,
+.button-live-preview.preview-button-style-clean button:hover {
+  color: var(--pv-preview-button-bg);
+  box-shadow: none;
+}
+
+.preview-widget-buttons.preview-button-style-clean button:hover::after,
+.button-live-preview.preview-button-style-clean button:hover::after {
+  transform: scaleX(1);
+}
+
+.button-option-preview.preview-button-style-clean span {
+  min-height: 24px;
+  padding: 3px 0;
+  border-width: 0 0 2px;
+  border-color: var(--pv-preview-button-bg);
+  border-radius: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  text-transform: uppercase;
+}
+
+.preview-widget-buttons.preview-button-style-outline button,
+.button-live-preview.preview-button-style-outline button {
+  color: var(--pv-preview-button-bg);
+  background: #fff;
+  border-color: var(--pv-preview-button-bg);
+  box-shadow: none;
+}
+
+.preview-widget-buttons.preview-button-style-outline button:hover,
+.button-live-preview.preview-button-style-outline button:hover {
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+}
+
+.button-option-preview.preview-button-style-outline span {
+  color: var(--pv-preview-button-bg);
+  border-color: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-soft button,
+.button-live-preview.preview-button-style-soft button,
+.button-option-preview.preview-button-style-soft span {
+  border-radius: 999px;
+}
+
+.preview-widget-buttons.preview-button-style-soft button:first-child,
+.button-live-preview.preview-button-style-soft button:first-child,
+.button-option-preview.preview-button-style-soft span:first-child {
+  border-color: transparent;
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-soft button:last-child,
+.button-live-preview.preview-button-style-soft button:last-child,
+.button-option-preview.preview-button-style-soft span:last-child {
+  border-color: transparent;
+  color: var(--pv-preview-button-bg);
+  background: #f8fafc;
+}
+
+.preview-widget-buttons.preview-button-style-soft button:last-child:hover,
+.button-live-preview.preview-button-style-soft button:last-child:hover {
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
 }
 
 .preview-launch-frame {
@@ -4109,6 +4397,19 @@ td small {
     grid-column: 1 / -1;
     justify-self: start;
     white-space: normal;
+  }
+
+  .button-style-option {
+    grid-template-columns: 38px minmax(0, 1fr);
+  }
+
+  .button-option-preview {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .button-color-controls {
+    grid-template-columns: 1fr;
   }
 
   .compact-copy {

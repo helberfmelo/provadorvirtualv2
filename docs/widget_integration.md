@@ -1,6 +1,6 @@
 # Widget e Integração Universal
 
-Atualizado em: 2026-05-25
+Atualizado em: 2026-05-28
 
 ## Objetivo
 
@@ -151,6 +151,8 @@ Status Sprint 92: o tema do widget aceita `presentation_mode` com os valores `dr
 Status Sprint 93: a opção `theme.confetti_enabled` continua controlando a celebração por loja. Em `/app/widget`, ao marcar `Animação de confetes`, o portal dispara uma prévia com a mesma classe `.pv-confetti-layer`, 42 peças, cores e keyframes do widget público, para a empresa ver exatamente o efeito que o comprador verá ao chegar ao resultado completo. Publicado no run `26414392783` e validado em produção.
 
 Status Sprint 96: `/api/v1/widget-install` passa a retornar `platform_guide` e `platform_guides` com snippet, ponto de instalação, passos, matriz de dados e exemplo de `reload` por plataforma. A tela `/app/widget` foi reorganizada em blocos de instalação, domínios e personalização, com preview, código e guia lateral atualizados automaticamente conforme a plataforma escolhida. A validação de produção passa a cobrir também `/app/widget`.
+
+Status Sprint 106: a personalização do widget passa a aceitar `theme.button_style`, `theme.button_background` e `theme.button_text`. Os estilos disponíveis são `gradient`, `clean`, `outline` e `soft`, inspirados no padrão público observado da Sizebay sem copiar seus assets: botões com ícones/texto curto, variações minimalistas ou preenchidas e animações de hover como brilho, elevação, sublinhado e preenchimento. Em `/app/widget`, a empresa escolhe o estilo em lista vertical, ajusta fundo/texto dos botões em um box próprio e vê a prévia antes de salvar.
 
 ## Guias por plataforma
 

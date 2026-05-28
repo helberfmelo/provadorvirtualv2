@@ -35,6 +35,9 @@ type WidgetInstall = {
     font_size?: string
     font_weight?: string
     button_radius?: string
+    button_style?: 'gradient' | 'clean' | 'outline' | 'soft' | string
+    button_background?: string
+    button_text?: string
     confetti_enabled?: boolean | string
     presentation_mode?: 'drawer' | 'modal' | string
   }
@@ -80,6 +83,9 @@ const form = reactive({
     font_size: '14',
     font_weight: '800',
     button_radius: '8',
+    button_style: 'gradient',
+    button_background: '#ff4d5e',
+    button_text: '#ffffff',
     confetti_enabled: true,
     presentation_mode: 'drawer',
   },
@@ -129,6 +135,38 @@ const presentationModeOptions = [
   { value: 'drawer', label: 'Drawer lateral', icon: 'fa-table-columns' },
   { value: 'modal', label: 'Modal central', icon: 'fa-window-maximize' },
 ]
+
+const buttonStyleOptions = [
+  {
+    value: 'gradient',
+    label: 'Destaque com brilho',
+    icon: 'fa-wand-magic-sparkles',
+    description: 'Botão principal preenchido e tabela em contorno.',
+  },
+  {
+    value: 'clean',
+    label: 'Minimal com ícones',
+    icon: 'fa-ruler-combined',
+    description: 'Texto em caixa alta, ícones curtos e sublinhado animado.',
+  },
+  {
+    value: 'outline',
+    label: 'Contorno leve',
+    icon: 'fa-square',
+    description: 'Dois botões equivalentes com preenchimento no hover.',
+  },
+  {
+    value: 'soft',
+    label: 'Pílulas suaves',
+    icon: 'fa-capsules',
+    description: 'Bordas arredondadas, toque macio e elevação discreta.',
+  },
+]
+
+const selectedButtonStyle = computed(() => {
+  return buttonStyleOptions.find((option) => option.value === form.theme.button_style)
+    || buttonStyleOptions[0]
+})
 
 const isBigShopContract = computed(() => {
   return auth.activeCompany?.platform === 'bigshop'
@@ -192,6 +230,8 @@ const previewStyle = computed(() => ({
   '--pv-preview-accent': form.theme.accent,
   '--pv-preview-bg': form.theme.background,
   '--pv-preview-text': form.theme.text,
+  '--pv-preview-button-bg': form.theme.button_background,
+  '--pv-preview-button-text': form.theme.button_text,
   '--pv-preview-radius': `${form.theme.button_radius}px`,
   fontFamily: form.theme.font_family,
   fontSize: `${form.theme.font_size}px`,
@@ -230,6 +270,11 @@ function fillForm(data: WidgetInstall) {
   form.theme.font_size = data.theme?.font_size || '14'
   form.theme.font_weight = data.theme?.font_weight || '800'
   form.theme.button_radius = data.theme?.button_radius || '8'
+  form.theme.button_style = ['gradient', 'clean', 'outline', 'soft'].includes(String(data.theme?.button_style))
+    ? String(data.theme?.button_style)
+    : 'gradient'
+  form.theme.button_background = data.theme?.button_background || data.theme?.secondary || '#ff4d5e'
+  form.theme.button_text = data.theme?.button_text || '#ffffff'
   form.theme.presentation_mode = data.theme?.presentation_mode === 'modal' ? 'modal' : 'drawer'
   form.theme.confetti_enabled = data.theme?.confetti_enabled === undefined
     || data.theme?.confetti_enabled === null
@@ -427,6 +472,60 @@ function removeConfettiPreview() {
             <small>O modal central fica amplo no desktop e ocupa a tela toda no celular.</small>
           </fieldset>
 
+          <section class="widget-button-customizer" :style="previewStyle" aria-labelledby="widget-button-style-title">
+            <div class="subsection-heading compact-heading">
+              <h2 id="widget-button-style-title">Botões personalizados</h2>
+              <span>{{ selectedButtonStyle.label }}</span>
+            </div>
+
+            <div class="button-style-list" role="radiogroup" aria-label="Visual dos botões">
+              <button
+                v-for="option in buttonStyleOptions"
+                :key="option.value"
+                type="button"
+                class="button-style-option"
+                :class="{ active: form.theme.button_style === option.value }"
+                role="radio"
+                :aria-checked="form.theme.button_style === option.value"
+                @click="form.theme.button_style = option.value"
+              >
+                <i :class="['fa-solid', option.icon]" aria-hidden="true"></i>
+                <span class="button-style-copy">
+                  <strong>{{ option.label }}</strong>
+                  <small>{{ option.description }}</small>
+                </span>
+                <span :class="['button-option-preview', `preview-button-style-${option.value}`]" aria-hidden="true">
+                  <span>PV Descubra</span>
+                  <span>cm Tabela</span>
+                </span>
+              </button>
+            </div>
+
+            <div class="button-color-box" :style="previewStyle">
+              <div class="button-color-controls">
+                <label>
+                  Fundo do botão
+                  <span class="swatch-field">
+                    <input v-model="form.theme.button_background" type="color" />
+                    <input v-model="form.theme.button_background" maxlength="7" />
+                  </span>
+                </label>
+                <label>
+                  Texto do botão
+                  <span class="swatch-field">
+                    <input v-model="form.theme.button_text" type="color" />
+                    <input v-model="form.theme.button_text" maxlength="7" />
+                  </span>
+                </label>
+              </div>
+
+              <div :class="['button-live-preview', `preview-button-style-${form.theme.button_style}`]">
+                <button type="button"><span>PV</span>Descubra seu tamanho</button>
+                <button type="button"><span>cm</span>Tabela de Medidas</button>
+              </div>
+            </div>
+          </section>
+
           <div class="widget-color-grid">
             <label>
               Primária
@@ -526,7 +625,7 @@ function removeConfettiPreview() {
               <strong>Vestido Midi Aurora</strong>
               <span>Selecione seu tamanho</span>
             </div>
-            <div class="preview-widget-buttons">
+            <div :class="['preview-widget-buttons', `preview-button-style-${form.theme.button_style}`]">
               <button type="button">Descubra seu tamanho</button>
               <button type="button">Tabela de Medidas</button>
             </div>

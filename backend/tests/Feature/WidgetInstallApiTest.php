@@ -31,6 +31,7 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.platform', 'custom')
             ->assertJsonPath('data.is_active', true)
             ->assertJsonPath('data.theme.presentation_mode', 'drawer')
+            ->assertJsonPath('data.theme.button_style', 'gradient')
             ->assertJsonPath('data.platform_guide.key', 'custom')
             ->assertJsonPath('data.platform_guide.guide.placement_label', 'Página de produto')
             ->assertJsonPath('data.platform_guides.0.key', 'bigshop');
@@ -48,6 +49,9 @@ class WidgetInstallApiTest extends TestCase
                     'secondary' => '#ff4d5e',
                     'accent' => '#17a398',
                     'presentation_mode' => 'modal',
+                    'button_style' => 'clean',
+                    'button_background' => '#101820',
+                    'button_text' => '#ffffff',
                 ],
                 'is_active' => false,
             ])
@@ -57,6 +61,9 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.allowed_domains.1', 'localhost')
             ->assertJsonPath('data.theme.primary', '#101820')
             ->assertJsonPath('data.theme.presentation_mode', 'modal')
+            ->assertJsonPath('data.theme.button_style', 'clean')
+            ->assertJsonPath('data.theme.button_background', '#101820')
+            ->assertJsonPath('data.theme.button_text', '#ffffff')
             ->assertJsonPath('data.is_active', false)
             ->assertJsonPath('data.platform_guide.key', 'bigshop');
 
@@ -66,6 +73,8 @@ class WidgetInstallApiTest extends TestCase
             ->json('data.snippet');
 
         $this->assertStringContainsString('presentation_mode', $bigShopSnippet);
+        $this->assertStringContainsString('button_style', $bigShopSnippet);
+        $this->assertStringContainsString('button_background', $bigShopSnippet);
         $this->assertStringContainsString('data-platform="bigshop"', $bigShopSnippet);
         $this->assertStringContainsString('BIGSHOP_PRODUCT_ID', $bigShopSnippet);
 
