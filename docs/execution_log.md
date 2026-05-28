@@ -1076,3 +1076,5 @@
 - A tela `/app/widget` ganhou lista vertical de estilos personalizados, box de cores de fundo/texto dos botões e prévia em tempo real.
 - Documentação atualizada em `current_platform_state`, `widget_integration`, `sizebay_benchmark` e `roadmap_sprints`.
 - Validações locais passaram com `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit`, `npm run build`, `vendor/bin/pint --dirty` e `git diff --check`. No Windows local, os testes com banco foram executados via PHPUnit direto com `pdo_sqlite`/`sqlite3` carregados por `-d`, pois o `php.ini` atual carrega apenas `pdo_mysql` por padrão.
+- Commit `68b647a` enviado para `main`; o run `26600519176` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/widget`, widget JS/CSS, rotas públicas, SaaS, portal, APIs e redirects legados.

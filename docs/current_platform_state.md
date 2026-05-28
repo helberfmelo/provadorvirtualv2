@@ -215,6 +215,7 @@ Atualizado em: 2026-05-28
 - Sprint 105 remove a frase auxiliar da etapa `Suas medidas` e mantém apenas o aviso `Preencha altura e peso para ver o tamanho inicial.` antes dos campos.
 - Sprint 105 enviada ao GitHub no commit `8a04ed6`; o run `26425163585` finalizou com sucesso e a validação de produção confirmou o JS do widget publicado com aviso único.
 - Sprint 106 adiciona personalização de botões em `/app/widget`: estilos `Destaque com brilho`, `Minimal com ícones`, `Contorno leve` e `Pílulas suaves`, cores próprias de fundo/texto dos botões, lista vertical de seleção e prévia com as mesmas animações do widget público.
+- Sprint 106 enviada ao GitHub no commit `68b647a`; o run `26600519176` finalizou com sucesso e a validação de produção confirmou `/app/widget`, widget JS/CSS, APIs públicas, SaaS, portal e redirects legados.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
