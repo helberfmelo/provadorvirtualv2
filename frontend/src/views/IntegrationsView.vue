@@ -63,6 +63,49 @@ type BigShopActivation = {
   occurred_at: string | null
 }
 
+type BigShopDryRunIssue = {
+  severity: 'error' | 'warning'
+  code: string
+  product_id: string | null
+  product_name: string | null
+  grid_id: string | null
+  message: string
+}
+
+type BigShopDryRunProduct = {
+  external_product_id: string
+  name: string | null
+  sku: string | null
+  brand: string | null
+  category: string | null
+  gender: string | null
+  grid_count: number
+  sizes: string[]
+}
+
+type BigShopDryRunResult = {
+  dry_run: boolean
+  status: 'ready' | 'warning'
+  products_read: number
+  products_valid: number
+  products_with_grids: number
+  products_without_grids: number
+  grids_read: number
+  grids_joined: number
+  grids_without_product: number
+  grids_without_size: number
+  variants_detected: number
+  sizes_detected: number
+  errors_count: number
+  warnings_count: number
+  sample_products: BigShopDryRunProduct[]
+  issues: BigShopDryRunIssue[]
+  limited: {
+    sample_products: boolean
+    issues: boolean
+  }
+}
+
 const auth = useAuthStore()
 const platforms = ref<Platform[]>([])
 const selectedKey = ref('bigshop')
@@ -74,6 +117,7 @@ const copied = ref(false)
 const integrationReport = ref<Record<string, number | string> | null>(null)
 const validation = ref<ValidationResult | null>(null)
 const bigShopActivations = ref<BigShopActivation[]>([])
+const bigShopDryRun = ref<BigShopDryRunResult | null>(null)
 
 const form = reactive({
   external_store_id: '',
@@ -150,6 +194,7 @@ function selectPlatform(platform: Platform) {
   selectedKey.value = platform.key
   integrationReport.value = null
   validation.value = null
+  bigShopDryRun.value = null
   fillForm(platform)
   loadBigShopActivations()
 }
@@ -200,6 +245,7 @@ async function probeBigShop() {
 
   running.value = true
   integrationReport.value = null
+  bigShopDryRun.value = null
 
   try {
     const { data } = await api.post('/integrations/bigshop/probe')
@@ -228,6 +274,7 @@ async function syncBigShop() {
 
   running.value = true
   integrationReport.value = null
+  bigShopDryRun.value = null
 
   try {
     const { data } = await api.post('/integrations/bigshop/sync')
@@ -252,6 +299,36 @@ async function syncBigShop() {
   }
 }
 
+async function dryRunBigShop() {
+  if (!canRunBigShopApiAction()) {
+    return
+  }
+
+  running.value = true
+  integrationReport.value = null
+  bigShopDryRun.value = null
+
+  try {
+    const { data } = await api.post('/integrations/bigshop/dry-run')
+    bigShopDryRun.value = data.data
+    showFeedback({
+      status: bigShopDryRun.value?.errors_count ? 'info' : 'success',
+      title: bigShopDryRun.value?.errors_count ? 'Prévia concluída com alertas' : 'Prévia BigShop pronta',
+      message: 'Nenhum produto, variação ou tabela foi alterado. Revise os contadores e erros antes de sincronizar.',
+      duration: bigShopDryRun.value?.errors_count ? 0 : undefined,
+    })
+    await loadPlatforms()
+  } catch (requestError: any) {
+    showFeedback({
+      status: 'error',
+      title: 'Falha no dry-run BigShop',
+      message: friendlyRequestMessage(requestError, 'Não foi possível executar a prévia segura da BigShop.'),
+    })
+  } finally {
+    running.value = false
+  }
+}
+
 async function syncXmlFeed() {
   if (!selected.value) {
     return
@@ -270,6 +347,7 @@ async function syncXmlFeed() {
 
   running.value = true
   integrationReport.value = null
+  bigShopDryRun.value = null
 
   try {
     const { data } = await api.post(`/integrations/${selected.value.key}/sync-xml`)
@@ -386,10 +464,15 @@ function checkIcon(key: string) {
   return 'fa-circle-exclamation'
 }
 
+function dryRunStatusLabel(status: string) {
+  return status === 'ready' ? 'Pronto' : 'Com alertas'
+}
+
 function friendlyRequestMessage(requestError: any, fallback: string) {
   return requestError.response?.data?.message
     || requestError.response?.data?.errors?.feed_url?.[0]
     || requestError.response?.data?.errors?.url?.[0]
+    || requestError.response?.data?.errors?.bigshop?.[0]
     || fallback
 }
 
@@ -664,6 +747,15 @@ function canRunBigShopApiAction() {
                 class="btn btn-secondary"
                 type="button"
                 :disabled="running"
+                @click="dryRunBigShop"
+              >
+                <i class="fa-solid fa-list-check" aria-hidden="true"></i>
+                Prévia segura
+              </button>
+              <button
+                class="btn btn-secondary"
+                type="button"
+                :disabled="running"
                 @click="syncBigShop"
               >
                 <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
@@ -678,6 +770,77 @@ function canRunBigShopApiAction() {
             <strong>{{ value }}</strong>
             <small>{{ key }}</small>
           </span>
+        </div>
+
+        <div v-if="bigShopDryRun" class="guide-panel bigshop-dry-run-panel">
+          <div class="subsection-heading">
+            <h2>Prévia BigShop</h2>
+            <span>{{ dryRunStatusLabel(bigShopDryRun.status) }}</span>
+          </div>
+
+          <div class="summary-strip">
+            <span>
+              <strong>{{ bigShopDryRun.products_read }}</strong>
+              <small>produtos lidos</small>
+            </span>
+            <span>
+              <strong>{{ bigShopDryRun.grids_read }}</strong>
+              <small>grades lidas</small>
+            </span>
+            <span>
+              <strong>{{ bigShopDryRun.grids_joined }}</strong>
+              <small>grades cruzadas</small>
+            </span>
+            <span>
+              <strong>{{ bigShopDryRun.sizes_detected }}</strong>
+              <small>tamanhos</small>
+            </span>
+            <span>
+              <strong>{{ bigShopDryRun.errors_count }}</strong>
+              <small>erros</small>
+            </span>
+            <span>
+              <strong>{{ bigShopDryRun.warnings_count }}</strong>
+              <small>alertas</small>
+            </span>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th>SKU</th>
+                  <th>Categoria</th>
+                  <th>Grades</th>
+                  <th>Tamanhos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="product in bigShopDryRun.sample_products" :key="product.external_product_id">
+                  <td>
+                    <strong>{{ product.name || product.external_product_id }}</strong>
+                    <small>{{ product.external_product_id }}</small>
+                  </td>
+                  <td>{{ product.sku || '-' }}</td>
+                  <td>{{ product.category || '-' }}</td>
+                  <td>{{ product.grid_count }}</td>
+                  <td>{{ product.sizes.length ? product.sizes.join(', ') : '-' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div v-if="bigShopDryRun.issues.length" class="dry-run-issues">
+            <article v-for="issue in bigShopDryRun.issues" :key="`${issue.code}-${issue.product_id || issue.grid_id || issue.message}`">
+              <i class="fa-solid" :class="issue.severity === 'error' ? 'fa-circle-xmark' : 'fa-circle-exclamation'" aria-hidden="true"></i>
+              <span>
+                <strong>{{ issue.product_name || issue.product_id || issue.grid_id || issue.code }}</strong>
+                <small>{{ issue.message }}</small>
+              </span>
+              <em :class="issue.severity">{{ issue.severity === 'error' ? 'Erro' : 'Alerta' }}</em>
+            </article>
+          </div>
         </div>
 
         <div v-if="selected?.key === 'bigshop'" class="guide-panel">

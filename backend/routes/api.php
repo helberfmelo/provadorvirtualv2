@@ -138,6 +138,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,integrations,view');
         Route::post('/integrations/bigshop/probe', [BigShopIntegrationController::class, 'probe'])
             ->middleware('portal.permission:merchant,integrations,edit');
+        Route::post('/integrations/bigshop/dry-run', [BigShopIntegrationController::class, 'dryRun'])
+            ->middleware('portal.permission:merchant,integrations,edit');
         Route::post('/integrations/bigshop/sync', [BigShopIntegrationController::class, 'sync'])
             ->middleware('portal.permission:merchant,integrations,edit');
         Route::get('/imports', [ImportController::class, 'index'])

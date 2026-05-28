@@ -23,18 +23,15 @@ class BigShopClient
 
     public function products(PlatformConnection $connection): array
     {
-        $response = $this->request($connection, '/v3/products');
-
-        if (! $response->successful()) {
-            throw new RuntimeException('BigShop retornou HTTP '.$response->status().' ao sincronizar produtos.');
-        }
-
-        $payload = $this->payload($response);
-
-        return $this->productsFromPayload($payload);
+        return $this->paginatedItems($connection, '/v3/products', 'produtos');
     }
 
-    private function request(PlatformConnection $connection, string $path): Response
+    public function productGrids(PlatformConnection $connection): array
+    {
+        return $this->paginatedItems($connection, '/v3/product_grids', 'grades');
+    }
+
+    private function request(PlatformConnection $connection, string $path, array $query = []): Response
     {
         $token = $this->token($connection);
         $storeId = $connection->external_store_id;
@@ -54,9 +51,9 @@ class BigShopClient
                 'x-api' => $token,
                 'Store-Id' => $storeId,
             ])
-            ->get($baseUrl.$path, [
+            ->get($baseUrl.$path, array_merge([
                 'Store-Id' => $storeId,
-            ]);
+            ], $query));
     }
 
     private function token(PlatformConnection $connection): ?string
@@ -75,14 +72,44 @@ class BigShopClient
         return is_array($payload) ? $payload : [];
     }
 
-    private function productsFromPayload(array $payload): array
+    private function paginatedItems(PlatformConnection $connection, string $path, string $label): array
     {
-        if (isset($payload['data']) && is_array($payload['data'])) {
-            return $payload['data'];
+        $items = [];
+        $page = 1;
+        $visitedPages = [];
+        $maxPages = 50;
+
+        while ($page <= $maxPages && ! in_array($page, $visitedPages, true)) {
+            $visitedPages[] = $page;
+            $response = $this->request($connection, $path, [
+                'page' => $page,
+                'per_page' => 100,
+            ]);
+
+            if (! $response->successful()) {
+                throw new RuntimeException('BigShop retornou HTTP '.$response->status().' ao sincronizar '.$label.'.');
+            }
+
+            $payload = $this->payload($response);
+            array_push($items, ...$this->itemsFromPayload($payload));
+
+            $nextPage = $this->nextPage($payload, $page);
+            if (! $nextPage) {
+                break;
+            }
+
+            $page = $nextPage;
         }
 
-        if (isset($payload['products']) && is_array($payload['products'])) {
-            return $payload['products'];
+        return $items;
+    }
+
+    private function itemsFromPayload(array $payload): array
+    {
+        foreach (['data', 'products', 'product_grids', 'grids'] as $key) {
+            if (isset($payload[$key]) && is_array($payload[$key])) {
+                return array_is_list($payload[$key]) ? $payload[$key] : array_values($payload[$key]);
+            }
         }
 
         if (! array_is_list($payload)) {
@@ -106,6 +133,28 @@ class BigShopClient
         return $hasPaginatorEnvelope ? $products : $payload;
     }
 
+    private function nextPage(array $payload, int $currentPage): ?int
+    {
+        $envelope = $payload;
+
+        if (array_is_list($payload) && isset($payload[0]) && is_array($payload[0]) && $this->isPaginatorEnvelope($payload[0])) {
+            $envelope = $payload[0];
+        }
+
+        $reportedCurrentPage = $this->integer($envelope['current_page'] ?? $currentPage) ?? $currentPage;
+        $lastPage = $this->integer($envelope['last_page'] ?? null);
+
+        if ($lastPage && $reportedCurrentPage < $lastPage) {
+            return $reportedCurrentPage + 1;
+        }
+
+        if (! empty($envelope['next_page_url']) && $this->itemsFromPayload($envelope) !== []) {
+            return $reportedCurrentPage + 1;
+        }
+
+        return null;
+    }
+
     private function isPaginatorEnvelope(array $entry): bool
     {
         return isset($entry['data'])
@@ -116,5 +165,14 @@ class BigShopClient
                 || array_key_exists('last_page', $entry)
                 || array_key_exists('total', $entry)
             );
+    }
+
+    private function integer(mixed $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return (int) preg_replace('/[^0-9-]/', '', (string) $value);
     }
 }

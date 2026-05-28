@@ -1104,3 +1104,13 @@
 - Validações locais passaram com `php -l`, `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit` com 87 testes e 727 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, `git diff --check` e renderização Puppeteer dos 10 modelos sem botões vazios ou sobrepostos.
 - Commit `482631e` enviado para `main`; o run `26603841134` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo páginas públicas, SaaS, portal, `/app/widget`, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 109 Dry-run BigShop Zak com grades
+
+- A primeira demanda da lista pós-benchmark foi iniciada antes de importar a Zak: dry-run BigShop com paginação, `product_grids`, join por produto e extração de tamanho.
+- `BigShopClient` passa a paginar `products` e `product_grids` usando `Store-Id`, mantendo suporte a retorno paginado/envelopado.
+- Criado `BigShopDryRunService` para cruzar grades por `produtoid`, extrair tamanho de `caracteristicas`, contar produtos/grades/tamanhos e gerar erros/alertas por produto sem gravar catálogo.
+- O endpoint protegido `POST /api/v1/integrations/bigshop/dry-run` retorna `dry_run=true` e registra evento `dry_run_import`.
+- `/app/integracoes` ganhou botão `Prévia segura` e painel com contadores, amostra de produtos, tamanhos detectados e lista de erros/alertas.
+- Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit` com 88 testes e 745 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`.
+- Commit, push, Actions/deploy e validação de produção pendentes.

@@ -101,6 +101,111 @@ class BigShopIntegrationTest extends TestCase
         $this->assertSame(1, IntegrationEvent::query()->where('event_type', 'sync_products')->count());
     }
 
+    public function test_merchant_can_dry_run_bigshop_products_and_product_grids_without_importing(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $this->configureBigShop($headers);
+
+        $productsBefore = Product::query()->count();
+        $tablesBefore = MeasurementTable::query()->count();
+
+        Http::fake(function ($request) {
+            $url = $request->url();
+            parse_str(parse_url($url, PHP_URL_QUERY) ?: '', $query);
+            $page = (int) ($query['page'] ?? 1);
+
+            if (str_contains($url, '/v3/products')) {
+                return Http::response([
+                    'current_page' => $page,
+                    'last_page' => 2,
+                    'data' => $page === 1 ? [
+                        [
+                            'id' => 'BS-10',
+                            'nome' => 'Vestido BigShop',
+                            'sku' => 'BS-VEST',
+                            'categoria' => 'Vestidos',
+                            'genero' => 'feminino',
+                        ],
+                    ] : [
+                        [
+                            'id' => 'BS-20',
+                            'nome' => 'Blusa sem grade',
+                            'sku' => 'BS-BLUSA',
+                            'categoria' => 'Blusas',
+                        ],
+                    ],
+                ]);
+            }
+
+            if (str_contains($url, '/v3/product_grids')) {
+                return Http::response([
+                    'current_page' => $page,
+                    'last_page' => 2,
+                    'data' => $page === 1 ? [
+                        [
+                            '_id' => 'G10-P',
+                            'produtoid' => 'BS-10',
+                            'sku' => 'BS-VEST-P',
+                            'estoque' => 4,
+                            'preco' => '209.90',
+                            'caracteristicas' => [
+                                ['nome' => 'Tamanho', 'valor' => 'P'],
+                            ],
+                        ],
+                        [
+                            '_id' => 'G10-M',
+                            'produtoid' => 'BS-10',
+                            'sku' => 'BS-VEST-M',
+                            'caracteristicas' => 'Tamanho: M',
+                        ],
+                    ] : [
+                        [
+                            '_id' => 'G10-SEM-TAM',
+                            'produtoid' => 'BS-10',
+                            'sku' => 'BS-VEST-X',
+                            'caracteristicas' => [
+                                ['nome' => 'Cor', 'valor' => 'Preto'],
+                            ],
+                        ],
+                        [
+                            '_id' => 'G999',
+                            'produtoid' => 'BS-999',
+                            'sku' => 'BS-ORFA',
+                            'caracteristicas' => [
+                                ['nome' => 'Tamanho', 'valor' => 'G'],
+                            ],
+                        ],
+                    ],
+                ]);
+            }
+
+            return Http::response([], 404);
+        });
+
+        $this->withHeaders($headers)
+            ->postJson('/api/v1/integrations/bigshop/dry-run')
+            ->assertOk()
+            ->assertJsonPath('data.dry_run', true)
+            ->assertJsonPath('data.status', 'warning')
+            ->assertJsonPath('data.products_read', 2)
+            ->assertJsonPath('data.grids_read', 4)
+            ->assertJsonPath('data.grids_joined', 3)
+            ->assertJsonPath('data.products_without_grids', 1)
+            ->assertJsonPath('data.grids_without_product', 1)
+            ->assertJsonPath('data.grids_without_size', 1)
+            ->assertJsonPath('data.sizes_detected', 2)
+            ->assertJsonPath('data.sample_products.0.sizes.0', 'P')
+            ->assertJsonPath('data.sample_products.0.sizes.1', 'M');
+
+        $this->assertSame($productsBefore, Product::query()->count());
+        $this->assertSame($tablesBefore, MeasurementTable::query()->count());
+        $this->assertSame(1, IntegrationEvent::query()->where('event_type', 'dry_run_import')->count());
+
+        Http::assertSent(fn ($request): bool => str_contains($request->url(), '/v3/product_grids')
+            && $request->hasHeader('Store-Id', 'store-123'));
+    }
+
     public function test_merchant_can_monitor_bigshop_one_click_activations(): void
     {
         $this->seed();

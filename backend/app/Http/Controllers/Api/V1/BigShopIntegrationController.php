@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\V1\Concerns\ResolvesMerchant;
 use App\Http\Controllers\Controller;
 use App\Models\IntegrationEvent;
 use App\Models\PlatformConnection;
+use App\Services\Integrations\BigShopDryRunService;
 use App\Services\Integrations\BigShopSyncService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -15,7 +16,10 @@ class BigShopIntegrationController extends Controller
 {
     use ResolvesMerchant;
 
-    public function __construct(private readonly BigShopSyncService $bigShop) {}
+    public function __construct(
+        private readonly BigShopSyncService $bigShop,
+        private readonly BigShopDryRunService $dryRun
+    ) {}
 
     public function probe(Request $request)
     {
@@ -51,6 +55,37 @@ class BigShopIntegrationController extends Controller
         try {
             return response()->json([
                 'data' => $this->bigShop->syncProducts($merchant, $company, $connection),
+            ]);
+        } catch (RuntimeException $exception) {
+            $connection->update([
+                'status' => 'error',
+                'last_error' => $exception->getMessage(),
+            ]);
+
+            throw ValidationException::withMessages([
+                'bigshop' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function dryRun(Request $request)
+    {
+        $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
+        $connection = $this->connection($merchant->id, $company?->id);
+        $company = $connection->merchant_company_id
+            ? $this->merchantCompany($merchant, $connection->merchant_company_id)
+            : $company;
+
+        if (! $company) {
+            throw ValidationException::withMessages([
+                'bigshop' => 'Selecione uma empresa antes de executar o dry-run BigShop.',
+            ]);
+        }
+
+        try {
+            return response()->json([
+                'data' => $this->dryRun->run($merchant, $company, $connection),
             ]);
         } catch (RuntimeException $exception) {
             $connection->update([

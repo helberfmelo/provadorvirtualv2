@@ -4327,6 +4327,64 @@ textarea {
   background: #ecfdf5;
 }
 
+.bigshop-dry-run-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.bigshop-dry-run-panel td strong,
+.bigshop-dry-run-panel td small {
+  display: block;
+}
+
+.bigshop-dry-run-panel td small {
+  color: #6b7280;
+}
+
+.dry-run-issues {
+  display: grid;
+  gap: 8px;
+}
+
+.dry-run-issues article {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.dry-run-issues i {
+  color: #d97706;
+}
+
+.dry-run-issues span,
+.dry-run-issues strong,
+.dry-run-issues small {
+  display: block;
+}
+
+.dry-run-issues small {
+  color: #6b7280;
+}
+
+.dry-run-issues em {
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: #92400e;
+  background: #fffbeb;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.dry-run-issues em.error {
+  color: #991b1b;
+  background: #fef2f2;
+}
+
 .assistant-status,
 .warning-list {
   display: flex;

@@ -138,6 +138,13 @@ Achados tecnicos:
 - o tamanho da grade aparece em `caracteristicas` e precisa de extracao especifica;
 - antes de alimentar tabelas finais da Zak, a importacao deve passar por dry-run, mapeamento de marca/categoria/modelagem e revisao de medidas.
 
+Status Sprint 109:
+
+- `POST /api/v1/integrations/bigshop/dry-run` executa leitura segura sem gravar produtos, variações ou tabelas;
+- o cliente BigShop pagina `products` e `product_grids` usando `Store-Id`;
+- o dry-run cruza grades por `produtoid`, extrai tamanho de `caracteristicas` e devolve contadores, amostras e erros/alertas por produto;
+- `/app/integracoes` mostra a ação `Prévia segura` e um painel de revisão antes da sincronização real.
+
 Detalhes completos do benchmark Sizebay/Zak: `docs/sizebay_zak_hyper_benchmark.md`.
 
 ## Integração de um clique

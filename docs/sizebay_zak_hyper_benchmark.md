@@ -577,6 +577,8 @@ Usos praticos da IA:
 - Bloquear sync final de tabelas quando a estrutura de medidas nao for compativel.
 - Criar tela de mapeamento pendente para categoria, marca, genero, faixa etaria e modelagem.
 
+Status Sprint 109: o dry-run BigShop foi implementado para produtos e `product_grids` paginados, com join por `produtoid`, extracao de tamanho em `caracteristicas`, evento `dry_run_import` e painel de prévia em `/app/integracoes`. A importacao final segue bloqueada ate mapeamentos e modelo flexivel de tabelas.
+
 ### P1 - Igualar operacao da Sizebay no portal do cliente
 
 - Criar tela "Sincronizacao" com historico, contadores e erros.
