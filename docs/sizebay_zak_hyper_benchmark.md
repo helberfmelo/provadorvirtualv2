@@ -591,7 +591,7 @@ Status Sprint 111: a tela `/app/regras-de-importacao` foi criada com regras visu
 
 Status Sprint 112: as tabelas flexiveis foram implementadas e publicadas no commit `2872cc7`, run `26606965068`, com validação de produção OK. A importacao final da Zak segue bloqueada por governança ate validar o mapeamento dos dados reais contra esse modelo flexivel.
 
-Status Sprint 113: o cadastro de modelagens foi implementado localmente em `/app/modelagens` e `/api/v1/fit-profiles`; commit/deploy/validação de produção pendentes.
+Status Sprint 113: o cadastro de modelagens foi implementado e publicado em `/app/modelagens` e `/api/v1/fit-profiles`; commit `85f7cec`, run `26607795341`, com validação de produção OK.
 
 ### P2 - Melhorar widget/personalizacao
 

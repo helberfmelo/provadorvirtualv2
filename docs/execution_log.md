@@ -1161,4 +1161,5 @@
 - Formulários de produto e tabela passam a carregar modelagens cadastradas; listagens exibem a modelagem vinculada.
 - `scripts/validate-production.ps1` passa a cobrir `/app/modelagens`.
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter FitProfilesApiTest`, testes focados de produtos/tabelas, PHPUnit completo com 91 testes e 806 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
-- Commit, push, Actions/deploy e validação de produção pendentes.
+- Commit `85f7cec` enviado para `main`; o run `26607795341` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/modelagens`, `/app/tabelas-de-medidas`, `/app/produtos`, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
