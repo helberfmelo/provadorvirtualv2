@@ -18,7 +18,7 @@ class StoreMeasurementTableRequest extends FormRequest
             'name' => ['required', 'string', 'max:180'],
             'product_type' => ['required', 'string', 'max:80'],
             'gender' => ['nullable', 'string', 'max:40'],
-            'fit_profile' => ['nullable', 'string', 'max:40'],
+            'fit_profile' => ['nullable', 'string', 'max:80'],
             'measurement_target' => ['nullable', 'in:body,garment,mixed'],
             'size_system' => ['nullable', 'in:br_alpha,br_numeric,international,custom'],
             'range_mode' => ['nullable', 'in:min_max,exact,tolerance'],

@@ -23,7 +23,7 @@ class StoreProductRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'category' => ['nullable', 'string', 'max:120'],
             'gender' => ['nullable', 'string', 'max:40'],
-            'fit_profile' => ['nullable', 'string', 'max:40'],
+            'fit_profile' => ['nullable', 'string', 'max:80'],
             'status' => ['nullable', 'in:active,draft,inactive'],
             'image_url' => ['nullable', 'string', 'max:500'],
         ];

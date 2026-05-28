@@ -13,6 +13,21 @@ export type ProductVariant = {
   is_active: boolean
 }
 
+export type FitProfile = {
+  id: number
+  merchant_company_id: number | null
+  name: string
+  code: string
+  description: string | null
+  product_type: string | null
+  gender: 'female' | 'male' | 'unisex' | 'kids' | null
+  fit_intensity: 'very_slim' | 'slim' | 'regular' | 'relaxed' | 'oversized' | 'custom'
+  stretch_level: 'none' | 'low' | 'medium' | 'high'
+  status: 'active' | 'draft' | 'inactive'
+  products_count: number
+  measurement_tables_count: number
+}
+
 export type Product = {
   id: number
   measurement_table_id: number | null

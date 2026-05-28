@@ -5,6 +5,7 @@ import CheckoutSuccessView from '../views/CheckoutSuccessView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
 import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
+import FitProfilesView from '../views/FitProfilesView.vue'
 import GoLiveView from '../views/GoLiveView.vue'
 import ImportRulesView from '../views/ImportRulesView.vue'
 import ImportsView from '../views/ImportsView.vue'
@@ -57,6 +58,7 @@ const router = createRouter({
     { path: '/app/tabelas-de-medidas', component: MeasurementTablesView },
     { path: '/app/tabelas-de-medidas/nova', component: MeasurementTableFormView },
     { path: '/app/tabelas-de-medidas/:id/editar', component: MeasurementTableFormView },
+    { path: '/app/modelagens', component: FitProfilesView },
     { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/analytics', component: AnalyticsView },
     { path: '/app/go-live', component: GoLiveView },

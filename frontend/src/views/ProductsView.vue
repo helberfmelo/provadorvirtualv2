@@ -71,6 +71,7 @@ async function removeProduct(product: Product) {
             <tr>
               <th>Produto</th>
               <th>Categoria</th>
+              <th>Modelagem</th>
               <th>Tabela</th>
               <th>Variações</th>
               <th>Status</th>
@@ -79,7 +80,7 @@ async function removeProduct(product: Product) {
           </thead>
           <tbody>
             <tr v-if="!products.length">
-              <td colspan="6">Nenhum produto cadastrado.</td>
+              <td colspan="7">Nenhum produto cadastrado.</td>
             </tr>
             <tr v-for="product in products" :key="product.id">
               <td>
@@ -87,6 +88,7 @@ async function removeProduct(product: Product) {
                 <small>{{ product.sku || 'sem SKU' }}</small>
               </td>
               <td>{{ product.category || '-' }}</td>
+              <td>{{ product.fit_profile || '-' }}</td>
               <td>{{ product.measurement_table?.name || 'Sem tabela' }}</td>
               <td>{{ product.variants_count ?? 0 }}</td>
               <td>

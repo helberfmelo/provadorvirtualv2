@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { api } from '../services/api'
-import type { MeasurementTableOption, Product, ProductVariant } from '../services/merchantTypes'
+import type { FitProfile, MeasurementTableOption, Product, ProductVariant } from '../services/merchantTypes'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,6 +10,7 @@ const productId = computed(() => Number(route.params.id || 0))
 const editing = computed(() => Boolean(productId.value))
 
 const measurementTables = ref<MeasurementTableOption[]>([])
+const fitProfiles = ref<FitProfile[]>([])
 const selected = ref<Product | null>(null)
 const loading = ref(false)
 const saving = ref(false)
@@ -33,6 +34,23 @@ const variantForm = reactive({
   stock_quantity: null as number | null,
 })
 
+const fallbackFitProfiles = [
+  { code: 'slim', name: 'Slim' },
+  { code: 'regular', name: 'Regular' },
+  { code: 'oversized', name: 'Ampla' },
+  { code: 'loose', name: 'Solta' },
+  { code: 'comfort', name: 'Conforto' },
+]
+
+const fitProfileOptions = computed(() => {
+  const options = new Map(fallbackFitProfiles.map((profile) => [profile.code, profile.name]))
+  fitProfiles.value
+    .filter((profile) => profile.status === 'active' || profile.code === form.fit_profile)
+    .forEach((profile) => options.set(profile.code, profile.name))
+
+  return Array.from(options, ([code, name]) => ({ code, name }))
+})
+
 onMounted(() => {
   loadForm()
 })
@@ -42,8 +60,12 @@ async function loadForm() {
   error.value = ''
 
   try {
-    const tablesResponse = await api.get('/measurement-tables')
+    const [tablesResponse, profilesResponse] = await Promise.all([
+      api.get('/measurement-tables'),
+      api.get('/fit-profiles').catch(() => ({ data: { data: [] } })),
+    ])
     measurementTables.value = tablesResponse.data.data
+    fitProfiles.value = profilesResponse.data.data
 
     if (editing.value) {
       const { data } = await api.get(`/products/${productId.value}`)
@@ -193,9 +215,9 @@ async function removeVariant(variant: ProductVariant) {
         <label>
           Modelagem
           <select v-model="form.fit_profile">
-            <option value="slim">Slim</option>
-            <option value="regular">Regular</option>
-            <option value="oversized">Ampla</option>
+            <option v-for="profile in fitProfileOptions" :key="profile.code" :value="profile.code">
+              {{ profile.name }}
+            </option>
           </select>
         </label>
         <label>

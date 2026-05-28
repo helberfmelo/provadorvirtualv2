@@ -585,11 +585,13 @@ Status Sprint 111: a tela `/app/regras-de-importacao` foi criada com regras visu
 
 - Tela "Sincronizacao" criada na Sprint 110 com historico, contadores, filtros e erros por produto.
 - Tela "Regras de importacao" criada na Sprint 111 com construtor visual simples.
-- Criar cadastro de modelagens.
+- Cadastro de modelagens criado na Sprint 113 com código canônico, intensidade, elasticidade, status e uso em produtos/tabelas.
 - Melhorar lista de produtos com status de configuracao do provador.
 - Tabelas de medidas evoluidas na Sprint 112 para medida corporal, medida da peca, sistema de tamanho, ranges e medidas compostas.
 
 Status Sprint 112: as tabelas flexiveis foram implementadas e publicadas no commit `2872cc7`, run `26606965068`, com validação de produção OK. A importacao final da Zak segue bloqueada por governança ate validar o mapeamento dos dados reais contra esse modelo flexivel.
+
+Status Sprint 113: o cadastro de modelagens foi implementado localmente em `/app/modelagens` e `/api/v1/fit-profiles`; commit/deploy/validação de produção pendentes.
 
 ### P2 - Melhorar widget/personalizacao
 

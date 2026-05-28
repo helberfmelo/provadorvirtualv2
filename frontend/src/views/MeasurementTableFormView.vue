@@ -2,7 +2,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { api } from '../services/api'
-import type { MeasurementRow, MeasurementTable, MeasurementTemplate } from '../services/merchantTypes'
+import type { FitProfile, MeasurementRow, MeasurementTable, MeasurementTemplate } from '../services/merchantTypes'
 
 const route = useRoute()
 const router = useRouter()
@@ -10,6 +10,7 @@ const tableId = computed(() => Number(route.params.id || 0))
 const editing = computed(() => Boolean(tableId.value))
 
 const templates = ref<MeasurementTemplate[]>([])
+const fitProfiles = ref<FitProfile[]>([])
 const selectedTemplateKey = ref('')
 const loading = ref(false)
 const saving = ref(false)
@@ -65,6 +66,23 @@ const form = reactive({
   rows: [] as MeasurementRow[],
 })
 
+const fallbackFitProfiles = [
+  { code: 'slim', name: 'Slim' },
+  { code: 'regular', name: 'Regular' },
+  { code: 'oversized', name: 'Ampla' },
+  { code: 'loose', name: 'Solta' },
+  { code: 'comfort', name: 'Conforto' },
+]
+
+const fitProfileOptions = computed(() => {
+  const options = new Map(fallbackFitProfiles.map((profile) => [profile.code, profile.name]))
+  fitProfiles.value
+    .filter((profile) => profile.status === 'active' || profile.code === form.fit_profile)
+    .forEach((profile) => options.set(profile.code, profile.name))
+
+  return Array.from(options, ([code, name]) => ({ code, name }))
+})
+
 onMounted(() => {
   loadForm()
 })
@@ -74,8 +92,12 @@ async function loadForm() {
   error.value = ''
 
   try {
-    const templatesResponse = await api.get('/measurement-templates')
+    const [templatesResponse, profilesResponse] = await Promise.all([
+      api.get('/measurement-templates'),
+      api.get('/fit-profiles').catch(() => ({ data: { data: [] } })),
+    ])
     templates.value = templatesResponse.data.data
+    fitProfiles.value = profilesResponse.data.data
 
     if (editing.value) {
       const { data } = await api.get(`/measurement-tables/${tableId.value}`)
@@ -322,11 +344,9 @@ async function saveTable() {
         <label>
           Modelagem
           <select v-model="form.fit_profile">
-            <option value="slim">Slim</option>
-            <option value="regular">Regular</option>
-            <option value="oversized">Ampla</option>
-            <option value="loose">Solta</option>
-            <option value="comfort">Conforto</option>
+            <option v-for="profile in fitProfileOptions" :key="profile.code" :value="profile.code">
+              {{ profile.name }}
+            </option>
           </select>
         </label>
         <label>

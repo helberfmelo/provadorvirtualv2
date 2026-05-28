@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\FitProfile;
 use App\Models\MeasurementTable;
 use App\Models\MeasurementTableRow;
 use App\Models\Merchant;
@@ -68,6 +69,7 @@ class DatabaseSeeder extends Seeder
             ]
         );
         $company->ensureAccessCode();
+        $this->ensureFitProfiles($merchant);
 
         $dressTable = $this->tableWithRows($merchant, $company, [
             'name' => 'Vestidos femininos - modelagem regular',
@@ -251,6 +253,37 @@ class DatabaseSeeder extends Seeder
         }
 
         return $table;
+    }
+
+    private function ensureFitProfiles(Merchant $merchant): void
+    {
+        $profiles = [
+            ['name' => 'Slim', 'code' => 'slim', 'fit_intensity' => 'slim', 'stretch_level' => 'medium', 'description' => 'Mais ajustada ao corpo, indicada para peças com menor folga.'],
+            ['name' => 'Regular', 'code' => 'regular', 'fit_intensity' => 'regular', 'stretch_level' => 'medium', 'description' => 'Caimento padrão, base segura para a maioria das tabelas.'],
+            ['name' => 'Ampla', 'code' => 'oversized', 'fit_intensity' => 'oversized', 'stretch_level' => 'low', 'description' => 'Mais solta e com volume proposital na peça.'],
+            ['name' => 'Solta', 'code' => 'loose', 'fit_intensity' => 'relaxed', 'stretch_level' => 'medium', 'description' => 'Caimento relaxado, com folga moderada.'],
+            ['name' => 'Conforto', 'code' => 'comfort', 'fit_intensity' => 'relaxed', 'stretch_level' => 'high', 'description' => 'Modelagem confortável, útil para peças com elasticidade ou uso prolongado.'],
+        ];
+
+        foreach ($profiles as $profile) {
+            FitProfile::query()->updateOrCreate(
+                [
+                    'merchant_id' => $merchant->id,
+                    'merchant_company_id' => null,
+                    'code' => $profile['code'],
+                ],
+                [
+                    'name' => $profile['name'],
+                    'description' => $profile['description'],
+                    'product_type' => null,
+                    'gender' => null,
+                    'fit_intensity' => $profile['fit_intensity'],
+                    'stretch_level' => $profile['stretch_level'],
+                    'status' => 'active',
+                    'metadata' => ['source' => 'seed_default'],
+                ]
+            );
+        }
     }
 
     private function productWithVariants(Merchant $merchant, MerchantCompany $company, MeasurementTable $table, array $productData, array $sizes): Product

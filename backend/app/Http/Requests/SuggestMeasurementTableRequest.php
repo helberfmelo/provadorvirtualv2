@@ -22,7 +22,7 @@ class SuggestMeasurementTableRequest extends FormRequest
             'name' => ['nullable', 'string', 'max:180'],
             'product_type' => ['nullable', 'string', 'max:80'],
             'gender' => ['nullable', 'string', 'max:40'],
-            'fit_profile' => ['nullable', 'string', 'max:40'],
+            'fit_profile' => ['nullable', 'string', 'max:80'],
             'unit' => ['nullable', Rule::in(['cm'])],
         ];
     }

@@ -74,6 +74,7 @@ async function removeTable(table: MeasurementTable) {
               <th>Base</th>
               <th>Sistema</th>
               <th>Gênero</th>
+              <th>Modelagem</th>
               <th>Linhas</th>
               <th>Produtos</th>
               <th>Status</th>
@@ -82,7 +83,7 @@ async function removeTable(table: MeasurementTable) {
           </thead>
           <tbody>
             <tr v-if="!tables.length">
-              <td colspan="9">Nenhuma tabela cadastrada.</td>
+              <td colspan="10">Nenhuma tabela cadastrada.</td>
             </tr>
             <tr v-for="table in tables" :key="table.id">
               <td>
@@ -93,6 +94,7 @@ async function removeTable(table: MeasurementTable) {
               <td>{{ table.measurement_target === 'garment' ? 'Peça' : table.measurement_target === 'mixed' ? 'Corpo + peça' : 'Corpo' }}</td>
               <td>{{ table.size_system === 'br_numeric' ? 'BR numérico' : table.size_system === 'international' ? 'Internacional' : table.size_system === 'custom' ? 'Personalizado' : 'BR letras' }}</td>
               <td>{{ table.gender || '-' }}</td>
+              <td>{{ table.fit_profile || '-' }}</td>
               <td>{{ table.rows_count ?? 0 }}</td>
               <td>{{ table.products_count ?? 0 }}</td>
               <td>

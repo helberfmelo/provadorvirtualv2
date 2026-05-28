@@ -228,6 +228,7 @@ Atualizado em: 2026-05-28
 - Sprint 111 enviada ao GitHub no commit `5d938ba`; o run `26606288957` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 112 evolui tabelas de medidas com `measurement_target`, `size_system`, `range_mode`, JSON flexível por linha e medida composta `fit_balance`, preservando compatibilidade com as colunas usadas pelo motor atual.
 - Sprint 112 enviada ao GitHub no commit `2872cc7`; o run `26606965068` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/tabelas-de-medidas`, `/app/tabelas-de-medidas/nova`, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
+- Sprint 113 cria cadastro de modelagens em `fit_profiles`, com API `/api/v1/fit-profiles`, tela `/app/modelagens`, uso em produtos/tabelas e bloqueio de remoção quando a modelagem está vinculada.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -244,11 +245,12 @@ Atualizado em: 2026-05-28
 
 ## Superficie atual
 
-- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/regras-de-importacao`, `/app/sincronizacao`, `/app/usuarios`.
+- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/modelagens`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/regras-de-importacao`, `/app/sincronizacao`, `/app/usuarios`.
 - Painel SaaS protegido por papel/permissão: `/saas`, `/saas/empresas`, `/saas/usuarios`, `/saas/checkout`, `/saas/pedidos` e `/saas/emails`, com entrada administrativa em `/saas/login`.
 - CRUDs do SaaS seguem padrão list-first: listagem ocupa a tela e novo/editar abre rota própria.
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
 - CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
+- Modelagens: `/app/modelagens` cadastra caimentos por código, intensidade, elasticidade, gênero, tipo, status e uso em produtos/tabelas; a API protegida é `/api/v1/fit-profiles`.
 - Tabelas de medidas: `/app/tabelas-de-medidas` e formulários suportam base corpo/peça/mista, sistema BR letras/BR numérico/internacional/custom, ranges e medida composta por linha, mantendo o formato antigo para recomendação.
 - Diretriz obrigatória de telas: `docs/portal_ui_guidelines.md`.
 - Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão, links para termos/privacidade, modal amigável de falha por meio de pagamento e conclusão específica para Pix, boleto e cartão. A conclusão pública mostra pedido, status do pagamento em português e forma de pagamento, sem expor a operadora.

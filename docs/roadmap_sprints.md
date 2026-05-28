@@ -1779,3 +1779,35 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 112 no commit `2872cc7`, publicado com sucesso no run `26606965068`. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter MeasurementTablesApiTest`, PHPUnit completo com 90 testes e 777 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/tabelas-de-medidas`, `/app/tabelas-de-medidas/nova`, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 113 - Cadastro de modelagens
+
+Objetivo: criar um cadastro próprio de modelagens para que o lojista governe caimentos usados por produtos, tabelas e regras de importação, no padrão limpo observado no portal do cliente Sizebay.
+
+Entregas:
+
+- criar tabela `fit_profiles` com nome, código, tipo de produto, gênero, intensidade, elasticidade, status e metadados;
+- popular modelagens padrão por merchant existente: Slim, Regular, Ampla, Solta e Conforto;
+- criar API protegida `/api/v1/fit-profiles` com listagem, criação, edição, exclusão segura e contadores de uso;
+- bloquear remoção de modelagem em uso por produtos ou tabelas;
+- ao alterar o código de uma modelagem, atualizar produtos e tabelas vinculados para preservar o relacionamento;
+- criar tela `/app/modelagens` com lista vertical, edição limpa, status e uso;
+- adicionar menu `Modelagens` no portal da empresa;
+- usar o cadastro nos formulários de produto e tabela de medidas;
+- exibir modelagem nas listagens de produtos e tabelas;
+- ampliar validação de produção para cobrir `/app/modelagens`.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter FitProfilesApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter ProductsApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter MeasurementTablesApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter FitProfilesApiTest`, testes focados de produtos/tabelas, PHPUnit completo com 91 testes e 806 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Commit, push, Actions/deploy e validação de produção pendentes.

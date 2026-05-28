@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\BigShopActivationController;
 use App\Http\Controllers\Api\V1\BigShopIntegrationController;
 use App\Http\Controllers\Api\V1\BillingSubscriptionController;
 use App\Http\Controllers\Api\V1\DemoProductController;
+use App\Http\Controllers\Api\V1\FitProfileController;
 use App\Http\Controllers\Api\V1\GoLiveReadinessController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\ImportController;
@@ -122,6 +123,12 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,dashboard,edit');
         Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index'])
             ->middleware('portal.permission:merchant,measurement_tables,view');
+        Route::apiResource('fit-profiles', FitProfileController::class)
+            ->only(['index', 'show'])
+            ->middleware('portal.permission:merchant,measurement_tables,view');
+        Route::apiResource('fit-profiles', FitProfileController::class)
+            ->only(['store', 'update', 'destroy'])
+            ->middleware('portal.permission:merchant,measurement_tables,edit');
         Route::get('/widget-install', [WidgetInstallController::class, 'show'])
             ->middleware('portal.permission:merchant,widget,view');
         Route::patch('/widget-install', [WidgetInstallController::class, 'update'])

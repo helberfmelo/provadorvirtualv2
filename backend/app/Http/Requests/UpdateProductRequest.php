@@ -23,7 +23,7 @@ class UpdateProductRequest extends FormRequest
             'description' => ['sometimes', 'nullable', 'string'],
             'category' => ['sometimes', 'nullable', 'string', 'max:120'],
             'gender' => ['sometimes', 'nullable', 'string', 'max:40'],
-            'fit_profile' => ['sometimes', 'nullable', 'string', 'max:40'],
+            'fit_profile' => ['sometimes', 'nullable', 'string', 'max:80'],
             'status' => ['sometimes', 'nullable', 'in:active,draft,inactive'],
             'image_url' => ['sometimes', 'nullable', 'string', 'max:500'],
         ];
