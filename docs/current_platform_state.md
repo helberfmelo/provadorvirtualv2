@@ -223,6 +223,7 @@ Atualizado em: 2026-05-28
 - Sprint 109 inicia a importação segura da Zak: BigShop agora tem dry-run paginado de `products` e `product_grids`, join por `produtoid`, extração de tamanho de `caracteristicas`, erros por produto e painel de prévia em `/app/integracoes`, sem gravar produtos/tabelas.
 - Sprint 109 enviada ao GitHub no commit `6aaf8f4`; o run `26604636247` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/integracoes`, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 110 cria `/app/sincronizacao`: histórico limpo de eventos de sync/dry-run/XML com filtros, contadores, amostra de produtos e erros por produto, usando `integration_events` e `import_jobs`.
+- Sprint 110 enviada ao GitHub no commit `efe87b8`; o run `26605323289` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
