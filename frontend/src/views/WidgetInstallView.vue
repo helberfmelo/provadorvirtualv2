@@ -41,7 +41,15 @@ type WidgetInstall = {
     confetti_enabled?: boolean | string
     presentation_mode?: 'drawer' | 'modal' | string
   }
+  draft?: {
+    platform: string
+    allowed_domains: string[]
+    theme: WidgetInstall['theme']
+    is_active: boolean
+    has_unpublished_changes: boolean
+  }
   is_active: boolean
+  published_at?: string | null
   script_url: string
   css_url: string
   snippet: string
@@ -67,6 +75,8 @@ const install = ref<WidgetInstall | null>(null)
 const loading = ref(false)
 const saving = ref(false)
 const copied = ref(false)
+const previewDevice = ref<'desktop' | 'mobile'>('desktop')
+const savedFormSnapshot = ref('')
 let confettiPreviewTimeout: number | null = null
 
 const form = reactive({
@@ -212,6 +222,17 @@ const selectedButtonStyle = computed(() => {
     || buttonStyleOptions[0]
 })
 
+const hasUnpublishedChanges = computed(() => Boolean(install.value?.draft?.has_unpublished_changes))
+const hasLocalChanges = computed(() => savedFormSnapshot.value !== JSON.stringify(formState()))
+const hasPendingChanges = computed(() => hasUnpublishedChanges.value || hasLocalChanges.value)
+const publicationStatusLabel = computed(() => {
+  if (hasLocalChanges.value) {
+    return 'Alterações locais'
+  }
+
+  return hasUnpublishedChanges.value ? 'Rascunho salvo' : 'Publicado'
+})
+
 const isBigShopContract = computed(() => {
   return auth.activeCompany?.platform === 'bigshop'
     || install.value?.company?.platform === 'bigshop'
@@ -302,43 +323,87 @@ async function loadInstall() {
 }
 
 function fillForm(data: WidgetInstall) {
-  form.platform = isBigShopContract.value ? 'bigshop' : data.platform || 'custom'
-  form.allowed_domains = (data.allowed_domains || []).join('\n')
-  form.is_active = data.is_active
-  form.theme.primary = data.theme?.primary || '#0f172a'
-  form.theme.secondary = data.theme?.secondary || '#ff4d5e'
-  form.theme.accent = data.theme?.accent || '#ff7a1a'
-  form.theme.background = data.theme?.background || '#ffffff'
-  form.theme.text = data.theme?.text || '#111827'
-  form.theme.font_family = data.theme?.font_family || 'Manrope, Inter, Arial, sans-serif'
-  form.theme.font_size = data.theme?.font_size || '14'
-  form.theme.font_weight = data.theme?.font_weight || '800'
-  form.theme.button_radius = data.theme?.button_radius || '8'
-  const buttonStyle = String(data.theme?.button_style || '')
+  const draft = data.draft || {
+    platform: data.platform,
+    allowed_domains: data.allowed_domains,
+    theme: data.theme,
+    is_active: data.is_active,
+    has_unpublished_changes: false,
+  }
+  const theme = draft.theme || data.theme || {}
+
+  form.platform = isBigShopContract.value ? 'bigshop' : draft.platform || data.platform || 'custom'
+  form.allowed_domains = (draft.allowed_domains || data.allowed_domains || []).join('\n')
+  form.is_active = draft.is_active
+  form.theme.primary = theme.primary || '#0f172a'
+  form.theme.secondary = theme.secondary || '#ff4d5e'
+  form.theme.accent = theme.accent || '#ff7a1a'
+  form.theme.background = theme.background || '#ffffff'
+  form.theme.text = theme.text || '#111827'
+  form.theme.font_family = theme.font_family || 'Manrope, Inter, Arial, sans-serif'
+  form.theme.font_size = theme.font_size || '14'
+  form.theme.font_weight = theme.font_weight || '800'
+  form.theme.button_radius = theme.button_radius || '8'
+  const buttonStyle = String(theme.button_style || '')
   form.theme.button_style = buttonStyleValues.includes(buttonStyle)
     ? buttonStyle
     : legacyButtonStyleMap[buttonStyle] || 'gallery_1_text_icons'
-  form.theme.button_background = data.theme?.button_background || data.theme?.secondary || '#ff4d5e'
-  form.theme.button_text = data.theme?.button_text || '#ffffff'
-  form.theme.presentation_mode = data.theme?.presentation_mode === 'modal' ? 'modal' : 'drawer'
-  form.theme.confetti_enabled = data.theme?.confetti_enabled === undefined
-    || data.theme?.confetti_enabled === null
-    || data.theme?.confetti_enabled === true
-    || data.theme?.confetti_enabled === 'true'
-    || data.theme?.confetti_enabled === '1'
+  form.theme.button_background = theme.button_background || theme.secondary || '#ff4d5e'
+  form.theme.button_text = theme.button_text || '#ffffff'
+  form.theme.presentation_mode = theme.presentation_mode === 'modal' ? 'modal' : 'drawer'
+  form.theme.confetti_enabled = theme.confetti_enabled === undefined
+    || theme.confetti_enabled === null
+    || theme.confetti_enabled === true
+    || theme.confetti_enabled === 'true'
+    || theme.confetti_enabled === '1'
+  savedFormSnapshot.value = JSON.stringify(formState())
 }
 
-async function saveInstall() {
+function formState() {
+  return {
+    platform: form.platform,
+    allowed_domains: domains.value,
+    is_active: form.is_active,
+    theme: { ...form.theme },
+  }
+}
+
+function widgetPayload(mode: 'draft' | 'publish' | 'discard') {
+  if (mode === 'discard') {
+    return { mode }
+  }
+
+  return {
+    mode,
+    platform: form.platform,
+    allowed_domains: domains.value,
+    is_active: form.is_active,
+    theme: form.theme,
+  }
+}
+
+async function saveInstall(mode: 'draft' | 'publish' = 'draft') {
   saving.value = true
 
   try {
-    const { data } = await api.patch('/widget-install', {
-      platform: form.platform,
-      allowed_domains: domains.value,
-      is_active: form.is_active,
-      theme: form.theme,
-    })
+    const { data } = await api.patch('/widget-install', widgetPayload(mode))
 
+    install.value = data.data
+    fillForm(data.data)
+  } finally {
+    saving.value = false
+  }
+}
+
+async function saveDraft() {
+  await saveInstall('draft')
+}
+
+async function discardDraft() {
+  saving.value = true
+
+  try {
+    const { data } = await api.patch('/widget-install', widgetPayload('discard'))
     install.value = data.data
     fillForm(data.data)
   } finally {
@@ -420,16 +485,21 @@ function removeConfettiPreview() {
           Ajuste botões, cores, domínios e código para exibir o provador na página de produto.
         </p>
       </div>
-      <button class="btn btn-secondary" type="button" :disabled="!currentSnippet" @click="copySnippet">
-        <i class="fa-solid fa-copy" aria-hidden="true"></i>
-        {{ copied ? 'Copiado' : 'Copiar código' }}
-      </button>
+      <div class="action-row compact">
+        <span class="status-pill" :class="{ ok: !hasPendingChanges, warning: hasPendingChanges }">
+          {{ publicationStatusLabel }}
+        </span>
+        <button class="btn btn-secondary" type="button" :disabled="!currentSnippet" @click="copySnippet">
+          <i class="fa-solid fa-copy" aria-hidden="true"></i>
+          {{ copied ? 'Copiado' : 'Copiar código' }}
+        </button>
+      </div>
     </div>
 
     <div v-if="loading" class="empty-state">Carregando provador...</div>
 
     <div v-else class="install-grid widget-install-layout">
-      <form class="panel-main admin-form widget-config-form" @submit.prevent="saveInstall">
+      <form class="panel-main admin-form widget-config-form" @submit.prevent="saveDraft">
         <section class="widget-config-section">
           <div class="subsection-heading">
             <h2>Instalação</h2>
@@ -654,7 +724,15 @@ function removeConfettiPreview() {
         <div class="action-row compact">
           <button class="btn btn-primary" type="submit" :disabled="saving">
             <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-            Salvar provador
+            Salvar rascunho
+          </button>
+          <button class="btn btn-secondary" type="button" :disabled="saving" @click="saveInstall('publish')">
+            <i class="fa-solid fa-cloud-arrow-up" aria-hidden="true"></i>
+            Publicar
+          </button>
+          <button class="btn btn-secondary" type="button" :disabled="saving || !hasPendingChanges" @click="discardDraft">
+            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+            Desfazer
           </button>
         </div>
       </form>
@@ -663,9 +741,26 @@ function removeConfettiPreview() {
         <section class="panel-main widget-preview-panel">
           <div class="subsection-heading">
             <h2>Visualizador</h2>
-            <span>{{ form.theme.presentation_mode === 'modal' ? 'Modal central' : 'Drawer lateral' }}</span>
+            <div class="segmented-control compact-segmented">
+              <button
+                type="button"
+                :class="{ active: previewDevice === 'desktop' }"
+                @click="previewDevice = 'desktop'"
+              >
+                <i class="fa-solid fa-display" aria-hidden="true"></i>
+                Desktop
+              </button>
+              <button
+                type="button"
+                :class="{ active: previewDevice === 'mobile' }"
+                @click="previewDevice = 'mobile'"
+              >
+                <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+                Mobile
+              </button>
+            </div>
           </div>
-          <div class="widget-style-preview" :style="previewStyle">
+          <div :class="['widget-style-preview', `preview-device-${previewDevice}`]" :style="previewStyle">
             <div class="preview-product-line">
               <strong>Vestido Midi Aurora</strong>
               <span>Selecione seu tamanho</span>

@@ -1811,3 +1811,34 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 113 no commit `85f7cec`, publicado com sucesso no run `26607795341`. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter FitProfilesApiTest`, testes focados de produtos/tabelas, PHPUnit completo com 91 testes e 806 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/modelagens`, `/app/tabelas-de-medidas`, `/app/produtos`, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 114 - Publicação e preview do widget
+
+Objetivo: ampliar a personalização do widget com preview desktop/mobile, rascunho separado da configuração publicada, publicar/desfazer e manutenção da galeria completa de botões.
+
+Entregas:
+
+- adicionar campos de rascunho em `widget_installs`: `draft_platform`, `draft_allowed_domains`, `draft_theme` e `draft_is_active`;
+- adicionar `published_at` e expor estado publicado/rascunho no recurso de widget;
+- manter compatibilidade da API: chamadas antigas continuam publicando direto;
+- adicionar `mode=draft`, `mode=publish` e `mode=discard` no `PATCH /api/v1/widget-install`;
+- preservar o tema publicado para o widget público até o lojista clicar em publicar;
+- permitir desfazer rascunho sem alterar a loja;
+- adicionar estado visual `Publicado`, `Rascunho salvo` e `Alterações locais` em `/app/widget`;
+- trocar o botão principal para `Salvar rascunho` e adicionar `Publicar` e `Desfazer`;
+- ampliar o visualizador com alternância Desktop/Mobile;
+- manter os 10 modelos de botões da galeria Sprint 108 no fluxo de personalização.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetInstallApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetAssetTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetInstallApiTest`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetAssetTest`, PHPUnit completo com 91 testes e 825 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Commit, push, Actions/deploy e validação de produção pendentes.

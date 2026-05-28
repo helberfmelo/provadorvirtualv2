@@ -32,6 +32,7 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.is_active', true)
             ->assertJsonPath('data.theme.presentation_mode', 'drawer')
             ->assertJsonPath('data.theme.button_style', 'gallery_1_text_icons')
+            ->assertJsonPath('data.draft.has_unpublished_changes', false)
             ->assertJsonPath('data.platform_guide.key', 'custom')
             ->assertJsonPath('data.platform_guide.guide.placement_label', 'Página de produto')
             ->assertJsonPath('data.platform_guides.0.key', 'bigshop');
@@ -39,6 +40,36 @@ class WidgetInstallApiTest extends TestCase
         $this->assertStringContainsString('provador-virtual.js', $response->json('data.snippet'));
         $this->assertStringContainsString('data-merchant-id', $response->json('data.snippet'));
         $this->assertStringContainsString('data-platform="custom"', $response->json('data.snippet'));
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'mode' => 'draft',
+                'platform' => 'bigshop',
+                'allowed_domains' => ['Preview.Loja.Com.Br'],
+                'theme' => [
+                    'primary' => '#101820',
+                    'presentation_mode' => 'modal',
+                    'button_style' => 'gallery_10_badge_tooltip',
+                ],
+                'is_active' => false,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'custom')
+            ->assertJsonPath('data.theme.primary', '#0f172a')
+            ->assertJsonPath('data.is_active', true)
+            ->assertJsonPath('data.draft.platform', 'bigshop')
+            ->assertJsonPath('data.draft.allowed_domains.0', 'preview.loja.com.br')
+            ->assertJsonPath('data.draft.theme.primary', '#101820')
+            ->assertJsonPath('data.draft.is_active', false)
+            ->assertJsonPath('data.draft.has_unpublished_changes', true);
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'mode' => 'discard',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'custom')
+            ->assertJsonPath('data.draft.has_unpublished_changes', false);
 
         $this->withHeaders($headers)
             ->patchJson('/api/v1/widget-install', [
@@ -78,12 +109,29 @@ class WidgetInstallApiTest extends TestCase
         $this->assertStringContainsString('data-platform="bigshop"', $bigShopSnippet);
         $this->assertStringContainsString('BIGSHOP_PRODUCT_ID', $bigShopSnippet);
 
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'mode' => 'draft',
+                'platform' => 'shopify',
+                'theme' => [
+                    'primary' => '#333333',
+                    'button_style' => 'gallery_5_pills',
+                ],
+                'is_active' => true,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'bigshop')
+            ->assertJsonPath('data.draft.platform', 'shopify')
+            ->assertJsonPath('data.draft.has_unpublished_changes', true);
+
         $shopifyResponse = $this->withHeaders($headers)
             ->patchJson('/api/v1/widget-install', [
-                'platform' => 'shopify',
+                'mode' => 'publish',
             ])
             ->assertOk()
             ->assertJsonPath('data.platform', 'shopify')
+            ->assertJsonPath('data.theme.primary', '#333333')
+            ->assertJsonPath('data.draft.has_unpublished_changes', false)
             ->assertJsonPath('data.platform_guide.key', 'shopify');
 
         $this->assertStringContainsString('{{ product.id }}', $shopifyResponse->json('data.snippet'));

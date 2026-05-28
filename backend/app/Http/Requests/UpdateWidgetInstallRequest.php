@@ -18,6 +18,7 @@ class UpdateWidgetInstallRequest extends FormRequest
     {
         return [
             'merchant_company_id' => ['nullable', 'integer'],
+            'mode' => ['sometimes', 'string', Rule::in(['draft', 'publish', 'discard'])],
             'platform' => ['sometimes', 'string', Rule::in(PlatformCatalog::keys())],
             'allowed_domains' => ['sometimes', 'array', 'max:12'],
             'allowed_domains.*' => ['required', 'string', 'max:120'],

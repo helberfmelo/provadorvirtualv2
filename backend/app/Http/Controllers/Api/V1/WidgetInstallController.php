@@ -34,6 +34,8 @@ class WidgetInstallController extends Controller
         $activeCompany = app(ActiveTenant::class)->company($request, $merchant);
         $install = $this->resolveInstall($merchant, $activeCompany);
         $data = $request->validated();
+        $mode = $data['mode'] ?? 'publish';
+        unset($data['mode']);
 
         abort_if(
             $activeCompany?->platform === 'bigshop'
@@ -43,6 +45,48 @@ class WidgetInstallController extends Controller
             'Sua empresa contratou o plano BigShop. O widget pode ser instalado apenas na BigShop.'
         );
 
+        $data = $this->normalizePayload($merchant, $activeCompany, $data);
+        $stateChanges = Arr::only($data, ['platform', 'allowed_domains', 'theme', 'is_active']);
+
+        if ($mode === 'discard') {
+            $install->forceFill($this->draftColumns())->save();
+        } elseif ($mode === 'draft') {
+            $draftState = array_replace($this->draftState($install), $stateChanges);
+            $install->update([
+                'draft_platform' => $draftState['platform'],
+                'draft_allowed_domains' => $draftState['allowed_domains'],
+                'draft_theme' => $draftState['theme'],
+                'draft_is_active' => $draftState['is_active'],
+            ]);
+        } else {
+            $baseState = $stateChanges === [] ? $this->draftState($install) : $this->liveState($install);
+            $publishState = array_replace($baseState, $stateChanges);
+            $install->update([
+                ...Arr::only($data, ['merchant_company_id']),
+                'platform' => $publishState['platform'],
+                'allowed_domains' => $publishState['allowed_domains'],
+                'theme' => $publishState['theme'],
+                'is_active' => $publishState['is_active'],
+                ...$this->draftColumns(),
+                'published_at' => now(),
+            ]);
+        }
+
+        app(AuditLogger::class)->log($request, $merchant, 'widget_install.updated', 'widget', 'info', [
+            'platform' => $install->platform,
+            'merchant_company_id' => $install->merchant_company_id,
+            'module' => 'widget',
+            'action' => $mode,
+            'is_active' => $install->is_active,
+            'allowed_domains_count' => count($install->allowed_domains ?? []),
+            'has_draft' => filled($install->draft_platform) || is_array($install->draft_theme),
+        ], $install);
+
+        return new WidgetInstallResource($install->refresh()->load('company'));
+    }
+
+    private function normalizePayload($merchant, ?MerchantCompany $activeCompany, array $data): array
+    {
         if ($activeCompany?->platform === 'bigshop') {
             $data['platform'] = 'bigshop';
             $data['merchant_company_id'] = $activeCompany->id;
@@ -53,7 +97,10 @@ class WidgetInstallController extends Controller
         }
 
         if (array_key_exists('theme', $data)) {
-            $data['theme'] = array_filter($data['theme'] ?? [], fn ($value): bool => filled($value));
+            $data['theme'] = array_filter(
+                $data['theme'] ?? [],
+                fn ($value): bool => ! ($value === null || $value === '')
+            );
         }
 
         if (array_key_exists('allowed_domains', $data)) {
@@ -65,24 +112,39 @@ class WidgetInstallController extends Controller
                 ->all();
         }
 
-        $install->update(Arr::only($data, [
-            'merchant_company_id',
-            'platform',
-            'allowed_domains',
-            'theme',
-            'is_active',
-        ]));
+        return $data;
+    }
 
-        app(AuditLogger::class)->log($request, $merchant, 'widget_install.updated', 'widget', 'info', [
-            'platform' => $install->platform,
-            'merchant_company_id' => $install->merchant_company_id,
-            'module' => 'widget',
-            'action' => 'update',
-            'is_active' => $install->is_active,
-            'allowed_domains_count' => count($install->allowed_domains ?? []),
-        ], $install);
+    private function liveState(WidgetInstall $install): array
+    {
+        return [
+            'platform' => $install->platform ?: 'custom',
+            'allowed_domains' => $install->allowed_domains ?? [],
+            'theme' => $install->theme ?? [],
+            'is_active' => (bool) $install->is_active,
+        ];
+    }
 
-        return new WidgetInstallResource($install->refresh()->load('company'));
+    private function draftState(WidgetInstall $install): array
+    {
+        $liveState = $this->liveState($install);
+
+        return [
+            'platform' => $install->draft_platform ?: $liveState['platform'],
+            'allowed_domains' => $install->draft_allowed_domains ?? $liveState['allowed_domains'],
+            'theme' => $install->draft_theme ?? $liveState['theme'],
+            'is_active' => $install->draft_is_active ?? $liveState['is_active'],
+        ];
+    }
+
+    private function draftColumns(): array
+    {
+        return [
+            'draft_platform' => null,
+            'draft_allowed_domains' => null,
+            'draft_theme' => null,
+            'draft_is_active' => null,
+        ];
     }
 
     private function resolveInstall($merchant, ?MerchantCompany $company = null): WidgetInstall

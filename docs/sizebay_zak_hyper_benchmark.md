@@ -596,9 +596,7 @@ Status Sprint 113: o cadastro de modelagens foi implementado e publicado em `/ap
 ### P2 - Melhorar widget/personalizacao
 
 - A galeria de botoes foi ampliada na Sprint 108 para 10 modelos inspirados na galeria publica correta, com variacoes e animacoes proprias.
-- Adicionar preview desktop/mobile real.
-- Separar configuracao salva de configuracao publicada.
-- Criar "desfazer alteracoes" e "publicar" para widget.
+- Preview desktop/mobile, rascunho separado da configuração publicada e comandos "Publicar" / "Desfazer" implementados na Sprint 114.
 - Adicionar posicao por seletor/ancora em modo avancado.
 
 ### P3 - Analytics e IA

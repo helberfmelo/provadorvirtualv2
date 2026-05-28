@@ -17,6 +17,8 @@ class WidgetInstallResource extends JsonResource
         $platformGuides = $this->platformGuides($scriptUrl, $cssUrl, $product);
         $platformKey = (string) ($this->platform ?: 'custom');
         $platformGuide = $platformGuides[$platformKey] ?? $platformGuides['custom'];
+        $liveState = $this->liveState();
+        $draftState = $this->draftState($liveState);
 
         return [
             'id' => $this->id,
@@ -27,6 +29,11 @@ class WidgetInstallResource extends JsonResource
             'allowed_domains' => $this->allowed_domains ?? [],
             'theme' => $this->theme ?? [],
             'is_active' => $this->is_active,
+            'draft' => [
+                ...$draftState,
+                'has_unpublished_changes' => $this->normalizeState($draftState) !== $this->normalizeState($liveState),
+            ],
+            'published_at' => ($this->published_at ?: $this->updated_at)?->toISOString(),
             'script_url' => $scriptUrl,
             'css_url' => $cssUrl,
             'container_id' => 'provador-virtual-container',
@@ -47,6 +54,36 @@ class WidgetInstallResource extends JsonResource
                 'external_product_id' => $product->external_product_id,
             ] : null,
             'updated_at' => $this->updated_at?->toISOString(),
+        ];
+    }
+
+    private function liveState(): array
+    {
+        return [
+            'platform' => $this->platform ?: 'custom',
+            'allowed_domains' => $this->allowed_domains ?? [],
+            'theme' => $this->theme ?? [],
+            'is_active' => (bool) $this->is_active,
+        ];
+    }
+
+    private function draftState(array $liveState): array
+    {
+        return [
+            'platform' => $this->draft_platform ?: $liveState['platform'],
+            'allowed_domains' => $this->draft_allowed_domains ?? $liveState['allowed_domains'],
+            'theme' => $this->draft_theme ?? $liveState['theme'],
+            'is_active' => $this->draft_is_active ?? $liveState['is_active'],
+        ];
+    }
+
+    private function normalizeState(array $state): array
+    {
+        return [
+            'platform' => (string) ($state['platform'] ?? 'custom'),
+            'allowed_domains' => collect($state['allowed_domains'] ?? [])->map(fn ($domain) => (string) $domain)->values()->all(),
+            'theme' => collect($state['theme'] ?? [])->sortKeys()->all(),
+            'is_active' => (bool) ($state['is_active'] ?? false),
         ];
     }
 

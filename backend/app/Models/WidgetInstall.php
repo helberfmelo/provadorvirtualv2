@@ -16,8 +16,12 @@ class WidgetInstall extends Model
     {
         return [
             'allowed_domains' => 'array',
+            'draft_allowed_domains' => 'array',
             'theme' => 'array',
+            'draft_theme' => 'array',
             'is_active' => 'boolean',
+            'draft_is_active' => 'boolean',
+            'published_at' => 'datetime',
         ];
     }
 
