@@ -65,6 +65,7 @@ const companyLinks = computed<NavLink[]>(() => [
   { to: '/app/importacoes', label: 'Importações', icon: 'fa-file-arrow-up', show: auth.canView('imports') },
   { to: '/app/widget', label: 'Provador', icon: 'fa-code', show: auth.canView('widget') },
   { to: '/app/integracoes', label: 'Integrações', icon: 'fa-plug', show: auth.canView('integrations') },
+  { to: '/app/sincronizacao', label: 'Sincronização', icon: 'fa-rotate', show: auth.canView('integrations') },
   { to: '/app/analytics', label: 'Analytics', icon: 'fa-chart-line', show: auth.canView('analytics') },
   { to: '/app/go-live', label: 'Go-live', icon: 'fa-rocket', show: auth.canView('go_live') },
   { to: '/app/usuarios', label: 'Usuários', icon: 'fa-users-gear', show: auth.canView('users') },

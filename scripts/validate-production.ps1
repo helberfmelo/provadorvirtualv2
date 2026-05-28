@@ -89,6 +89,8 @@ Assert-Page "/app/produtos"
 Assert-Page "/app/produtos/novo"
 Assert-Page "/app/tabelas-de-medidas"
 Assert-Page "/app/tabelas-de-medidas/nova"
+Assert-Page "/app/integracoes"
+Assert-Page "/app/sincronizacao"
 Assert-Page "/app/usuarios"
 Assert-Page "/app/usuarios/novo"
 

@@ -1696,3 +1696,31 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 109 no commit `6aaf8f4`, publicado com sucesso no run `26604636247`. Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit`, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo páginas públicas, SaaS, portal, `/app/integracoes`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 110 - Tela de sincronização e erros por produto
+
+Objetivo: criar uma tela limpa de sincronização, no padrão operacional observado na Sizebay, para revisar histórico, status, contadores e erros por produto antes de novas importações.
+
+Entregas:
+
+- criar endpoint protegido `GET /api/v1/integrations/sync-history`;
+- consolidar eventos `dry_run_import`, `sync_products` e `xml_feed_sync`;
+- anexar erros de `integration_events.payload.issues`, erros gerais do evento e erros de `import_jobs`;
+- normalizar contadores de produtos, variações, tabelas, erros e alertas;
+- criar rota `/app/sincronizacao`;
+- adicionar menu `Sincronização` no portal da empresa;
+- construir tela list-first com filtros por status/tipo, detalhe da execução, amostra de produtos e erros por produto;
+- ampliar validação de produção para cobrir `/app/integracoes` e `/app/sincronizacao`.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `vendor/bin/phpunit --filter IntegrationsApiTest`;
+- `vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter IntegrationsApiTest`, `vendor/bin/phpunit`, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`. Commit, push, Actions/deploy e validação de produção pendentes.

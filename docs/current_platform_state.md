@@ -222,6 +222,7 @@ Atualizado em: 2026-05-28
 - Sprint 108 enviada ao GitHub no commit `482631e`; o run `26603841134` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/widget`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
 - Sprint 109 inicia a importação segura da Zak: BigShop agora tem dry-run paginado de `products` e `product_grids`, join por `produtoid`, extração de tamanho de `caracteristicas`, erros por produto e painel de prévia em `/app/integracoes`, sem gravar produtos/tabelas.
 - Sprint 109 enviada ao GitHub no commit `6aaf8f4`; o run `26604636247` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/integracoes`, widget, APIs, CORS, login demo e go-live readiness.
+- Sprint 110 cria `/app/sincronizacao`: histórico limpo de eventos de sync/dry-run/XML com filtros, contadores, amostra de produtos e erros por produto, usando `integration_events` e `import_jobs`.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -238,7 +239,7 @@ Atualizado em: 2026-05-28
 
 ## Superficie atual
 
-- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/usuarios`.
+- Painel protegido: `/app`, `/app/produtos`, `/app/tabelas-de-medidas`, `/app/assistente`, `/app/analytics`, `/app/widget`, `/app/integracoes`, `/app/sincronizacao`, `/app/usuarios`.
 - Painel SaaS protegido por papel/permissão: `/saas`, `/saas/empresas`, `/saas/usuarios`, `/saas/checkout`, `/saas/pedidos` e `/saas/emails`, com entrada administrativa em `/saas/login`.
 - CRUDs do SaaS seguem padrão list-first: listagem ocupa a tela e novo/editar abre rota própria.
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
@@ -253,7 +254,8 @@ Atualizado em: 2026-05-28
 - Go-live protegido: `/api/v1/go-live/readiness` e `/app/go-live`.
 - Pacote comercial protegido: `/app/go-live` mostra links de venda, onboarding, automações e pendências reais.
 - Observabilidade pública: `/api/v1/ops/status`.
-- BigShop protegido: probe e sync em `/api/v1/integrations/bigshop/*`.
+- BigShop protegido: probe, dry-run e sync em `/api/v1/integrations/bigshop/*`.
+- Sincronização protegida: `GET /api/v1/integrations/sync-history` consolida eventos `dry_run_import`, `sync_products` e `xml_feed_sync` para `/app/sincronizacao`.
 - Monitor BigShop protegido: `GET /api/v1/integrations/bigshop/activations`.
 - Validação de instalação protegida: `POST /api/v1/integrations/{platform}/validate-install`.
 - BigShop público assinado: ativação em `/api/v1/public/bigshop/activate`.

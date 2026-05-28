@@ -248,6 +248,41 @@ class IntegrationController extends Controller
         ]);
     }
 
+    public function syncHistory(Request $request)
+    {
+        $merchant = $this->currentMerchant($request);
+        $company = $this->activeCompany($request, $merchant);
+        $events = IntegrationEvent::query()
+            ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->whereIn('event_type', ['dry_run_import', 'sync_products', 'xml_feed_sync'])
+            ->orderByDesc('occurred_at')
+            ->orderByDesc('id')
+            ->limit(30)
+            ->get();
+
+        $jobs = ImportJob::query()
+            ->where('merchant_id', $merchant->id)
+            ->whereIn('id', $events->map(fn (IntegrationEvent $event): mixed => data_get($event->summary, 'import_job_id'))->filter()->values())
+            ->get()
+            ->keyBy('id');
+
+        $items = $events->map(fn (IntegrationEvent $event): array => $this->syncHistoryItem(
+            $event,
+            $jobs->get(data_get($event->summary, 'import_job_id'))
+        ))->values();
+
+        return response()->json([
+            'data' => $items,
+            'meta' => [
+                'total' => $items->count(),
+                'with_errors' => $items->where('counters.errors', '>', 0)->count(),
+                'warnings' => $items->where('counters.warnings', '>', 0)->count(),
+                'last_status' => $items->first()['status'] ?? null,
+            ],
+        ]);
+    }
+
     private function statusFor(array $data, ?string $fallback): string
     {
         if (
@@ -260,6 +295,108 @@ class IntegrationController extends Controller
         }
 
         return $fallback ?: 'draft';
+    }
+
+    private function syncHistoryItem(IntegrationEvent $event, ?ImportJob $job): array
+    {
+        $summary = $event->summary ?? [];
+        $payload = $event->payload ?? [];
+        $issues = $this->syncIssues($event, $job);
+
+        return [
+            'id' => $event->id,
+            'platform' => $event->platform,
+            'event_type' => $event->event_type,
+            'title' => $this->syncEventTitle($event->event_type),
+            'status' => $event->status,
+            'occurred_at' => $event->occurred_at?->toISOString(),
+            'error' => $event->error,
+            'counters' => [
+                'products' => (int) (data_get($summary, 'products_read')
+                    ?? data_get($summary, 'products_synced')
+                    ?? data_get($summary, 'summary.products')
+                    ?? data_get($summary, 'total_rows')
+                    ?? 0),
+                'variants' => (int) (data_get($summary, 'variants_detected')
+                    ?? data_get($summary, 'variants_synced')
+                    ?? data_get($summary, 'summary.variants')
+                    ?? 0),
+                'tables' => (int) (data_get($summary, 'measurement_tables_synced')
+                    ?? data_get($summary, 'summary.measurement_tables')
+                    ?? 0),
+                'errors' => (int) (data_get($summary, 'errors_count')
+                    ?? data_get($summary, 'failed_rows')
+                    ?? $issues->where('severity', 'error')->count()),
+                'warnings' => (int) (data_get($summary, 'warnings_count')
+                    ?? $issues->where('severity', 'warning')->count()),
+            ],
+            'summary' => [
+                'products_valid' => data_get($summary, 'products_valid'),
+                'products_with_grids' => data_get($summary, 'products_with_grids'),
+                'products_without_grids' => data_get($summary, 'products_without_grids'),
+                'grids_read' => data_get($summary, 'grids_read'),
+                'grids_joined' => data_get($summary, 'grids_joined'),
+                'grids_without_product' => data_get($summary, 'grids_without_product'),
+                'grids_without_size' => data_get($summary, 'grids_without_size'),
+                'sizes_detected' => data_get($summary, 'sizes_detected'),
+                'import_job_id' => data_get($summary, 'import_job_id'),
+                'import_status' => data_get($summary, 'import_status'),
+                'feed_host' => data_get($summary, 'feed_host'),
+                'http_status' => data_get($summary, 'http_status'),
+            ],
+            'sample_products' => collect(data_get($payload, 'sample_products', []))->take(8)->values()->all(),
+            'issues' => $issues->take(80)->values()->all(),
+        ];
+    }
+
+    private function syncIssues(IntegrationEvent $event, ?ImportJob $job)
+    {
+        $issues = collect(data_get($event->payload ?? [], 'issues', []))
+            ->filter(fn (mixed $issue): bool => is_array($issue))
+            ->map(fn (array $issue): array => [
+                'severity' => in_array($issue['severity'] ?? null, ['error', 'warning'], true) ? $issue['severity'] : 'warning',
+                'code' => (string) ($issue['code'] ?? $event->event_type),
+                'product_id' => $issue['product_id'] ?? null,
+                'product_name' => $issue['product_name'] ?? null,
+                'grid_id' => $issue['grid_id'] ?? null,
+                'line' => $issue['line'] ?? null,
+                'message' => (string) ($issue['message'] ?? 'Pendência de sincronização.'),
+            ]);
+
+        if ($job?->errors) {
+            $issues = $issues->merge(collect($job->errors)->map(fn (array $row): array => [
+                'severity' => 'error',
+                'code' => 'import_row_failed',
+                'product_id' => data_get($row, 'data.sku') ?: data_get($row, 'data.external_product_id'),
+                'product_name' => data_get($row, 'data.name'),
+                'grid_id' => data_get($row, 'data.variant_sku'),
+                'line' => data_get($row, 'line'),
+                'message' => collect(data_get($row, 'errors', []))->filter()->join(' | ') ?: 'Linha não importada.',
+            ]));
+        }
+
+        if ($event->error) {
+            $issues->push([
+                'severity' => 'error',
+                'code' => 'sync_error',
+                'product_id' => null,
+                'product_name' => null,
+                'grid_id' => null,
+                'line' => null,
+                'message' => $event->error,
+            ]);
+        }
+
+        return $issues;
+    }
+
+    private function syncEventTitle(string $type): string
+    {
+        return [
+            'dry_run_import' => 'Prévia BigShop',
+            'sync_products' => 'Sync API BigShop',
+            'xml_feed_sync' => 'Sync XML/feed',
+        ][$type] ?? $type;
     }
 
     private function activeCompany(Request $request, Merchant $merchant): ?MerchantCompany

@@ -28,6 +28,7 @@ import SaasEmailsView from '../views/SaasEmailsView.vue'
 import SaasEmailSettingsView from '../views/SaasEmailSettingsView.vue'
 import SaasUserFormView from '../views/SaasUserFormView.vue'
 import SaasUsersView from '../views/SaasUsersView.vue'
+import SyncStatusView from '../views/SyncStatusView.vue'
 import TermsView from '../views/TermsView.vue'
 import UserFormView from '../views/UserFormView.vue'
 import UsersView from '../views/UsersView.vue'
@@ -61,6 +62,7 @@ const router = createRouter({
     { path: '/app/importacoes', component: ImportsView },
     { path: '/app/widget', component: WidgetInstallView },
     { path: '/app/integracoes', component: IntegrationsView },
+    { path: '/app/sincronizacao', component: SyncStatusView },
     { path: '/app/usuarios', component: UsersView },
     { path: '/app/usuarios/novo', component: UserFormView },
     { path: '/app/usuarios/:id/editar', component: UserFormView },

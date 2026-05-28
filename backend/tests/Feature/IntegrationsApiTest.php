@@ -235,6 +235,63 @@ XML, 200),
         ]);
     }
 
+    public function test_merchant_can_view_sync_history_with_product_errors(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $company = MerchantCompany::query()->where('external_store_id', 'pv-demo-store')->firstOrFail();
+
+        IntegrationEvent::query()->create([
+            'merchant_id' => $company->merchant_id,
+            'merchant_company_id' => $company->id,
+            'platform' => 'bigshop',
+            'event_type' => 'dry_run_import',
+            'direction' => 'outbound',
+            'status' => 'warning',
+            'summary' => [
+                'products_read' => 2,
+                'products_valid' => 2,
+                'grids_read' => 4,
+                'grids_joined' => 3,
+                'errors_count' => 1,
+                'warnings_count' => 2,
+            ],
+            'payload' => [
+                'sample_products' => [
+                    [
+                        'external_product_id' => 'BS-10',
+                        'name' => 'Vestido BigShop',
+                        'grid_count' => 2,
+                        'sizes' => ['P', 'M'],
+                    ],
+                ],
+                'issues' => [
+                    [
+                        'severity' => 'error',
+                        'code' => 'grid_product_not_found',
+                        'product_id' => 'BS-999',
+                        'product_name' => null,
+                        'grid_id' => 'G999',
+                        'message' => 'Grade aponta para produto que nao veio em products.',
+                    ],
+                ],
+            ],
+            'occurred_at' => now(),
+        ]);
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/integrations/sync-history')
+            ->assertOk()
+            ->assertJsonPath('meta.total', 1)
+            ->assertJsonPath('meta.with_errors', 1)
+            ->assertJsonPath('data.0.title', 'Prévia BigShop')
+            ->assertJsonPath('data.0.counters.products', 2)
+            ->assertJsonPath('data.0.counters.errors', 1)
+            ->assertJsonPath('data.0.sample_products.0.external_product_id', 'BS-10')
+            ->assertJsonPath('data.0.issues.0.product_id', 'BS-999')
+            ->assertJsonPath('data.0.issues.0.grid_id', 'G999');
+    }
+
     public function test_bigshop_contract_can_only_access_bigshop_integration(): void
     {
         $this->seed();

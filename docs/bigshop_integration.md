@@ -145,6 +145,12 @@ Status Sprint 109:
 - o dry-run cruza grades por `produtoid`, extrai tamanho de `caracteristicas` e devolve contadores, amostras e erros/alertas por produto;
 - `/app/integracoes` mostra a ação `Prévia segura` e um painel de revisão antes da sincronização real.
 
+Status Sprint 110:
+
+- `/app/sincronizacao` centraliza histórico de sync e dry-run em tela list-first;
+- `GET /api/v1/integrations/sync-history` consolida eventos `dry_run_import`, `sync_products` e `xml_feed_sync`;
+- a tela mostra status, contadores, amostra de produtos e erros por produto/grade vindos de `integration_events` e `import_jobs`.
+
 Detalhes completos do benchmark Sizebay/Zak: `docs/sizebay_zak_hyper_benchmark.md`.
 
 ## Integração de um clique

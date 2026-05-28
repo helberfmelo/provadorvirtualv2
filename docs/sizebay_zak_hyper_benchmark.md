@@ -581,7 +581,7 @@ Status Sprint 109: o dry-run BigShop foi implementado para produtos e `product_g
 
 ### P1 - Igualar operacao da Sizebay no portal do cliente
 
-- Criar tela "Sincronizacao" com historico, contadores e erros.
+- Tela "Sincronizacao" criada na Sprint 110 com historico, contadores, filtros e erros por produto.
 - Criar "Regras de importacao" com construtor visual simples.
 - Criar cadastro de modelagens.
 - Melhorar lista de produtos com status de configuracao do provador.

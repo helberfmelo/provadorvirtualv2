@@ -1115,3 +1115,13 @@
 - Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit` com 88 testes e 745 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`.
 - Commit `6aaf8f4` enviado para `main`; o run `26604636247` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo páginas públicas, SaaS, portal, `/app/integracoes`, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 110 Tela de sincronização e erros por produto
+
+- A segunda demanda da lista pós-benchmark foi iniciada: tela de sincronização com histórico e erros por produto.
+- Criado `GET /api/v1/integrations/sync-history`, consolidando `dry_run_import`, `sync_products` e `xml_feed_sync`.
+- O endpoint normaliza contadores e agrega erros vindos de `integration_events.payload.issues`, erro geral do evento e `import_jobs.errors`.
+- O portal ganhou `/app/sincronizacao`, menu próprio e tela list-first com filtros por status/tipo, detalhe da execução, amostra de produtos e seção `Erros por produto`.
+- `scripts/validate-production.ps1` passa a cobrir `/app/integracoes` e `/app/sincronizacao`.
+- Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter IntegrationsApiTest`, `vendor/bin/phpunit` com 89 testes e 755 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`.
+- Commit, push, Actions/deploy e validação de produção pendentes.
