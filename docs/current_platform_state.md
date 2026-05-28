@@ -225,6 +225,7 @@ Atualizado em: 2026-05-28
 - Sprint 110 cria `/app/sincronizacao`: histórico limpo de eventos de sync/dry-run/XML com filtros, contadores, amostra de produtos e erros por produto, usando `integration_events` e `import_jobs`.
 - Sprint 110 enviada ao GitHub no commit `efe87b8`; o run `26605323289` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 111 cria `/app/regras-de-importacao`: regras visuais por conexão para categoria, marca, gênero, faixa etária, status e modelagem, salvas em `platform_connections.import_rules` e usadas por dry-run/sync BigShop e XML/feed.
+- Sprint 111 enviada ao GitHub no commit `5d938ba`; o run `26606288957` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.

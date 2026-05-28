@@ -159,6 +159,7 @@ Status Sprint 111:
 - `BigShopDryRunService` exibe campos mapeados e alertas de regra obrigatória sem gravar catálogo;
 - `BigShopSyncService` aplica as regras em produtos, metadados e tabelas criadas pela API;
 - `XmlFeedSyncService` repassa as mesmas regras para importações Google XML/feed.
+- publicado no commit `5d938ba`, com deploy green no run `26606288957` e validação de produção incluindo `/app/regras-de-importacao`.
 
 Detalhes completos do benchmark Sizebay/Zak: `docs/sizebay_zak_hyper_benchmark.md`.
 

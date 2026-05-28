@@ -579,7 +579,7 @@ Usos praticos da IA:
 
 Status Sprint 109: o dry-run BigShop foi implementado para produtos e `product_grids` paginados, com join por `produtoid`, extracao de tamanho em `caracteristicas`, evento `dry_run_import` e painel de prévia em `/app/integracoes`. A importacao final segue bloqueada ate mapeamentos e modelo flexivel de tabelas.
 
-Status Sprint 111: a tela `/app/regras-de-importacao` foi criada com regras visuais por conexão para categoria, marca, genero, faixa etaria, status e modelagem. As regras passam a alimentar dry-run/sync BigShop e XML/feed.
+Status Sprint 111: a tela `/app/regras-de-importacao` foi criada com regras visuais por conexão para categoria, marca, genero, faixa etaria, status e modelagem. As regras passam a alimentar dry-run/sync BigShop e XML/feed. Publicado no commit `5d938ba`, run `26606288957`, com validação de produção OK.
 
 ### P1 - Igualar operacao da Sizebay no portal do cliente
 

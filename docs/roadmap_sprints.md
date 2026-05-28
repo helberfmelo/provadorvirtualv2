@@ -1751,4 +1751,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente. Validações locais passaram com `php -l`, PHPUnit com `pdo_sqlite/sqlite3` carregados por `-d`, `npm --prefix frontend run build` e `vendor/bin/pint --dirty`. Commit, push, Actions/deploy e validação de produção pendentes.
+Status: implementado na Sprint 111 no commit `5d938ba`, publicado com sucesso no run `26606288957`. Validações locais passaram com `php -l`, PHPUnit com `pdo_sqlite/sqlite3` carregados por `-d`, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
