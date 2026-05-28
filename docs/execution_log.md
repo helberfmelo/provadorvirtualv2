@@ -1113,4 +1113,5 @@
 - O endpoint protegido `POST /api/v1/integrations/bigshop/dry-run` retorna `dry_run=true` e registra evento `dry_run_import`.
 - `/app/integracoes` ganhou botão `Prévia segura` e painel com contadores, amostra de produtos, tamanhos detectados e lista de erros/alertas.
 - Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit` com 88 testes e 745 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`.
-- Commit, push, Actions/deploy e validação de produção pendentes.
+- Commit `6aaf8f4` enviado para `main`; o run `26604636247` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo páginas públicas, SaaS, portal, `/app/integracoes`, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.

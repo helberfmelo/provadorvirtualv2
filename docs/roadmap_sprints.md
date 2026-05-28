@@ -1695,4 +1695,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente. Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit`, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`. Commit, push, Actions/deploy e validação de produção pendentes.
+Status: implementado na Sprint 109 no commit `6aaf8f4`, publicado com sucesso no run `26604636247`. Validações locais passaram com `php -l`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit`, `npm --prefix frontend run build`, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo páginas públicas, SaaS, portal, `/app/integracoes`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.

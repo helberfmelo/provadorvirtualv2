@@ -221,6 +221,7 @@ Atualizado em: 2026-05-28
 - Sprint 108 corrige a personalização de botões com base na galeria correta `https://sizebay-buttons-gallery.vercel.app/`: `/app/widget` passa a listar 10 modelos próprios inspirados nos cards públicos da galeria, com cores de fundo/texto, prévia e animações equivalentes no widget.
 - Sprint 108 enviada ao GitHub no commit `482631e`; o run `26603841134` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/widget`, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
 - Sprint 109 inicia a importação segura da Zak: BigShop agora tem dry-run paginado de `products` e `product_grids`, join por `produtoid`, extração de tamanho de `caracteristicas`, erros por produto e painel de prévia em `/app/integracoes`, sem gravar produtos/tabelas.
+- Sprint 109 enviada ao GitHub no commit `6aaf8f4`; o run `26604636247` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/integracoes`, widget, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
