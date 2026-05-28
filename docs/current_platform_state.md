@@ -217,6 +217,7 @@ Atualizado em: 2026-05-28
 - Sprint 106 adiciona personalização de botões em `/app/widget`: estilos `Destaque com brilho`, `Minimal com ícones`, `Contorno leve` e `Pílulas suaves`, cores próprias de fundo/texto dos botões, lista vertical de seleção e prévia com as mesmas animações do widget público.
 - Sprint 106 enviada ao GitHub no commit `68b647a`; o run `26600519176` finalizou com sucesso e a validação de produção confirmou `/app/widget`, widget JS/CSS, APIs públicas, SaaS, portal e redirects legados.
 - Sprint 107 registra a Zak/loja BigShop `124` como cliente piloto real em local e producao, com token criptografado e sem segredos versionados; o benchmark completo do portal Sizebay da Zak fica em `docs/sizebay_zak_hyper_benchmark.md`.
+- Sprint 107 enviada ao GitHub no commit `931d09e`; o run `26602780031` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, widget, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
