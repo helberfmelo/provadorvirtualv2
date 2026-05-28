@@ -31,7 +31,7 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.platform', 'custom')
             ->assertJsonPath('data.is_active', true)
             ->assertJsonPath('data.theme.presentation_mode', 'drawer')
-            ->assertJsonPath('data.theme.button_style', 'gradient')
+            ->assertJsonPath('data.theme.button_style', 'gallery_1_text_icons')
             ->assertJsonPath('data.platform_guide.key', 'custom')
             ->assertJsonPath('data.platform_guide.guide.placement_label', 'Página de produto')
             ->assertJsonPath('data.platform_guides.0.key', 'bigshop');
@@ -49,7 +49,7 @@ class WidgetInstallApiTest extends TestCase
                     'secondary' => '#ff4d5e',
                     'accent' => '#17a398',
                     'presentation_mode' => 'modal',
-                    'button_style' => 'clean',
+                    'button_style' => 'gallery_10_badge_tooltip',
                     'button_background' => '#101820',
                     'button_text' => '#ffffff',
                 ],
@@ -61,7 +61,7 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.allowed_domains.1', 'localhost')
             ->assertJsonPath('data.theme.primary', '#101820')
             ->assertJsonPath('data.theme.presentation_mode', 'modal')
-            ->assertJsonPath('data.theme.button_style', 'clean')
+            ->assertJsonPath('data.theme.button_style', 'gallery_10_badge_tooltip')
             ->assertJsonPath('data.theme.button_background', '#101820')
             ->assertJsonPath('data.theme.button_text', '#ffffff')
             ->assertJsonPath('data.is_active', false)

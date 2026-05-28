@@ -1642,3 +1642,30 @@ Validação:
 - validação de produção após deploy.
 
 Status: implementado na Sprint 107 no commit `931d09e`, publicado com sucesso no run `26602780031`. Validações locais passaram com `php -l backend/app/Services/Integrations/BigShopClient.php`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit`, `vendor/bin/pint --dirty` e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo páginas públicas, SaaS, portal, widget, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 108 - Botões da galeria Sizebay correta
+
+Objetivo: corrigir a Sprint 106 para alinhar a personalização do widget aos 10 modelos da galeria pública correta da Sizebay, mantendo identidade própria, cores configuráveis e compatibilidade com estilos antigos.
+
+Entregas:
+
+- estudar a galeria correta `https://sizebay-buttons-gallery.vercel.app/` e mapear seus 10 padrões visuais sem copiar assets;
+- substituir a seleção do portal por 10 modelos próprios em lista vertical: texto com ícones, ícone lateral, bloco escuro, sublinhado, pílulas, linha central, editorial, pontilhado, bloco claro e selo novo;
+- atualizar a prévia do portal para refletir layout, cor de fundo, cor do texto, hover e animações de cada modelo;
+- atualizar o widget público para renderizar os 10 estilos com `theme.button_style`, `theme.button_background` e `theme.button_text`;
+- manter `gradient`, `clean`, `outline` e `soft` aceitos no backend/widget para compatibilidade com instalações já salvas;
+- atualizar testes e documentação registrando que a correção da galeria ficou na Sprint 108.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `node --check backend/public/widget/v1/provador-virtual.js`;
+- `vendor/bin/phpunit --filter Widget`;
+- `vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Validações locais passaram com `php -l`, `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit`, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, `git diff --check` e renderização Puppeteer dos 10 modelos. Commit, push, Actions/deploy e validação de produção pendentes.

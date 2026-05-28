@@ -98,7 +98,7 @@ class BigShopActivationService
                     'primary' => '#0f172a',
                     'secondary' => '#ff4d5e',
                     'accent' => '#ff7a1a',
-                    'button_style' => 'gradient',
+                    'button_style' => 'gallery_1_text_icons',
                     'button_background' => '#ff4d5e',
                     'button_text' => '#ffffff',
                     'confetti_enabled' => true,

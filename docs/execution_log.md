@@ -1092,3 +1092,14 @@
 - Validacoes locais passaram com `php -l backend/app/Services/Integrations/BigShopClient.php`, `vendor/bin/phpunit --filter BigShopIntegrationTest`, `vendor/bin/phpunit` com 87 testes e 717 assertions, `vendor/bin/pint --dirty` e `git diff --check`.
 - Commit `931d09e` enviado para `main`; o run `26602780031` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 108 Botões da galeria Sizebay correta
+
+- Confirmado que a Sprint 106 ficou incompleta em relação à galeria correta `https://sizebay-buttons-gallery.vercel.app/`.
+- A galeria pública foi renderizada e inspecionada em leitura para mapear os 10 modelos: texto com ícones, ícone lateral, bloco escuro, sublinhado, pílulas, linha central, editorial, pontilhado, bloco claro e selo novo com tooltip.
+- A tela `/app/widget` passa a selecionar os 10 modelos em lista vertical e mantém o box de cores de fundo/texto com prévia viva.
+- O widget público aceita os 10 novos valores `gallery_*`, aplica hover/animações coerentes com cada modelo e respeita redução de movimento.
+- Os valores antigos `gradient`, `clean`, `outline` e `soft` continuam aceitos no backend/widget para compatibilidade, enquanto o portal converte seleções antigas para a galeria nova.
+- Documentação atualizada em `widget_integration`, `sizebay_benchmark`, `sizebay_zak_hyper_benchmark`, `current_platform_state` e `roadmap_sprints`.
+- Validações locais passaram com `php -l`, `node --check backend/public/widget/v1/provador-virtual.js`, `vendor/bin/phpunit --filter Widget`, `vendor/bin/phpunit` com 87 testes e 727 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, `git diff --check` e renderização Puppeteer dos 10 modelos sem botões vazios ou sobrepostos.
+- Commit, push, Actions/deploy e validação de produção pendentes.

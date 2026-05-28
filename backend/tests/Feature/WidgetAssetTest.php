@@ -54,6 +54,16 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('<img class="pv-shape-image"', $scriptContents);
         $this->assertStringContainsString('loading="eager"', $scriptContents);
         $this->assertStringContainsString('.pv-trigger', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_1_text_icons', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_2_side_icons', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_3_dark_outline', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_4_underlined_icons', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_5_pills', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_6_split_line', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_7_editorial_links', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_8_dotted_stack', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_9_light_block', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_10_badge_tooltip', $cssContents);
         $this->assertStringContainsString('.pv-trigger-style-clean', $cssContents);
         $this->assertStringContainsString('.pv-trigger-style-outline', $cssContents);
         $this->assertStringContainsString('.pv-trigger-style-soft', $cssContents);

@@ -59,6 +59,23 @@ Principais aprendizados novos:
 - nossas tabelas precisam evoluir para medidas corporais, medidas da peça, sistema de tamanho, medidas compostas e ranges;
 - o portal deve continuar limpo, com cards/tabelas compactos, pouca cor, preview no contexto da PDP e ação clara de publicar/desfazer.
 
+## Releitura Sprint 108
+
+Em 2026-05-28, a galeria correta `https://sizebay-buttons-gallery.vercel.app/` foi renderizada e inspecionada especificamente para corrigir a personalização dos botões. Foram identificados 10 padrões públicos de apresentação, todos reinterpretados como estilos próprios do Provador Virtual:
+
+- texto com ícones;
+- cartões verticais com ícone lateral;
+- blocos escuros com inversão no hover;
+- links sublinhados com ícones;
+- pílulas verticais com movimento do ícone;
+- links compactos com linha central;
+- links editoriais sublinhados;
+- botões verticais com contorno pontilhado;
+- blocos claros com preenchimento no hover;
+- links com selo `novo` e tooltip no VFR.
+
+A Sprint 108 substitui a seleção antiga de 4 estilos por esses 10 modelos no portal e no widget público, mantendo `button_background` e `button_text` como controles de cor. Os estilos anteriores continuam aceitos tecnicamente apenas para compatibilidade.
+
 ## Contrato técnico observado na documentação
 
 ### Script

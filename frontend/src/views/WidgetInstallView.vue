@@ -35,7 +35,7 @@ type WidgetInstall = {
     font_size?: string
     font_weight?: string
     button_radius?: string
-    button_style?: 'gradient' | 'clean' | 'outline' | 'soft' | string
+    button_style?: string
     button_background?: string
     button_text?: string
     confetti_enabled?: boolean | string
@@ -83,7 +83,7 @@ const form = reactive({
     font_size: '14',
     font_weight: '800',
     button_radius: '8',
-    button_style: 'gradient',
+    button_style: 'gallery_1_text_icons',
     button_background: '#ff4d5e',
     button_text: '#ffffff',
     confetti_enabled: true,
@@ -138,30 +138,74 @@ const presentationModeOptions = [
 
 const buttonStyleOptions = [
   {
-    value: 'gradient',
-    label: 'Destaque com brilho',
-    icon: 'fa-wand-magic-sparkles',
-    description: 'Botão principal preenchido e tabela em contorno.',
-  },
-  {
-    value: 'clean',
-    label: 'Minimal com ícones',
+    value: 'gallery_1_text_icons',
+    label: '#1 Texto com ícones',
     icon: 'fa-ruler-combined',
-    description: 'Texto em caixa alta, ícones curtos e sublinhado animado.',
+    description: 'Links horizontais limpos com prefixos curtos e hover discreto.',
   },
   {
-    value: 'outline',
-    label: 'Contorno leve',
+    value: 'gallery_2_side_icons',
+    label: '#2 Ícone lateral',
+    icon: 'fa-table-list',
+    description: 'Botões empilhados com bloco lateral para o ícone.',
+  },
+  {
+    value: 'gallery_3_dark_outline',
     icon: 'fa-square',
-    description: 'Dois botões equivalentes com preenchimento no hover.',
+    label: '#3 Bloco escuro',
+    description: 'Botões preenchidos que invertem no hover.',
   },
   {
-    value: 'soft',
-    label: 'Pílulas suaves',
+    value: 'gallery_4_underlined_icons',
+    label: '#4 Sublinhado',
+    icon: 'fa-underline',
+    description: 'Links sublinhados com ícones antes do texto.',
+  },
+  {
+    value: 'gallery_5_pills',
+    label: '#5 Pílulas',
     icon: 'fa-capsules',
-    description: 'Bordas arredondadas, toque macio e elevação discreta.',
+    description: 'Botões empilhados em pílula com animação no ícone.',
+  },
+  {
+    value: 'gallery_6_split_line',
+    label: '#6 Linha central',
+    icon: 'fa-minus',
+    description: 'Links verticais compactos com divisor animado.',
+  },
+  {
+    value: 'gallery_7_editorial_links',
+    label: '#7 Editorial',
+    icon: 'fa-link',
+    description: 'Links sublinhados leves para lojas mais minimalistas.',
+  },
+  {
+    value: 'gallery_8_dotted_stack',
+    label: '#8 Pontilhado',
+    icon: 'fa-grip-lines',
+    description: 'Botões empilhados com borda pontilhada e hover preenchido.',
+  },
+  {
+    value: 'gallery_9_light_block',
+    label: '#9 Bloco claro',
+    icon: 'fa-square-full',
+    description: 'Botões claros que ficam preenchidos ao passar o mouse.',
+  },
+  {
+    value: 'gallery_10_badge_tooltip',
+    label: '#10 Selo novo',
+    icon: 'fa-certificate',
+    description: 'Links com selo no provador e dica ao passar o mouse.',
   },
 ]
+
+const buttonStyleValues = buttonStyleOptions.map((option) => option.value)
+const legacyButtonStyleMap: Record<string, string> = {
+  gradient: 'gallery_3_dark_outline',
+  clean: 'gallery_1_text_icons',
+  outline: 'gallery_3_dark_outline',
+  soft: 'gallery_5_pills',
+}
 
 const selectedButtonStyle = computed(() => {
   return buttonStyleOptions.find((option) => option.value === form.theme.button_style)
@@ -270,9 +314,10 @@ function fillForm(data: WidgetInstall) {
   form.theme.font_size = data.theme?.font_size || '14'
   form.theme.font_weight = data.theme?.font_weight || '800'
   form.theme.button_radius = data.theme?.button_radius || '8'
-  form.theme.button_style = ['gradient', 'clean', 'outline', 'soft'].includes(String(data.theme?.button_style))
-    ? String(data.theme?.button_style)
-    : 'gradient'
+  const buttonStyle = String(data.theme?.button_style || '')
+  form.theme.button_style = buttonStyleValues.includes(buttonStyle)
+    ? buttonStyle
+    : legacyButtonStyleMap[buttonStyle] || 'gallery_1_text_icons'
   form.theme.button_background = data.theme?.button_background || data.theme?.secondary || '#ff4d5e'
   form.theme.button_text = data.theme?.button_text || '#ffffff'
   form.theme.presentation_mode = data.theme?.presentation_mode === 'modal' ? 'modal' : 'drawer'

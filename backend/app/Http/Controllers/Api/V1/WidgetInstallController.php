@@ -10,6 +10,7 @@ use App\Models\MerchantCompany;
 use App\Models\WidgetInstall;
 use App\Services\Audit\AuditLogger;
 use App\Support\ActiveTenant;
+use App\Support\WidgetButtonStyleCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -109,7 +110,7 @@ class WidgetInstallController extends Controller
                     'font_size' => '14',
                     'font_weight' => '800',
                     'button_radius' => '8',
-                    'button_style' => 'gradient',
+                    'button_style' => WidgetButtonStyleCatalog::DEFAULT,
                     'button_background' => '#ff4d5e',
                     'button_text' => '#ffffff',
                     'confetti_enabled' => true,

@@ -3137,6 +3137,382 @@ textarea {
   box-shadow: 0 12px 24px rgba(17, 24, 39, 0.13);
 }
 
+.preview-widget-buttons.preview-button-style-gallery_1_text_icons,
+.button-live-preview.preview-button-style-gallery_1_text_icons,
+.button-option-preview.preview-button-style-gallery_1_text_icons {
+  gap: 16px;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_1_text_icons button,
+.button-live-preview.preview-button-style-gallery_1_text_icons button {
+  min-height: 32px;
+  padding: 4px 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  box-shadow: none;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_1_text_icons button span,
+.button-live-preview.preview-button-style-gallery_1_text_icons button span {
+  color: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-gallery_1_text_icons button:hover,
+.button-live-preview.preview-button-style-gallery_1_text_icons button:hover {
+  color: var(--pv-preview-button-bg);
+  box-shadow: none;
+}
+
+.button-option-preview.preview-button-style-gallery_1_text_icons span {
+  border: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+}
+
+.button-option-preview.preview-button-style-gallery_1_text_icons span::first-letter {
+  color: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-gallery_2_side_icons,
+.button-live-preview.preview-button-style-gallery_2_side_icons,
+.button-option-preview.preview-button-style-gallery_2_side_icons {
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_2_side_icons button,
+.button-live-preview.preview-button-style-gallery_2_side_icons button {
+  justify-content: flex-start;
+  width: min(280px, 100%);
+  min-height: 46px;
+  padding: 0 12px 0 0;
+  border-color: #e5e7eb;
+  border-radius: 10px;
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+  box-shadow: 0 1px 3px rgba(17, 24, 39, 0.16);
+  font-size: 0.88em;
+  text-transform: uppercase;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_2_side_icons button span,
+.button-live-preview.preview-button-style-gallery_2_side_icons button span {
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  margin-right: 8px;
+  place-items: center;
+  border-radius: 9px 0 0 9px;
+  color: var(--pv-preview-button-bg);
+  background: #f3f4f6;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_2_side_icons button:hover,
+.button-live-preview.preview-button-style-gallery_2_side_icons button:hover {
+  color: var(--pv-preview-button-bg);
+  background: #fff;
+}
+
+.button-option-preview.preview-button-style-gallery_2_side_icons span {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: 8px;
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-gallery_3_dark_outline button,
+.button-live-preview.preview-button-style-gallery_3_dark_outline button {
+  min-height: 42px;
+  padding: 12px 16px;
+  border-color: transparent;
+  border-radius: 0;
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+  box-shadow: 0 0 0 1px var(--pv-preview-button-text);
+}
+
+.preview-widget-buttons.preview-button-style-gallery_3_dark_outline button:hover,
+.button-live-preview.preview-button-style-gallery_3_dark_outline button:hover {
+  color: var(--pv-preview-button-bg);
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--pv-preview-button-bg);
+}
+
+.button-option-preview.preview-button-style-gallery_3_dark_outline span {
+  border-color: var(--pv-preview-button-text);
+  border-radius: 0;
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-gallery_4_underlined_icons button,
+.button-live-preview.preview-button-style-gallery_4_underlined_icons button,
+.preview-widget-buttons.preview-button-style-gallery_7_editorial_links button,
+.button-live-preview.preview-button-style-gallery_7_editorial_links button {
+  min-height: 34px;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  box-shadow: none;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_4_underlined_icons button span,
+.button-live-preview.preview-button-style-gallery_4_underlined_icons button span {
+  display: inline-grid;
+  width: 24px;
+  height: 24px;
+  margin-right: 6px;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.78em;
+  text-decoration: none;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_4_underlined_icons button:hover,
+.button-live-preview.preview-button-style-gallery_4_underlined_icons button:hover,
+.preview-widget-buttons.preview-button-style-gallery_7_editorial_links button:hover,
+.button-live-preview.preview-button-style-gallery_7_editorial_links button:hover {
+  color: var(--pv-preview-button-bg);
+  box-shadow: none;
+}
+
+.button-option-preview.preview-button-style-gallery_4_underlined_icons span,
+.button-option-preview.preview-button-style-gallery_7_editorial_links span {
+  border: 0;
+  border-radius: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_5_pills,
+.button-live-preview.preview-button-style-gallery_5_pills,
+.preview-widget-buttons.preview-button-style-gallery_8_dotted_stack,
+.button-live-preview.preview-button-style-gallery_8_dotted_stack,
+.button-option-preview.preview-button-style-gallery_5_pills,
+.button-option-preview.preview-button-style-gallery_8_dotted_stack {
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_5_pills button,
+.button-live-preview.preview-button-style-gallery_5_pills button,
+.preview-widget-buttons.preview-button-style-gallery_8_dotted_stack button,
+.button-live-preview.preview-button-style-gallery_8_dotted_stack button {
+  width: min(300px, 100%);
+  min-height: 38px;
+  justify-content: center;
+  padding: 10px 12px;
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-gallery_5_pills button,
+.button-live-preview.preview-button-style-gallery_5_pills button,
+.button-option-preview.preview-button-style-gallery_5_pills span {
+  border-color: #e5e7eb;
+  border-radius: 999px;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_5_pills button:first-child span,
+.button-live-preview.preview-button-style-gallery_5_pills button:first-child span {
+  animation: pv-preview-button-swing 2s ease-in-out infinite;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_6_split_line,
+.button-live-preview.preview-button-style-gallery_6_split_line,
+.button-option-preview.preview-button-style-gallery_6_split_line {
+  flex-direction: column;
+  gap: 0;
+  align-items: center;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_6_split_line button,
+.button-live-preview.preview-button-style-gallery_6_split_line button {
+  width: min(230px, 100%);
+  min-height: 24px;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.9em;
+  text-transform: uppercase;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_6_split_line button:first-child::after,
+.button-live-preview.preview-button-style-gallery_6_split_line button:first-child::after {
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: min(160px, 100%);
+  height: 1px;
+  content: "";
+  background: var(--pv-preview-button-bg);
+  transform: translateX(-50%);
+  transition: width 180ms ease;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_6_split_line button:first-child:hover::after,
+.button-live-preview.preview-button-style-gallery_6_split_line button:first-child:hover::after {
+  width: min(190px, 100%);
+}
+
+.button-option-preview.preview-button-style-gallery_6_split_line span {
+  border: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  text-transform: uppercase;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_7_editorial_links button,
+.button-live-preview.preview-button-style-gallery_7_editorial_links button {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_7_editorial_links button span,
+.button-live-preview.preview-button-style-gallery_7_editorial_links button span {
+  display: none;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_8_dotted_stack button,
+.button-live-preview.preview-button-style-gallery_8_dotted_stack button,
+.button-option-preview.preview-button-style-gallery_8_dotted_stack span {
+  border: 1px dotted #e5e7eb;
+  border-radius: 0;
+  color: var(--pv-preview-button-text);
+  background: transparent;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_8_dotted_stack button:hover,
+.button-live-preview.preview-button-style-gallery_8_dotted_stack button:hover {
+  border-style: solid;
+  background: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-gallery_9_light_block button,
+.button-live-preview.preview-button-style-gallery_9_light_block button,
+.button-option-preview.preview-button-style-gallery_9_light_block span {
+  min-height: 42px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 0;
+  color: var(--pv-preview-button-bg);
+  background: #fff;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_9_light_block button:hover,
+.button-live-preview.preview-button-style-gallery_9_light_block button:hover {
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+}
+
+.preview-widget-buttons.preview-button-style-gallery_10_badge_tooltip button,
+.button-live-preview.preview-button-style-gallery_10_badge_tooltip button {
+  min-height: 34px;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.94em;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_10_badge_tooltip button span,
+.button-live-preview.preview-button-style-gallery_10_badge_tooltip button span {
+  display: inline-grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+  font-size: 0.72em;
+  text-decoration: none;
+}
+
+.preview-widget-buttons.preview-button-style-gallery_10_badge_tooltip button:first-child::after,
+.button-live-preview.preview-button-style-gallery_10_badge_tooltip button:first-child::after {
+  display: inline-flex;
+  min-width: 30px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  margin-left: 6px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  content: "novo";
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+  font-size: 0.66em;
+  font-weight: 900;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.button-option-preview.preview-button-style-gallery_10_badge_tooltip span {
+  border: 0;
+  color: var(--pv-preview-text);
+  background: transparent;
+  text-decoration: underline;
+}
+
+.button-option-preview.preview-button-style-gallery_10_badge_tooltip span:first-child::after {
+  margin-left: 4px;
+  padding: 1px 4px;
+  border-radius: 999px;
+  content: "novo";
+  color: var(--pv-preview-button-text);
+  background: var(--pv-preview-button-bg);
+  font-size: 0.64rem;
+  text-decoration: none;
+}
+
+@keyframes pv-preview-button-swing {
+  0% {
+    transform: rotate(-14deg);
+  }
+
+  50% {
+    transform: rotate(14deg);
+  }
+
+  100% {
+    transform: rotate(-14deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-widget-buttons button,
+  .button-live-preview button,
+  .button-live-preview button span,
+  .preview-widget-buttons button::after,
+  .button-live-preview button::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
 .preview-widget-buttons.preview-button-style-gradient button:first-child,
 .button-live-preview.preview-button-style-gradient button:first-child {
   color: var(--pv-preview-button-text);

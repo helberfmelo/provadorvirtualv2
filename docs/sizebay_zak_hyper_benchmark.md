@@ -316,7 +316,8 @@ Funcionalidades observadas:
 O que copiar/adaptar:
 
 - A Sprint 106 criou a base de personalizacao de botoes.
-- Proximo passo: ampliar para a galeria completa de estilos, preview mobile/desktop e fluxo publicar/desfazer.
+- A Sprint 108 amplia a personalizacao para os 10 modelos da galeria correta, com estilos proprios e compatibilidade com os valores antigos.
+- Proximos passos: preview mobile/desktop real e fluxo publicar/desfazer.
 - Botao deve ser configurado visualmente no contexto da pagina, nao isolado.
 
 ### Settings - VFR Customization
@@ -586,7 +587,7 @@ Usos praticos da IA:
 
 ### P2 - Melhorar widget/personalizacao
 
-- Ampliar a galeria de botoes para a colecao completa inspirada na Sizebay, com variacoes e animacoes.
+- A galeria de botoes foi ampliada na Sprint 108 para 10 modelos inspirados na galeria publica correta, com variacoes e animacoes proprias.
 - Adicionar preview desktop/mobile real.
 - Separar configuracao salva de configuracao publicada.
 - Criar "desfazer alteracoes" e "publicar" para widget.
@@ -602,9 +603,9 @@ Usos praticos da IA:
 
 ## Sprint sugerida depois deste benchmark
 
-1. Sprint 108 - Importacao BigShop Zak em dry-run.
-2. Sprint 109 - Modelagens, marcas e categorias normalizadas.
-3. Sprint 110 - Tabela de medidas flexivel.
-4. Sprint 111 - Sync visual com erros e regras de importacao.
-5. Sprint 112 - Publicacao/preview do widget como Sizebay.
-6. Sprint 113 - Analytics de uso e base de IA.
+1. Sprint 109 - Importacao BigShop Zak em dry-run.
+2. Sprint 110 - Modelagens, marcas e categorias normalizadas.
+3. Sprint 111 - Tabela de medidas flexivel.
+4. Sprint 112 - Sync visual com erros e regras de importacao.
+5. Sprint 113 - Publicacao/preview do widget como Sizebay.
+6. Sprint 114 - Analytics de uso e base de IA.

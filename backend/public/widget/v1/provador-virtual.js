@@ -360,10 +360,25 @@
   }
 
   function buttonStyle() {
-    var style = config.theme && config.theme.button_style ? String(config.theme.button_style).toLowerCase() : 'gradient';
-    var allowed = ['gradient', 'clean', 'outline', 'soft'];
+    var style = config.theme && config.theme.button_style ? String(config.theme.button_style).toLowerCase() : 'gallery_1_text_icons';
+    var allowed = [
+      'gallery_1_text_icons',
+      'gallery_2_side_icons',
+      'gallery_3_dark_outline',
+      'gallery_4_underlined_icons',
+      'gallery_5_pills',
+      'gallery_6_split_line',
+      'gallery_7_editorial_links',
+      'gallery_8_dotted_stack',
+      'gallery_9_light_block',
+      'gallery_10_badge_tooltip',
+      'gradient',
+      'clean',
+      'outline',
+      'soft',
+    ];
 
-    return allowed.indexOf(style) >= 0 ? style : 'gradient';
+    return allowed.indexOf(style) >= 0 ? style : 'gallery_1_text_icons';
   }
 
   function openRecommendationDrawer() {

@@ -198,7 +198,7 @@ class DatabaseSeeder extends Seeder
                     'font_size' => '14',
                     'font_weight' => '800',
                     'button_radius' => '8',
-                    'button_style' => 'gradient',
+                    'button_style' => 'gallery_1_text_icons',
                     'button_background' => '#ff4d5e',
                     'button_text' => '#ffffff',
                     'confetti_enabled' => true,
