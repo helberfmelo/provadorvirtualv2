@@ -231,6 +231,7 @@ Atualizado em: 2026-05-28
 - Sprint 113 cria cadastro de modelagens em `fit_profiles`, com API `/api/v1/fit-profiles`, tela `/app/modelagens`, uso em produtos/tabelas e bloqueio de remoção quando a modelagem está vinculada.
 - Sprint 113 enviada ao GitHub no commit `85f7cec`; o run `26607795341` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/modelagens`, `/app/tabelas-de-medidas`, `/app/produtos`, `/app/regras-de-importacao`, `/app/integracoes`, `/app/sincronizacao`, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 114 separa rascunho e configuração publicada do widget, com `mode=draft/publish/discard`, botões Salvar rascunho/Publicar/Desfazer e preview desktop/mobile em `/app/widget`.
+- Sprint 114 enviada ao GitHub no commit `a6e1ff1`; o run `26608432348` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/widget`, widget, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.

@@ -1173,4 +1173,5 @@
 - `/app/widget` passou a salvar rascunho, publicar, desfazer rascunho e indicar `Publicado`, `Rascunho salvo` ou `Alterações locais`.
 - O visualizador ganhou alternância Desktop/Mobile, mantendo os 10 modelos da galeria Sprint 108.
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetInstallApiTest`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter WidgetAssetTest`, PHPUnit completo com 91 testes e 825 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
-- Commit, push, Actions/deploy e validação de produção pendentes.
+- Commit `a6e1ff1` enviado para `main`; o run `26608432348` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/widget`, páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
