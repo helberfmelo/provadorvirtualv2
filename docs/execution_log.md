@@ -1293,5 +1293,8 @@
 - Criada a página pública `/termos/troca-bigshop`.
 - A tela `/app/integracoes` ganhou orientação de Google Tag Manager como caminho opcional para plataformas sem app/tema simples, usando container na PDP, tag HTML personalizada e validação antes de publicar.
 - Documentação atualizada em guias de integração, arquitetura, widget e estado atual da plataforma.
-- Validações locais passaram com `npm --prefix frontend run build`, `php -l`, `vendor/bin/pint --dirty` e `git diff --check`.
-- Testes focados `MerchantCompanyProfileApiTest`, `IntegrationChangeRequestApiTest` e `SaasAdminApiTest` ficaram bloqueados localmente porque o PHP deste ambiente não tem driver SQLite (`could not find driver`).
+- Validações locais passaram com `php -d extension_dir=... -d extension=php_pdo_sqlite.dll -d extension=php_sqlite3.dll vendor/bin/phpunit` (102 testes, 927 assertions), `npm --prefix frontend run build`, `php -l`, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`.
+- O primeiro push `9e16705` falhou no CI porque o teste novo não limpava o guard Sanctum entre duas requisições simuladas; corrigido em `c5b90e6`.
+- O segundo push passou na validação backend, mas o deploy remoto falhou em MySQL strict mode por `timestamp not null` sem default em `requested_at`; ajustado para `dateTime` em `49c94e4`.
+- Commit final `49c94e4` enviado para `main`; o run `26617845717` do GitHub Actions finalizou com sucesso, incluindo validação backend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, SaaS, portal da empresa, páginas públicas, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.

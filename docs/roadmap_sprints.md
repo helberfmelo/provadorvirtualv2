@@ -2083,9 +2083,9 @@ Validação:
 - `npm --prefix frontend run build`;
 - `php -l` nos arquivos PHP alterados;
 - `vendor/bin/pint --dirty`;
+- `php -d extension_dir=... -d extension=php_pdo_sqlite.dll -d extension=php_sqlite3.dll vendor/bin/phpunit`;
 - `git diff --check`;
-- testes focados `MerchantCompanyProfileApiTest`, `IntegrationChangeRequestApiTest` e `SaasAdminApiTest` bloqueados localmente por ausência do driver SQLite (`could not find driver`);
 - GitHub Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente e pronto para publicação da Sprint 123. O monitoramento do GitHub Actions e a validação de produção devem ser registrados após o push.
+Status: implementado na Sprint 123 nos commits `9e16705`, `c5b90e6` e `49c94e4`, publicado com sucesso no run `26617845717`. Validações locais passaram com PHPUnit completo (102 testes, 927 assertions), build frontend, `php -l`, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
