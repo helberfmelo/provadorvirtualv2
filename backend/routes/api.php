@@ -121,6 +121,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,dashboard,edit');
         Route::patch('/merchant/company-profile', [MerchantCompanyProfileController::class, 'update'])
             ->middleware('portal.permission:merchant,dashboard,edit');
+        Route::patch('/merchant/company-platform', [MerchantCompanyProfileController::class, 'updatePlatform'])
+            ->middleware('portal.permission:merchant,integrations,edit');
         Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index'])
             ->middleware('portal.permission:merchant,measurement_tables,view');
         Route::apiResource('fit-profiles', FitProfileController::class)

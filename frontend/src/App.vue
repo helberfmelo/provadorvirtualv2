@@ -71,6 +71,7 @@ const workViewKey = computed(() => {
 
   return `${route.fullPath}:company:${auth.activeCompany?.id || 'none'}`
 })
+const workContextReady = computed(() => !isWorkRoute.value || !auth.isAuthenticated || auth.initialized)
 
 const publicLinks = computed<NavLink[]>(() => [
   ...(publicPlatformLink.value ? [publicPlatformLink.value] : []),
@@ -110,7 +111,7 @@ const visibleWorkLinks = computed(() => (
 ).filter((link) => link.show))
 
 onMounted(() => {
-  auth.loadMe().catch(() => undefined)
+  auth.ensureLoaded().catch(() => undefined)
   cookieNoticeVisible.value = !hasCookieNoticeAcceptance()
 })
 
@@ -246,7 +247,8 @@ function handleBrandClick(event: MouseEvent) {
 
         <label v-if="isCompanyRoute && auth.isAuthenticated && auth.companyOptions.length > 1" class="company-switcher">
           <span>Empresa</span>
-          <select :value="auth.activeCompany?.id || ''" @change="switchCompany">
+          <select :value="auth.activeCompany?.id || ''" :disabled="auth.loadingMe" @change="switchCompany">
+            <option v-if="!auth.activeCompany" value="" disabled>Selecione</option>
             <option v-for="company in auth.companyOptions" :key="company.id" :value="company.id">
               {{ company.name }}
             </option>
@@ -296,7 +298,10 @@ function handleBrandClick(event: MouseEvent) {
       </aside>
 
       <main class="work-main">
-        <RouterView :key="workViewKey" />
+        <div v-if="!workContextReady" class="empty-state work-context-loading">
+          Carregando contexto da empresa...
+        </div>
+        <RouterView v-else :key="workViewKey" />
       </main>
     </div>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { api } from '../services/api'
 import { showFeedback } from '../services/saveFeedback'
 import { useAuthStore } from '../stores/auth'
@@ -123,13 +123,27 @@ type BigShopDryRunResult = {
 }
 
 const auth = useAuthStore()
+const platformOptions = [
+  { value: 'bigshop', label: 'BigShop' },
+  { value: 'shopify', label: 'Shopify' },
+  { value: 'woocommerce', label: 'WooCommerce' },
+  { value: 'nuvemshop', label: 'Nuvemshop' },
+  { value: 'vtex', label: 'VTEX' },
+  { value: 'tray', label: 'Tray' },
+  { value: 'loja_integrada', label: 'Loja Integrada' },
+  { value: 'magento', label: 'Magento' },
+  { value: 'opencart', label: 'OpenCart' },
+  { value: 'custom', label: 'Personalizada' },
+]
 const platforms = ref<Platform[]>([])
 const selectedKey = ref('bigshop')
 const loading = ref(false)
 const saving = ref(false)
+const savingCompanyPlatform = ref(false)
 const running = ref(false)
 const validating = ref(false)
 const copied = ref(false)
+const loadError = ref('')
 const integrationReport = ref<Record<string, number | string> | null>(null)
 const validation = ref<ValidationResult | null>(null)
 const bigShopActivations = ref<BigShopActivation[]>([])
@@ -144,6 +158,9 @@ const form = reactive({
   access_token: '',
   webhook_secret: '',
   validation_url: '',
+})
+const companyPlatformForm = reactive({
+  platform: auth.activeCompany?.platform || 'custom',
 })
 
 const selected = computed(() => platforms.value.find((platform) => platform.key === selectedKey.value) || platforms.value[0] || null)
@@ -246,6 +263,20 @@ const isBigShopContract = computed(() => {
   return auth.activeCompany?.platform === 'bigshop'
     || (platforms.value.length === 1 && platforms.value[0]?.key === 'bigshop')
 })
+const companyPlatformLabel = computed(() => platformLabel(auth.activeCompany?.platform || companyPlatformForm.platform))
+const companyPlatformOptions = computed(() => {
+  return isBigShopContract.value
+    ? platformOptions.filter((platform) => platform.value === 'bigshop')
+    : platformOptions.filter((platform) => platform.value !== 'bigshop')
+})
+const canEditCompanyPlatform = computed(() => !isBigShopContract.value && auth.canEdit('integrations'))
+const companyPlatformHelp = computed(() => {
+  if (isBigShopContract.value) {
+    return 'Definida no cadastro da empresa no SaaS. No contrato BigShop, o portal mantém somente a integração BigShop.'
+  }
+
+  return 'O lojista informa aqui quando precisa trocar a plataforma operacional. O SaaS também pode alterar em Empresas > editar.'
+})
 const fieldHelp = {
   external_store_id: 'Informe o identificador da loja na plataforma. Na BigShop, use o store_id da loja.',
   api_base_url: 'Informe a URL base da API quando a plataforma tiver API autenticada. Na BigShop, use a API V3.',
@@ -261,19 +292,47 @@ onMounted(() => {
   loadPlatforms()
 })
 
+watch(() => auth.activeCompany?.platform, (platform) => {
+  companyPlatformForm.platform = platform || 'custom'
+}, { immediate: true })
+
+watch(() => auth.activeCompany?.id, (companyId, previousCompanyId) => {
+  if (!companyId || companyId === previousCompanyId) {
+    return
+  }
+
+  loadPlatforms()
+})
+
 async function loadPlatforms() {
   loading.value = true
+  loadError.value = ''
 
   try {
     const { data } = await api.get('/integrations')
-    platforms.value = data.data
+    platforms.value = Array.isArray(data.data) ? data.data : []
 
-    if (!platforms.value.find((platform) => platform.key === selectedKey.value)) {
-      selectedKey.value = platforms.value[0]?.key || 'bigshop'
+    if (!platforms.value.length) {
+      selectedKey.value = ''
+      fillForm(null)
+      return
+    }
+
+    const preferredKey = preferredPlatformKey()
+    if (
+      !platforms.value.find((platform) => platform.key === selectedKey.value)
+      || (selectedKey.value === 'bigshop' && preferredKey !== 'bigshop')
+    ) {
+      selectedKey.value = preferredKey
     }
 
     fillForm()
     await loadBigShopActivations()
+  } catch (requestError: any) {
+    platforms.value = []
+    selectedKey.value = ''
+    fillForm(null)
+    loadError.value = friendlyRequestMessage(requestError, 'Não foi possível carregar as integrações da empresa ativa.')
   } finally {
     loading.value = false
   }
@@ -288,7 +347,7 @@ function selectPlatform(platform: Platform) {
   loadBigShopActivations()
 }
 
-function fillForm(platform = selected.value) {
+function fillForm(platform: Platform | null = selected.value) {
   form.external_store_id = platform?.connection?.external_store_id || ''
   form.api_base_url = platform?.connection?.api_base_url || ''
   form.feed_url = platform?.connection?.feed_url || ''
@@ -296,6 +355,37 @@ function fillForm(platform = selected.value) {
   form.status = platform?.status || platform?.connection?.status || 'draft'
   form.access_token = ''
   form.webhook_secret = ''
+}
+
+async function saveCompanyPlatform() {
+  if (!canEditCompanyPlatform.value || companyPlatformForm.platform === auth.activeCompany?.platform) {
+    return
+  }
+
+  savingCompanyPlatform.value = true
+
+  try {
+    await api.patch('/merchant/company-platform', {
+      platform: companyPlatformForm.platform,
+    })
+    selectedKey.value = companyPlatformForm.platform
+    await auth.loadMe()
+    await loadPlatforms()
+    showFeedback({
+      status: 'success',
+      title: 'Plataforma atualizada',
+      message: 'As instruções e opções de integração foram atualizadas para a plataforma da loja.',
+    })
+  } catch (requestError: any) {
+    companyPlatformForm.platform = auth.activeCompany?.platform || 'custom'
+    showFeedback({
+      status: 'error',
+      title: 'Não foi possível salvar a plataforma',
+      message: friendlyRequestMessage(requestError, 'Não foi possível alterar a plataforma da loja.'),
+    })
+  } finally {
+    savingCompanyPlatform.value = false
+  }
 }
 
 async function savePlatform() {
@@ -535,6 +625,16 @@ function statusLabel(status: string) {
   }[status] || status
 }
 
+function platformLabel(platform: string) {
+  return platformOptions.find((option) => option.value === platform)?.label || 'Personalizada'
+}
+
+function preferredPlatformKey() {
+  const platform = auth.activeCompany?.platform || companyPlatformForm.platform
+
+  return platforms.value.find((item) => item.key === platform)?.key || platforms.value[0]?.key || ''
+}
+
 function checkStatus(key: string) {
   return validation.value?.checks.find((check) => check.key === key)?.status || 'pending'
 }
@@ -562,6 +662,7 @@ function friendlyRequestMessage(requestError: any, fallback: string) {
     || requestError.response?.data?.errors?.feed_url?.[0]
     || requestError.response?.data?.errors?.url?.[0]
     || requestError.response?.data?.errors?.bigshop?.[0]
+    || requestError.response?.data?.errors?.platform?.[0]
     || fallback
 }
 
@@ -613,6 +714,10 @@ function canRunBigShopApiAction() {
     </p>
 
     <div v-if="loading" class="empty-state">Carregando integrações...</div>
+    <div v-else-if="loadError" class="empty-state">{{ loadError }}</div>
+    <div v-else-if="!platforms.length" class="empty-state">
+      Nenhuma plataforma foi encontrada para a empresa ativa. Atualize a página ou revise o cadastro da empresa no SaaS.
+    </div>
 
     <div v-else class="integrations-stack">
       <form class="admin-form integrations-form" @submit.prevent="savePlatform">
@@ -620,6 +725,34 @@ function canRunBigShopApiAction() {
           <div class="subsection-heading">
             <h2>Plataforma</h2>
             <span>{{ platformModeLabel }}</span>
+          </div>
+
+          <div class="company-platform-source">
+            <div>
+              <small>Plataforma da loja</small>
+              <strong>{{ companyPlatformLabel }}</strong>
+              <span>{{ companyPlatformHelp }}</span>
+            </div>
+            <div class="company-platform-controls">
+              <select
+                v-model="companyPlatformForm.platform"
+                :disabled="!canEditCompanyPlatform || savingCompanyPlatform"
+              >
+                <option v-for="platform in companyPlatformOptions" :key="platform.value" :value="platform.value">
+                  {{ platform.label }}
+                </option>
+              </select>
+              <button
+                v-if="canEditCompanyPlatform"
+                class="btn btn-secondary btn-compact"
+                type="button"
+                :disabled="savingCompanyPlatform || companyPlatformForm.platform === auth.activeCompany?.platform"
+                @click="saveCompanyPlatform"
+              >
+                <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                {{ savingCompanyPlatform ? 'Salvando...' : 'Salvar plataforma' }}
+              </button>
+            </div>
           </div>
 
           <div class="integration-platform-summary">

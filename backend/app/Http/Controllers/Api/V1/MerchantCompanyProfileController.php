@@ -10,6 +10,7 @@ use App\Support\PlatformCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class MerchantCompanyProfileController extends Controller
 {
@@ -39,6 +40,42 @@ class MerchantCompanyProfileController extends Controller
 
         $company->ensureAccessCode();
         $this->renamePlaceholderMerchant($merchant, $company);
+
+        return response()->json([
+            'data' => $this->serializeCompany($company->fresh() ?? $company),
+        ]);
+    }
+
+    public function updatePlatform(Request $request)
+    {
+        $merchant = app(ActiveTenant::class)->merchant($request);
+        $company = app(ActiveTenant::class)->company($request, $merchant);
+
+        abort_if(! $company, 404, 'Empresa ativa não encontrada.');
+
+        $request->merge([
+            'platform' => $request->input('platform') ?: 'custom',
+        ]);
+
+        $data = $request->validate([
+            'platform' => ['required', 'string', Rule::in(PlatformCatalog::keys())],
+        ]);
+
+        if ($company->platform === 'bigshop' && $data['platform'] !== 'bigshop') {
+            throw ValidationException::withMessages([
+                'platform' => ['Plano BigShop ativo: altere a plataforma pelo cadastro da empresa no SaaS.'],
+            ]);
+        }
+
+        if ($company->platform !== 'bigshop' && $data['platform'] === 'bigshop') {
+            throw ValidationException::withMessages([
+                'platform' => ['A plataforma BigShop deve ser ativada pelo cadastro da empresa no SaaS.'],
+            ]);
+        }
+
+        $company->forceFill([
+            'platform' => $data['platform'],
+        ])->save();
 
         return response()->json([
             'data' => $this->serializeCompany($company->fresh() ?? $company),
@@ -129,7 +166,22 @@ class MerchantCompanyProfileController extends Controller
             'platform' => $company->platform,
             'external_store_id' => $company->external_store_id,
             'status' => $company->status,
-            'profile_completed' => true,
+            'profile_completed' => $this->companyProfileCompleted($company),
         ];
+    }
+
+    private function companyProfileCompleted(MerchantCompany $company): bool
+    {
+        if (Str::startsWith((string) $company->name, 'Empresa CNPJ ')) {
+            return false;
+        }
+
+        foreach (['name', 'legal_name', 'document', 'domain', 'zip_code', 'street', 'number', 'district', 'city', 'state'] as $field) {
+            if (blank($company->{$field})) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

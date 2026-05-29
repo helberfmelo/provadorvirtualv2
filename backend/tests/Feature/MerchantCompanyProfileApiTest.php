@@ -16,13 +16,7 @@ class MerchantCompanyProfileApiTest extends TestCase
     public function test_owner_completes_company_profile_after_cnpj_only_checkout(): void
     {
         [$user, $merchant, $company] = $this->tenant();
-        $headers = [
-            'Authorization' => 'Bearer '.$user->createToken('test', [
-                'role:merchant',
-                'merchant:'.$merchant->id,
-                'company:'.$company->id,
-            ])->plainTextToken,
-        ];
+        $headers = $this->headers($user, $merchant, $company);
 
         $this->withHeaders($headers)
             ->getJson('/api/v1/me')
@@ -68,7 +62,69 @@ class MerchantCompanyProfileApiTest extends TestCase
             ->assertJsonPath('active_company.profile_completed', true);
     }
 
-    private function tenant(): array
+    public function test_owner_updates_non_bigshop_company_platform_from_integrations(): void
+    {
+        [$user, $merchant, $company] = $this->tenant('custom');
+
+        $this->withHeaders($this->headers($user, $merchant, $company))
+            ->patchJson('/api/v1/merchant/company-platform', [
+                'platform' => 'shopify',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'shopify');
+
+        $this->assertDatabaseHas('merchant_companies', [
+            'id' => $company->id,
+            'platform' => 'shopify',
+        ]);
+    }
+
+    public function test_bigshop_company_platform_is_locked_in_company_portal(): void
+    {
+        [$user, $merchant, $company] = $this->tenant('bigshop');
+
+        $this->withHeaders($this->headers($user, $merchant, $company))
+            ->patchJson('/api/v1/merchant/company-platform', [
+                'platform' => 'shopify',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('platform');
+
+        $this->assertDatabaseHas('merchant_companies', [
+            'id' => $company->id,
+            'platform' => 'bigshop',
+        ]);
+    }
+
+    public function test_non_bigshop_company_cannot_self_activate_bigshop_platform(): void
+    {
+        [$user, $merchant, $company] = $this->tenant('custom');
+
+        $this->withHeaders($this->headers($user, $merchant, $company))
+            ->patchJson('/api/v1/merchant/company-platform', [
+                'platform' => 'bigshop',
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('platform');
+
+        $this->assertDatabaseHas('merchant_companies', [
+            'id' => $company->id,
+            'platform' => 'custom',
+        ]);
+    }
+
+    private function headers(User $user, Merchant $merchant, MerchantCompany $company): array
+    {
+        return [
+            'Authorization' => 'Bearer '.$user->createToken('test', [
+                'role:merchant',
+                'merchant:'.$merchant->id,
+                'company:'.$company->id,
+            ])->plainTextToken,
+        ];
+    }
+
+    private function tenant(string $platform = 'bigshop'): array
     {
         $merchant = Merchant::query()->create([
             'name' => 'Empresa CNPJ 11.222.333/0001-81',
@@ -79,7 +135,7 @@ class MerchantCompanyProfileApiTest extends TestCase
             'merchant_id' => $merchant->id,
             'name' => 'Empresa CNPJ 11.222.333/0001-81',
             'document' => '11222333000181',
-            'platform' => 'bigshop',
+            'platform' => $platform,
             'status' => 'active',
         ]);
         $user = User::query()->create([

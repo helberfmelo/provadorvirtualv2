@@ -40,7 +40,9 @@ type CompanyOption = AuthCompany & {
   merchant: AuthMerchant | null
 }
 
-const storedToken = localStorage.getItem('pv_token')
+const tokenStorageKey = 'pv_token'
+const companyStorageKey = 'pv_active_company_id'
+const storedToken = localStorage.getItem(tokenStorageKey)
 type PermissionMap = Record<string, { view: boolean; edit: boolean }>
 
 export const useAuthStore = defineStore('auth', () => {
@@ -51,7 +53,10 @@ export const useAuthStore = defineStore('auth', () => {
   const companyOptions = ref<CompanyOption[]>([])
   const permissions = ref<PermissionMap | null>(null)
   const saasPermissions = ref<PermissionMap | null>(null)
+  const loadingMe = ref(false)
+  const initialized = ref(!storedToken)
   const isAuthenticated = computed(() => Boolean(token.value))
+  let loadMePromise: Promise<void> | null = null
 
   setAuthToken(storedToken)
 
@@ -61,29 +66,95 @@ export const useAuthStore = defineStore('auth', () => {
       password,
       company_access: companyAccess || undefined,
     })
-    token.value = data.token
-    user.value = data.user
-    activeMerchant.value = data.active_merchant || null
-    activeCompany.value = data.active_company || null
-    companyOptions.value = data.company_options || []
-    permissions.value = data.permissions || null
-    saasPermissions.value = data.saas_permissions || null
-    localStorage.setItem('pv_token', data.token)
-    setAuthToken(data.token)
+    applySessionPayload(data)
+    initialized.value = true
   }
 
   async function loadMe() {
-    if (!token.value) {
+    if (loadMePromise) {
+      return loadMePromise
+    }
+
+    loadMePromise = fetchMe()
+
+    try {
+      await loadMePromise
+    } finally {
+      loadMePromise = null
+    }
+  }
+
+  async function ensureLoaded() {
+    if (initialized.value) {
       return
     }
 
-    const { data } = await api.get('/me')
+    await loadMe()
+  }
+
+  async function fetchMe() {
+    if (!token.value) {
+      initialized.value = true
+      return
+    }
+
+    loadingMe.value = true
+
+    try {
+      const rememberedCompanyId = rememberedActiveCompanyId()
+      const { data } = await api.get('/me')
+      applySessionPayload(data, false, false)
+
+      if (
+        rememberedCompanyId
+        && rememberedCompanyId !== activeCompany.value?.id
+        && companyOptions.value.some((company) => company.id === rememberedCompanyId)
+      ) {
+        await selectCompany(rememberedCompanyId)
+        return
+      }
+
+      rememberActiveCompany(activeCompany.value)
+    } finally {
+      loadingMe.value = false
+      initialized.value = true
+    }
+  }
+
+  function applySessionPayload(data: any, persistToken = true, rememberCompany = true) {
+    if (data.token) {
+      token.value = data.token
+      if (persistToken) {
+        localStorage.setItem(tokenStorageKey, data.token)
+      }
+      setAuthToken(data.token)
+    }
+
     user.value = data.user
     activeMerchant.value = data.active_merchant || null
     activeCompany.value = data.active_company || null
     companyOptions.value = data.company_options || []
     permissions.value = data.permissions || null
     saasPermissions.value = data.saas_permissions || null
+
+    if (rememberCompany) {
+      rememberActiveCompany(activeCompany.value)
+    }
+  }
+
+  function rememberActiveCompany(company: AuthCompany | null) {
+    if (company?.id) {
+      localStorage.setItem(companyStorageKey, String(company.id))
+      return
+    }
+
+    localStorage.removeItem(companyStorageKey)
+  }
+
+  function rememberedActiveCompanyId() {
+    const value = Number(localStorage.getItem(companyStorageKey) || 0)
+
+    return Number.isFinite(value) && value > 0 ? value : null
   }
 
   async function selectCompany(companyId: number) {
@@ -91,15 +162,8 @@ export const useAuthStore = defineStore('auth', () => {
       company_id: companyId,
     })
 
-    token.value = data.token
-    user.value = data.user
-    activeMerchant.value = data.active_merchant || null
-    activeCompany.value = data.active_company || null
-    companyOptions.value = data.company_options || []
-    permissions.value = data.permissions || null
-    saasPermissions.value = data.saas_permissions || null
-    localStorage.setItem('pv_token', data.token)
-    setAuthToken(data.token)
+    applySessionPayload(data)
+    initialized.value = true
   }
 
   async function logout() {
@@ -114,7 +178,10 @@ export const useAuthStore = defineStore('auth', () => {
     companyOptions.value = []
     permissions.value = null
     saasPermissions.value = null
-    localStorage.removeItem('pv_token')
+    loadingMe.value = false
+    initialized.value = true
+    localStorage.removeItem(tokenStorageKey)
+    localStorage.removeItem(companyStorageKey)
     setAuthToken(null)
   }
 
@@ -158,9 +225,12 @@ export const useAuthStore = defineStore('auth', () => {
     companyOptions,
     permissions,
     saasPermissions,
+    loadingMe,
+    initialized,
     isAuthenticated,
     login,
     loadMe,
+    ensureLoaded,
     selectCompany,
     logout,
     canView,
