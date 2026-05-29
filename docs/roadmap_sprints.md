@@ -2303,7 +2303,7 @@ Critérios de aceite:
 - erros de importação apontam linha, coluna, campo e correção sugerida;
 - exportação respeita filtros aplicados.
 
-Status: planejada.
+Status: implementado na Sprint 133 no commit `3c2dda6`, publicado com sucesso no run `26633856533`. O benchmark read-only da Sizebay em `/table-measurements` confirmou botões Export, Import e Create, busca e filtros simples; `/modelings` não expôs uma tela própria útil nesta sessão, mas reforçou que modelagem precisa aparecer como filtro operacional. O Provador Virtual evoluiu esse fluxo com exportação CSV/XLSX respeitando filtros, modelos editáveis para corpo/peça/misto, importação com prévia visual antes de gravar, erros por linha/coluna/campo/sugestão, bloqueio de tamanhos duplicados, observações por tabela/tamanho/medida e auditoria `measurement_table.imported`. Validações locais passaram com PHPUnit completo (`108 tests`, `1052 assertions`), `MeasurementTablesApiTest`, Pint, build frontend, varredura de segredos, `git diff --check` e inspeção visual desktop/mobile em `5175`; o GitHub Actions finalizou com deploy e smoke público com sucesso, e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
 
 ### Sprint 134 - Editor avançado de medidas e variações
 

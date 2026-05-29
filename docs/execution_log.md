@@ -1384,3 +1384,18 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
 - Commit `ea5b06b` enviado para `main`; o run `26632065139` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A primeira tentativa de `scripts/validate-production.ps1` sofreu reset de conexão pelo host remoto após `/login`; a repetição passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 133 Tabelas com importar, exportar e observações
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy e a sessão Sizebay.
+- Acessado o MySizebay da Zak em modo somente leitura em `/table-measurements` e `/modelings`, sem alterar dados, sem salvar, sem publicar e sem acionar suporte.
+- O benchmark Sizebay confirmou na tela de tabelas os botões Export, Import, Create Measurement Table, busca e filtros; a rota `/modelings` não abriu uma tela própria útil nesta sessão, mas o aprendizado foi manter modelagem como filtro operacional visível.
+- O Provador Virtual ganhou exportação CSV/XLSX de tabelas respeitando os filtros aplicados, modelos editáveis para bases corpo, peça e mista e importação dedicada com prévia visual antes do commit.
+- A prévia de importação aponta erros por linha, coluna, campo e sugestão; bloqueia máximo menor que mínimo, valores fora de 0 a 999,99, enums inválidos e tamanhos duplicados dentro da mesma tabela.
+- Observações por tabela, tamanho e medida passam a ser preservadas em `notes` e `measurement_table_rows.metadata`, aparecendo no formulário, na listagem, na exportação e no retorno da API.
+- `POST /api/v1/measurement-tables/import` cria ou atualiza tabelas por nome no escopo da empresa ativa, substitui linhas somente após prévia sem falhas e registra auditoria `measurement_table.imported`.
+- Validação visual local rodou em `http://127.0.0.1:5175/app/tabelas-de-medidas`, com backend local em `8001`, cobrindo desktop e mobile com prévia de CSV sem gravar dados.
+- Validações locais passaram com `php -l`, `php vendor\bin\pint --dirty`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter MeasurementTablesApiTest`, PHPUnit completo (`108 tests`, `1052 assertions`) e `npm --prefix frontend run build` (com o aviso conhecido de bundle acima de 500 kB).
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
+- Commit `3c2dda6` enviado para `main`; o run `26633856533` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
