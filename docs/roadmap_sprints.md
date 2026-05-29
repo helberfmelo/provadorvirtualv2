@@ -2063,3 +2063,29 @@ Validação:
 Observação: `php artisan test --filter=MerchantCompanyProfileApiTest` não rodou neste ambiente local porque o PHP disponível está sem driver SQLite (`could not find driver` para `sqlite :memory:`). O workflow remoto validou backend e deploy com sucesso.
 
 Status: implementado na Sprint 122 no commit `de6a1ef`, publicado com sucesso no run `26616086732`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 123 - Troca protegida de integração BigShop
+
+Objetivo: corrigir a Zak para carregar a integração BigShop no portal quando o admin do SaaS acessa a empresa, separar plataforma operacional de benefício comercial BigShop e criar o fluxo protegido de solicitação de troca para lojas BigShop com desconto.
+
+Entregas:
+
+- `ActiveTenant` passa a resolver o lojista pelo escopo `merchant:<id>` do token para admin/support, sem exigir vínculo pivot do admin com o lojista;
+- `merchant_companies.bigshop_discount_active` separa o benefício comercial BigShop da plataforma operacional `platform=bigshop`;
+- empresas sem benefício BigShop podem trocar a plataforma operacional diretamente em `/app/integracoes`, inclusive para BigShop sem desconto;
+- empresas BigShop com benefício ativo veem o botão `Mudar integração`, aceitam termos em modal e geram `integration_change_requests`;
+- SaaS lista solicitações pendentes na visão geral e na edição da empresa, com status, link de pagamento, observações e aplicação da troca quando concluída;
+- criada página pública `/termos/troca-bigshop`;
+- documentação registra o uso opcional de Google Tag Manager inspirado na documentação pública da Sizebay, com container na PDP e tag HTML disparada apenas em página de produto.
+
+Validação:
+
+- `npm --prefix frontend run build`;
+- `php -l` nos arquivos PHP alterados;
+- `vendor/bin/pint --dirty`;
+- `git diff --check`;
+- testes focados `MerchantCompanyProfileApiTest`, `IntegrationChangeRequestApiTest` e `SaasAdminApiTest` bloqueados localmente por ausência do driver SQLite (`could not find driver`);
+- GitHub Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente e pronto para publicação da Sprint 123. O monitoramento do GitHub Actions e a validação de produção devem ser registrados após o push.

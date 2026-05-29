@@ -29,6 +29,7 @@ export type CompanyRow = {
   state: string | null
   domain: string | null
   platform: string
+  bigshop_discount_active: boolean
   external_store_id: string | null
   status: string
   merchant: {
@@ -76,6 +77,37 @@ export type TransactionalEmailSend = {
   error: string | null
   sent_at: string | null
   created_at: string | null
+}
+
+export type IntegrationChangeRequest = {
+  id: number
+  from_platform: string
+  from_platform_label: string
+  to_platform: string
+  to_platform_label: string
+  status: string
+  status_label: string
+  requested_at: string | null
+  payment_link: string | null
+  admin_notes: string | null
+  company: {
+    id: number
+    name: string
+    access_code: string | null
+    domain: string | null
+    platform: string
+    bigshop_discount_active: boolean
+  }
+  merchant: {
+    id: number
+    name: string
+    slug: string | null
+  }
+  user: {
+    id: number | null
+    name: string | null
+    email: string | null
+  }
 }
 
 export type CheckoutProviderOption = {

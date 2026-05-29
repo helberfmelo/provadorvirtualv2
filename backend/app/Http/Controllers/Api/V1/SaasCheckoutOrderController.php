@@ -139,6 +139,7 @@ class SaasCheckoutOrderController extends Controller
             'country' => $company->country,
             'domain' => $company->domain,
             'platform' => $company->platform,
+            'bigshop_discount_active' => (bool) $company->bigshop_discount_active,
             'external_store_id' => $company->external_store_id,
             'status' => $company->status,
         ];

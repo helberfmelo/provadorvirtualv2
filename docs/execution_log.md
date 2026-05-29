@@ -1281,3 +1281,17 @@
 - `php artisan test --filter=MerchantCompanyProfileApiTest` ficou bloqueado localmente porque o PHP deste ambiente não tem driver SQLite (`could not find driver`); o GitHub Actions executou validação backend/deploy com sucesso.
 - Commit `de6a1ef` enviado para `main`; o run `26616086732` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-29 - Sprint 123 Troca protegida de integração BigShop
+
+- Corrigida a causa de `/app/integracoes` mostrar `Lojista não encontrado` para a Zak quando o admin SaaS entrava no portal da empresa: admin/support agora resolvem o lojista pelo escopo do token selecionado.
+- Separados os conceitos de plataforma operacional e benefício comercial BigShop com `merchant_companies.bigshop_discount_active`.
+- Lojas sem benefício BigShop podem trocar diretamente para qualquer plataforma no portal, inclusive BigShop sem desconto.
+- Lojas BigShop com benefício ativo não mudam para outra plataforma de forma direta: o portal mostra `Mudar integração`, abre modal com explicação comercial, exige aceite dos termos e cria uma solicitação protegida.
+- Criados modelo, migração e endpoints de `integration_change_requests` para portal e SaaS.
+- A visão geral do SaaS mostra solicitações pendentes e a edição da empresa permite informar status, link de pagamento, observações e aplicar a troca quando a solicitação estiver concluída.
+- Criada a página pública `/termos/troca-bigshop`.
+- A tela `/app/integracoes` ganhou orientação de Google Tag Manager como caminho opcional para plataformas sem app/tema simples, usando container na PDP, tag HTML personalizada e validação antes de publicar.
+- Documentação atualizada em guias de integração, arquitetura, widget e estado atual da plataforma.
+- Validações locais passaram com `npm --prefix frontend run build`, `php -l`, `vendor/bin/pint --dirty` e `git diff --check`.
+- Testes focados `MerchantCompanyProfileApiTest`, `IntegrationChangeRequestApiTest` e `SaasAdminApiTest` ficaram bloqueados localmente porque o PHP deste ambiente não tem driver SQLite (`could not find driver`).

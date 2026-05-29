@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import AiAssistantView from '../views/AiAssistantView.vue'
 import AnalyticsView from '../views/AnalyticsView.vue'
+import BigShopChangeTermsView from '../views/BigShopChangeTermsView.vue'
 import CheckoutSuccessView from '../views/CheckoutSuccessView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
 import DashboardView from '../views/DashboardView.vue'
@@ -51,6 +52,7 @@ const router = createRouter({
     { path: '/checkout/sucesso', component: CheckoutSuccessView },
     { path: '/privacidade', component: PrivacyView },
     { path: '/termos', component: TermsView },
+    { path: '/termos/troca-bigshop', component: BigShopChangeTermsView },
     { path: '/app', component: DashboardView },
     { path: '/app/produtos', component: ProductsView },
     { path: '/app/produtos/novo', component: ProductFormView },

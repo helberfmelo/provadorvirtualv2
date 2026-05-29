@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\V1\FitProfileController;
 use App\Http\Controllers\Api\V1\GoLiveReadinessController;
 use App\Http\Controllers\Api\V1\HealthController;
 use App\Http\Controllers\Api\V1\ImportController;
+use App\Http\Controllers\Api\V1\IntegrationChangeRequestController;
 use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\MeasurementTableController;
 use App\Http\Controllers\Api\V1\MeasurementTemplateController;
@@ -123,6 +124,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,dashboard,edit');
         Route::patch('/merchant/company-platform', [MerchantCompanyProfileController::class, 'updatePlatform'])
             ->middleware('portal.permission:merchant,integrations,edit');
+        Route::post('/merchant/integration-change-requests', [IntegrationChangeRequestController::class, 'store'])
+            ->middleware('portal.permission:merchant,integrations,edit');
         Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index'])
             ->middleware('portal.permission:merchant,measurement_tables,view');
         Route::apiResource('fit-profiles', FitProfileController::class)
@@ -183,6 +186,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:saas,saas_dashboard,view');
         Route::get('/saas/companies', [SaasAdminController::class, 'companies'])
             ->middleware('portal.permission:saas,saas_companies,view');
+        Route::get('/saas/integration-change-requests', [IntegrationChangeRequestController::class, 'index'])
+            ->middleware('portal.permission:saas,saas_companies,view');
+        Route::patch('/saas/integration-change-requests/{integrationChangeRequest}', [IntegrationChangeRequestController::class, 'update'])
+            ->middleware('portal.permission:saas,saas_companies,edit');
         Route::post('/saas/companies', [SaasAdminController::class, 'storeCompany'])
             ->middleware('portal.permission:saas,saas_companies,edit');
         Route::patch('/saas/companies/{company}', [SaasAdminController::class, 'updateCompany'])

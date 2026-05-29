@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { api } from '../services/api'
-import type { CompanyRow, MerchantRow } from '../services/saasTypes'
+import type { CompanyRow, IntegrationChangeRequest, MerchantRow } from '../services/saasTypes'
 
 const route = useRoute()
 const router = useRouter()
@@ -14,6 +14,15 @@ const loading = ref(false)
 const saving = ref(false)
 const cepLoading = ref(false)
 const error = ref('')
+const changeRequestError = ref('')
+const savingChangeRequestId = ref<number | null>(null)
+const changeRequests = ref<IntegrationChangeRequest[]>([])
+const changeRequestForms = reactive<Record<number, {
+  status: string
+  payment_link: string
+  admin_notes: string
+  apply_change: boolean
+}>>({})
 
 const form = reactive({
   merchant_id: '',
@@ -31,6 +40,7 @@ const form = reactive({
   state: '',
   domain: '',
   platform: 'bigshop',
+  bigshop_discount_active: true,
   external_store_id: '',
   status: 'active',
   owner_name: '',
@@ -39,8 +49,22 @@ const form = reactive({
   owner_password: '',
 })
 
+const changeRequestStatusOptions = [
+  { value: 'pending', label: 'Pendente' },
+  { value: 'payment_requested', label: 'Link enviado' },
+  { value: 'approved', label: 'Aprovada' },
+  { value: 'completed', label: 'Concluída' },
+  { value: 'cancelled', label: 'Cancelada' },
+]
+
 onMounted(() => {
   loadForm()
+})
+
+watch(() => form.platform, (platform) => {
+  if (platform !== 'bigshop') {
+    form.bigshop_discount_active = false
+  }
 })
 
 async function loadForm() {
@@ -48,11 +72,16 @@ async function loadForm() {
   error.value = ''
 
   try {
-    const [merchantsResponse, companiesResponse] = await Promise.all([
+    const [merchantsResponse, companiesResponse, changeRequestsResponse] = await Promise.all([
       api.get('/saas/merchants'),
       editing.value ? api.get('/saas/companies') : Promise.resolve({ data: { data: [] } }),
+      editing.value
+        ? api.get('/saas/integration-change-requests', { params: { company_id: companyId.value } })
+        : Promise.resolve({ data: { data: [] } }),
     ])
     merchants.value = merchantsResponse.data.data
+    changeRequests.value = changeRequestsResponse.data.data
+    resetChangeRequestForms()
 
     if (editing.value) {
       const company = (companiesResponse.data.data as CompanyRow[]).find((item) => item.id === companyId.value)
@@ -77,6 +106,7 @@ async function loadForm() {
         state: company.state || '',
         domain: company.domain || '',
         platform: company.platform || 'custom',
+        bigshop_discount_active: Boolean(company.bigshop_discount_active),
         external_store_id: company.external_store_id || '',
         status: company.status || 'active',
         owner_name: '',
@@ -89,6 +119,21 @@ async function loadForm() {
     error.value = requestError.response?.data?.message || 'Não foi possível carregar o cadastro da empresa.'
   } finally {
     loading.value = false
+  }
+}
+
+function resetChangeRequestForms() {
+  for (const key of Object.keys(changeRequestForms)) {
+    delete changeRequestForms[Number(key)]
+  }
+
+  for (const request of changeRequests.value) {
+    changeRequestForms[request.id] = {
+      status: request.status,
+      payment_link: request.payment_link || '',
+      admin_notes: request.admin_notes || '',
+      apply_change: false,
+    }
   }
 }
 
@@ -145,6 +190,42 @@ async function saveCompany() {
     error.value = requestError.response?.data?.message || 'Não foi possível salvar a empresa.'
   } finally {
     saving.value = false
+  }
+}
+
+async function updateChangeRequest(request: IntegrationChangeRequest) {
+  const requestForm = changeRequestForms[request.id]
+
+  if (!requestForm) {
+    return
+  }
+
+  savingChangeRequestId.value = request.id
+  changeRequestError.value = ''
+
+  try {
+    const { data } = await api.patch(`/saas/integration-change-requests/${request.id}`, {
+      status: requestForm.status,
+      payment_link: requestForm.payment_link || null,
+      admin_notes: requestForm.admin_notes || null,
+      apply_change: requestForm.apply_change,
+    })
+
+    const updated = data.data as IntegrationChangeRequest
+    const index = changeRequests.value.findIndex((item) => item.id === updated.id)
+    if (index >= 0) {
+      changeRequests.value.splice(index, 1, updated)
+    }
+
+    resetChangeRequestForms()
+
+    if (requestForm.apply_change && requestForm.status === 'completed') {
+      await loadForm()
+    }
+  } catch (requestError: any) {
+    changeRequestError.value = requestError.response?.data?.message || 'Não foi possível atualizar a solicitação de troca.'
+  } finally {
+    savingChangeRequestId.value = null
   }
 }
 </script>
@@ -264,6 +345,14 @@ async function saveCompany() {
         </label>
       </div>
 
+      <label v-if="form.platform === 'bigshop'" class="settings-check bigshop-benefit-check">
+        <input v-model="form.bigshop_discount_active" type="checkbox" />
+        <span>
+          Benefício comercial BigShop ativo
+          <small>Use somente quando a loja tem preço/desconto BigShop. Se a loja apenas escolheu BigShop como plataforma operacional, deixe desmarcado.</small>
+        </span>
+      </label>
+
       <div class="form-grid">
         <label>
           ID externo
@@ -306,5 +395,65 @@ async function saveCompany() {
         </button>
       </div>
     </form>
+
+    <section v-if="editing && changeRequests.length" class="panel-main admin-form form-page integration-change-admin-section">
+      <div class="subsection-heading">
+        <h2>Solicitações de troca</h2>
+        <span>BigShop para outra integração</span>
+      </div>
+
+      <p v-if="changeRequestError" class="form-error">{{ changeRequestError }}</p>
+
+      <article v-for="request in changeRequests" :key="request.id" class="integration-change-admin-card">
+        <header>
+          <span>
+            <strong>{{ request.from_platform_label }} para {{ request.to_platform_label }}</strong>
+            <small>Solicitado por {{ request.user.name || request.user.email || 'usuário do portal' }}</small>
+          </span>
+          <em class="status-pill warning">{{ request.status_label }}</em>
+        </header>
+
+        <div class="form-grid">
+          <label>
+            Status
+            <select v-model="changeRequestForms[request.id].status">
+              <option v-for="option in changeRequestStatusOptions" :key="option.value" :value="option.value">
+                {{ option.label }}
+              </option>
+            </select>
+          </label>
+          <label>
+            Link de pagamento
+            <input v-model="changeRequestForms[request.id].payment_link" type="url" placeholder="https://..." />
+          </label>
+        </div>
+
+        <label>
+          Observações internas
+          <textarea v-model="changeRequestForms[request.id].admin_notes" rows="3"></textarea>
+        </label>
+
+        <label class="settings-check">
+          <input
+            v-model="changeRequestForms[request.id].apply_change"
+            type="checkbox"
+            :disabled="changeRequestForms[request.id].status !== 'completed'"
+          />
+          <span>Aplicar troca para {{ request.to_platform_label }} ao salvar esta solicitação.</span>
+        </label>
+
+        <div class="action-row compact">
+          <button
+            class="btn btn-secondary"
+            type="button"
+            :disabled="savingChangeRequestId === request.id"
+            @click="updateChangeRequest(request)"
+          >
+            <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+            {{ savingChangeRequestId === request.id ? 'Salvando...' : 'Salvar solicitação' }}
+          </button>
+        </div>
+      </article>
+    </section>
   </section>
 </template>

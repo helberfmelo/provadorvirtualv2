@@ -232,6 +232,7 @@ class PublicCheckoutController extends Controller
             'country' => 'BR',
             'domain' => $data['company_domain'] ?? null,
             'platform' => $data['platform'] ?? 'custom',
+            'bigshop_discount_active' => ($data['platform'] ?? null) === 'bigshop',
             'external_store_id' => null,
             'status' => 'pending_payment',
         ]);

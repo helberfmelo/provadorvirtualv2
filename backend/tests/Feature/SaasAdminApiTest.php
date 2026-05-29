@@ -60,6 +60,41 @@ class SaasAdminApiTest extends TestCase
             ->assertJsonPath('data.name', 'Loja Piloto Teste');
     }
 
+    public function test_admin_controls_bigshop_commercial_benefit_separately_from_platform(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->adminToken()];
+
+        $company = $this->withHeaders($headers)
+            ->postJson('/api/v1/saas/companies', [
+                'merchant_name' => 'Loja BigShop',
+                'billing_status' => 'active',
+                'name' => 'Loja BigShop',
+                'legal_name' => 'Loja BigShop Ltda',
+                'document' => '11222333000181',
+                'platform' => 'bigshop',
+                'external_store_id' => '124',
+            ])
+            ->assertCreated()
+            ->assertJsonPath('data.platform', 'bigshop')
+            ->assertJsonPath('data.bigshop_discount_active', true)
+            ->json('data');
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/saas/companies/'.$company['id'], [
+                'name' => 'Loja BigShop',
+                'legal_name' => 'Loja BigShop Ltda',
+                'document' => '11222333000181',
+                'platform' => 'bigshop',
+                'bigshop_discount_active' => false,
+                'external_store_id' => '124',
+                'status' => 'active',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'bigshop')
+            ->assertJsonPath('data.bigshop_discount_active', false);
+    }
+
     public function test_merchant_cannot_read_saas_admin(): void
     {
         $this->seed();

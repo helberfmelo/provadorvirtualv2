@@ -22,6 +22,7 @@ class MerchantCompanyProfileController extends Controller
         abort_if(! $company, 404, 'Empresa ativa não encontrada.');
 
         $data = $this->validateProfile($request);
+        $this->guardDiscountedBigShopChange($company, $data['platform']);
 
         $company->forceFill([
             'name' => $data['name'],
@@ -36,6 +37,7 @@ class MerchantCompanyProfileController extends Controller
             'country' => 'BR',
             'domain' => $data['domain'],
             'platform' => $data['platform'],
+            'bigshop_discount_active' => $this->nextBigShopDiscountState($company, $data['platform']),
         ])->save();
 
         $company->ensureAccessCode();
@@ -61,20 +63,15 @@ class MerchantCompanyProfileController extends Controller
             'platform' => ['required', 'string', Rule::in(PlatformCatalog::keys())],
         ]);
 
-        if ($company->platform === 'bigshop' && $data['platform'] !== 'bigshop') {
+        if ($company->platform === 'bigshop' && $company->bigshop_discount_active && $data['platform'] !== 'bigshop') {
             throw ValidationException::withMessages([
-                'platform' => ['Plano BigShop ativo: altere a plataforma pelo cadastro da empresa no SaaS.'],
-            ]);
-        }
-
-        if ($company->platform !== 'bigshop' && $data['platform'] === 'bigshop') {
-            throw ValidationException::withMessages([
-                'platform' => ['A plataforma BigShop deve ser ativada pelo cadastro da empresa no SaaS.'],
+                'platform' => ['Plano BigShop com desconto ativo: solicite a troca de integração pelo painel.'],
             ]);
         }
 
         $company->forceFill([
             'platform' => $data['platform'],
+            'bigshop_discount_active' => $this->nextBigShopDiscountState($company, $data['platform']),
         ])->save();
 
         return response()->json([
@@ -164,6 +161,7 @@ class MerchantCompanyProfileController extends Controller
             'country' => $company->country,
             'domain' => $company->domain,
             'platform' => $company->platform,
+            'bigshop_discount_active' => (bool) $company->bigshop_discount_active,
             'external_store_id' => $company->external_store_id,
             'status' => $company->status,
             'profile_completed' => $this->companyProfileCompleted($company),
@@ -183,5 +181,19 @@ class MerchantCompanyProfileController extends Controller
         }
 
         return true;
+    }
+
+    private function guardDiscountedBigShopChange(MerchantCompany $company, string $nextPlatform): void
+    {
+        if ($company->platform === 'bigshop' && $company->bigshop_discount_active && $nextPlatform !== 'bigshop') {
+            throw ValidationException::withMessages([
+                'platform' => ['Plano BigShop com desconto ativo: solicite a troca de integração pelo painel.'],
+            ]);
+        }
+    }
+
+    private function nextBigShopDiscountState(MerchantCompany $company, string $nextPlatform): bool
+    {
+        return $nextPlatform === 'bigshop' && (bool) $company->bigshop_discount_active;
     }
 }

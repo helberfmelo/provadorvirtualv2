@@ -17,7 +17,7 @@ Implementado:
 - endpoint `POST /api/v1/integrations/{platform}/validate-install`;
 - registro de validação em `integration_events` com `event_type=install_validation`;
 - auditoria `integration.install_validated`;
-- bloqueio mantido: contrato BigShop vê e valida apenas BigShop.
+- bloqueio comercial BigShop agora depende de `merchant_companies.bigshop_discount_active`: loja BigShop com benefício vê BigShop e solicita troca; loja sem benefício pode trocar a plataforma operacional no portal.
 
 Publicado e validado em produção no run `26339199751`.
 
@@ -34,9 +34,9 @@ Locais de entrada:
 
 Regras:
 
-- contrato BigShop fica travado como BigShop no portal da empresa;
-- empresa não BigShop não pode se autoativar como BigShop pelo portal;
-- alteração para BigShop deve ser feita pelo cadastro SaaS, pois impacta contrato, preço, caminho de instalação e escopo de integração.
+- empresa que usa Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou personalizada pode trocar diretamente no portal para qualquer plataforma, inclusive BigShop, sem ativar desconto;
+- empresa BigShop com `bigshop_discount_active=true` mantém o benefício comercial protegido: para sair da BigShop, precisa solicitar a troca no portal, aceitar os termos e aguardar revisão/pagamento pelo SaaS;
+- o SaaS pode ajustar a plataforma e marcar/desmarcar o benefício BigShop no cadastro da empresa, preservando a diferença entre plataforma operacional e condição comercial.
 
 Endpoint operacional:
 
@@ -53,6 +53,23 @@ Payload:
 ```
 
 Permissão exigida: `integrations.edit`.
+
+Fluxo protegido BigShop:
+
+```http
+POST /api/v1/merchant/integration-change-requests
+```
+
+Payload:
+
+```json
+{
+  "to_platform": "shopify",
+  "accepted_terms": true
+}
+```
+
+O pedido aparece no SaaS em `Solicitações de troca` e na edição da empresa. O time interno registra link de pagamento, status e aplica a troca somente quando a solicitação estiver concluída.
 
 ## Checklist padrão
 
@@ -82,6 +99,19 @@ window.ProvadorVirtual?.reload({
 ```
 
 Na BigShop, o ponto oficial planejado para instalação automática é o `produto.vue` da model3 plano pro. Esse ajuste será feito em sprint futura no repositório BigShop correto; no SaaS, o fallback continua sendo o snippet gerado no painel.
+
+## Google Tag Manager
+
+A Sizebay documenta o Google Tag Manager como uma forma de implementação do provador: primeiro cria-se o elemento âncora na página de produto e depois uma tag HTML personalizada, disparada somente em páginas de produto, carrega o script/prescript do serviço. A própria documentação da Sizebay trata a conferência da instalação como equivalente para implantação direta ou por GTM.
+
+No Provador Virtual, GTM deve ser oferecido como caminho opcional quando a plataforma não tem app, tema editável simples ou integração nativa pronta. Regras para usar com segurança:
+
+- manter o container visual no template da página de produto, perto da grade/tamanho;
+- disparar a tag somente em páginas de produto;
+- ler produto, variação e SKU do DOM, variáveis GTM ou `dataLayer`;
+- chamar `window.ProvadorVirtual.reload(...)` quando a loja troca variação sem recarregar a página;
+- validar a URL no painel antes de publicar;
+- para BigShop nativa, preferir instalação por app/tema oficial quando disponível, usando GTM apenas como fallback assistido.
 
 ## Endpoint de validação
 

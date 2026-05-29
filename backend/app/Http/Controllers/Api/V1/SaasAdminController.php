@@ -129,6 +129,7 @@ class SaasAdminController extends Controller
             'country' => 'BR',
             'domain' => $data['domain'] ?? null,
             'platform' => $data['platform'] ?? 'custom',
+            'bigshop_discount_active' => $this->bigShopDiscountState($data['platform'] ?? 'custom', $data, true),
             'external_store_id' => $data['external_store_id'] ?? null,
             'status' => $data['status'] ?? 'active',
         ]);
@@ -178,6 +179,7 @@ class SaasAdminController extends Controller
             'country' => 'BR',
             'domain' => $data['domain'] ?? null,
             'platform' => $data['platform'] ?? 'custom',
+            'bigshop_discount_active' => $this->bigShopDiscountState($data['platform'] ?? 'custom', $data, (bool) $company->bigshop_discount_active),
             'external_store_id' => $data['external_store_id'] ?? null,
             'status' => $data['status'] ?? 'active',
         ])->save();
@@ -262,6 +264,7 @@ class SaasAdminController extends Controller
             'state' => ['nullable', 'string', 'size:2'],
             'domain' => ['nullable', 'string', 'max:180'],
             'platform' => ['nullable', 'string', Rule::in(PlatformCatalog::keys())],
+            'bigshop_discount_active' => ['nullable', 'boolean'],
             'external_store_id' => ['nullable', 'string', 'max:120'],
             'status' => ['nullable', 'string', 'in:active,inactive,pending_payment,trialing'],
             'owner_name' => ['nullable', 'string', 'max:255', 'required_with:owner_email'],
@@ -269,6 +272,17 @@ class SaasAdminController extends Controller
             'owner_cpf' => ['nullable', 'string', 'size:11'],
             'owner_password' => ['nullable', 'string', 'min:8'],
         ]);
+    }
+
+    private function bigShopDiscountState(string $platform, array $data, bool $default): bool
+    {
+        if ($platform !== 'bigshop') {
+            return false;
+        }
+
+        return array_key_exists('bigshop_discount_active', $data)
+            ? (bool) $data['bigshop_discount_active']
+            : $default;
     }
 
     private function upsertOwnerIfRequested(Merchant $merchant, array $data): ?User
@@ -360,6 +374,7 @@ class SaasAdminController extends Controller
             'country' => $company->country,
             'domain' => $company->domain,
             'platform' => $company->platform,
+            'bigshop_discount_active' => (bool) $company->bigshop_discount_active,
             'external_store_id' => $company->external_store_id,
             'status' => $company->status,
             'merchant' => [

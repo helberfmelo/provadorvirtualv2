@@ -979,6 +979,88 @@ a {
   margin-top: 18px;
 }
 
+.change-request-list {
+  display: grid;
+  gap: 10px;
+}
+
+.change-request-list article {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fff7ed;
+}
+
+.change-request-list i {
+  display: inline-grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 8px;
+  color: #ff4d5e;
+  background: #fff;
+}
+
+.change-request-list strong,
+.change-request-list small {
+  display: block;
+}
+
+.change-request-list small {
+  color: #64748b;
+}
+
+.bigshop-benefit-check {
+  margin: 4px 0 18px;
+  align-items: flex-start;
+}
+
+.bigshop-benefit-check small {
+  display: block;
+  margin-top: 3px;
+  color: #64748b;
+  font-size: 0.82rem;
+  line-height: 1.35;
+}
+
+.integration-change-admin-section {
+  margin-top: 18px;
+}
+
+.integration-change-admin-card {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.integration-change-admin-card + .integration-change-admin-card {
+  margin-top: 14px;
+}
+
+.integration-change-admin-card header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.integration-change-admin-card header span {
+  display: grid;
+  gap: 3px;
+}
+
+.integration-change-admin-card header small {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
 .quick-card {
   display: grid;
   gap: 8px;
@@ -4856,6 +4938,61 @@ textarea {
   align-items: stretch;
 }
 
+.integration-change-modal {
+  display: grid;
+  gap: 16px;
+  width: min(620px, 100%);
+  max-height: min(720px, calc(100vh - 44px));
+  overflow: auto;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.28);
+}
+
+.integration-change-modal .drawer-close {
+  position: static;
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+}
+
+.integration-change-modal label:not(.settings-check) {
+  display: grid;
+  gap: 7px;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.integration-change-modal select {
+  min-height: 42px;
+  padding: 9px 11px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #0f172a;
+  background: #fff;
+  font-weight: 800;
+}
+
+.integration-change-copy {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fff7ed;
+}
+
+.integration-change-copy p {
+  margin: 0;
+  color: #334155;
+  line-height: 1.5;
+}
+
+.settings-check a {
+  color: #0f172a;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
 .integration-action-card {
   display: grid;
   gap: 10px;
@@ -5633,6 +5770,7 @@ td small {
   .plan-choice-grid,
   .metric-grid,
   .quick-grid,
+  .change-request-list article,
   .app-grid,
   .form-grid,
   .checkout-company-grid,

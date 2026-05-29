@@ -81,7 +81,7 @@ class MerchantCompanyProfileApiTest extends TestCase
 
     public function test_bigshop_company_platform_is_locked_in_company_portal(): void
     {
-        [$user, $merchant, $company] = $this->tenant('bigshop');
+        [$user, $merchant, $company] = $this->tenant('bigshop', true);
 
         $this->withHeaders($this->headers($user, $merchant, $company))
             ->patchJson('/api/v1/merchant/company-platform', [
@@ -96,7 +96,7 @@ class MerchantCompanyProfileApiTest extends TestCase
         ]);
     }
 
-    public function test_non_bigshop_company_cannot_self_activate_bigshop_platform(): void
+    public function test_non_bigshop_company_can_switch_to_bigshop_without_discount_lock(): void
     {
         [$user, $merchant, $company] = $this->tenant('custom');
 
@@ -104,12 +104,14 @@ class MerchantCompanyProfileApiTest extends TestCase
             ->patchJson('/api/v1/merchant/company-platform', [
                 'platform' => 'bigshop',
             ])
-            ->assertUnprocessable()
-            ->assertJsonValidationErrors('platform');
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'bigshop')
+            ->assertJsonPath('data.bigshop_discount_active', false);
 
         $this->assertDatabaseHas('merchant_companies', [
             'id' => $company->id,
-            'platform' => 'custom',
+            'platform' => 'bigshop',
+            'bigshop_discount_active' => false,
         ]);
     }
 
@@ -124,7 +126,7 @@ class MerchantCompanyProfileApiTest extends TestCase
         ];
     }
 
-    private function tenant(string $platform = 'bigshop'): array
+    private function tenant(string $platform = 'bigshop', bool $bigshopDiscountActive = false): array
     {
         $merchant = Merchant::query()->create([
             'name' => 'Empresa CNPJ 11.222.333/0001-81',
@@ -136,6 +138,7 @@ class MerchantCompanyProfileApiTest extends TestCase
             'name' => 'Empresa CNPJ 11.222.333/0001-81',
             'document' => '11222333000181',
             'platform' => $platform,
+            'bigshop_discount_active' => $bigshopDiscountActive,
             'status' => 'active',
         ]);
         $user = User::query()->create([

@@ -235,4 +235,41 @@ class AuthTest extends TestCase
             ->assertOk()
             ->assertJsonPath('summary.products', 1);
     }
+
+    public function test_admin_selected_company_resolves_merchant_without_pivot_link(): void
+    {
+        $admin = User::query()->create([
+            'name' => 'Admin',
+            'email' => 'admin.context@example.com',
+            'cpf' => '12345678901',
+            'role' => 'admin',
+            'password' => Hash::make('password123'),
+        ]);
+        $merchant = Merchant::query()->create([
+            'name' => 'Zak',
+            'slug' => 'zak',
+            'billing_status' => 'trialing',
+        ]);
+        $company = MerchantCompany::query()->create([
+            'merchant_id' => $merchant->id,
+            'name' => 'Zak',
+            'platform' => 'bigshop',
+            'bigshop_discount_active' => true,
+            'status' => 'active',
+        ]);
+
+        $token = $admin->createToken('admin-test', ['role:admin'])->plainTextToken;
+        $companyToken = $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/v1/auth/select-company', [
+                'company_id' => $company->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('active_company.id', $company->id)
+            ->json('token');
+
+        $this->withHeader('Authorization', 'Bearer '.$companyToken)
+            ->getJson('/api/v1/integrations')
+            ->assertOk()
+            ->assertJsonPath('data.0.key', 'bigshop');
+    }
 }

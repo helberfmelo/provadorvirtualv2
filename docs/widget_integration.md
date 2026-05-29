@@ -279,10 +279,12 @@ Rotas protegidas:
 
 Plataformas catalogadas: `bigshop`, `shopify`, `woocommerce`, `nuvemshop`, `vtex`, `tray`, `loja_integrada`, `magento`, `opencart` e `custom`.
 
-Regra comercial Sprint 32: empresas que contrataram como BigShop recebem o desconto BigShop e, no painel, podem visualizar/configurar apenas instalação BigShop. O backend também bloqueia tentativas de salvar Shopify, WooCommerce, Nuvemshop, VTEX, Tray ou custom para esse contrato.
+Regra comercial atual: `platform=bigshop` define a plataforma operacional do widget; `bigshop_discount_active=true` define o benefício comercial. Empresas sem benefício podem trocar de plataforma em `/app/integracoes`, inclusive para BigShop sem desconto. Empresas BigShop com benefício ativo solicitam a troca para outra plataforma pelo portal, aceitam os termos de troca e aguardam o SaaS revisar diferença de plano, link de pagamento e aplicação da mudança.
 
 Status Sprint 34: o catálogo de integrações passou a incluir `loja_integrada`, `magento` e `opencart`, além das plataformas anteriores. `GET /api/v1/integrations` retorna guia, snippet, checklist e matriz de dados por plataforma. `POST /api/v1/integrations/{platform}/validate-install` valida domínio público, container, script, plataforma e identificadores do produto sem salvar o HTML da loja.
 
 Status Sprint 121: `GET /api/v1/integrations` passa a retornar também `setup` por plataforma, separando campos de conexão, fluxo de catálogo, ponto de instalação na página de produto e tracking/aprendizado. O status exposto pela API é efetivo: conexões antigas gravadas como `draft`, mas com dados mínimos de configuração, aparecem como `configured`; a interface exibe esse estado como `Configurada` e reserva `Pendente` para integrações sem dados suficientes.
+
+Status Sprint 123: `/app/integracoes` mostra `Mudar integração` para BigShop com benefício ativo, abre modal com aceite dos termos e grava `integration_change_requests`. O SaaS lista solicitações pendentes na visão geral e na edição da empresa, podendo registrar link de pagamento/status e aplicar a troca quando concluída.
 
 Credenciais de plataforma devem ser salvas apenas por endpoints protegidos e persistidas criptografadas. A API retorna somente flags como `has_access_token` e `has_webhook_secret`.

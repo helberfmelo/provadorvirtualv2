@@ -528,6 +528,7 @@ class UserAccessController extends Controller
             'name' => $company->name,
             'document' => $company->document,
             'platform' => $company->platform,
+            'bigshop_discount_active' => (bool) $company->bigshop_discount_active,
             'status' => $company->status,
             'merchant' => [
                 'id' => $company->merchant?->id,

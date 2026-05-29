@@ -292,13 +292,13 @@ Conector deve mapear:
 - imagem de tabela -> backlog de OCR/assistencia;
 - estoque/status -> campos informativos, sem promessa no widget se não for necessário.
 
-Regra comercial da Sprint 32:
+Regra comercial atual:
 
-- quando a empresa ativa/contratada tiver `platform=bigshop`, `GET /integrations` retorna somente BigShop;
-- `PATCH /integrations/{platform}` bloqueia plataformas diferentes de `bigshop`;
-- `POST /integrations/{platform}/validate-install` também respeita a trava BigShop e valida somente URL pública;
-- `GET|PATCH /widget-install` mantem `platform=bigshop` para esse contrato;
-- o front do painel também mostra apenas a opção BigShop nesses casos.
+- `merchant_companies.platform` define a plataforma operacional exibida nos guias e snippets;
+- `merchant_companies.bigshop_discount_active` define se a loja tem benefício comercial BigShop;
+- empresas sem benefício BigShop podem trocar a plataforma operacional diretamente em `/app/integracoes`, inclusive para BigShop sem desconto;
+- empresas BigShop com benefício ativo não trocam para outra plataforma diretamente: o portal cria `integration_change_requests` com aceite dos termos, e o SaaS revisa pagamento/diferença antes de aplicar a troca;
+- enquanto a plataforma operacional for BigShop, `GET /integrations`, validação e widget exibem o guia BigShop; após a troca, a página se adapta ao novo catálogo da plataforma.
 
 ## Ambientes
 

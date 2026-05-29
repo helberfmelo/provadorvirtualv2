@@ -32,6 +32,7 @@ type AuthCompany = {
   country?: string | null
   domain?: string | null
   platform: string
+  bigshop_discount_active?: boolean
   external_store_id?: string | null
   status: string
   profile_completed?: boolean

@@ -2,12 +2,13 @@
 import { onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
-import type { CompanyRow, MerchantRow, Summary, TransactionalEmailSend } from '../services/saasTypes'
+import type { CompanyRow, IntegrationChangeRequest, MerchantRow, Summary, TransactionalEmailSend } from '../services/saasTypes'
 
 const summary = ref<Summary>({})
 const merchants = ref<MerchantRow[]>([])
 const companies = ref<CompanyRow[]>([])
 const emailSends = ref<TransactionalEmailSend[]>([])
+const integrationChangeRequests = ref<IntegrationChangeRequest[]>([])
 const loading = ref(false)
 const error = ref('')
 
@@ -20,17 +21,19 @@ async function loadOverview() {
   error.value = ''
 
   try {
-    const [overviewResponse, merchantsResponse, companiesResponse, emailSendsResponse] = await Promise.all([
+    const [overviewResponse, merchantsResponse, companiesResponse, emailSendsResponse, changeRequestsResponse] = await Promise.all([
       api.get('/saas/overview'),
       api.get('/saas/merchants'),
       api.get('/saas/companies'),
       api.get('/saas/transactional-email-sends'),
+      api.get('/saas/integration-change-requests', { params: { status: 'pending' } }),
     ])
 
     summary.value = overviewResponse.data.data.summary
     merchants.value = merchantsResponse.data.data
     companies.value = companiesResponse.data.data
     emailSends.value = emailSendsResponse.data.data
+    integrationChangeRequests.value = changeRequestsResponse.data.data
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível carregar o painel SaaS.'
   } finally {
@@ -105,6 +108,28 @@ async function loadOverview() {
         <span>Contratações, tentativas recusadas e detalhes da operadora.</span>
       </RouterLink>
     </div>
+
+    <section v-if="integrationChangeRequests.length" class="panel-main subsection">
+      <div class="subsection-heading">
+        <h2>Solicitações de troca</h2>
+        <span>{{ integrationChangeRequests.length }} pendente{{ integrationChangeRequests.length === 1 ? '' : 's' }}</span>
+      </div>
+      <div class="change-request-list">
+        <article v-for="request in integrationChangeRequests.slice(0, 6)" :key="request.id">
+          <i class="fa-solid fa-right-left" aria-hidden="true"></i>
+          <span>
+            <strong>{{ request.company.name }}</strong>
+            <small>
+              {{ request.from_platform_label }} para {{ request.to_platform_label }} ·
+              solicitado por {{ request.user.name || request.user.email || 'usuário do portal' }}
+            </small>
+          </span>
+          <RouterLink class="btn btn-secondary btn-compact" :to="`/saas/empresas/${request.company.id}/editar`">
+            Abrir empresa
+          </RouterLink>
+        </article>
+      </div>
+    </section>
 
     <section class="panel-main subsection">
       <div class="subsection-heading">
