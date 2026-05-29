@@ -2766,7 +2766,7 @@ Critérios de aceite:
 - eventos são idempotentes e não duplicam contagem;
 - filtros carregam rápido.
 
-Status: planejada.
+Status: implementada localmente na Sprint 148. O portal `/app/analytics` ganhou a seção `Uso do widget` com filtros por período, produto, tabela, marca, categoria, plataforma e dispositivo, além de KPIs, funil, distribuição por device e evolução diária. O backend passou a expor `GET /api/v1/analytics/widget-usage` e o widget público passou a enviar eventos idempotentes para `POST /api/v1/public/widget-events`, cobrindo `button_impression`, `virtual_try_on_open`, `measurement_table_open`, `recommendation_generated`, `size_selected` e `feedback_submitted`. Validações locais passaram com `php artisan test`, `php vendor/bin/pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `5177` com backend local em `8002`. Publicação, monitoramento e validação final de produção seguem no ciclo obrigatório antes de avançar para a Sprint 149.
 
 ### Sprint 149 - Ranking de produtos e relatório de recomendações
 

@@ -250,6 +250,12 @@ Assert-True ($widgetInstall.data.theme.placement.selector -eq "#provador-virtual
 Assert-True (@($widgetInstall.data.platform_guide.guide.placement_suggestions).Count -gt 0) "widget sem sugestoes de seletor"
 "API widget install OK"
 
+$widgetUsageAnalytics = Invoke-RestMethod -Uri "$ApiBase/analytics/widget-usage?period=30d" -Headers $headers
+Assert-True ($null -ne $widgetUsageAnalytics.data) "widget usage analytics sem data"
+Assert-True ($null -ne $widgetUsageAnalytics.data.summary) "widget usage analytics sem resumo"
+Assert-True ($null -ne $widgetUsageAnalytics.data.filter_options) "widget usage analytics sem filtros"
+"API widget usage analytics OK"
+
 $placementBody = @{
     platform = $widgetInstall.data.platform
     url = "$FrontendBase/produto-teste"

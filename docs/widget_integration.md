@@ -1,6 +1,6 @@
 # Widget e Integração Universal
 
-Atualizado em: 2026-05-28
+Atualizado em: 2026-05-29
 
 ## Objetivo
 
@@ -111,6 +111,8 @@ Status Sprint 134: a ativação por tabela foi adicionada ao contrato público. 
 
 Status Sprint 147: o painel `/app/widget` passou a expor editor dedicado do modal do provador, com `theme.presentation_mode` e `theme.modal.*` para logo, textos, etapas, tabela, cores, bordas, tipografia e estilo da tabela. O preview desktop/mobile mostra o modal completo e a tabela integrada, enquanto o backend normaliza temas antigos e exige contraste mínimo antes de publicar.
 
+Status Sprint 148: o widget público passou a registrar eventos operacionais de uso em `POST /api/v1/public/widget-events`, cobrindo impressões, abertura do provador, abertura da tabela, recomendação gerada, aplicação de tamanho e envio de feedback. O `event_id` é determinístico por visita/ação para evitar contagem duplicada em re-render, reabertura ou repetição da mesma recomendação.
+
 ## Evolucao inteligente prevista
 
 Benchmark Sizebay/Zak em `docs/sizebay_benchmark.md` confirmou que o widget deve evoluir para:
@@ -132,6 +134,7 @@ Endpoints usados pelo widget:
 - `POST /api/v1/public/recommendations`
 - `POST /api/v1/public/recommendations/{id}/feedback`
 - `POST /api/v1/public/recommendations/{id}/signal`
+- `POST /api/v1/public/widget-events`
 - `POST /api/v1/public/shopper-profiles/forget`
 
 `config-check` retorna também a tabela de medidas normalizada para o modal público, quando o produto estiver configurado. Quando bloqueado por produto, retorna `reason` como `virtual_try_on_disabled`, `measurement_table_disabled`, `product_inactive` ou `measurement_table_missing`. Quando apenas o provador da tabela estiver desativado, a resposta permanece configurada para permitir a tabela pública e informa `virtual_try_on_enabled=false`.
@@ -141,6 +144,8 @@ Endpoints usados pelo widget:
 `recommendations` também aceita `shopper_profile.raw_widget_data` para registrar a jornada completa do widget. Esse campo deve conter apenas dados operacionais da recomendação, sem nome, e-mail, telefone, documento ou outros identificadores pessoais diretos.
 
 `signal` registra eventos `add_to_cart`, `purchase`, `return` e `exchange` para aprendizado estatístico. Desde a Sprint 115, o payload pode incluir `ordered_size`, `returned_size`, `exchanged_to_size`, `return_reason`, `order_status`, `quantity`, `unit_price`, `source_platform` e `occurred_at`. `order_reference` é aceito apenas para gerar hash interno; a referência bruta não deve aparecer em telas, logs ou documentos. Plataformas que ainda não tiverem integração automática podem enviar esses sinais depois pelo próprio front ou por conector server-to-server.
+
+`widget-events` registra eventos operacionais do funil público sem exigir autenticação de shopper. Os eventos aceitos hoje são `button_impression`, `virtual_try_on_open`, `measurement_table_open`, `recommendation_generated`, `size_selected` e `feedback_submitted`. O backend deriva `device_type` do `User-Agent`, aceita `session_key` e `visit_key` para análise agregada e deduplica por `client_event_id` dentro do merchant.
 
 O widget resolve a base da API a partir do próprio `src`. Quando o script está em uma subpasta, como `/provadorvirtual_v2/widget/v1/provador-virtual.js`, a base padrão da API é calculada diretamente como `/provadorvirtual_v2/public/api/v1`, evitando redirect no preflight CORS do navegador. Em instalações fora desse padrão, `data-api-base-url` pode sobrescrever a base explicitamente.
 

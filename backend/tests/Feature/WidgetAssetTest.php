@@ -33,6 +33,15 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('button_style', $scriptContents);
         $this->assertStringContainsString('button_background', $scriptContents);
         $this->assertStringContainsString('button_text', $scriptContents);
+        $this->assertStringContainsString('/public/widget-events', $scriptContents);
+        $this->assertStringContainsString('trackWidgetEvent', $scriptContents);
+        $this->assertStringContainsString('button_impression', $scriptContents);
+        $this->assertStringContainsString('virtual_try_on_open', $scriptContents);
+        $this->assertStringContainsString('measurement_table_open', $scriptContents);
+        $this->assertStringContainsString('recommendation_generated', $scriptContents);
+        $this->assertStringContainsString('feedback_submitted', $scriptContents);
+        $this->assertStringContainsString('widgetSessionStorageKey', $scriptContents);
+        $this->assertStringContainsString('widgetVisitStorageKey', $scriptContents);
         $this->assertStringContainsString('button_primary_icon', $scriptContents);
         $this->assertStringContainsString('button_secondary_icon', $scriptContents);
         $this->assertStringContainsString('button_icon_animation', $scriptContents);

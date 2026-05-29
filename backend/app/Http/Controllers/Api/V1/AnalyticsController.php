@@ -4,12 +4,14 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\V1\Concerns\ResolvesMerchant;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\WidgetUsageAnalyticsRequest;
 use App\Models\IntegrationEvent;
 use App\Models\Product;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
 use App\Models\ShopperProfile;
+use App\Services\Analytics\WidgetUsageAnalyticsService;
 use App\Services\Recommendation\MeasurementTableInsightService;
 use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
@@ -17,6 +19,16 @@ use Illuminate\Http\Request;
 class AnalyticsController extends Controller
 {
     use ResolvesMerchant;
+
+    public function widgetUsage(WidgetUsageAnalyticsRequest $request, WidgetUsageAnalyticsService $widgetUsage): array
+    {
+        $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
+
+        return [
+            'data' => $widgetUsage->report($merchant, $company, $request->validated()),
+        ];
+    }
 
     public function recommendations(Request $request, MeasurementTableInsightService $tableInsights): array
     {

@@ -1,6 +1,6 @@
 # Analytics, SaaS Admin e Auditoria
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-29
 
 ## Objetivo
 
@@ -42,6 +42,34 @@ Também retorna series diarias, distribuicao por tamanho, produtos com recomenda
 Status Sprint 36: `/app/analytics` mostra os novos cards de perfis, aprendizado e outliers. Sinais `blocked_outlier` são armazenados para investigacao e não entram direto em refinamento automático.
 
 Status Sprint 115: `/app/analytics` passa a mostrar sugestões por tabela de medidas com base em pedidos, devoluções, trocas e feedback. A referência de pedido é guardada apenas como hash, e os insights indicam revisão humana em vez de alterar tabelas automaticamente.
+
+Status Sprint 148: `/app/analytics` também passa a mostrar o relatório `Uso do widget`, alimentado por `GET /api/v1/analytics/widget-usage`.
+
+Resumo entregue por `/analytics/widget-usage`:
+
+- impressões dos botões do provador;
+- aberturas do provador;
+- consultas à tabela de medidas;
+- recomendações geradas;
+- tamanhos aplicados;
+- feedbacks enviados;
+- conversões associadas quando existir compra ligada à recomendação;
+- taxa de uso, taxa de consulta de tabela, taxa de aplicação do tamanho e taxa de conversão;
+- funil do widget;
+- distribuição por desktop, mobile e tablet;
+- evolução diária do uso.
+
+Filtros entregues:
+
+- período (`today`, `7d`, `30d`, `90d`, `custom`);
+- produto;
+- tabela de medidas;
+- marca;
+- categoria;
+- plataforma;
+- dispositivo.
+
+Regra operacional Sprint 148: o widget envia `button_impression`, `virtual_try_on_open`, `measurement_table_open`, `recommendation_generated`, `size_selected` e `feedback_submitted` para `POST /api/v1/public/widget-events`. A contagem é idempotente por `client_event_id` dentro do merchant para evitar duplicidade em re-render, reload ou repetição de chamada.
 
 ## SaaS Admin
 

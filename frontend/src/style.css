@@ -8426,6 +8426,33 @@ textarea {
   margin-top: 24px;
 }
 
+.analytics-filter-panel {
+  margin-top: 24px;
+}
+
+.analytics-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.analytics-filter-actions {
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  grid-column: 1 / -1;
+}
+
+.usage-funnel-strip span {
+  min-height: 88px;
+}
+
+.analytics-device-row strong,
+.analytics-device-row small {
+  display: block;
+}
+
 .bar-list {
   display: grid;
   gap: 10px;
@@ -8437,6 +8464,16 @@ textarea {
   grid-template-columns: 58px minmax(0, 1fr) 42px;
   gap: 10px;
   align-items: center;
+}
+
+.analytics-bar-row-wide {
+  grid-template-columns: 58px minmax(0, 1fr) 48px minmax(160px, 0.8fr);
+}
+
+.analytics-bar-row-wide small {
+  color: #6b7280;
+  font-size: 0.8rem;
+  line-height: 1.35;
 }
 
 .bar-row div {
@@ -8907,6 +8944,7 @@ td small {
   .widget-modal-type-grid,
   .widget-color-grid,
   .widget-type-grid,
+  .analytics-filter-grid,
   .widget-data-support,
   .integrations-grid,
   .import-grid,
@@ -8956,6 +8994,14 @@ td small {
   .product-detail-overview,
   .product-detail-tabs {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .analytics-bar-row-wide {
+    grid-template-columns: 58px minmax(0, 1fr) 48px;
+  }
+
+  .analytics-bar-row-wide small {
+    grid-column: 1 / -1;
   }
 
   .product-origin-columns,

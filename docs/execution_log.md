@@ -1622,3 +1622,17 @@
 - Validações locais passaram com `php artisan test` usando o PHP `C:\php\php.exe` com `sqlite3`, `php vendor/bin/pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check` e varredura de segredos. A revisão visual headless abriu `/app/widget` com login demo, confirmou o bloco `Modal do provador` e a prévia aberta em desktop.
 - Commit `fe82320` enviado para `main`; o run `26663180067` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/widget`, widget JS/CSS, APIs públicas, APIs protegidas, CORS, login demo, go-live readiness, integrações, sincronização, taxonomia e `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 148 Relatórios de uso do widget
+
+- Relida a documentação obrigatória antes da sprint. `docs/credentials.local.md` ainda não foi reaberto nesta etapa porque o ciclo ainda estava em implementação/validação local, sem entrar em deploy ou produção.
+- Usado o benchmark já registrado de `Reports / Usage Data` da Sizebay como referência para KPIs, segmentação por dispositivo, funil e filtros por período.
+- Criado `POST /api/v1/public/widget-events`, com eventos idempotentes por `client_event_id` para `button_impression`, `virtual_try_on_open`, `measurement_table_open`, `recommendation_generated`, `size_selected` e `feedback_submitted`.
+- Criado `GET /api/v1/analytics/widget-usage`, com filtros por período, produto, tabela, marca, categoria, plataforma e dispositivo, retornando resumo, funil, evolução diária, distribuição por device e opções de filtros para o portal.
+- `/app/analytics` ganhou a seção `Uso do widget`, com cards de KPI, filtros operacionais, funil, distribuição por dispositivo e evolução diária, preservando a área já existente de qualidade da recomendação.
+- O widget público passou a emitir eventos de uso de forma tolerante a falhas, com chaves determinísticas por visita/ação para evitar duplicidade em re-render e reabertura do mesmo fluxo.
+- O script `scripts/validate-production.ps1` foi ampliado para checar também `GET /api/v1/analytics/widget-usage`.
+- Validações locais passaram com `C:\php\php.exe -l` nos PHP alterados, `C:\php\php.exe artisan test --filter=WidgetAssetTest`, `C:\php\php.exe artisan test --filter=AnalyticsApiTest`, `C:\php\php.exe artisan test`, `C:\php\php.exe vendor\bin\pint --dirty --test` e `npm --prefix frontend run build`.
+- `git diff --check` e a varredura de segredos passaram; os únicos avisos observados no terminal foram de fim de linha (`LF`/`CRLF`) em arquivos frontend/PowerShell, sem whitespace inválido nem segredo real nos arquivos versionados alterados.
+- A validação visual local rodou em `http://127.0.0.1:5177/app/analytics`, com backend local em `8002`, Playwright headless e usuário demo. O banco local precisou receber a migration pendente `2026_05_29_120000_create_widget_usage_events_table` para a tela carregar o novo relatório; em seguida foram gerados eventos demo locais para revisar o funil e os cards com dados reais. Desktop e mobile passaram sem erros de console/página; as capturas ficaram em `.tmp/sprint148-analytics-desktop.png` e `.tmp/sprint148-analytics-mobile.png` e não devem ser versionadas.
+- Aguardando commit, push, monitoramento do GitHub Actions, validação de produção, commit documental final e nova validação pós-deploy antes de avançar para a Sprint 149.

@@ -12,12 +12,13 @@ class AnalyticsApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_merchant_can_read_recommendation_analytics_and_audit_logs(): void
+    public function test_merchant_can_read_recommendation_and_widget_usage_analytics(): void
     {
         $this->seed();
         $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
         $merchant = Merchant::query()->where('slug', 'provador-virtual-demo')->firstOrFail();
         $product = Product::query()->where('sku', 'PV-AURORA-MIDI')->firstOrFail();
+        $mobileUserAgent = 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Mobile/15E148 Safari/604.1';
 
         Product::query()->create([
             'merchant_id' => $merchant->id,
@@ -44,6 +45,61 @@ class AnalyticsApiTest extends TestCase
                 'fit_preference' => 'regular',
             ],
         ])->assertCreated()->json('recommendation_id');
+
+        $this->withHeader('User-Agent', $mobileUserAgent)
+            ->postJson('/api/v1/public/widget-events', [
+                'merchant_id' => $merchant->id,
+                'product_id' => $product->id,
+                'platform' => 'custom',
+                'event_name' => 'button_impression',
+                'event_id' => 'evt-button-impression-1',
+                'session_key' => 'session-1',
+                'visit_key' => 'visit-1',
+                'payload' => ['presentation_mode' => 'drawer'],
+            ])
+            ->assertCreated()
+            ->assertJsonPath('tracked', true)
+            ->assertJsonPath('duplicate', false);
+
+        $this->withHeader('User-Agent', $mobileUserAgent)
+            ->postJson('/api/v1/public/widget-events', [
+                'merchant_id' => $merchant->id,
+                'product_id' => $product->id,
+                'platform' => 'custom',
+                'event_name' => 'button_impression',
+                'event_id' => 'evt-button-impression-1',
+                'session_key' => 'session-1',
+                'visit_key' => 'visit-1',
+            ])
+            ->assertOk()
+            ->assertJsonPath('tracked', true)
+            ->assertJsonPath('duplicate', true);
+
+        foreach ([
+            ['virtual_try_on_open', 'evt-open-1'],
+            ['measurement_table_open', 'evt-table-1'],
+            ['recommendation_generated', 'evt-recommendation-1'],
+            ['size_selected', 'evt-size-1'],
+            ['feedback_submitted', 'evt-feedback-1'],
+        ] as [$eventName, $eventId]) {
+            $payload = [
+                'merchant_id' => $merchant->id,
+                'product_id' => $product->id,
+                'platform' => 'custom',
+                'event_name' => $eventName,
+                'event_id' => $eventId,
+                'recommendation_id' => in_array($eventName, ['recommendation_generated', 'size_selected', 'feedback_submitted'], true)
+                    ? $recommendationId
+                    : null,
+                'selected_size' => in_array($eventName, ['size_selected', 'feedback_submitted'], true) ? 'M' : null,
+                'session_key' => 'session-1',
+                'visit_key' => 'visit-1',
+            ];
+
+            $this->withHeader('User-Agent', $mobileUserAgent)
+                ->postJson('/api/v1/public/widget-events', $payload)
+                ->assertCreated();
+        }
 
         $this->postJson("/api/v1/public/recommendations/{$recommendationId}/feedback", [
             'was_helpful' => true,
@@ -90,6 +146,23 @@ class AnalyticsApiTest extends TestCase
             ->assertJsonPath('data.sizes.0.size', 'M')
             ->assertJsonPath('data.learning_statuses.0.status', 'accepted')
             ->assertJsonPath('data.measurement_table_insights.0.suggested_action', 'review_size_too_small');
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/analytics/widget-usage?period=30d&device_type=mobile')
+            ->assertOk()
+            ->assertJsonPath('data.summary.button_impressions', 1)
+            ->assertJsonPath('data.summary.virtual_try_on_opens', 1)
+            ->assertJsonPath('data.summary.measurement_table_opens', 1)
+            ->assertJsonPath('data.summary.recommendations_generated', 1)
+            ->assertJsonPath('data.summary.size_selections', 1)
+            ->assertJsonPath('data.summary.feedback_submitted', 1)
+            ->assertJsonPath('data.summary.conversions', 1)
+            ->assertJsonPath('data.summary.usage_rate', 100)
+            ->assertJsonPath('data.summary.selection_rate', 100)
+            ->assertJsonPath('data.summary.conversion_rate', 100)
+            ->assertJsonPath('data.device_distribution.0.device_type', 'mobile')
+            ->assertJsonPath('data.funnel.0.key', 'button_impression')
+            ->assertJsonPath('data.filter_options.platforms.0', 'custom');
 
         $this->withHeaders($headers)
             ->getJson('/api/v1/audit-logs')

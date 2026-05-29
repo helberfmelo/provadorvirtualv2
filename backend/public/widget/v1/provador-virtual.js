@@ -12,6 +12,9 @@
   var suppressDrawerOpenUntil = 0;
   var profileStorageKey = 'pv_shopper_profile_v2';
   var profileStoragePrefix = 'pv_shopper_profile_v2_table_';
+  var widgetSessionStorageKey = 'pv_widget_session_v1';
+  var widgetVisitStorageKey = 'pv_widget_visit_v1';
+  var trackedEventCache = {};
   var state = initialState();
 
   exposePublicApi();
@@ -357,6 +360,98 @@
     return request('/public/recommendations/config-check', identityPayload());
   }
 
+  function trackWidgetEvent(eventName, options) {
+    options = options || {};
+
+    var eventId = options.eventId || widgetEventId(eventName, options.unique || {});
+
+    if (trackedEventCache[eventId]) {
+      return Promise.resolve({ tracked: true, client_event_id: eventId, cached: true });
+    }
+
+    trackedEventCache[eventId] = true;
+
+    var payload = Object.assign(identityPayload(), {
+      event_name: eventName,
+      event_id: eventId,
+      recommendation_id: options.recommendationId || null,
+      selected_size: options.selectedSize || null,
+      session_key: widgetSessionKey(),
+      visit_key: widgetVisitKey(),
+      occurred_at: new Date().toISOString(),
+      payload: eventPayload(options.payload || {}),
+    });
+
+    emitWidgetEvent('provadorvirtual:usage', Object.assign({}, payload, { event_name: eventName }));
+
+    return request('/public/widget-events', payload).catch(function (error) {
+      delete trackedEventCache[eventId];
+      throw error;
+    });
+  }
+
+  function widgetEventId(eventName, unique) {
+    return 'pv-' + eventName + '-' + simpleHash(JSON.stringify({
+      event_name: eventName,
+      identity: identityPayload(),
+      visit_key: widgetVisitKey(),
+      unique: unique || {},
+    }));
+  }
+
+  function widgetSessionKey() {
+    return readOrCreateStorageKey('localStorage', widgetSessionStorageKey);
+  }
+
+  function widgetVisitKey() {
+    return readOrCreateStorageKey('sessionStorage', widgetVisitStorageKey);
+  }
+
+  function readOrCreateStorageKey(storageName, key) {
+    var storage = safeStorage(storageName);
+
+    if (!storage) {
+      return 'pv-fallback-' + simpleHash(key + '-' + window.location.pathname + '-' + window.location.host);
+    }
+
+    var current = storage.getItem(key);
+    if (current) {
+      return current;
+    }
+
+    var generated = 'pv-' + simpleHash(key + '-' + Date.now() + '-' + Math.random());
+    storage.setItem(key, generated);
+
+    return generated;
+  }
+
+  function safeStorage(storageName) {
+    try {
+      return window[storageName] || null;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function simpleHash(value) {
+    var hash = 0;
+
+    for (var index = 0; index < value.length; index += 1) {
+      hash = ((hash << 5) - hash) + value.charCodeAt(index);
+      hash |= 0;
+    }
+
+    return Math.abs(hash).toString(36);
+  }
+
+  function eventPayload(payload) {
+    if (!payload || typeof payload !== 'object') {
+      return {};
+    }
+
+    return payload;
+  }
+
   function failurePayload(reason, error) {
     return {
       configured: false,
@@ -451,6 +546,25 @@
     }
 
     root.appendChild(group);
+    trackWidgetEvent('button_impression', {
+      unique: {
+        product_id: config.productId || null,
+        variant_id: config.variantId || null,
+        presentation_mode: presentationMode(),
+        virtual_try_on_enabled: virtualTryOnEnabled,
+        measurement_table_enabled: measurementTableEnabled,
+      },
+      payload: {
+        product_id: config.productId || null,
+        variant_id: config.variantId || null,
+        sku: config.sku || null,
+        presentation_mode: presentationMode(),
+        virtual_try_on_enabled: virtualTryOnEnabled,
+        measurement_table_enabled: measurementTableEnabled,
+      },
+    }).catch(function () {
+      // Widget usage tracking cannot block the storefront.
+    });
   }
 
   function applyTheme(element) {
@@ -570,6 +684,22 @@
 
     activeBackdrop = createBackdrop('', recommendationBackdropClass());
     activeBackdrop.innerHTML = drawerFrameHtml();
+    trackWidgetEvent('virtual_try_on_open', {
+      unique: {
+        product_id: config.productId || null,
+        variant_id: config.variantId || null,
+        presentation_mode: presentationMode(),
+      },
+      payload: {
+        product_id: config.productId || null,
+        variant_id: config.variantId || null,
+        sku: config.sku || null,
+        presentation_mode: presentationMode(),
+        measurement_table_id: state.config ? state.config.measurement_table_id : null,
+      },
+    }).catch(function () {
+      // Widget usage tracking cannot block the storefront.
+    });
     renderDrawer(activeBackdrop);
     scheduleAutoRecommendation(activeBackdrop);
   }
@@ -1152,6 +1282,24 @@
       recommendation: state.recommendation,
     });
 
+    trackWidgetEvent('size_selected', {
+      recommendationId: state.recommendation.recommendation_id,
+      selectedSize: size,
+      unique: {
+        recommendation_signature: recommendationSignature(),
+        selected_size: size,
+      },
+      payload: {
+        recommendation_id: state.recommendation.recommendation_id,
+        recommended_size: state.recommendation.recommended_size || null,
+        selected_size: size,
+        confidence: state.recommendation.confidence || null,
+        precision: state.precision,
+      },
+    }).catch(function () {
+      // Widget usage tracking cannot block the storefront.
+    });
+
     suppressDrawerOpenUntil = Date.now() + 900;
     closeBackdrop(backdrop);
     emitWidgetEvent('provadorvirtual:size-selected', detail);
@@ -1342,6 +1490,21 @@
         comment: state.feedback.comment || null,
       }).then(function () {
         state.feedback.sent = true;
+        trackWidgetEvent('feedback_submitted', {
+          recommendationId: state.recommendation.recommendation_id,
+          selectedSize: state.feedback.selectedSize || state.recommendation.recommended_size,
+          unique: {
+            recommendation_id: state.recommendation.recommendation_id,
+          },
+          payload: {
+            recommendation_id: state.recommendation.recommendation_id,
+            was_helpful: state.feedback.wasHelpful,
+            selected_size: state.feedback.selectedSize || state.recommendation.recommended_size,
+            has_comment: Boolean(state.feedback.comment),
+          },
+        }).catch(function () {
+          // Widget usage tracking cannot block the storefront.
+        });
         renderDrawer(backdrop);
       }).catch(function () {
         sendButton.disabled = false;
@@ -1433,6 +1596,25 @@
         state.recommendationSignature = signature;
         state.dirty = false;
         state.feedback.selectedSize = data.recommended_size || '';
+
+        trackWidgetEvent('recommendation_generated', {
+          recommendationId: data.recommendation_id,
+          unique: {
+            recommendation_signature: signature,
+            recommended_size: data.recommended_size || null,
+          },
+          payload: {
+            recommendation_id: data.recommendation_id,
+            recommended_size: data.recommended_size || null,
+            confidence: data.confidence || null,
+            precision: state.precision,
+            reason: options.reason || 'manual',
+            steps_completed: completedSteps(),
+            measurement_table_id: state.config ? state.config.measurement_table_id : null,
+          },
+        }).catch(function () {
+          // Widget usage tracking cannot block the storefront.
+        });
 
         persistProfileFromRecommendation(data, savedProfile, measurements);
 
@@ -1793,6 +1975,22 @@
 
   function openTableModal() {
     var backdrop = createBackdrop(tableModalHtml(), 'pv-modal-backdrop');
+
+    trackWidgetEvent('measurement_table_open', {
+      unique: {
+        product_id: config.productId || null,
+        variant_id: config.variantId || null,
+        measurement_table_id: state.config ? state.config.measurement_table_id : null,
+      },
+      payload: {
+        product_id: config.productId || null,
+        variant_id: config.variantId || null,
+        sku: config.sku || null,
+        measurement_table_id: state.config ? state.config.measurement_table_id : null,
+      },
+    }).catch(function () {
+      // Widget usage tracking cannot block the storefront.
+    });
 
     backdrop.querySelector('[data-pv-close]').addEventListener('click', function () {
       backdrop.remove();

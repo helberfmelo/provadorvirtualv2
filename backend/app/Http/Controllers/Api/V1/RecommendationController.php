@@ -8,6 +8,7 @@ use App\Http\Requests\RecommendationConfigCheckRequest;
 use App\Http\Requests\StoreRecommendationFeedbackRequest;
 use App\Http\Requests\StoreRecommendationRequest;
 use App\Http\Requests\StoreRecommendationSignalRequest;
+use App\Http\Requests\StoreWidgetUsageEventRequest;
 use App\Models\FitProfile;
 use App\Models\MeasurementTable;
 use App\Models\MerchantCompany;
@@ -18,9 +19,12 @@ use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
 use App\Models\WidgetInstall;
+use App\Models\WidgetUsageEvent;
 use App\Services\Recommendation\LearningSignalService;
 use App\Services\Recommendation\RecommendationEngine;
 use App\Services\Recommendation\ShopperProfileService;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class RecommendationController extends Controller
@@ -222,6 +226,91 @@ class RecommendationController extends Controller
             'forgotten' => $forgotten,
             'message' => $forgotten ? 'Perfil removido deste provador.' : 'Perfil não encontrado.',
         ], $forgotten ? 200 : 404);
+    }
+
+    public function trackWidgetEvent(StoreWidgetUsageEventRequest $request)
+    {
+        $data = $request->validated();
+        $product = $this->resolveProduct($data);
+        $configurationIssue = $this->configurationIssue($product, false);
+
+        if ($configurationIssue) {
+            return response()->json([
+                'tracked' => false,
+                'reason' => $configurationIssue['reason'],
+                'message' => $configurationIssue['message'],
+            ], 422);
+        }
+
+        $product->loadMissing('measurementTable');
+
+        $recommendationLog = null;
+        if (! empty($data['recommendation_id'])) {
+            $recommendationLog = RecommendationLog::query()
+                ->whereKey((int) $data['recommendation_id'])
+                ->where('merchant_id', $product->merchant_id)
+                ->where(function (Builder $query) use ($product): void {
+                    $query->where('product_id', $product->id)
+                        ->orWhereNull('product_id');
+                })
+                ->first();
+        }
+
+        $attributes = [
+            'merchant_company_id' => $product->merchant_company_id,
+            'product_id' => $product->id,
+            'product_variant_id' => $recommendationLog?->product_variant_id,
+            'measurement_table_id' => $product->measurement_table_id,
+            'recommendation_log_id' => $recommendationLog?->id,
+            'event_name' => $data['event_name'],
+            'platform' => $this->cleanString($data['platform'] ?? null),
+            'device_type' => $this->deviceType($request->userAgent()),
+            'session_key' => $this->cleanString($data['session_key'] ?? null),
+            'visit_key' => $this->cleanString($data['visit_key'] ?? null),
+            'selected_size' => $this->cleanString($data['selected_size'] ?? null),
+            'product_name' => $product->name,
+            'measurement_table_name' => $product->measurementTable?->name,
+            'brand_label' => $this->brandLabel($product),
+            'category_label' => $this->categoryLabel($product),
+            'payload' => $this->payloadSnapshot($data['payload'] ?? null),
+            'occurred_at' => $this->occurredAt($data['occurred_at'] ?? null),
+        ];
+
+        $event = WidgetUsageEvent::query()->firstOrCreate(
+            [
+                'merchant_id' => $product->merchant_id,
+                'client_event_id' => $data['event_id'],
+            ],
+            $attributes
+        );
+
+        if (! $event->wasRecentlyCreated) {
+            $updates = [];
+
+            if (! $event->recommendation_log_id && $recommendationLog?->id) {
+                $updates['recommendation_log_id'] = $recommendationLog->id;
+                $updates['product_variant_id'] = $recommendationLog->product_variant_id;
+            }
+
+            if (! $event->selected_size && filled($attributes['selected_size'])) {
+                $updates['selected_size'] = $attributes['selected_size'];
+            }
+
+            if ($event->payload === null && $attributes['payload'] !== null) {
+                $updates['payload'] = $attributes['payload'];
+            }
+
+            if ($updates !== []) {
+                $event->update($updates);
+                $event->refresh();
+            }
+        }
+
+        return response()->json([
+            'tracked' => true,
+            'duplicate' => ! $event->wasRecentlyCreated,
+            'event_id' => $event->id,
+        ], $event->wasRecentlyCreated ? 201 : 200);
     }
 
     private function resolveProduct(array $data): ?Product
@@ -611,6 +700,86 @@ class RecommendationController extends Controller
         }
 
         return $payload;
+    }
+
+    private function payloadSnapshot(mixed $payload): ?array
+    {
+        if (! is_array($payload) || $payload === []) {
+            return null;
+        }
+
+        $json = json_encode($payload);
+
+        if ($json === false) {
+            return null;
+        }
+
+        if (strlen($json) > 4000) {
+            return [
+                'truncated' => true,
+                'original_size' => strlen($json),
+                'keys' => array_keys($payload),
+            ];
+        }
+
+        return $payload;
+    }
+
+    private function deviceType(?string $userAgent): string
+    {
+        $agent = mb_strtolower((string) $userAgent);
+
+        if ($agent !== '' && preg_match('/ipad|tablet|sm-t|kindle|silk/', $agent)) {
+            return 'tablet';
+        }
+
+        if ($agent !== '' && preg_match('/iphone|ipod|android|mobile|blackberry|opera mini|windows phone/', $agent)) {
+            return 'mobile';
+        }
+
+        return 'desktop';
+    }
+
+    private function brandLabel(Product $product): ?string
+    {
+        return $this->cleanString(
+            data_get($product->metadata ?? [], 'normalized_brand.name')
+            ?: data_get($product->metadata ?? [], 'normalized_brand_name')
+            ?: data_get($product->metadata ?? [], 'brand')
+        );
+    }
+
+    private function categoryLabel(Product $product): ?string
+    {
+        return $this->cleanString(
+            data_get($product->metadata ?? [], 'normalized_category.name')
+            ?: data_get($product->metadata ?? [], 'normalized_category_name')
+            ?: $product->category
+        );
+    }
+
+    private function cleanString(mixed $value): ?string
+    {
+        if (! is_scalar($value)) {
+            return null;
+        }
+
+        $clean = trim((string) $value);
+
+        return $clean !== '' ? $clean : null;
+    }
+
+    private function occurredAt(?string $value): Carbon
+    {
+        if (! $value) {
+            return now();
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (\Throwable) {
+            return now();
+        }
     }
 
     private function hashValue(?string $value): ?string

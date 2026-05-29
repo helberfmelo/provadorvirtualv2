@@ -43,6 +43,9 @@ Route::prefix('v1')->group(function (): void {
     Route::options('/public/recommendations/{path?}', fn () => response()->noContent())
         ->where('path', '.*')
         ->middleware('widget.origin');
+    Route::options('/public/widget-events/{path?}', fn () => response()->noContent())
+        ->where('path', '.*')
+        ->middleware('widget.origin');
     Route::options('/public/shopper-profiles/{path?}', fn () => response()->noContent())
         ->where('path', '.*')
         ->middleware('widget.origin');
@@ -53,6 +56,8 @@ Route::prefix('v1')->group(function (): void {
     Route::post('/public/recommendations/{recommendationLog}/feedback', [RecommendationController::class, 'feedback'])
         ->middleware(['widget.origin', 'throttle:120,1']);
     Route::post('/public/recommendations/{recommendationLog}/signal', [RecommendationController::class, 'signal'])
+        ->middleware(['widget.origin', 'throttle:120,1']);
+    Route::post('/public/widget-events', [RecommendationController::class, 'trackWidgetEvent'])
         ->middleware(['widget.origin', 'throttle:120,1']);
     Route::post('/public/shopper-profiles/forget', [RecommendationController::class, 'forgetProfile'])
         ->middleware(['widget.origin', 'throttle:30,1']);
@@ -149,6 +154,8 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/ai/measurement-table-suggestions', [AiMeasurementAssistantController::class, 'suggest'])
             ->middleware('portal.permission:merchant,ai_assistant,edit');
         Route::get('/analytics/recommendations', [AnalyticsController::class, 'recommendations'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/analytics/widget-usage', [AnalyticsController::class, 'widgetUsage'])
             ->middleware('portal.permission:merchant,analytics,view');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])
             ->middleware('portal.permission:merchant,analytics,view');
