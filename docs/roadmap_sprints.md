@@ -2109,4 +2109,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` apos deploy.
 
-Status: em validacao.
+Status: implementado na Sprint 124 no commit `041ad07`, publicado com sucesso no run `26619251869`. Validação local documental passou com varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.

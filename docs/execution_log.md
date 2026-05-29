@@ -1308,3 +1308,5 @@
 - A comparacao cobre navegacao, dashboard, produtos, tabelas, modelagens, marcas, categorias, taxonomias, integracoes, sync, regras, widget, analytics, pedidos, devolucoes, IA, go-live, suporte, billing, SaaS Admin e governanca BigShop.
 - `docs/README.md` passou a listar o novo comparativo como documento obrigatorio de leitura.
 - Validação local documental passou com varredura de segredos e `git diff --check`.
+- Commit `041ad07` enviado para `main`; o run `26619251869` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
