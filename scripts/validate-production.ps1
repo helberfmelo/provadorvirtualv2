@@ -299,6 +299,17 @@ Assert-True ($checkKeys -contains "sku_found") "checklist sem SKU"
 Assert-True ($checkKeys -contains "buttons_rendered") "checklist sem botoes renderizados"
 "API integrations OK"
 
+$ruleSimulationBody = @{
+    import_rules = @{}
+} | ConvertTo-Json -Depth 5
+
+$ruleSimulation = Invoke-RestMethod -Method Post -Uri "$ApiBase/integrations/custom/import-rules/simulate" -Headers $headers -ContentType "application/json" -Body $ruleSimulationBody
+Assert-True ($null -ne $ruleSimulation.data) "simulacao de regras sem data"
+Assert-True ($ruleSimulation.data.sample_total -gt 0) "simulacao de regras sem amostra"
+Assert-True (@($ruleSimulation.data.impact_by_rule).Count -gt 0) "simulacao de regras sem impacto"
+Assert-True (@($ruleSimulation.data.rows).Count -gt 0) "simulacao de regras sem linhas"
+"API import rule simulation OK"
+
 $syncHistory = Invoke-RestMethod -Uri "$ApiBase/integrations/sync-history" -Headers $headers
 Assert-True ($null -ne $syncHistory.data) "sync history sem data"
 Assert-True ($null -ne $syncHistory.meta) "sync history sem meta"

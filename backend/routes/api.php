@@ -120,6 +120,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,integrations,edit');
         Route::post('/integrations/{platform}/test-webhook', [IntegrationController::class, 'testWebhook'])
             ->middleware('portal.permission:merchant,integrations,edit');
+        Route::post('/integrations/{platform}/import-rules/simulate', [IntegrationController::class, 'simulateImportRules'])
+            ->middleware('portal.permission:merchant,integrations,edit');
         Route::get('/integrations/sync-history', [IntegrationController::class, 'syncHistory'])
             ->middleware('portal.permission:merchant,integrations,view');
         Route::get('/integrations/sync-issues/export', [IntegrationController::class, 'exportSyncIssues'])

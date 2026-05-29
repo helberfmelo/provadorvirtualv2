@@ -15,6 +15,7 @@ use App\Models\PlatformConnection;
 use App\Models\Product;
 use App\Models\WidgetInstall;
 use App\Services\Audit\AuditLogger;
+use App\Services\Imports\ImportRuleImpactService;
 use App\Services\Imports\ImportRuleMapper;
 use App\Services\Integrations\XmlFeedSyncService;
 use App\Support\ActiveTenant;
@@ -361,6 +362,37 @@ class IntegrationController extends Controller
                 'log' => $this->webhookLogItem($event),
                 'recent_logs' => $this->recentWebhookLogs($merchant->id, $company?->id, $platform),
             ],
+        ]);
+    }
+
+    public function simulateImportRules(Request $request, string $platform, ImportRuleImpactService $impact)
+    {
+        if (! PlatformCatalog::find($platform)) {
+            throw new NotFoundHttpException('Integração não encontrada.');
+        }
+
+        $merchant = $this->currentMerchant($request);
+        $company = $this->activeCompany($request, $merchant);
+        $this->guardPlatformAllowed($company, $platform);
+
+        $data = $request->validate([
+            'import_rules' => ['nullable', 'array'],
+            'import_rules.*' => ['nullable', 'array'],
+            'import_rules.*.enabled' => ['nullable', 'boolean'],
+            'import_rules.*.required' => ['nullable', 'boolean'],
+            'import_rules.*.source_field' => ['nullable', 'string', 'max:120'],
+            'import_rules.*.fallback' => ['nullable', 'string', 'max:120'],
+            'import_rules.*.aliases' => ['nullable', 'array'],
+            'import_rules.*.aliases.*' => ['nullable', 'string', 'max:120'],
+        ]);
+
+        $connection = $this->connectionFor($merchant->id, $company?->id, $platform);
+        $rules = array_key_exists('import_rules', $data)
+            ? $data['import_rules']
+            : ($connection?->import_rules ?? []);
+
+        return response()->json([
+            'data' => $impact->simulate($merchant, $company, $platform, $connection, $rules),
         ]);
     }
 

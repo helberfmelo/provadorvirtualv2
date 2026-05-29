@@ -40,6 +40,7 @@ const ignoredPrefixes = [
 const ignoredFragments = [
   '/probe',
   '/sync',
+  '/import-rules/simulate',
   '/validate-install',
   '/placement-preview',
   '/recommendations',

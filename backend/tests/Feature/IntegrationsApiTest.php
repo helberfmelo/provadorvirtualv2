@@ -334,6 +334,88 @@ XML, 200),
         $this->assertSame('active', $connection->import_rules['status']['fallback']);
     }
 
+    public function test_merchant_can_simulate_import_rule_impact_without_persisting_changes(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $company = MerchantCompany::query()->where('external_store_id', 'pv-demo-store')->firstOrFail();
+
+        $connection = PlatformConnection::query()->create([
+            'merchant_id' => $company->merchant_id,
+            'merchant_company_id' => $company->id,
+            'platform' => 'custom',
+            'external_store_id' => 'custom-rules',
+            'status' => 'configured',
+            'import_rules' => [
+                'category' => [
+                    'enabled' => true,
+                    'required' => true,
+                    'source_field' => 'category',
+                    'fallback' => null,
+                ],
+                'brand' => [
+                    'enabled' => true,
+                    'required' => false,
+                    'source_field' => 'brand',
+                    'fallback' => null,
+                ],
+            ],
+        ]);
+        Product::query()->create([
+            'merchant_id' => $company->merchant_id,
+            'merchant_company_id' => $company->id,
+            'external_product_id' => 'SIM-1',
+            'sku' => 'SIM-SKU-1',
+            'name' => 'Vestido Simulação',
+            'slug' => 'vestido-simulacao',
+            'category' => 'Vestidos',
+            'gender' => 'female',
+            'fit_profile' => 'regular',
+            'status' => 'active',
+            'metadata' => [
+                'brand' => 'Zak',
+                'age_group' => 'adult',
+            ],
+        ]);
+
+        $eventCount = IntegrationEvent::query()->count();
+        $productCount = Product::query()->count();
+
+        $this->withHeaders($headers)
+            ->postJson('/api/v1/integrations/custom/import-rules/simulate', [
+                'import_rules' => [
+                    'category' => [
+                        'enabled' => true,
+                        'required' => true,
+                        'source_field' => 'category',
+                    ],
+                    'brand' => [
+                        'enabled' => true,
+                        'required' => false,
+                        'source_field' => 'category',
+                    ],
+                    'gender' => [
+                        'enabled' => true,
+                        'required' => true,
+                        'source_field' => 'category',
+                        'fallback' => 'unisex',
+                    ],
+                ],
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'custom')
+            ->assertJsonPath('data.sample_source', 'real_catalog')
+            ->assertJsonPath('data.save_blocked', true)
+            ->assertJsonPath('data.rows.0.id', 'SIM-1')
+            ->assertJsonPath('data.rows.0.changes.0.field', 'brand')
+            ->assertJsonFragment(['code' => 'source_field_conflict'])
+            ->assertJsonFragment(['source_field' => 'category']);
+
+        $this->assertSame($eventCount, IntegrationEvent::query()->count());
+        $this->assertSame($productCount, Product::query()->count());
+        $this->assertSame('brand', $connection->refresh()->import_rules['brand']['source_field']);
+    }
+
     public function test_xml_feed_sync_command_processes_configured_connections(): void
     {
         $this->seed();

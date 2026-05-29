@@ -2673,7 +2673,7 @@ Critérios de aceite:
 - regras conflitantes são bloqueadas ou sinalizadas;
 - simulação não altera dados permanentes.
 
-Status: planejada.
+Status: implementada localmente na Sprint 145, aguardando commit/deploy. Criado `POST /api/v1/integrations/{platform}/import-rules/simulate` para simular regras em modo somente leitura, usando amostra real do catálogo ou amostra técnica quando a empresa ainda não tem produtos. A simulação compara regra atual e proposta, retorna produtos afetados, percentual, impacto por regra, uso de fallback, obrigatórios ausentes, antes/depois por produto e avisos de conflito ou regra ampla demais. `/app/regras-de-importacao` ganhou painel de impacto no catálogo, avisos, tabela por regra, lista de produtos alterados e bloqueio de salvamento quando a simulação atual aponta conflito crítico. Validações locais passaram com `php -l`, `IntegrationsApiTest`, suíte focada, PHPUnit completo (`125 tests`, `1400 assertions`), Pint, build frontend e validação visual headless desktop/mobile em `5177` com backend em `8002`.
 
 ### Sprint 146 - Galeria de botões e personalização mais polida
 

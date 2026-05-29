@@ -28,6 +28,60 @@ type Platform = {
   connection: PlatformConnection | null
 }
 
+type RuleSimulationWarning = {
+  id: string
+  severity: 'info' | 'warning' | 'error'
+  code: string
+  message: string
+  rule_keys: RuleKey[]
+}
+
+type RuleSimulationChange = {
+  field: RuleKey
+  label: string
+  before: string | null
+  after: string | null
+  source_field: string | null
+  source_value: string | null
+  origin: string | null
+}
+
+type RuleSimulation = {
+  platform: string
+  sample_source: 'real_catalog' | 'synthetic' | string
+  sample_total: number
+  affected_products: number
+  affected_percentage: number
+  active_rules: number
+  required_rules: number
+  save_blocked: boolean
+  warnings: RuleSimulationWarning[]
+  impact_by_rule: Array<{
+    key: RuleKey
+    label: string
+    enabled: boolean
+    required: boolean
+    source_field: string
+    fallback: string | null
+    affected_products: number
+    affected_percentage: number
+    missing_required: number
+    fallback_applied: number
+    status: 'ok' | 'warning' | 'muted' | string
+    changed_values: Array<{ value: string, count: number }>
+  }>
+  rows: Array<{
+    id: string
+    name: string
+    sku: string | null
+    category: string | null
+    brand: string | null
+    changes: RuleSimulationChange[]
+    warnings: RuleSimulationWarning[]
+    status: 'changed' | 'unchanged' | string
+  }>
+}
+
 const ruleKeys: RuleKey[] = ['category', 'brand', 'gender', 'age_group', 'status', 'fit_profile']
 const ruleIcons: Record<RuleKey, string> = {
   category: 'fa-tags',
@@ -94,6 +148,9 @@ const selectedPlatformKey = ref('bigshop')
 const selectedRuleKey = ref<RuleKey>('category')
 const loading = ref(false)
 const saving = ref(false)
+const simulating = ref(false)
+const simulation = ref<RuleSimulation | null>(null)
+const simulationSignature = ref('')
 const aliasDraft = reactive({ alias: '', target: '' })
 const rules = reactive<Record<RuleKey, ImportRule>>(defaultRules())
 
@@ -103,6 +160,14 @@ const activeRules = computed(() => ruleKeys.filter((key) => rules[key].enabled).
 const requiredRules = computed(() => ruleKeys.filter((key) => rules[key].enabled && rules[key].required).length)
 const fallbackRules = computed(() => ruleKeys.filter((key) => rules[key].enabled && rules[key].fallback).length)
 const previewRows = computed(() => ruleKeys.map((key) => previewRule(key)))
+const currentRulesSignature = computed(() => JSON.stringify(serializedRules()))
+const simulationIsStale = computed(() => Boolean(simulation.value && simulationSignature.value !== currentRulesSignature.value))
+const simulationRequired = computed(() => !simulation.value || simulationIsStale.value)
+const blockingSimulation = computed(() => Boolean(simulation.value?.save_blocked && !simulationIsStale.value))
+const saveBlocked = computed(() => saving.value || simulationRequired.value || blockingSimulation.value)
+const criticalWarnings = computed(() => (simulation.value?.warnings || []).filter((warning) => warning.severity === 'error'))
+const nonCriticalWarnings = computed(() => (simulation.value?.warnings || []).filter((warning) => warning.severity !== 'error'))
+const changedSimulationRows = computed(() => (simulation.value?.rows || []).filter((row) => row.status === 'changed'))
 
 onMounted(() => {
   loadPlatforms()
@@ -127,6 +192,8 @@ async function loadPlatforms() {
 
 function fillRules() {
   replaceRules(selectedPlatform.value?.connection?.import_rules || defaultRules())
+  simulation.value = null
+  simulationSignature.value = ''
 }
 
 function selectRule(key: RuleKey) {
@@ -137,6 +204,24 @@ function selectRule(key: RuleKey) {
 
 async function saveRules() {
   if (!selectedPlatform.value) {
+    return
+  }
+
+  if (simulationRequired.value) {
+    showFeedback({
+      status: 'error',
+      title: 'Simule o impacto',
+      message: 'Execute a simulação atual antes de salvar as regras.',
+    })
+    return
+  }
+
+  if (blockingSimulation.value) {
+    showFeedback({
+      status: 'error',
+      title: 'Simulação com bloqueios',
+      message: 'Ajuste os conflitos sinalizados antes de salvar as regras.',
+    })
     return
   }
 
@@ -165,6 +250,33 @@ async function saveRules() {
 
 function resetRules() {
   replaceRules(defaultRules())
+  simulation.value = null
+  simulationSignature.value = ''
+}
+
+async function simulateRules() {
+  if (!selectedPlatform.value) {
+    return
+  }
+
+  simulating.value = true
+
+  try {
+    const signature = currentRulesSignature.value
+    const { data } = await api.post(`/integrations/${selectedPlatform.value.key}/import-rules/simulate`, {
+      import_rules: serializedRules(),
+    })
+    simulation.value = data.data
+    simulationSignature.value = signature
+  } catch (requestError: any) {
+    showFeedback({
+      status: 'error',
+      title: 'Não foi possível simular',
+      message: requestError.response?.data?.message || 'Revise as regras antes de testar o impacto.',
+    })
+  } finally {
+    simulating.value = false
+  }
 }
 
 function addAlias() {
@@ -382,6 +494,18 @@ function normalize(value: string) {
     .replace(/[_-]+/g, ' ')
     .replace(/\s+/g, ' ')
 }
+
+function warningTone(severity: string) {
+  return {
+    error: 'error',
+    warning: 'warning',
+    info: 'info',
+  }[severity] || 'info'
+}
+
+function simulationSourceLabel(source: string) {
+  return source === 'real_catalog' ? 'catálogo real' : 'amostra técnica'
+}
 </script>
 
 <template>
@@ -391,10 +515,16 @@ function normalize(value: string) {
         <span class="eyebrow">Importações</span>
         <h1>Regras de importação</h1>
       </div>
-      <button class="btn btn-primary" type="button" :disabled="saving" @click="saveRules">
-        <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-        {{ saving ? 'Salvando...' : 'Salvar regras' }}
-      </button>
+      <div class="action-row compact">
+        <button class="btn btn-secondary btn-compact" type="button" :disabled="simulating" @click="simulateRules">
+          <i class="fa-solid fa-flask" aria-hidden="true"></i>
+          {{ simulating ? 'Simulando...' : 'Simular impacto' }}
+        </button>
+        <button class="btn btn-primary btn-compact" type="button" :disabled="saveBlocked" @click="saveRules">
+          <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+          {{ saving ? 'Salvando...' : 'Salvar regras' }}
+        </button>
+      </div>
     </div>
 
     <div v-if="loading" class="empty-state">Carregando regras...</div>
@@ -507,8 +637,9 @@ function normalize(value: string) {
         <div class="guide-panel import-rule-preview">
           <div class="subsection-heading">
             <h2>Prévia</h2>
-            <button class="icon-link" type="button" title="Restaurar padrões" @click="resetRules">
-              <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+            <button class="btn btn-secondary btn-compact" type="button" :disabled="simulating" @click="simulateRules">
+              <i class="fa-solid fa-flask" aria-hidden="true"></i>
+              {{ simulating ? 'Simulando...' : 'Simular impacto' }}
             </button>
           </div>
 
@@ -540,12 +671,120 @@ function normalize(value: string) {
           </div>
         </div>
 
+        <div v-if="simulation" class="guide-panel import-rule-impact-panel">
+          <div class="subsection-heading">
+            <h2>Impacto no catálogo</h2>
+            <span>{{ simulationSourceLabel(simulation.sample_source) }}</span>
+          </div>
+
+          <div class="summary-strip import-rule-impact-summary">
+            <span>
+              <strong>{{ simulation.affected_products }}</strong>
+              <small>produtos afetados</small>
+            </span>
+            <span>
+              <strong>{{ simulation.affected_percentage }}%</strong>
+              <small>da amostra</small>
+            </span>
+            <span>
+              <strong>{{ simulation.sample_total }}</strong>
+              <small>produtos testados</small>
+            </span>
+            <span>
+              <strong>{{ simulation.active_rules }}</strong>
+              <small>regras ativas</small>
+            </span>
+          </div>
+
+          <div v-if="simulationIsStale" class="impact-alert info">
+            <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+            <span>Simulação desatualizada</span>
+          </div>
+
+          <div v-if="criticalWarnings.length" class="impact-warning-list">
+            <article v-for="warning in criticalWarnings" :key="warning.id" :class="warningTone(warning.severity)">
+              <i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>
+              <span>
+                <strong>Bloqueio</strong>
+                <small>{{ warning.message }}</small>
+              </span>
+            </article>
+          </div>
+
+          <div v-if="nonCriticalWarnings.length" class="impact-warning-list compact">
+            <article v-for="warning in nonCriticalWarnings" :key="warning.id" :class="warningTone(warning.severity)">
+              <i class="fa-solid fa-circle-info" aria-hidden="true"></i>
+              <span>
+                <strong>{{ warning.severity === 'warning' ? 'Atenção' : 'Nota' }}</strong>
+                <small>{{ warning.message }}</small>
+              </span>
+            </article>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Regra</th>
+                  <th>Origem</th>
+                  <th>Afetados</th>
+                  <th>Fallback</th>
+                  <th>Obrigatórios</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="item in simulation.impact_by_rule" :key="item.key">
+                  <td>
+                    <strong>{{ item.label }}</strong>
+                    <small>{{ item.enabled ? 'ativa' : 'pausada' }}</small>
+                  </td>
+                  <td>
+                    {{ item.source_field }}
+                    <small v-if="item.fallback">fallback {{ item.fallback }}</small>
+                  </td>
+                  <td>{{ item.affected_products }} · {{ item.affected_percentage }}%</td>
+                  <td>{{ item.fallback_applied }}</td>
+                  <td>{{ item.missing_required }}</td>
+                  <td>
+                    <span class="status-pill" :class="{ ok: item.status === 'ok', warning: item.status === 'warning' }">
+                      {{ item.status === 'warning' ? 'Atenção' : item.status === 'muted' ? 'Pausada' : 'Ok' }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div v-if="changedSimulationRows.length" class="impact-change-list">
+            <article v-for="row in changedSimulationRows.slice(0, 8)" :key="row.id">
+              <span>
+                <strong>{{ row.name || row.id }}</strong>
+                <small>{{ row.sku || '-' }} · {{ row.category || '-' }} · {{ row.brand || '-' }}</small>
+              </span>
+              <div>
+                <span v-for="change in row.changes" :key="`${row.id}-${change.field}`" class="impact-change-row">
+                  <em>{{ change.label }}</em>
+                  <small>{{ change.before || '-' }} -> {{ change.after || '-' }}</small>
+                  <strong>{{ change.origin || '-' }}</strong>
+                </span>
+              </div>
+            </article>
+          </div>
+
+          <div v-else class="empty-state">Nenhuma mudança detectada na amostra.</div>
+        </div>
+
         <div class="action-row">
           <button class="btn btn-secondary" type="button" @click="resetRules">
             <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
             Restaurar padrão
           </button>
-          <button class="btn btn-primary" type="submit" :disabled="saving">
+          <button class="btn btn-secondary" type="button" :disabled="simulating" @click="simulateRules">
+            <i class="fa-solid fa-flask" aria-hidden="true"></i>
+            {{ simulating ? 'Simulando...' : 'Simular impacto' }}
+          </button>
+          <button class="btn btn-primary" type="submit" :disabled="saveBlocked">
             <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
             {{ saving ? 'Salvando...' : 'Salvar regras' }}
           </button>

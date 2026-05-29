@@ -7498,6 +7498,150 @@ textarea {
   background: #fffbeb;
 }
 
+.import-rule-impact-panel {
+  display: grid;
+  gap: 14px;
+  background: #f9fafb;
+}
+
+.import-rule-impact-summary {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.impact-alert,
+.impact-warning-list article {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  color: #1e40af;
+  background: #eff6ff;
+}
+
+.impact-warning-list {
+  display: grid;
+  gap: 8px;
+}
+
+.impact-warning-list.compact {
+  gap: 6px;
+}
+
+.impact-warning-list article.warning {
+  border-color: #fde68a;
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.impact-warning-list article.error {
+  border-color: #fecaca;
+  color: #991b1b;
+  background: #fef2f2;
+}
+
+.impact-warning-list span,
+.impact-warning-list strong,
+.impact-warning-list small {
+  display: block;
+}
+
+.impact-warning-list small {
+  color: inherit;
+  opacity: 0.86;
+}
+
+.import-rule-impact-panel td strong,
+.import-rule-impact-panel td small {
+  display: block;
+}
+
+.import-rule-impact-panel td small {
+  color: #6b7280;
+}
+
+.import-rule-impact-panel .status-pill {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 8px;
+  color: #6b7280;
+  background: #f3f4f6;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.import-rule-impact-panel .status-pill.ok {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.import-rule-impact-panel .status-pill.warning {
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.impact-change-list {
+  display: grid;
+  gap: 8px;
+}
+
+.impact-change-list article {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.8fr) minmax(0, 1.4fr);
+  gap: 12px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.impact-change-list article > span,
+.impact-change-list article > span strong,
+.impact-change-list article > span small {
+  display: block;
+}
+
+.impact-change-list article > span small {
+  color: #6b7280;
+}
+
+.impact-change-row {
+  display: grid;
+  grid-template-columns: 120px minmax(0, 1fr) 96px;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.impact-change-row:last-child {
+  border-bottom: 0;
+}
+
+.impact-change-row em {
+  color: #374151;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.impact-change-row small {
+  color: #4b5563;
+}
+
+.impact-change-row strong {
+  justify-self: end;
+  padding: 4px 7px;
+  border-radius: 8px;
+  color: #0f172a;
+  background: #e0f2fe;
+  font-size: 0.76rem;
+}
+
 .sync-page {
   display: grid;
   gap: 18px;
@@ -8321,6 +8465,10 @@ td small {
   .gtm-guide,
   .import-rule-editor-grid,
   .alias-row,
+  .import-rule-impact-summary,
+  .impact-warning-list article,
+  .impact-change-list article,
+  .impact-change-row,
   .smart-catalog-panel,
   .measurement-editor-grid,
   .measurement-field-grid,

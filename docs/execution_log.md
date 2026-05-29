@@ -1586,3 +1586,16 @@
 - `git diff --check`, `git diff --cached --check` e varredura de segredos passaram; `package.json` da raiz permaneceu não versionado e `.tmp` não foi stageado.
 - Commit `d988e85` enviado para `main`; o run `26655128955` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/sincronizacao`, `GET /api/v1/integrations/sync-history`, `GET /api/v1/integrations/sync-issues/export` com `API sync issues export OK`, páginas públicas, SaaS, portal, widget JS/CSS, APIs, CORS, login demo, go-live readiness, integrações e taxonomia. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 145 Simulação de importação e impacto das regras
+
+- Relida a documentação obrigatória antes da sprint, incluindo `docs/credentials.local.md` somente em modo mascarado por envolver produção/deploy e integrações. Não houve novo acesso ao portal Sizebay nem uso de credenciais.
+- Usado o benchmark já registrado de Settings/Importation Rules e Sync da Sizebay como referência para simulação antes de salvar, condições, ações e impacto no catálogo.
+- Criado `ImportRuleImpactService` para simular regras de importação em modo somente leitura, comparando regra atual e regra proposta contra amostra real do catálogo da empresa ativa ou amostra técnica quando ainda não há produtos.
+- Criado `POST /api/v1/integrations/{platform}/import-rules/simulate`, protegido por permissão de integrações, sem gravar `Product`, `IntegrationEvent`, `PlatformConnection`, segredo ou payload sensível.
+- A simulação retorna total de amostra, produtos afetados, percentual, impacto por regra, uso de fallback, obrigatórios ausentes, valores alterados, antes/depois por produto e avisos de conflito ou regra ampla demais.
+- Regras conflitantes por campo de origem são sinalizadas; conflito crítico bloqueia salvamento no frontend até o lojista ajustar e simular novamente.
+- `/app/regras-de-importacao` ganhou botão de simular impacto, painel de impacto no catálogo, avisos, tabela por regra e lista de produtos alterados com antes/depois. O feedback global deixa de tratar a simulação como salvamento.
+- `scripts/validate-production.ps1` passa a validar `POST /api/v1/integrations/custom/import-rules/simulate` com amostra, impacto e linhas retornadas.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest` (`11 tests`, `195 assertions`), suíte focada de integrações/importações/BigShop/produtos/categorias/marcas/modelagens/analytics (`32 tests`, `541 assertions`), PHPUnit completo (`125 tests`, `1400 assertions`), `php vendor/bin/pint --dirty --test` e `npm --prefix frontend run build` com o aviso conhecido de bundle acima de 500 kB.
+- Validação visual local rodou em `http://127.0.0.1:5177/app/regras-de-importacao`, com backend local em `8002`, Chrome headless/CDP e respostas sintéticas autorizadas apenas no browser para cobrir impacto, bloqueios, antes/depois e estado de salvamento bloqueado sem alterar o banco local. Desktop e mobile passaram sem erros de console e sem overflow horizontal; as capturas ficaram em `.tmp/sprint145-import-rules-*.png` e não devem ser versionadas.
