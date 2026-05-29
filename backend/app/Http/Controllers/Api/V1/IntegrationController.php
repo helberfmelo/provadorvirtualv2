@@ -12,6 +12,7 @@ use App\Models\IntegrationEvent;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
+use App\Models\Product;
 use App\Models\WidgetInstall;
 use App\Services\Audit\AuditLogger;
 use App\Services\Imports\ImportRuleMapper;
@@ -397,6 +398,7 @@ class IntegrationController extends Controller
                 'totals' => $this->syncTotals($items),
                 'by_origin' => $items->groupBy('origin.method')->map->count()->all(),
                 'by_status' => $items->groupBy('status')->map->count()->all(),
+                'issue_summary' => $this->syncIssueSummary($items),
                 'timeline' => $items->take(16)->map(fn (array $item): array => [
                     'id' => $item['id'],
                     'status' => $item['status'],
@@ -407,6 +409,162 @@ class IntegrationController extends Controller
                     'errors' => $item['counters']['errors'],
                     'warnings' => $item['counters']['warnings'],
                 ])->values()->all(),
+            ],
+        ]);
+    }
+
+    public function exportSyncIssues(Request $request)
+    {
+        $merchant = $this->currentMerchant($request);
+        $company = $this->activeCompany($request, $merchant);
+        $data = $request->validate([
+            'event_id' => ['nullable', 'integer'],
+        ]);
+
+        $events = IntegrationEvent::query()
+            ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->whereIn('event_type', ['dry_run_import', 'sync_products', 'xml_feed_sync'])
+            ->when($data['event_id'] ?? null, fn ($query, $eventId) => $query->whereKey($eventId))
+            ->orderByDesc('occurred_at')
+            ->orderByDesc('id')
+            ->limit(60)
+            ->get();
+
+        $jobs = ImportJob::query()
+            ->where('merchant_id', $merchant->id)
+            ->whereIn('id', $events->map(fn (IntegrationEvent $event): mixed => data_get($event->summary, 'import_job_id'))->filter()->values())
+            ->get()
+            ->keyBy('id');
+
+        $rows = $events->flatMap(function (IntegrationEvent $event) use ($jobs): array {
+            $issues = $this->syncIssues($event, $jobs->get(data_get($event->summary, 'import_job_id')));
+
+            return $issues->map(fn (array $issue): array => [
+                'execution_key' => $this->syncExecutionKey($event),
+                'occurred_at' => $event->occurred_at?->toISOString(),
+                'platform' => $event->platform,
+                'severity' => $issue['severity'],
+                'status' => data_get($issue, 'resolution.status', 'open'),
+                'code' => $issue['code'],
+                'root_cause' => $issue['cause_label'],
+                'product_id' => $issue['product_id'],
+                'product_name' => $issue['product_name'],
+                'sku' => data_get($issue, 'context.sku'),
+                'variant' => $issue['grid_id'],
+                'category' => data_get($issue, 'context.category'),
+                'brand' => data_get($issue, 'context.brand'),
+                'sizes' => implode('|', data_get($issue, 'context.sizes', [])),
+                'message' => $issue['message'],
+                'recommended_action' => $issue['recommended_action_label'],
+                'resolution_reason' => data_get($issue, 'resolution.reason'),
+            ])->all();
+        })->values();
+
+        $headers = [
+            'execution_key',
+            'occurred_at',
+            'platform',
+            'severity',
+            'status',
+            'code',
+            'root_cause',
+            'product_id',
+            'product_name',
+            'sku',
+            'variant',
+            'category',
+            'brand',
+            'sizes',
+            'message',
+            'recommended_action',
+            'resolution_reason',
+        ];
+        $csv = collect([$headers])
+            ->concat($rows->map(fn (array $row): array => collect($headers)->map(fn (string $key): mixed => $row[$key] ?? null)->all()))
+            ->map(fn (array $row): string => collect($row)->map(fn (mixed $value): string => $this->csvCell($value))->implode(','))
+            ->implode("\n");
+
+        return response("\xEF\xBB\xBF".$csv."\n", 200, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="provador-sync-erros.csv"',
+        ]);
+    }
+
+    public function resolveSyncIssues(Request $request)
+    {
+        $merchant = $this->currentMerchant($request);
+        $company = $this->activeCompany($request, $merchant);
+        $data = $request->validate([
+            'event_id' => ['required', 'integer'],
+            'issue_uids' => ['required', 'array', 'min:1', 'max:80'],
+            'issue_uids.*' => ['required', 'string', 'max:80'],
+            'action' => ['required', 'string', 'in:ignore,request_reprocess,reviewed'],
+            'reason' => ['nullable', 'required_if:action,ignore', 'string', 'max:500'],
+        ]);
+
+        $event = IntegrationEvent::query()
+            ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->whereIn('event_type', ['dry_run_import', 'sync_products', 'xml_feed_sync'])
+            ->whereKey((int) $data['event_id'])
+            ->firstOrFail();
+        $job = ImportJob::query()
+            ->where('merchant_id', $merchant->id)
+            ->whereKey(data_get($event->summary, 'import_job_id'))
+            ->first();
+        $issues = $this->syncIssues($event, $job);
+        $selected = $issues
+            ->whereIn('uid', collect($data['issue_uids'])->map(fn (mixed $uid): string => (string) $uid)->all())
+            ->values();
+
+        if ($selected->isEmpty()) {
+            throw ValidationException::withMessages([
+                'issue_uids' => ['Nenhum erro selecionado foi encontrado nesta execução.'],
+            ]);
+        }
+
+        $payload = $event->payload ?? [];
+        $resolutions = data_get($payload, 'issue_resolutions', []);
+        $status = match ($data['action']) {
+            'ignore' => 'ignored',
+            'request_reprocess' => 'reprocess_requested',
+            default => 'reviewed',
+        };
+
+        foreach ($selected as $issue) {
+            $resolutions[$issue['uid']] = [
+                'status' => $status,
+                'action' => $data['action'],
+                'reason' => $data['reason'] ?? null,
+                'actor_user_id' => $request->user()?->id,
+                'updated_at' => now()->toISOString(),
+            ];
+        }
+
+        $payload['issue_resolutions'] = $resolutions;
+        $event->update(['payload' => $payload]);
+
+        app(AuditLogger::class)->log($request, $merchant, 'integration.sync_issue_actioned', 'integrations', 'info', [
+            'platform' => $event->platform,
+            'merchant_company_id' => $company?->id,
+            'module' => 'integrations',
+            'action' => 'sync_issue_'.$data['action'],
+            'event_id' => $event->id,
+            'issue_uids' => $selected->pluck('uid')->values()->all(),
+            'status' => $status,
+            'reason_present' => filled($data['reason'] ?? null),
+        ], $event);
+
+        $event->refresh();
+        $updatedIssues = $this->syncIssues($event, $job);
+
+        return response()->json([
+            'data' => [
+                'event' => $this->syncHistoryItem($event, $job),
+                'issue_summary' => $this->syncIssueSummary(collect([[
+                    'issues' => $updatedIssues->all(),
+                ]])),
             ],
         ]);
     }
@@ -547,6 +705,7 @@ class IntegrationController extends Controller
                 'source' => data_get($summary, 'source'),
             ],
             'sample_products' => collect(data_get($payload, 'sample_products', []))->take(8)->values()->all(),
+            'issue_groups' => $this->syncIssueGroups($issues),
             'issues' => $issues->take(80)->values()->all(),
         ];
     }
@@ -724,7 +883,47 @@ class IntegrationController extends Controller
             ], 'sync_error'));
         }
 
-        return $issues;
+        $sampleProducts = collect(data_get($event->payload ?? [], 'sample_products', []))
+            ->filter(fn (mixed $product): bool => is_array($product))
+            ->keyBy(fn (array $product): string => (string) ($product['external_product_id'] ?? $product['sku'] ?? ''));
+        $productKeys = $issues
+            ->pluck('product_id')
+            ->filter()
+            ->map(fn (mixed $value): string => (string) $value)
+            ->unique()
+            ->values();
+        $products = $productKeys->isEmpty()
+            ? collect()
+            : Product::query()
+                ->where('merchant_id', $event->merchant_id)
+                ->when($event->merchant_company_id, fn ($query) => $query->where(function ($companyQuery) use ($event): void {
+                    $companyQuery->where('merchant_company_id', $event->merchant_company_id)
+                        ->orWhereNull('merchant_company_id');
+                }))
+                ->where(function ($query) use ($productKeys): void {
+                    $query->whereIn('external_product_id', $productKeys)
+                        ->orWhereIn('sku', $productKeys);
+                })
+                ->with(['variants' => fn ($query) => $query->select(['id', 'product_id', 'sku', 'size_label', 'is_active'])])
+                ->get()
+                ->mapWithKeys(function (Product $product): array {
+                    $keys = [];
+
+                    if ($product->external_product_id) {
+                        $keys[(string) $product->external_product_id] = $product;
+                    }
+
+                    if ($product->sku) {
+                        $keys[(string) $product->sku] = $product;
+                    }
+
+                    return $keys;
+                });
+        $resolutions = data_get($event->payload ?? [], 'issue_resolutions', []);
+
+        return $issues
+            ->map(fn (array $issue): array => $this->syncIssueEnriched($issue, $sampleProducts, $products, is_array($resolutions) ? $resolutions : []))
+            ->values();
     }
 
     private function syncIssueItem(array $issue, string $fallbackCode): array
@@ -740,14 +939,290 @@ class IntegrationController extends Controller
             'grid_id' => $issue['grid_id'] ?? null,
             'line' => $issue['line'] ?? null,
             'message' => (string) ($issue['message'] ?? 'Pendência de sincronização.'),
-            'action_url' => filled($productId) ? '/app/produtos?busca='.rawurlencode((string) $productId) : '/app/regras-de-importacao',
-            'action_label' => filled($productId) ? 'Abrir produto' : 'Revisar regra',
+            'sku' => $issue['sku'] ?? null,
+            'category' => $issue['category'] ?? null,
+            'brand' => $issue['brand'] ?? null,
+            'sizes' => $issue['sizes'] ?? [],
+            'product_url' => $issue['product_url'] ?? null,
+            'variant_sku' => $issue['variant_sku'] ?? null,
+        ];
+    }
+
+    private function syncIssueEnriched(array $issue, $sampleProducts, $products, array $resolutions): array
+    {
+        $productId = $issue['product_id'] ? (string) $issue['product_id'] : null;
+        $sample = $productId ? $sampleProducts->get($productId, []) : [];
+        $product = $productId ? $products->get($productId) : null;
+        $code = (string) $issue['code'];
+        $rootCause = $this->syncIssueRootCause($code);
+        $context = $this->syncIssueContext($issue, is_array($sample) ? $sample : [], $product instanceof Product ? $product : null);
+        $recommendedAction = $this->syncIssueRecommendedAction($rootCause['key'], $productId, $context);
+        $uid = $this->syncIssueUid($issue);
+        $resolution = $this->syncIssueResolution($resolutions[$uid] ?? null);
+        $availableActions = $this->syncIssueAvailableActions($rootCause['key'], $productId, $context, $recommendedAction);
+
+        return [
+            ...$issue,
+            'uid' => $uid,
+            'root_cause' => $rootCause['key'],
+            'cause_label' => $rootCause['label'],
+            'context' => $context,
+            'recommended_action' => $recommendedAction['key'],
+            'recommended_action_label' => $recommendedAction['label'],
+            'recommended_action_url' => $recommendedAction['url'],
+            'available_actions' => $availableActions,
+            'resolution' => $resolution,
+            'action_url' => $recommendedAction['url'],
+            'action_label' => $recommendedAction['label'],
             'rule_url' => '/app/regras-de-importacao',
             'related' => [
                 'product' => filled($productId),
-                'rule' => str_contains($code, 'rule') || str_contains($code, 'mapping') || ! filled($productId),
+                'rule' => $rootCause['key'] === 'import_rule' || ! filled($productId),
+                'table' => $rootCause['key'] === 'measurement_table',
+                'modeling' => $rootCause['key'] === 'modeling',
+                'category' => $rootCause['key'] === 'category',
+                'brand' => $rootCause['key'] === 'brand',
             ],
         ];
+    }
+
+    private function syncIssueContext(array $issue, array $sample, ?Product $product): array
+    {
+        $sizes = collect($issue['sizes'] ?? [])
+            ->merge(data_get($sample, 'sizes', []))
+            ->merge($product?->variants?->pluck('size_label') ?? [])
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        return [
+            'product_id' => $issue['product_id'] ?? $product?->external_product_id,
+            'product_name' => $issue['product_name'] ?? data_get($sample, 'name') ?? $product?->name,
+            'sku' => $issue['sku'] ?? data_get($sample, 'sku') ?? $product?->sku,
+            'variant_id' => $issue['grid_id'] ?? null,
+            'variant_sku' => $issue['variant_sku'] ?? data_get($sample, 'variant_sku'),
+            'sizes' => $sizes,
+            'category' => $issue['category'] ?? data_get($sample, 'category') ?? $product?->category,
+            'brand' => $issue['brand'] ?? data_get($sample, 'brand') ?? data_get($product?->metadata ?? [], 'brand'),
+            'gender' => data_get($sample, 'gender') ?? $product?->gender,
+            'age_group' => data_get($sample, 'age_group') ?? data_get($product?->metadata ?? [], 'age_group'),
+            'fit_profile' => data_get($sample, 'fit_profile') ?? $product?->fit_profile,
+            'product_url' => $issue['product_url'] ?? data_get($sample, 'product_url'),
+            'line' => $issue['line'] ?? null,
+        ];
+    }
+
+    private function syncIssueRootCause(string $code): array
+    {
+        $normalized = Str::of($code)->lower()->toString();
+
+        return match (true) {
+            str_contains($normalized, 'measurement') || str_contains($normalized, 'table') => ['key' => 'measurement_table', 'label' => 'Tabela de medidas'],
+            str_contains($normalized, 'modeling') || str_contains($normalized, 'fit_profile') => ['key' => 'modeling', 'label' => 'Modelagem'],
+            str_contains($normalized, 'category') => ['key' => 'category', 'label' => 'Categoria'],
+            str_contains($normalized, 'brand') => ['key' => 'brand', 'label' => 'Marca'],
+            str_contains($normalized, 'rule') || str_contains($normalized, 'mapping') => ['key' => 'import_rule', 'label' => 'Regra de importação'],
+            str_contains($normalized, 'grid') || str_contains($normalized, 'size') || str_contains($normalized, 'variant') => ['key' => 'size_grid', 'label' => 'Grade e tamanhos'],
+            str_contains($normalized, 'product_id') || str_contains($normalized, 'product_not_found') => ['key' => 'product_identity', 'label' => 'Identificação do produto'],
+            str_contains($normalized, 'sync') || str_contains($normalized, 'import_row') || str_contains($normalized, 'failed') => ['key' => 'import_failure', 'label' => 'Falha de importação'],
+            default => ['key' => 'data_quality', 'label' => 'Qualidade dos dados'],
+        };
+    }
+
+    private function syncIssueRecommendedAction(string $rootCause, ?string $productId, array $context): array
+    {
+        $productSearch = $productId ? rawurlencode($productId) : '';
+
+        return match ($rootCause) {
+            'measurement_table' => [
+                'key' => 'link_table',
+                'label' => 'Vincular tabela',
+                'url' => '/app/produtos?filtro=sem_tabela'.($productSearch ? '&busca='.$productSearch : ''),
+            ],
+            'modeling' => [
+                'key' => 'create_modeling',
+                'label' => 'Criar modelagem',
+                'url' => '/app/modelagens',
+            ],
+            'category' => [
+                'key' => 'review_category',
+                'label' => 'Revisar categoria',
+                'url' => '/app/categorias',
+            ],
+            'brand' => [
+                'key' => 'review_brand',
+                'label' => 'Revisar marca',
+                'url' => '/app/marcas',
+            ],
+            'import_rule' => [
+                'key' => 'review_rule',
+                'label' => 'Revisar regra',
+                'url' => '/app/regras-de-importacao',
+            ],
+            'import_failure' => [
+                'key' => 'request_reprocess',
+                'label' => 'Reprocessar',
+                'url' => '/app/integracoes',
+            ],
+            default => filled($productId)
+                ? [
+                    'key' => 'open_product',
+                    'label' => 'Abrir produto',
+                    'url' => '/app/produtos?busca='.$productSearch,
+                ]
+                : [
+                    'key' => 'review_rule',
+                    'label' => 'Revisar regra',
+                    'url' => '/app/regras-de-importacao',
+                ],
+        };
+    }
+
+    private function syncIssueAvailableActions(string $rootCause, ?string $productId, array $context, array $recommendedAction): array
+    {
+        $actions = collect([$recommendedAction]);
+        $productSearch = $productId ? rawurlencode($productId) : '';
+
+        if (filled($productId) && $recommendedAction['key'] !== 'open_product') {
+            $actions->push([
+                'key' => 'open_product',
+                'label' => 'Abrir produto',
+                'url' => '/app/produtos?busca='.$productSearch,
+                'kind' => 'link',
+            ]);
+        }
+
+        foreach ([
+            'link_table' => ['label' => 'Vincular tabela', 'url' => '/app/produtos?filtro=sem_tabela'.($productSearch ? '&busca='.$productSearch : '')],
+            'create_modeling' => ['label' => 'Criar modelagem', 'url' => '/app/modelagens'],
+            'review_category' => ['label' => 'Revisar categoria', 'url' => '/app/categorias'],
+            'review_brand' => ['label' => 'Revisar marca', 'url' => '/app/marcas'],
+            'review_rule' => ['label' => 'Revisar regra', 'url' => '/app/regras-de-importacao'],
+        ] as $key => $action) {
+            $shouldShow = match ($key) {
+                'link_table' => $rootCause === 'measurement_table',
+                'create_modeling' => $rootCause === 'modeling',
+                'review_category' => $rootCause === 'category',
+                'review_brand' => $rootCause === 'brand',
+                'review_rule' => in_array($rootCause, ['import_rule', 'data_quality', 'product_identity', 'size_grid'], true),
+                default => false,
+            };
+
+            if ($shouldShow && $actions->where('key', $key)->isEmpty()) {
+                $actions->push(['key' => $key, ...$action, 'kind' => 'link']);
+            }
+        }
+
+        $actions->push(['key' => 'request_reprocess', 'label' => 'Reprocessar', 'url' => null, 'kind' => 'api']);
+        $actions->push(['key' => 'ignore', 'label' => 'Ignorar', 'url' => null, 'kind' => 'api']);
+
+        return $actions
+            ->map(fn (array $action): array => [
+                'key' => $action['key'],
+                'label' => $action['label'],
+                'url' => $action['url'] ?? null,
+                'kind' => $action['kind'] ?? 'link',
+            ])
+            ->unique('key')
+            ->values()
+            ->all();
+    }
+
+    private function syncIssueUid(array $issue): string
+    {
+        return substr(sha1(json_encode([
+            $issue['code'] ?? null,
+            $issue['product_id'] ?? null,
+            $issue['grid_id'] ?? null,
+            $issue['line'] ?? null,
+            $issue['message'] ?? null,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''), 0, 20);
+    }
+
+    private function syncIssueResolution(mixed $resolution): array
+    {
+        if (! is_array($resolution)) {
+            return [
+                'status' => 'open',
+                'label' => 'Aberto',
+                'reason' => null,
+                'updated_at' => null,
+            ];
+        }
+
+        $status = (string) ($resolution['status'] ?? 'open');
+
+        return [
+            'status' => $status,
+            'label' => [
+                'ignored' => 'Ignorado',
+                'reprocess_requested' => 'Reprocessamento solicitado',
+                'reviewed' => 'Revisado',
+                'open' => 'Aberto',
+            ][$status] ?? ucfirst($status),
+            'reason' => $resolution['reason'] ?? null,
+            'updated_at' => $resolution['updated_at'] ?? null,
+        ];
+    }
+
+    private function syncIssueGroups($issues): array
+    {
+        return collect($issues)
+            ->groupBy('root_cause')
+            ->map(function ($group, string $key): array {
+                $open = $group->where('resolution.status', 'open');
+
+                return [
+                    'key' => $key,
+                    'label' => $group->first()['cause_label'] ?? $key,
+                    'count' => $group->count(),
+                    'open_count' => $open->count(),
+                    'ignored_count' => $group->where('resolution.status', 'ignored')->count(),
+                    'reprocess_requested_count' => $group->where('resolution.status', 'reprocess_requested')->count(),
+                    'critical_count' => $open->where('severity', 'error')->count(),
+                    'recommended_action_label' => $group->first()['recommended_action_label'] ?? 'Revisar',
+                    'recommended_action_url' => $group->first()['recommended_action_url'] ?? null,
+                    'issue_uids' => $group->pluck('uid')->values()->all(),
+                    'product_ids' => $group->pluck('product_id')->filter()->unique()->values()->all(),
+                    'sample_messages' => $group->pluck('message')->filter()->unique()->take(3)->values()->all(),
+                ];
+            })
+            ->sortByDesc(fn (array $group): int => ($group['critical_count'] * 1000) + $group['open_count'])
+            ->values()
+            ->all();
+    }
+
+    private function syncIssueSummary($items): array
+    {
+        $issues = collect($items)
+            ->flatMap(fn (array $item): array => $item['issues'] ?? [])
+            ->values();
+        $open = $issues->where('resolution.status', 'open');
+
+        return [
+            'total' => $issues->count(),
+            'open' => $open->count(),
+            'critical_open' => $open->where('severity', 'error')->count(),
+            'ignored' => $issues->where('resolution.status', 'ignored')->count(),
+            'reprocess_requested' => $issues->where('resolution.status', 'reprocess_requested')->count(),
+            'reviewed' => $issues->where('resolution.status', 'reviewed')->count(),
+            'by_cause' => $issues
+                ->groupBy('root_cause')
+                ->map(fn ($group): array => [
+                    'label' => $group->first()['cause_label'] ?? 'Causa',
+                    'count' => $group->count(),
+                    'open' => $group->where('resolution.status', 'open')->count(),
+                ])
+                ->all(),
+        ];
+    }
+
+    private function csvCell(mixed $value): string
+    {
+        $value = str_replace('"', '""', (string) $value);
+
+        return '"'.$value.'"';
     }
 
     private function syncEventTitle(string $type): string

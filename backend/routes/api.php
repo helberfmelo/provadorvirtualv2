@@ -122,6 +122,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,integrations,edit');
         Route::get('/integrations/sync-history', [IntegrationController::class, 'syncHistory'])
             ->middleware('portal.permission:merchant,integrations,view');
+        Route::get('/integrations/sync-issues/export', [IntegrationController::class, 'exportSyncIssues'])
+            ->middleware('portal.permission:merchant,integrations,view');
+        Route::post('/integrations/sync-issues/actions', [IntegrationController::class, 'resolveSyncIssues'])
+            ->middleware('portal.permission:merchant,integrations,edit');
         Route::get('/integrations/bigshop/activations', [BigShopIntegrationController::class, 'activations'])
             ->middleware('portal.permission:merchant,integrations,view');
         Route::post('/integrations/bigshop/probe', [BigShopIntegrationController::class, 'probe'])

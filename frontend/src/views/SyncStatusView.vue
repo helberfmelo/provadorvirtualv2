@@ -4,6 +4,7 @@ import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 
 type SyncIssue = {
+  uid: string
   severity: 'error' | 'warning'
   code: string
   product_id: string | null
@@ -11,6 +12,38 @@ type SyncIssue = {
   grid_id: string | null
   line: number | null
   message: string
+  root_cause: string
+  cause_label: string
+  recommended_action: string
+  recommended_action_label: string
+  recommended_action_url: string | null
+  available_actions: Array<{
+    key: string
+    label: string
+    url: string | null
+    kind: 'link' | 'api'
+  }>
+  context: {
+    product_id: string | null
+    product_name: string | null
+    sku: string | null
+    variant_id: string | null
+    variant_sku: string | null
+    sizes: string[]
+    category: string | null
+    brand: string | null
+    gender: string | null
+    age_group: string | null
+    fit_profile: string | null
+    product_url: string | null
+    line: number | null
+  }
+  resolution: {
+    status: 'open' | 'ignored' | 'reprocess_requested' | 'reviewed' | string
+    label: string
+    reason: string | null
+    updated_at: string | null
+  }
   action_url?: string | null
   action_label?: string | null
   rule_url?: string | null
@@ -18,6 +51,21 @@ type SyncIssue = {
     product: boolean
     rule: boolean
   }
+}
+
+type SyncIssueGroup = {
+  key: string
+  label: string
+  count: number
+  open_count: number
+  ignored_count: number
+  reprocess_requested_count: number
+  critical_count: number
+  recommended_action_label: string
+  recommended_action_url: string | null
+  issue_uids: string[]
+  product_ids: string[]
+  sample_messages: string[]
 }
 
 type SyncSampleProduct = {
@@ -59,6 +107,7 @@ type SyncEvent = {
   }
   summary: Record<string, string | number | null>
   sample_products: SyncSampleProduct[]
+  issue_groups: SyncIssueGroup[]
   issues: SyncIssue[]
 }
 
@@ -70,6 +119,19 @@ type SyncMeta = {
   totals?: SyncEvent['counters']
   by_origin?: Record<string, number>
   by_status?: Record<string, number>
+  issue_summary?: {
+    total: number
+    open: number
+    critical_open: number
+    ignored: number
+    reprocess_requested: number
+    reviewed: number
+    by_cause: Record<string, {
+      label: string
+      count: number
+      open: number
+    }>
+  }
   timeline?: Array<{
     id: number
     status: string
@@ -93,6 +155,9 @@ const compareTargetId = ref<number | null>(null)
 const statusFilter = ref('all')
 const typeFilter = ref('all')
 const originFilter = ref('all')
+const actionLoading = ref('')
+const ignoreTarget = ref<{ eventId: number, issueUids: string[], label: string } | null>(null)
+const ignoreReason = ref('')
 
 const filteredEvents = computed(() => events.value.filter((event) => {
   const matchesStatus = statusFilter.value === 'all'
@@ -202,6 +267,17 @@ const comparisonRows = computed(() => {
   })
 })
 
+const selectedIssueGroups = computed(() => selectedEvent.value?.issue_groups || [])
+const issueOverview = computed(() => meta.value?.issue_summary || {
+  total: 0,
+  open: 0,
+  critical_open: 0,
+  ignored: 0,
+  reprocess_requested: 0,
+  reviewed: 0,
+  by_cause: {},
+})
+
 onMounted(() => {
   loadEvents()
 })
@@ -258,6 +334,85 @@ function selectTimelineItem(id: number) {
   selectedId.value = id
 }
 
+function isIssueOpen(issue: SyncIssue) {
+  return issue.resolution.status === 'open'
+}
+
+function startIgnore(issueUids: string[], label: string) {
+  if (!selectedEvent.value) {
+    return
+  }
+
+  ignoreTarget.value = {
+    eventId: selectedEvent.value.id,
+    issueUids,
+    label,
+  }
+  ignoreReason.value = ''
+}
+
+function cancelIgnore() {
+  ignoreTarget.value = null
+  ignoreReason.value = ''
+}
+
+async function submitIgnore() {
+  if (!ignoreTarget.value || !ignoreReason.value.trim()) {
+    return
+  }
+
+  await applyIssueAction(ignoreTarget.value.issueUids, 'ignore', ignoreReason.value.trim())
+  cancelIgnore()
+}
+
+async function requestReprocess(issueUids: string[]) {
+  await applyIssueAction(issueUids, 'request_reprocess')
+}
+
+async function applyIssueAction(issueUids: string[], action: 'ignore' | 'request_reprocess' | 'reviewed', reason = '') {
+  if (!selectedEvent.value) {
+    return
+  }
+
+  actionLoading.value = `${action}-${issueUids.join('-')}`
+
+  try {
+    const { data } = await api.post('/integrations/sync-issues/actions', {
+      event_id: selectedEvent.value.id,
+      issue_uids: issueUids,
+      action,
+      reason: reason || undefined,
+    })
+    const updatedEvent = data.data?.event as SyncEvent | undefined
+    if (updatedEvent) {
+      events.value = events.value.map((event) => event.id === updatedEvent.id ? updatedEvent : event)
+      selectedId.value = updatedEvent.id
+      await loadEvents()
+    }
+  } finally {
+    actionLoading.value = ''
+  }
+}
+
+async function downloadIssueExport() {
+  if (!selectedEvent.value) {
+    return
+  }
+
+  const response = await api.get('/integrations/sync-issues/export', {
+    params: { event_id: selectedEvent.value.id },
+    responseType: 'blob',
+  })
+  const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv;charset=utf-8' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = `provador-sync-erros-${selectedEvent.value.id}.csv`
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
+
 function formatDate(value: string | null) {
   if (!value) {
     return '-'
@@ -310,6 +465,31 @@ function formatDuration(seconds: number | null) {
         <strong>{{ statusLabel(meta?.last_status || '-') }}</strong>
         <small>último status</small>
       </span>
+    </div>
+
+    <div class="sync-issue-overview panel-main">
+      <div class="subsection-heading">
+        <h2>Correção de erros</h2>
+        <span>{{ issueOverview.open }} aberto(s)</span>
+      </div>
+      <div class="summary-strip sync-issue-summary">
+        <span>
+          <strong>{{ issueOverview.total }}</strong>
+          <small>erros listados</small>
+        </span>
+        <span>
+          <strong>{{ issueOverview.critical_open }}</strong>
+          <small>críticos abertos</small>
+        </span>
+        <span>
+          <strong>{{ issueOverview.reprocess_requested }}</strong>
+          <small>para reprocessar</small>
+        </span>
+        <span>
+          <strong>{{ issueOverview.ignored }}</strong>
+          <small>ignorados</small>
+        </span>
+      </div>
     </div>
 
     <div class="sync-filters panel-main">
@@ -475,26 +655,102 @@ function formatDuration(seconds: number | null) {
           <div class="subsection-heading compact-heading">
             <h2>Erros por produto</h2>
             <span>{{ selectedEvent.issues.length }}</span>
+            <button class="btn btn-secondary btn-compact" type="button" :disabled="!selectedEvent.issues.length" @click="downloadIssueExport">
+              <i class="fa-solid fa-download" aria-hidden="true"></i>
+              Exportar
+            </button>
           </div>
 
           <div v-if="!selectedEvent.issues.length" class="empty-state">Nenhum erro por produto nesta execução.</div>
-          <div v-else class="dry-run-issues sync-issues">
-            <article v-for="issue in selectedEvent.issues" :key="`${issue.code}-${issue.product_id || issue.grid_id || issue.line || issue.message}`">
+          <div v-else-if="selectedIssueGroups.length" class="sync-issue-groups">
+            <article v-for="group in selectedIssueGroups" :key="group.key">
+              <div>
+                <strong>{{ group.label }}</strong>
+                <small>{{ group.open_count }} aberto(s) · {{ group.critical_count }} crítico(s) · {{ group.count }} total</small>
+                <small v-for="message in group.sample_messages" :key="message">{{ message }}</small>
+              </div>
+              <div class="sync-issue-group-actions">
+                <RouterLink v-if="group.recommended_action_url" :to="group.recommended_action_url">
+                  {{ group.recommended_action_label }}
+                </RouterLink>
+                <button
+                  type="button"
+                  :disabled="actionLoading !== '' || group.open_count === 0"
+                  @click="requestReprocess(group.issue_uids)"
+                >
+                  Reprocessar grupo
+                </button>
+                <button
+                  type="button"
+                  :disabled="actionLoading !== '' || group.open_count === 0"
+                  @click="startIgnore(group.issue_uids, group.label)"
+                >
+                  Ignorar grupo
+                </button>
+              </div>
+            </article>
+          </div>
+
+          <div v-if="ignoreTarget" class="sync-ignore-panel">
+            <label>
+              Motivo para ignorar {{ ignoreTarget.label }}
+              <textarea v-model="ignoreReason" rows="3" maxlength="500"></textarea>
+            </label>
+            <div class="action-row compact">
+              <button class="btn btn-primary btn-compact" type="button" :disabled="!ignoreReason.trim() || actionLoading !== ''" @click="submitIgnore">
+                Confirmar
+              </button>
+              <button class="btn btn-secondary btn-compact" type="button" @click="cancelIgnore">
+                Cancelar
+              </button>
+            </div>
+          </div>
+
+          <div v-if="selectedEvent.issues.length && !ignoreTarget" class="dry-run-issues sync-issues">
+            <article
+              v-for="issue in selectedEvent.issues"
+              :key="issue.uid || `${issue.code}-${issue.product_id || issue.grid_id || issue.line || issue.message}`"
+              :class="{ resolved: !isIssueOpen(issue) }"
+            >
               <i class="fa-solid" :class="issue.severity === 'error' ? 'fa-circle-xmark' : 'fa-circle-exclamation'" aria-hidden="true"></i>
               <span>
                 <strong>{{ issue.product_name || issue.product_id || issue.grid_id || issue.code }}</strong>
                 <small>{{ issue.message }}</small>
-                <small>{{ issue.code }}<template v-if="issue.line"> · linha {{ issue.line }}</template></small>
+                <small>{{ issue.cause_label }} · {{ issue.code }}<template v-if="issue.line"> · linha {{ issue.line }}</template></small>
+                <small>
+                  {{ issue.context.sku || '-' }} · {{ issue.context.category || '-' }} · {{ issue.context.brand || '-' }}
+                  <template v-if="issue.context.sizes?.length"> · {{ issue.context.sizes.join(', ') }}</template>
+                </small>
+                <small v-if="issue.context.product_url">{{ issue.context.product_url }}</small>
+                <small v-if="issue.resolution.status !== 'open'">{{ issue.resolution.label }}<template v-if="issue.resolution.reason"> · {{ issue.resolution.reason }}</template></small>
                 <span class="sync-issue-actions">
-                  <RouterLink v-if="issue.action_url" :to="issue.action_url">
-                    {{ issue.action_label || 'Abrir item' }}
-                  </RouterLink>
+                  <template v-for="action in issue.available_actions" :key="`${issue.uid}-${action.key}`">
+                    <RouterLink v-if="action.kind === 'link' && action.url" :to="action.url">
+                      {{ action.label }}
+                    </RouterLink>
+                    <button
+                      v-else-if="action.key === 'request_reprocess'"
+                      type="button"
+                      :disabled="actionLoading !== '' || !isIssueOpen(issue)"
+                      @click="requestReprocess([issue.uid])"
+                    >
+                      {{ action.label }}
+                    </button>
+                    <button
+                      v-else-if="action.key === 'ignore'"
+                      type="button"
+                      :disabled="actionLoading !== '' || !isIssueOpen(issue)"
+                      @click="startIgnore([issue.uid], issue.product_name || issue.product_id || issue.code)"
+                    >
+                      {{ action.label }}
+                    </button>
+                  </template>
                   <RouterLink v-if="issue.rule_url && issue.related?.product" :to="issue.rule_url">
                     Revisar regra
                   </RouterLink>
                 </span>
               </span>
-              <em :class="issue.severity">{{ issue.severity === 'error' ? 'Erro' : 'Alerta' }}</em>
+              <em :class="issue.severity">{{ issue.resolution.status === 'open' ? (issue.severity === 'error' ? 'Erro' : 'Alerta') : issue.resolution.label }}</em>
             </article>
           </div>
         </template>

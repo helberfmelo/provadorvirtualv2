@@ -7641,6 +7641,15 @@ textarea {
   background: #fef2f2;
 }
 
+.sync-issue-overview {
+  display: grid;
+  gap: 12px;
+}
+
+.sync-issue-summary span {
+  min-width: 128px;
+}
+
 .sync-grid {
   margin-top: 0;
 }
@@ -7749,15 +7758,49 @@ textarea {
   color: #6b7280;
 }
 
+.sync-issue-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.sync-issue-groups article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.sync-issue-groups strong,
+.sync-issue-groups small {
+  display: block;
+}
+
+.sync-issue-groups small {
+  margin-top: 3px;
+  color: #6b7280;
+}
+
+.sync-issue-group-actions,
 .sync-issue-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: 8px;
 }
 
-.sync-issue-actions a {
+.sync-issue-group-actions {
+  justify-content: flex-end;
+}
+
+.sync-issue-group-actions a,
+.sync-issue-group-actions button,
+.sync-issue-actions a,
+.sync-issue-actions button {
   width: fit-content;
+  min-height: 30px;
   padding: 5px 8px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
@@ -7766,6 +7809,32 @@ textarea {
   font-size: 0.78rem;
   font-weight: 900;
   text-decoration: none;
+}
+
+.sync-issue-group-actions button:disabled,
+.sync-issue-actions button:disabled {
+  opacity: 0.55;
+}
+
+.sync-issue-actions {
+  margin-top: 8px;
+}
+
+.sync-ignore-panel {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.sync-ignore-panel textarea {
+  min-height: 74px;
+}
+
+.sync-issues article.resolved {
+  opacity: 0.72;
 }
 
 .assistant-status,
@@ -8260,6 +8329,7 @@ td small {
   .sync-filters,
   .sync-compare-controls,
   .sync-compare-grid,
+  .sync-issue-groups article,
   .sync-key-values,
   .install-grid,
   .widget-install-summary,

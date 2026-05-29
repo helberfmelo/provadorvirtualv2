@@ -482,6 +482,11 @@ XML, 200),
                         'product_id' => 'BS-999',
                         'product_name' => null,
                         'grid_id' => 'G999',
+                        'sku' => 'SKU-BS-999',
+                        'category' => 'Vestidos',
+                        'brand' => 'Zak',
+                        'sizes' => ['P', 'M'],
+                        'product_url' => 'https://zak.example/produto/bs-999',
                         'message' => 'Grade aponta para produto que nao veio em products.',
                     ],
                 ],
@@ -489,12 +494,15 @@ XML, 200),
             'occurred_at' => now(),
         ]);
 
-        $this->withHeaders($headers)
+        $response = $this->withHeaders($headers)
             ->getJson('/api/v1/integrations/sync-history')
             ->assertOk()
             ->assertJsonStructure(['data' => [['execution_key']]])
             ->assertJsonPath('meta.total', 1)
             ->assertJsonPath('meta.with_errors', 1)
+            ->assertJsonPath('meta.issue_summary.total', 1)
+            ->assertJsonPath('meta.issue_summary.open', 1)
+            ->assertJsonPath('meta.issue_summary.critical_open', 1)
             ->assertJsonPath('meta.totals.total', 5)
             ->assertJsonPath('meta.totals.inserted', 1)
             ->assertJsonPath('meta.totals.updated', 1)
@@ -517,10 +525,43 @@ XML, 200),
             ->assertJsonPath('data.0.counters.products', 2)
             ->assertJsonPath('data.0.counters.errors', 1)
             ->assertJsonPath('data.0.sample_products.0.external_product_id', 'BS-10')
+            ->assertJsonPath('data.0.issue_groups.0.key', 'size_grid')
+            ->assertJsonPath('data.0.issue_groups.0.open_count', 1)
             ->assertJsonPath('data.0.issues.0.product_id', 'BS-999')
             ->assertJsonPath('data.0.issues.0.grid_id', 'G999')
+            ->assertJsonPath('data.0.issues.0.context.sku', 'SKU-BS-999')
+            ->assertJsonPath('data.0.issues.0.context.category', 'Vestidos')
+            ->assertJsonPath('data.0.issues.0.context.brand', 'Zak')
+            ->assertJsonPath('data.0.issues.0.resolution.status', 'open')
+            ->assertJsonFragment(['key' => 'request_reprocess', 'label' => 'Reprocessar'])
             ->assertJsonPath('data.0.issues.0.action_label', 'Abrir produto')
             ->assertJsonPath('data.0.issues.0.action_url', '/app/produtos?busca=BS-999');
+
+        $eventId = $response->json('data.0.id');
+        $issueUid = $response->json('data.0.issues.0.uid');
+
+        $this->withHeaders($headers)
+            ->postJson('/api/v1/integrations/sync-issues/actions', [
+                'event_id' => $eventId,
+                'issue_uids' => [$issueUid],
+                'action' => 'ignore',
+                'reason' => 'Conferido com a regra da loja.',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.event.issues.0.resolution.status', 'ignored')
+            ->assertJsonPath('data.event.issues.0.resolution.reason', 'Conferido com a regra da loja.');
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/integrations/sync-history')
+            ->assertOk()
+            ->assertJsonPath('meta.issue_summary.open', 0)
+            ->assertJsonPath('meta.issue_summary.ignored', 1)
+            ->assertJsonPath('data.0.issue_groups.0.ignored_count', 1);
+
+        $export = $this->withHeaders($headers)
+            ->get('/api/v1/integrations/sync-issues/export?event_id='.$eventId)
+            ->assertOk();
+        $this->assertStringContainsString('grid_product_not_found', $export->getContent());
     }
 
     public function test_bigshop_contract_can_only_access_bigshop_integration(): void

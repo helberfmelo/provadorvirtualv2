@@ -229,9 +229,11 @@ function applyRouteFilters() {
   const shortcut = typeof route.query.filtro === 'string' ? route.query.filtro : ''
   const status = typeof route.query.status === 'string' ? route.query.status : ''
   const table = typeof route.query.tabela === 'string' ? route.query.tabela : ''
+  const search = typeof route.query.busca === 'string' ? route.query.busca : ''
 
   filters.status = status
   filters.table = table
+  filters.search = search
   filters.readiness = {
     prontos: 'ready',
     pendentes: 'pending',

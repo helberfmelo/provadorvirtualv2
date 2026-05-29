@@ -2643,7 +2643,7 @@ Critérios de aceite:
 - lojista consegue resolver erros em lote;
 - resolução atualiza cobertura do painel.
 
-Status: planejada.
+Status: implementada localmente na Sprint 144, aguardando commit/deploy. `GET /api/v1/integrations/sync-history` passa a retornar `issue_summary` e `issue_groups` por causa raiz; cada erro recebe `uid`, severidade, causa, ação recomendada, contexto de produto/variação/SKU/tamanhos/categoria/marca/URL e resolução. Foram criados `GET /api/v1/integrations/sync-issues/export` para CSV e `POST /api/v1/integrations/sync-issues/actions` para ignorar com motivo, solicitar reprocessamento ou marcar revisão com auditoria. `/app/sincronizacao` ganhou painel de correção, grupos, ações em lote, botões de próxima ação e exportação. Validações locais passaram com `php -l`, `IntegrationsApiTest`, suíte focada, PHPUnit completo (`124 tests`, `1388 assertions`), Pint, build frontend e validação visual headless desktop/mobile em `5177` com backend em `8002`.
 
 ### Sprint 145 - Simulação de importação e impacto das regras
 

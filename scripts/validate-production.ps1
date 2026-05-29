@@ -315,6 +315,12 @@ if (@($syncHistory.data).Count -gt 0) {
 }
 "API sync history OK"
 
+$syncIssueExport = Invoke-WebRequest -UseBasicParsing -Uri "$ApiBase/integrations/sync-issues/export" -Headers $headers
+Assert-True ($syncIssueExport.StatusCode -eq 200) "sync issues export nao retornou 200"
+Assert-True ($syncIssueExport.Content.Contains("execution_key")) "sync issues export sem execution_key"
+Assert-True ($syncIssueExport.Content.Contains("root_cause")) "sync issues export sem causa raiz"
+"API sync issues export OK"
+
 $integrationChangeCurrent = Invoke-RestMethod -Uri "$ApiBase/merchant/integration-change-requests/current" -Headers $headers
 Assert-True ($integrationChangeCurrent.PSObject.Properties.Name -contains "data") "integration change current sem data"
 "API integration change current OK"
