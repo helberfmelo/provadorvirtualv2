@@ -2151,7 +2151,7 @@ Critérios de aceite:
 - cada tela crítica tem ajuda contextual, mas sem blocos longos de texto;
 - layout responsivo sem sobreposição.
 
-Status: implementado na Sprint 128. O portal da empresa passou a ter navegação agrupada por Operação, Catálogo, Provador, Resultados e Conta, com sidebar escura, estado ativo mais claro, rótulos em linguagem de lojista, ajuda contextual por tela e manual rápido em `/app/ajuda`. O benchmark read-only da Sizebay confirmou o valor de menu curto, tenant visível, tela limpa e suporte acessível; o Provador Virtual aplicou esses aprendizados com próximos passos e manual sem blocos longos.
+Status: implementado na Sprint 128 no commit `001275b`, publicado com sucesso no run `26625998268`. O portal da empresa passou a ter navegação agrupada por Operação, Catálogo, Provador, Resultados e Conta, com sidebar escura, estado ativo mais claro, rótulos em linguagem de lojista, ajuda contextual por tela e manual rápido em `/app/ajuda`. O benchmark read-only da Sizebay confirmou o valor de menu curto, tenant visível, tela limpa e suporte acessível; o Provador Virtual aplicou esses aprendizados com próximos passos e manual sem blocos longos. Validação local passou com build frontend, preview em `5174`, varredura de segredos e `git diff --check`; o GitHub Actions finalizou com deploy e smoke público com sucesso. A validação local pós-deploy com `scripts/validate-production.ps1` foi tentada, mas esta máquina novamente não conseguiu abrir conexão HTTPS para produção, então o bloqueio ficou registrado como conectividade local.
 
 ### Sprint 129 - Painel de cobertura e prontidão operacional
 

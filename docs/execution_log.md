@@ -1322,3 +1322,6 @@
 - A navegação SaaS também foi agrupada para preservar consistência entre portais sem misturar contextos.
 - Validação visual local em `http://127.0.0.1:5174` cobriu desktop, mobile e menu mobile com dados de preview injetados apenas no navegador.
 - `npm --prefix frontend run build` passou. Testes backend não foram executados porque não houve alteração backend; o PHP local segue sem driver SQLite para testes que dependem do banco.
+- Varredura de segredos nos arquivos versionados alterados e `git diff --check` passaram.
+- Commit `001275b` enviado para `main`; o run `26625998268` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` foi tentada após o deploy, mas esta máquina local voltou a falhar ao conectar via HTTPS à produção; o bloqueio foi registrado como conectividade local, não como erro de aplicação.
