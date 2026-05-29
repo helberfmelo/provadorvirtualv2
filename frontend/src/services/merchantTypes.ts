@@ -99,6 +99,8 @@ export type Product = {
 export type MeasurementRow = {
   id?: number
   size_label: string
+  note?: string | null
+  size_note?: string | null
   sort_order?: number
   bust_min?: number | null
   bust_max?: number | null
@@ -118,6 +120,8 @@ export type MeasurementRow = {
   composite_max?: number | null
   measurements?: Record<string, { label?: string; min?: number | null; max?: number | null; value?: number | null }>
   composite_measurements?: Record<string, { label?: string; formula?: string; min?: number | null; max?: number | null; value?: number | null }>
+  measurement_notes?: Record<string, string | null>
+  metadata?: Record<string, unknown>
 }
 
 export type MeasurementTable = {
@@ -131,6 +135,7 @@ export type MeasurementTable = {
   range_mode: 'min_max' | 'exact' | 'tolerance'
   status: string
   source: string
+  notes: string | null
   rows_count?: number
   products_count?: number
   rows?: MeasurementRow[]

@@ -187,6 +187,14 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:saas,saas_emails,edit');
         Route::get('/saas/transactional-email-sends', [SaasEmailController::class, 'sendHistory'])
             ->middleware('portal.permission:saas,saas_emails,view');
+        Route::get('/measurement-tables/export', [MeasurementTableController::class, 'export'])
+            ->middleware('portal.permission:merchant,measurement_tables,view');
+        Route::get('/measurement-tables/template', [MeasurementTableController::class, 'template'])
+            ->middleware('portal.permission:merchant,measurement_tables,view');
+        Route::post('/measurement-tables/import/preview', [MeasurementTableController::class, 'previewImport'])
+            ->middleware('portal.permission:merchant,measurement_tables,edit');
+        Route::post('/measurement-tables/import', [MeasurementTableController::class, 'import'])
+            ->middleware('portal.permission:merchant,measurement_tables,edit');
         Route::apiResource('measurement-tables', MeasurementTableController::class)
             ->only(['index', 'show'])
             ->middleware('portal.permission:merchant,measurement_tables,view');

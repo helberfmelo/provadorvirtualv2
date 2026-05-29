@@ -29,6 +29,9 @@ class MeasurementTableRowResource extends JsonResource
             'shoulder_max' => $this->shoulder_max,
             'measurements' => $this->measurements ?? $this->legacyMeasurements(),
             'composite_measurements' => $this->composite_measurements ?? [],
+            'note' => data_get($this->metadata ?? [], 'note'),
+            'measurement_notes' => data_get($this->metadata ?? [], 'measurement_notes', []),
+            'metadata' => $this->metadata ?? [],
         ];
     }
 

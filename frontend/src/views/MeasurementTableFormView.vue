@@ -127,6 +127,7 @@ function fillForm(table: MeasurementTable) {
   form.range_mode = table.range_mode ?? 'min_max'
   form.status = table.status
   form.source = table.source
+  form.notes = table.notes ?? ''
   form.rows = (JSON.parse(JSON.stringify(table.rows ?? [])) as MeasurementRow[]).map(withCompositeFields)
 }
 
@@ -188,6 +189,8 @@ function withCompositeFields(row: MeasurementRow): MeasurementRow {
 
   return {
     ...row,
+    note: row.note ?? row.size_note ?? null,
+    measurement_notes: row.measurement_notes ?? {},
     composite_min: composite.min ?? null,
     composite_max: composite.max ?? null,
   }
@@ -247,12 +250,14 @@ async function saveTable() {
     status: form.status,
     source: form.source,
     notes: form.notes || null,
-    rows: form.rows.map((row, sort_order) => ({
-      ...row,
-      sort_order,
-      measurements: buildMeasurements(row),
-      composite_measurements: buildCompositeMeasurements(row),
-    })),
+      rows: form.rows.map((row, sort_order) => ({
+        ...row,
+        note: row.note || null,
+        measurement_notes: row.measurement_notes || {},
+        sort_order,
+        measurements: buildMeasurements(row),
+        composite_measurements: buildCompositeMeasurements(row),
+      })),
   }
 
   try {
@@ -382,6 +387,10 @@ async function saveTable() {
             <option value="inactive">Inativa</option>
           </select>
         </label>
+        <label class="full-row">
+          Observações da tabela
+          <textarea v-model="form.notes" rows="3" maxlength="1200" placeholder="Ex.: base do fornecedor, revisão feita, exceções por modelagem"></textarea>
+        </label>
       </div>
 
       <div class="subsection-heading">
@@ -405,6 +414,7 @@ async function saveTable() {
               <th>Comprimento</th>
               <th>Ombro</th>
               <th>Composta</th>
+              <th>Obs.</th>
               <th></th>
             </tr>
           </thead>
@@ -443,6 +453,7 @@ async function saveTable() {
                 <input v-model.number="row.composite_min" class="table-input mini" type="number" min="0" />
                 <input v-model.number="row.composite_max" class="table-input mini" type="number" min="0" />
               </td>
+              <td><input v-model="row.note" class="table-input note" maxlength="500" placeholder="Revisão, peça ou medida" /></td>
               <td class="row-actions">
                 <button type="button" title="Remover linha" @click="removeRow(index)">
                   <i class="fa-solid fa-trash" aria-hidden="true"></i>

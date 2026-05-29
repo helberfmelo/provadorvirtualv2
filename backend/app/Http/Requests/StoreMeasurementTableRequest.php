@@ -28,6 +28,8 @@ class StoreMeasurementTableRequest extends FormRequest
             'notes' => ['nullable', 'string'],
             'rows' => ['nullable', 'array', 'min:1'],
             'rows.*.size_label' => ['required_with:rows', 'string', 'max:40'],
+            'rows.*.note' => ['nullable', 'string', 'max:500'],
+            'rows.*.size_note' => ['nullable', 'string', 'max:500'],
             'rows.*.sort_order' => ['nullable', 'integer', 'min:0', 'max:999'],
             'rows.*.bust_min' => ['nullable', 'numeric', 'min:0', 'max:999.99'],
             'rows.*.bust_max' => ['nullable', 'numeric', 'min:0', 'max:999.99'],
@@ -56,6 +58,8 @@ class StoreMeasurementTableRequest extends FormRequest
             'rows.*.composite_measurements.*.min' => ['nullable', 'numeric', 'min:0', 'max:999.99'],
             'rows.*.composite_measurements.*.max' => ['nullable', 'numeric', 'min:0', 'max:999.99'],
             'rows.*.composite_measurements.*.value' => ['nullable', 'numeric', 'min:0', 'max:999.99'],
+            'rows.*.measurement_notes' => ['nullable', 'array'],
+            'rows.*.measurement_notes.*' => ['nullable', 'string', 'max:500'],
         ];
     }
 }

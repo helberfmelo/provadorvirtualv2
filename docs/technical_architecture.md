@@ -51,7 +51,11 @@ APIs protegidas já implementadas:
 - `PATCH /api/v1/billing/subscription/auto-renewal`
 - `GET|POST|PATCH|DELETE /api/v1/products`: a listagem é paginada no backend e aceita filtros por busca, status, tabela, categoria, marca, gênero, faixa etária, modelagem, origem, erro de sincronização e prontidão; a resposta inclui contadores por aba e opções de filtros. O detalhe expõe ativação individual, origem por campo, snapshot importado, overrides manuais, diagnóstico e histórico; updates preservam dados importados em `metadata`, registram ajustes manuais e geram auditoria para ativação/override. O vínculo em massa de tabela usa `PATCH /api/v1/products/bulk-measurement-table` com `action=preview|apply|undo`, prévia de produtos afetados, conflitos, recomendação de tabela por categoria/marca/gênero/modelagem/tamanhos, confirmação para substituir vínculo existente, `batch_id` reversível e auditoria.
 - `POST|PATCH|DELETE /api/v1/products/{product}/variants`
-- `GET|POST|PATCH|DELETE /api/v1/measurement-tables`
+- `GET|POST|PATCH|DELETE /api/v1/measurement-tables`: a listagem aceita filtros por busca, status, base de medida, tipo de produto, modelagem e uso em produtos; a resposta inclui resumo e opções de filtro.
+- `GET /api/v1/measurement-tables/export`: exporta CSV ou XLSX respeitando os filtros da listagem.
+- `GET /api/v1/measurement-tables/template`: baixa modelo CSV ou XLSX para tabelas de corpo, peça ou mistas.
+- `POST /api/v1/measurement-tables/import/preview`: valida CSV/XLSX antes de gravar e retorna erros com linha, coluna, campo e sugestão.
+- `POST /api/v1/measurement-tables/import`: cria ou atualiza tabelas por nome no escopo da empresa ativa, substitui linhas somente após prévia sem falhas e audita `measurement_table.imported`.
 - `GET /api/v1/measurement-templates`: retorna templates inteligentes normalizados a partir de `backend/database/data/default_measurement_tables_data.json`, herdado do v1, com base brasileira por gênero, tipo de produto, altura, peso, idade e formato corporal.
 - `GET|PATCH /api/v1/widget-install`
 - `POST /api/v1/public/bigshop/activate`
