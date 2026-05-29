@@ -24,6 +24,13 @@ type PlatformGuide = {
   data_support: Record<string, string>
 }
 
+type PlatformSetup = {
+  connection_fields: string[]
+  catalog_flow: string
+  product_page: string
+  tracking: string
+}
+
 type Platform = {
   key: string
   name: string
@@ -32,6 +39,7 @@ type Platform = {
   install_mode: string
   status: string
   summary: string
+  setup: PlatformSetup
   guide: PlatformGuide
   has_connection: boolean
   connection: PlatformConnection | null
@@ -144,6 +152,59 @@ const selectedPlatformSummary = computed(() => selected.value?.summary || (selec
   ? 'Integração BigShop para API, XML/feed, validação de instalação e sincronização de catálogo.'
   : 'Configure credenciais, validação e sincronização desta plataforma.'))
 const selectedPlatformIcon = computed(() => selected.value?.icon || (selected.value?.key === 'bigshop' ? 'fa-bolt' : 'fa-plug'))
+const selectedStatus = computed(() => selected.value?.status || form.status || 'draft')
+const platformModeLabel = computed(() => selected.value?.install_mode === 'one_click' ? 'Um clique' : 'Manual')
+const platformSetupItems = computed(() => {
+  const setup = selected.value?.setup
+
+  if (!setup) {
+    return []
+  }
+
+  return [
+    {
+      icon: 'fa-key',
+      label: 'Conexão',
+      text: setup.connection_fields.join(', '),
+    },
+    {
+      icon: 'fa-database',
+      label: 'Catálogo',
+      text: setup.catalog_flow,
+    },
+    {
+      icon: 'fa-window-maximize',
+      label: 'Página de produto',
+      text: setup.product_page,
+    },
+    {
+      icon: 'fa-chart-line',
+      label: 'Aprendizado',
+      text: setup.tracking,
+    },
+  ]
+})
+const platformNextStep = computed(() => {
+  if (selectedStatus.value === 'connected') {
+    return 'Conexão validada. Próximo passo: sincronizar catálogo, revisar erros e manter o widget publicado nos produtos com tabela.'
+  }
+
+  if (selectedStatus.value === 'configured') {
+    return selected.value?.key === 'bigshop'
+      ? 'Credenciais mínimas salvas. Próximo passo: testar conexão, rodar Prévia segura e revisar product_grids antes da sincronização real.'
+      : 'Configuração mínima salva. Próximo passo: validar a página de produto e sincronizar XML/feed ou API.'
+  }
+
+  if (selectedStatus.value === 'disabled') {
+    return 'Integração pausada. Reative o status quando a loja estiver pronta para validar e sincronizar.'
+  }
+
+  if (selectedStatus.value === 'error') {
+    return 'Existe falha registrada. Revise credenciais, domínio, feed e último erro antes de tentar novamente.'
+  }
+
+  return 'Informe os dados mínimos da plataforma para liberar validação, prévia e sincronização.'
+})
 const guideSteps = computed(() => {
   if (selected.value?.guide?.steps?.length) {
     return selected.value.guide.steps
@@ -232,7 +293,7 @@ function fillForm(platform = selected.value) {
   form.api_base_url = platform?.connection?.api_base_url || ''
   form.feed_url = platform?.connection?.feed_url || ''
   form.feed_format = platform?.connection?.feed_format || 'google_xml'
-  form.status = platform?.connection?.status || platform?.status || 'draft'
+  form.status = platform?.status || platform?.connection?.status || 'draft'
   form.access_token = ''
   form.webhook_secret = ''
 }
@@ -463,7 +524,7 @@ async function copyGuideSnippet() {
 
 function statusLabel(status: string) {
   return {
-    draft: 'Rascunho',
+    draft: 'Pendente',
     configured: 'Configurada',
     connected: 'Conectada',
     disabled: 'Pausada',
@@ -558,7 +619,7 @@ function canRunBigShopApiAction() {
         <section class="panel-main integration-section integration-platform-section">
           <div class="subsection-heading">
             <h2>Plataforma</h2>
-            <span>{{ selected?.install_mode === 'one_click' ? 'Um clique' : 'Manual' }}</span>
+            <span>{{ platformModeLabel }}</span>
           </div>
 
           <div class="integration-platform-summary">
@@ -569,7 +630,29 @@ function canRunBigShopApiAction() {
               <strong>{{ selectedPlatformName }}</strong>
               <small>{{ selectedPlatformSummary }}</small>
             </span>
-            <em class="integration-status-pill">{{ statusLabel(selected?.status || form.status) }}</em>
+            <em class="integration-status-pill" :class="selectedStatus">{{ statusLabel(selectedStatus) }}</em>
+          </div>
+
+          <div v-if="platformSetupItems.length" class="integration-platform-details">
+            <article v-for="item in platformSetupItems" :key="item.label">
+              <i class="fa-solid" :class="item.icon" aria-hidden="true"></i>
+              <span>
+                <small>{{ item.label }}</small>
+                <strong>{{ item.text }}</strong>
+              </span>
+            </article>
+          </div>
+
+          <p class="platform-next-step">
+            {{ platformNextStep }}
+          </p>
+
+          <p v-if="selected?.key === 'bigshop'" class="platform-reference-note">
+            BigShop exige Store ID para API, token x-api para leitura autenticada e atenção especial às grades em product_grids antes de importar medidas.
+          </p>
+
+          <div v-if="selected?.key !== 'bigshop'" class="platform-reference-note">
+            As instruções mudam conforme a plataforma: catálogo por API/feed, instalação na PDP e tracking de pedidos seguem contratos diferentes.
           </div>
 
           <div v-if="platforms.length > 1 && !isBigShopContract" class="integration-platform-picker" role="list">
@@ -628,7 +711,7 @@ function canRunBigShopApiAction() {
                 Status
               </span>
               <select v-model="form.status">
-                <option value="draft">Rascunho</option>
+                <option value="draft">Pendente</option>
                 <option value="configured">Configurada</option>
                 <option value="connected">Conectada</option>
                 <option value="disabled">Pausada</option>

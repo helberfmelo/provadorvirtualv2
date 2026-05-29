@@ -306,6 +306,7 @@ HTML
             'install_mode' => $installMode,
             'status' => 'draft',
             'summary' => $summary,
+            'setup' => self::setup($key),
             'guide' => [
                 'steps' => $steps,
                 'snippet' => $snippet,
@@ -313,6 +314,72 @@ HTML
                 'data_support' => $dataSupport,
             ],
         ];
+    }
+
+    private static function setup(string $key): array
+    {
+        return match ($key) {
+            'bigshop' => [
+                'connection_fields' => ['Store ID BigShop', 'Token x-api', 'URL da API V3', 'URL XML/feed'],
+                'catalog_flow' => 'Ler produtos pela API V3, cruzar product_grids por produto e complementar com Google XML/feed quando existir.',
+                'product_page' => 'Instalação nativa um clique ou snippet no produto.vue/model3 pro, perto do seletor de tamanho.',
+                'tracking' => 'Pedidos, trocas e devoluções entram por contrato BigShop/API quando habilitado para aprendizado.',
+            ],
+            'shopify' => [
+                'connection_fields' => ['Domínio permanente da loja', 'Admin/API token ou app', 'Posição da opção de tamanho', 'Feed opcional'],
+                'catalog_flow' => 'Catálogo por Admin API/app ou XML; gênero, faixa etária e modelagem devem vir por tags, metafields ou regras.',
+                'product_page' => 'Instalação no tema Liquid da PDP usando product.id, variant.id e variant.sku.',
+                'tracking' => 'Tracking por app ou API, com atenção à posição da variação de tamanho nos variants.',
+            ],
+            'woocommerce' => [
+                'connection_fields' => ['Domínio WordPress', 'Consumer key/secret ou XML', 'Atributo de tamanho', 'Feed opcional'],
+                'catalog_flow' => 'Catálogo por REST API, plugin de feed Google ou XML público.',
+                'product_page' => 'Instalação por hook/shortcode no produto, idealmente antes do botão Comprar.',
+                'tracking' => 'Tracking por plugin ou API, mapeando atributo de tamanho do WooCommerce.',
+            ],
+            'nuvemshop' => [
+                'connection_fields' => ['Domínio da loja', 'Token/API ou feed', 'Variável de variante', 'SKU da grade'],
+                'catalog_flow' => 'Catálogo por API ou feed; regras visuais normalizam categoria, gênero e status.',
+                'product_page' => 'Instalação no layout da PDP com recarga ao trocar variante.',
+                'tracking' => 'Pedidos e devoluções por API quando disponível no plano da loja.',
+            ],
+            'vtex' => [
+                'connection_fields' => ['Account/store', 'Credenciais Catalog API', 'Product Context', 'Feed opcional'],
+                'catalog_flow' => 'Catálogo por VTEX Catalog API ou feed, usando productId e itemId como produto/variação.',
+                'product_page' => 'Instalação por app/bloco de storefront ou template da PDP com selectedItem atualizado.',
+                'tracking' => 'Pedidos por OMS/API ou app VTEX IO quando autorizado.',
+            ],
+            'tray' => [
+                'connection_fields' => ['Domínio Tray', 'Token/API ou feed', 'ID da variação', 'SKU da grade'],
+                'catalog_flow' => 'Catálogo por API Tray, feed ou exportação de marketplace.',
+                'product_page' => 'Instalação no tema de produto, perto de productHelper.variants/form.',
+                'tracking' => 'Pedidos e trocas por API Tray quando o cliente autorizar.',
+            ],
+            'loja_integrada' => [
+                'connection_fields' => ['Domínio da loja', 'HTML/JS do tema', 'SKU/variação no DOM', 'Feed/exportação'],
+                'catalog_flow' => 'Catálogo por feed/exportação ou integração customizada.',
+                'product_page' => 'Instalação por HTML/JS personalizado na página de produto.',
+                'tracking' => 'Eventos de carrinho/pedido por script ou API futura.',
+            ],
+            'magento' => [
+                'connection_fields' => ['Base URL Magento', 'REST/Admin token ou módulo', 'Atributo de tamanho', 'Store view'],
+                'catalog_flow' => 'Catálogo por REST API, feed Google ou módulo, preservando produto configurável e simples.',
+                'product_page' => 'Instalação por bloco/layout catalog_product_view e recarga em opção configurável.',
+                'tracking' => 'Tracking por módulo/API, com atributo de tamanho configurado por store view.',
+            ],
+            'opencart' => [
+                'connection_fields' => ['Domínio OpenCart', 'Template Twig', 'Opção de tamanho', 'SKU/model'],
+                'catalog_flow' => 'Catálogo por feed, módulo ou API customizada.',
+                'product_page' => 'Instalação no product.twig e recarga quando opção/tamanho mudar.',
+                'tracking' => 'Eventos por script ou conector customizado.',
+            ],
+            default => [
+                'connection_fields' => ['Domínio público', 'Produto', 'Variação', 'SKU'],
+                'catalog_flow' => 'Catálogo por XML, CSV ou API conforme disponibilidade da loja.',
+                'product_page' => 'Snippet universal na PDP com recarga quando a variação mudar.',
+                'tracking' => 'Eventos de carrinho, pedido e devolução por script/API conforme contrato.',
+            ],
+        };
     }
 
     private static function checklist(): array

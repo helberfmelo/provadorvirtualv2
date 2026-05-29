@@ -37,6 +37,7 @@ class IntegrationsApiTest extends TestCase
                 'external_store_id' => 'loja-demo-bigshop',
                 'api_base_url' => 'https://api.bigshop.test',
                 'feed_url' => 'https://loja.bigshop.test/feed.xml',
+                'status' => 'draft',
                 'access_token' => 'token-secreto',
                 'webhook_secret' => 'assinatura-secreta',
             ])
@@ -54,7 +55,33 @@ class IntegrationsApiTest extends TestCase
             ->getJson('/api/v1/integrations')
             ->assertOk()
             ->assertJsonPath('data.0.status', 'configured')
+            ->assertJsonPath('data.0.setup.connection_fields.0', 'Store ID BigShop')
+            ->assertJsonPath('data.0.setup.product_page', 'Instalação nativa um clique ou snippet no produto.vue/model3 pro, perto do seletor de tamanho.')
             ->assertJsonPath('data.0.connection.has_access_token', true);
+    }
+
+    public function test_configured_connection_is_not_displayed_as_draft_when_saved_status_is_stale(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $company = MerchantCompany::query()->where('external_store_id', 'pv-demo-store')->firstOrFail();
+
+        PlatformConnection::query()->create([
+            'merchant_id' => $company->merchant_id,
+            'merchant_company_id' => $company->id,
+            'platform' => 'bigshop',
+            'external_store_id' => '124',
+            'feed_url' => 'https://www.zak.com.br/feed.xml',
+            'feed_format' => 'google_xml',
+            'status' => 'draft',
+        ]);
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/integrations')
+            ->assertOk()
+            ->assertJsonPath('data.0.key', 'bigshop')
+            ->assertJsonPath('data.0.status', 'configured')
+            ->assertJsonPath('data.0.connection.status', 'configured');
     }
 
     public function test_merchant_can_sync_products_from_xml_feed_connection(): void

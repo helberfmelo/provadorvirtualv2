@@ -41,10 +41,16 @@ class IntegrationController extends Controller
 
         $data = collect($this->catalogForCompany($company))->map(function (array $platform) use ($connections): array {
             $connection = $connections->get($platform['key']);
+            $status = $connection ? $this->effectiveConnectionStatus($connection) : $platform['status'];
+            $connectionData = $connection ? (new PlatformConnectionResource($connection))->resolve() : null;
+
+            if ($connectionData) {
+                $connectionData['status'] = $status;
+            }
 
             return array_merge($platform, [
-                'connection' => $connection ? (new PlatformConnectionResource($connection))->resolve() : null,
-                'status' => $connection?->status ?? $platform['status'],
+                'connection' => $connectionData,
+                'status' => $status,
                 'has_connection' => (bool) $connection,
             ]);
         })->values();
@@ -81,7 +87,6 @@ class IntegrationController extends Controller
             'import_rules' => array_key_exists('import_rules', $data)
                 ? app(ImportRuleMapper::class)->normalize($data['import_rules'])
                 : $connection->import_rules,
-            'status' => $data['status'] ?? $this->statusFor($data, $connection->status),
             'last_error' => null,
         ]);
 
@@ -97,6 +102,7 @@ class IntegrationController extends Controller
                 : null;
         }
 
+        $connection->status = $this->statusFor($data['status'] ?? null, $connection);
         $connection->save();
 
         app(AuditLogger::class)->log($request, $merchant, 'integration.updated', 'integrations', 'info', [
@@ -288,18 +294,40 @@ class IntegrationController extends Controller
         ]);
     }
 
-    private function statusFor(array $data, ?string $fallback): string
+    private function statusFor(?string $requestedStatus, PlatformConnection $connection): string
     {
-        if (
-            ! empty($data['external_store_id'])
-            || ! empty($data['api_base_url'])
-            || ! empty($data['access_token'])
-            || ! empty($data['feed_url'])
-        ) {
+        if (in_array($requestedStatus, ['connected', 'disabled', 'error'], true)) {
+            return $requestedStatus;
+        }
+
+        if ($this->hasMinimumConfiguration($connection)) {
             return 'configured';
         }
 
-        return $fallback ?: 'draft';
+        return 'draft';
+    }
+
+    private function effectiveConnectionStatus(PlatformConnection $connection): string
+    {
+        if (in_array($connection->status, ['connected', 'disabled', 'error'], true)) {
+            return $connection->status;
+        }
+
+        return $this->hasMinimumConfiguration($connection) ? 'configured' : ($connection->status ?: 'draft');
+    }
+
+    private function hasMinimumConfiguration(PlatformConnection $connection): bool
+    {
+        $hasToken = filled($connection->access_token_encrypted);
+        $hasFeed = filled($connection->feed_url);
+        $hasApi = filled($connection->api_base_url);
+        $hasStore = filled($connection->external_store_id);
+
+        if ($connection->platform === 'bigshop') {
+            return $hasStore && ($hasToken || $hasFeed);
+        }
+
+        return $hasFeed || ($hasApi && $hasToken) || $hasStore;
     }
 
     private function syncHistoryItem(IntegrationEvent $event, ?ImportJob $job): array
