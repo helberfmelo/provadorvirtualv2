@@ -20,7 +20,7 @@ Implementado:
 - bloqueio comercial BigShop agora depende de `merchant_companies.bigshop_discount_active`: loja BigShop com benefício vê BigShop e solicita troca; loja sem benefício pode trocar a plataforma operacional no portal;
 - SaaS admin recebe `integration_state` por empresa, com status técnico, status comercial, contagem de conexões e flags de API/feed/webhook sem expor token ou segredo.
 
-Sprint 139 validada localmente; publicação e validação de produção ficam registradas no log da sprint.
+Publicado no run `26647308642` e validado em produção com `scripts/validate-production.ps1`, incluindo `API integrations OK`.
 
 ## Onde a plataforma é informada
 
