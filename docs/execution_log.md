@@ -1230,3 +1230,16 @@
 - Validações locais passaram com `npm --prefix frontend run build`, testes focados `WidgetInstallApiTest|WidgetAssetTest`, PHPUnit completo com 93 testes e 884 assertions, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
 - Commit `4c66327` enviado para `main`; o run `26610700834` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/widget`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 119 Integrações em seções
+
+- A tela `/app/integracoes` foi reorganizada para uma coluna única.
+- A antiga coluna lateral de plataformas foi substituída por uma seção `Plataforma` no topo.
+- O seletor de plataformas aparece somente quando houver mais de uma integração disponível e o contrato não estiver travado em BigShop.
+- Credenciais, URL da API, XML/feed, status, token e webhook ficam agrupados na seção `Conexão`.
+- URL para validar, botão de validação, checklist e resultado técnico ficam agrupados na seção `Validação da instalação`.
+- Passo a passo, local de instalação e snippet de reload ficam na seção `Instalação no produto`.
+- `Dados suportados`, `Snippet`, `Ações`, resultado de sincronização, prévia BigShop e ativações um clique viraram seções independentes no mesmo fluxo vertical.
+- Validações locais passaram com `npm --prefix frontend run build`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`, varredura de segredos e `git diff --check`.
+- Commit `c366754` enviado para `main`; o run `26611218335` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.

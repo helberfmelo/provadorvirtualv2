@@ -240,6 +240,8 @@ Atualizado em: 2026-05-28
 - Sprint 117 enviada ao GitHub no commit `98c24b8`; o run `26609952186` finalizou com sucesso e a validação de produção confirmou login, SaaS, portal da empresa, páginas públicas, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 118 completa a personalização visual de botões em `/app/widget`: layout em coluna única, visualizador em modal, 12 modelos em grade 3x4, escolha de cores abaixo da grade, catálogo de ícones de medidas e animação pendular opcional do cabide.
 - Sprint 118 enviada ao GitHub no commit `4c66327`; o run `26610700834` finalizou com sucesso e a validação de produção confirmou `/app/widget`, páginas públicas, SaaS, portal da empresa, widget, APIs, CORS, login demo e go-live readiness.
+- Sprint 119 reorganiza `/app/integracoes` em uma coluna única com seções de Plataforma, Conexão, Validação da instalação, Instalação no produto, Dados suportados, Snippet, Ações, resultados, prévia BigShop e ativações.
+- Sprint 119 enviada ao GitHub no commit `c366754`; o run `26611218335` finalizou com sucesso e a validação de produção confirmou `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -273,7 +275,7 @@ Atualizado em: 2026-05-28
 - Go-live protegido: `/api/v1/go-live/readiness` e `/app/go-live`.
 - Pacote comercial protegido: `/app/go-live` mostra links de venda, onboarding, automações e pendências reais.
 - Observabilidade pública: `/api/v1/ops/status`.
-- BigShop protegido: probe, dry-run e sync em `/api/v1/integrations/bigshop/*`.
+- BigShop protegido: probe, dry-run e sync em `/api/v1/integrations/bigshop/*`. A tela `/app/integracoes` usa fluxo em uma coluna única com seções empilhadas para plataforma, conexão, validação, instalação, dados suportados, snippet, ações, prévia BigShop e ativações.
 - Sincronização protegida: `GET /api/v1/integrations/sync-history` consolida eventos `dry_run_import`, `sync_products` e `xml_feed_sync` para `/app/sincronizacao`.
 - Monitor BigShop protegido: `GET /api/v1/integrations/bigshop/activations`.
 - Validação de instalação protegida: `POST /api/v1/integrations/{platform}/validate-install`.

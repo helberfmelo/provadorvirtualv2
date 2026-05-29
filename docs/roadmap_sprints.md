@@ -1957,3 +1957,29 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 118 no commit `4c66327`, publicado com sucesso no run `26610700834`. Validações locais passaram com build frontend, testes focados do widget, PHPUnit completo com 93 testes e 884 assertions, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/widget`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 119 - Integrações em uma coluna com seções
+
+Objetivo: melhorar a tela `/app/integracoes`, removendo o layout com coluna lateral e deixando o fluxo em uma coluna única com seções claras para plataforma, conexão, validação, instalação, dados, snippet e ações.
+
+Entregas:
+
+- substituir a grade lateral de plataformas por uma pilha vertical de seções;
+- criar seção `Plataforma` com resumo da integração selecionada, modo de instalação e status;
+- manter seletor de plataformas apenas quando houver mais de uma opção disponível e o contrato não estiver travado em BigShop;
+- separar credenciais e catálogo na seção `Conexão`;
+- separar URL de validação, botão de validação, checklist e resultado na seção `Validação da instalação`;
+- agrupar passo a passo, local de instalação e snippet de reload na seção `Instalação no produto`;
+- manter `Dados suportados`, `Snippet`, `Ações`, resultado de sincronização, prévia BigShop e ativações como seções independentes;
+- ajustar CSS responsivo para a nova estrutura de uma coluna.
+
+Validação:
+
+- `npm --prefix frontend run build`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`;
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado na Sprint 119 no commit `c366754`, publicado com sucesso no run `26611218335`. Validações locais passaram com build frontend, `IntegrationsApiTest` com 7 testes e 84 assertions, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
