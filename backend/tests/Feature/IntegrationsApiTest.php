@@ -28,6 +28,10 @@ class IntegrationsApiTest extends TestCase
             ->assertJsonPath('data.0.priority', true)
             ->assertJsonPath('data.0.status', 'draft')
             ->assertJsonPath('data.0.guide.checklist.0.key', 'domain_configured')
+            ->assertJsonPath('data.0.guide.checklist.6.key', 'variant_id_found')
+            ->assertJsonPath('data.0.guide.api_examples.0.method', 'GET')
+            ->assertJsonPath('data.0.guide.webhook.signature_header', 'X-Provador-Signature')
+            ->assertJsonPath('data.0.guide.gtm.default', false)
             ->assertJsonPath('data.0.setup.fields.external_store_id.label', 'Store ID BigShop')
             ->assertJsonFragment(['key' => 'loja_integrada'])
             ->assertJsonFragment(['key' => 'magento'])
@@ -59,6 +63,8 @@ class IntegrationsApiTest extends TestCase
             ->assertJsonPath('data.status', 'configured')
             ->assertJsonPath('data.has_access_token', true)
             ->assertJsonPath('data.has_webhook_secret', true)
+            ->assertJsonPath('data.access_token_hint', '********')
+            ->assertJsonPath('data.webhook_secret_hint', '********')
             ->assertJsonMissing(['access_token' => 'token-secreto']);
 
         $this->withHeaders($headers)
@@ -68,6 +74,50 @@ class IntegrationsApiTest extends TestCase
             ->assertJsonPath('data.0.setup.connection_fields.0', 'Store ID BigShop')
             ->assertJsonPath('data.0.setup.product_page', 'Instalação nativa um clique ou snippet no produto.vue/model3 pro, perto do seletor de tamanho.')
             ->assertJsonPath('data.0.connection.has_access_token', true);
+    }
+
+    public function test_merchant_can_test_webhook_without_exposing_secret(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/integrations/api', [
+                'external_store_id' => 'loja-api',
+                'api_base_url' => 'https://api.loja.test',
+                'access_token' => 'token-de-leitura',
+                'webhook_secret' => 'segredo-do-webhook',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.has_webhook_secret', true)
+            ->assertJsonMissing(['webhook_secret' => 'segredo-do-webhook']);
+
+        $response = $this->withHeaders($headers)
+            ->postJson('/api/v1/integrations/api/test-webhook', [
+                'product_id' => 'PROD-1',
+                'variant_id' => 'VAR-1',
+                'sku' => 'SKU-1',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'passed')
+            ->assertJsonPath('data.has_webhook_secret', true)
+            ->assertJsonPath('data.signature_header', 'X-Provador-Signature')
+            ->assertJsonPath('data.payload.product_id', 'PROD-1')
+            ->assertJsonPath('data.recent_logs.0.status', 'passed')
+            ->assertJsonMissing(['webhook_secret' => 'segredo-do-webhook'])
+            ->assertJsonMissing(['secret' => 'segredo-do-webhook']);
+
+        $this->assertStringStartsWith('sha256:', $response->json('data.signature_masked'));
+        $this->assertStringContainsString('...', $response->json('data.signature_masked'));
+
+        $event = IntegrationEvent::query()
+            ->where('platform', 'api')
+            ->where('event_type', 'webhook_test')
+            ->firstOrFail();
+
+        $this->assertSame('stored_write_only', $event->summary['secret']);
+        $this->assertSame('PROD-1', $event->payload['product_id']);
+        $this->assertArrayNotHasKey('webhook_secret', $event->payload);
     }
 
     public function test_configured_connection_is_not_displayed_as_draft_when_saved_status_is_stale(): void
@@ -352,7 +402,7 @@ XML, 200),
         $this->seed();
         Http::fake([
             'https://provadorvirtual.online/produto-validacao' => Http::response(
-                '<div id="provador-virtual-container"></div><script id="provadorVirtualScript" src="https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js" data-platform="custom" data-product-id="123" data-sku="PV-123"></script>',
+                '<div id="provador-virtual-container"><button>Descubra seu tamanho</button><button>Tabela de Medidas</button></div><script id="provadorVirtualScript" src="https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js" data-platform="custom" data-product-id="123" data-variant-id="456" data-sku="PV-123"></script>',
                 200
             ),
         ]);
@@ -365,13 +415,25 @@ XML, 200),
             ->assertJsonPath('data.status', 'passed')
             ->assertJsonPath('data.checks.0.status', 'passed')
             ->assertJsonPath('data.checks.3.key', 'script_found')
-            ->assertJsonPath('data.checks.3.status', 'passed');
+            ->assertJsonPath('data.checks.3.status', 'passed')
+            ->assertJsonPath('data.checks.5.key', 'product_id_found')
+            ->assertJsonPath('data.checks.8.key', 'buttons_rendered')
+            ->assertJsonPath('data.diagnostics.product_id.value', '123')
+            ->assertJsonPath('data.diagnostics.variant_id.value', '456')
+            ->assertJsonPath('data.diagnostics.sku.value', 'PV-123')
+            ->assertJsonPath('data.diagnostics.buttons.found', true);
 
         $this->assertDatabaseHas('integration_events', [
             'platform' => 'custom',
             'event_type' => 'install_validation',
             'status' => 'passed',
         ]);
+
+        $this->withHeaders(['Authorization' => 'Bearer '.$this->loginToken()])
+            ->getJson('/api/v1/integrations')
+            ->assertOk()
+            ->assertJsonPath('data.11.diagnostics.last_install_validation.status', 'passed')
+            ->assertJsonPath('data.11.diagnostics.last_install_validation.diagnostics.product_id.value', '123');
     }
 
     public function test_merchant_can_view_sync_history_with_product_errors(): void

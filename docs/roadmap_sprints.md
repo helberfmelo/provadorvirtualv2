@@ -2553,7 +2553,7 @@ Critérios de aceite:
 - segredo nunca aparece em texto puro após salvo;
 - GTM é apresentado como alternativa, não como padrão quando há integração nativa.
 
-Status: planejada.
+Status: implementada localmente na Sprint 141. `GET /api/v1/integrations` agora entrega exemplos de API, guia de webhook assinado, GTM opcional/fallback e último diagnóstico por URL validada. `POST /api/v1/integrations/{platform}/validate-install` detalha container, script, plataforma, produto, variação, SKU e botões renderizados; `POST /api/v1/integrations/{platform}/test-webhook` assina payload de exemplo com segredo criptografado e retorna somente assinatura mascarada/log sanitizado. `/app/integracoes` mostra exemplos de API, teste de webhook, logs recentes, mascaramento/rotação write-only e diagnóstico visual da instalação. Validações locais passaram com `php -l`, `IntegrationsApiTest`, suíte focada de integrações/widget/recomendação/BigShop/SaaS/importações, PHPUnit completo (`122 tests`, `1318 assertions`), Pint, build frontend e validação visual headless desktop/mobile. O commit, deploy green e validação de produção serão registrados após publicação.
 
 ### Sprint 142 - Posicionamento visual do botão na página de produto
 

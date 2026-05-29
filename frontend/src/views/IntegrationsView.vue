@@ -16,7 +16,36 @@ type PlatformConnection = {
   status: string
   has_access_token: boolean
   has_webhook_secret: boolean
+  access_token_hint?: string | null
+  webhook_secret_hint?: string | null
   last_error: string | null
+  updated_at?: string | null
+}
+
+type ApiExample = {
+  label: string
+  method: string
+  path: string
+  description: string
+}
+
+type WebhookGuide = {
+  enabled: boolean
+  test_endpoint: string
+  signature_header: string
+  signature_algorithm: string
+  secret_storage: string
+  events: string[]
+  notes: string
+}
+
+type GtmGuide = {
+  default: boolean
+  recommended: boolean
+  trigger: string
+  required_data: string[]
+  when_to_use: string
+  validation: string
 }
 
 type PlatformGuide = {
@@ -24,6 +53,9 @@ type PlatformGuide = {
   snippet: string
   checklist: Array<{ key: string; label: string }>
   data_support: Record<string, string>
+  api_examples?: ApiExample[]
+  webhook?: WebhookGuide
+  gtm?: GtmGuide
 }
 
 type ConnectionFieldKey = 'external_store_id' | 'api_base_url' | 'feed_url' | 'access_token' | 'webhook_secret'
@@ -56,6 +88,10 @@ type Platform = {
   guide: PlatformGuide
   has_connection: boolean
   connection: PlatformConnection | null
+  diagnostics?: {
+    last_install_validation?: ValidationResult | null
+    recent_webhook_logs?: WebhookLog[]
+  }
 }
 
 type ValidationCheck = {
@@ -65,11 +101,45 @@ type ValidationCheck = {
   action: string | null
 }
 
+type InstallationDiagnostics = {
+  container?: { found: boolean; selector: string | null }
+  script?: { found: boolean; src: string | null }
+  platform?: { found: boolean; value: string | null; expected: string }
+  product_id?: { found: boolean; value: string | null }
+  variant_id?: { found: boolean; value: string | null }
+  sku?: { found: boolean; value: string | null }
+  buttons?: { found: boolean; labels: string[] }
+  gtm?: { detected: boolean }
+}
+
 type ValidationResult = {
   status: 'passed' | 'warning' | 'failed'
   url: string
   http_status: number | null
-  checks: ValidationCheck[]
+  checks: ValidationCheck[] | Record<string, ValidationCheck['status']>
+  diagnostics?: InstallationDiagnostics
+  checked_at?: string | null
+}
+
+type WebhookLog = {
+  id: number
+  status: string
+  event_type: string
+  signature_masked: string | null
+  store_id: string | null
+  payload_keys: string[]
+  occurred_at: string | null
+}
+
+type WebhookTestResult = {
+  status: string
+  platform: string
+  has_webhook_secret: boolean
+  signature_header: string
+  signature_masked: string
+  payload: Record<string, string | null>
+  log: WebhookLog
+  recent_logs: WebhookLog[]
 }
 
 type BigShopActivation = {
@@ -159,10 +229,12 @@ const requestingPlatformChange = ref(false)
 const changeRequestModalOpen = ref(false)
 const running = ref(false)
 const validating = ref(false)
+const testingWebhook = ref(false)
 const copied = ref(false)
 const loadError = ref('')
 const integrationReport = ref<Record<string, number | string> | null>(null)
 const validation = ref<ValidationResult | null>(null)
+const webhookTest = ref<WebhookTestResult | null>(null)
 const bigShopActivations = ref<BigShopActivation[]>([])
 const bigShopDryRun = ref<BigShopDryRunResult | null>(null)
 const currentChangeRequest = ref<IntegrationChangeRequest | null>(null)
@@ -259,6 +331,47 @@ const guideSteps = computed(() => {
 })
 const dataSupportEntries = computed<[string, string][]>(() => Object.entries(selected.value?.guide?.data_support || {}))
 const guideSnippet = computed(() => selected.value?.guide?.snippet || '')
+const apiExamples = computed(() => selected.value?.guide?.api_examples || [])
+const webhookGuide = computed(() => selected.value?.guide?.webhook || null)
+const gtmGuide = computed(() => selected.value?.guide?.gtm || null)
+const activeValidation = computed(() => validation.value || selected.value?.diagnostics?.last_install_validation || null)
+const activeValidationChecks = computed<ValidationCheck[]>(() => {
+  const checks = activeValidation.value?.checks
+
+  if (Array.isArray(checks)) {
+    return checks
+  }
+
+  if (!checks || !selected.value?.guide?.checklist) {
+    return []
+  }
+
+  return selected.value.guide.checklist.map((item) => ({
+    key: item.key,
+    label: item.label,
+    status: checks[item.key] || 'warning',
+    action: null,
+  }))
+})
+const validationDiagnostics = computed(() => activeValidation.value?.diagnostics || null)
+const validationDiagnosticItems = computed(() => {
+  const diagnostics = validationDiagnostics.value
+
+  if (!diagnostics) {
+    return []
+  }
+
+  return [
+    { key: 'container', label: 'Container', value: diagnostics.container?.selector || '-', ok: Boolean(diagnostics.container?.found) },
+    { key: 'script', label: 'Script', value: diagnostics.script?.src || '-', ok: Boolean(diagnostics.script?.found) },
+    { key: 'product', label: 'Produto', value: diagnostics.product_id?.value || '-', ok: Boolean(diagnostics.product_id?.found) },
+    { key: 'variant', label: 'Variação', value: diagnostics.variant_id?.value || '-', ok: Boolean(diagnostics.variant_id?.found) },
+    { key: 'sku', label: 'SKU', value: diagnostics.sku?.value || '-', ok: Boolean(diagnostics.sku?.found) },
+    { key: 'buttons', label: 'Botões', value: diagnostics.buttons?.labels?.join(', ') || '-', ok: Boolean(diagnostics.buttons?.found) },
+  ]
+})
+const recentWebhookLogs = computed(() => webhookTest.value?.recent_logs || selected.value?.diagnostics?.recent_webhook_logs || [])
+const canTestWebhook = computed(() => Boolean(showConnectionField('webhook_secret') && selected.value?.connection?.has_webhook_secret))
 const showXmlFeedAction = computed(() => showConnectionField('feed_url'))
 const installationPlacementSteps = computed(() => {
   const platformName = selected.value?.name || 'plataforma'
@@ -452,6 +565,7 @@ function selectPlatform(platform: Platform) {
   selectedKey.value = platform.key
   integrationReport.value = null
   validation.value = null
+  webhookTest.value = null
   bigShopDryRun.value = null
   fillForm(platform)
   loadBigShopActivations()
@@ -758,6 +872,39 @@ async function validateInstall() {
   }
 }
 
+async function testWebhook() {
+  if (!selected.value || !canTestWebhook.value) {
+    showFeedback({
+      status: 'info',
+      title: 'Webhook secret pendente',
+      message: 'Salve um segredo de webhook antes de rodar o teste. O campo é write-only: para rotacionar, cole um novo valor e salve.',
+    })
+    return
+  }
+
+  testingWebhook.value = true
+  webhookTest.value = null
+
+  try {
+    const { data } = await api.post(`/integrations/${selected.value.key}/test-webhook`)
+    webhookTest.value = data.data
+    showFeedback({
+      status: 'success',
+      title: 'Webhook testado',
+      message: 'O teste assinou um payload de exemplo com o segredo armazenado e registrou log sem expor o segredo.',
+    })
+    await loadPlatforms()
+  } catch (requestError: any) {
+    showFeedback({
+      status: 'error',
+      title: 'Falha ao testar webhook',
+      message: friendlyRequestMessage(requestError, 'Não foi possível testar o webhook desta plataforma.'),
+    })
+  } finally {
+    testingWebhook.value = false
+  }
+}
+
 async function copyGuideSnippet() {
   if (!guideSnippet.value) {
     return
@@ -820,7 +967,13 @@ function preferredPlatformKey() {
 }
 
 function checkStatus(key: string) {
-  return validation.value?.checks.find((check) => check.key === key)?.status || 'pending'
+  const checks = activeValidation.value?.checks
+
+  if (Array.isArray(checks)) {
+    return checks.find((check) => check.key === key)?.status || 'pending'
+  }
+
+  return checks?.[key] || 'pending'
 }
 
 function checkIcon(key: string) {
@@ -1094,6 +1247,9 @@ function canRunBigShopApiAction() {
                 {{ connectionField('access_token').label }}
               </span>
               <input v-model="form.access_token" :type="connectionField('access_token').secret ? 'password' : 'text'" autocomplete="off" :placeholder="connectionField('access_token').placeholder" :required="connectionField('access_token').required" />
+              <small v-if="selected?.connection?.has_access_token" class="secret-field-note">
+                Salvo como {{ selected.connection.access_token_hint || '********' }}. Cole um novo valor para rotacionar.
+              </small>
             </label>
             <label v-if="showConnectionField('webhook_secret')">
               <span class="field-label">
@@ -1101,6 +1257,9 @@ function canRunBigShopApiAction() {
                 {{ connectionField('webhook_secret').label }}
               </span>
               <input v-model="form.webhook_secret" :type="connectionField('webhook_secret').secret ? 'password' : 'text'" autocomplete="off" :placeholder="connectionField('webhook_secret').placeholder" :required="connectionField('webhook_secret').required" />
+              <small v-if="selected?.connection?.has_webhook_secret" class="secret-field-note">
+                Salvo como {{ selected.connection.webhook_secret_hint || '********' }}. Cole um novo segredo para rotacionar.
+              </small>
             </label>
           </div>
 
@@ -1127,7 +1286,7 @@ function canRunBigShopApiAction() {
         <section class="panel-main integration-section">
           <div class="subsection-heading">
             <h2>Validação da instalação</h2>
-            <span>{{ validation?.status ? statusLabel(validation.status) : 'Pendente' }}</span>
+            <span>{{ activeValidation?.status ? statusLabel(activeValidation.status) : 'Pendente' }}</span>
           </div>
 
           <div class="form-grid integration-validation-grid">
@@ -1161,12 +1320,22 @@ function canRunBigShopApiAction() {
             </span>
           </div>
 
-          <div v-if="validation" class="validation-result">
-            <strong>{{ validation.url }}</strong>
-            <small>HTTP {{ validation.http_status || '-' }}</small>
-            <p v-for="check in validation.checks.filter((item) => item.action)" :key="check.key">
+          <div v-if="activeValidation" class="validation-result">
+            <strong>{{ activeValidation.url }}</strong>
+            <small>
+              HTTP {{ activeValidation.http_status || '-' }}
+              <template v-if="activeValidation.checked_at"> - {{ shortDate(activeValidation.checked_at) }}</template>
+            </small>
+            <p v-for="check in activeValidationChecks.filter((item) => item.action)" :key="check.key">
               {{ check.action }}
             </p>
+          </div>
+
+          <div v-if="validationDiagnosticItems.length" class="install-diagnostics-grid">
+            <span v-for="item in validationDiagnosticItems" :key="item.key" :class="{ ok: item.ok }">
+              <small>{{ item.label }}</small>
+              <strong>{{ item.value }}</strong>
+            </span>
           </div>
         </section>
 
@@ -1197,20 +1366,60 @@ function canRunBigShopApiAction() {
   sku: 'SKU_DA_GRADE'
 })</code></pre>
 
-          <div class="gtm-guide">
+          <div v-if="gtmGuide" class="gtm-guide">
             <div>
               <h3>Google Tag Manager</h3>
-              <p>
-                Use como alternativa quando a plataforma permitir inserir o container no tema e disparar uma tag HTML
-                somente em páginas de produto. A tag deve carregar depois que os IDs do produto e da variação estiverem
-                disponíveis no DOM ou no dataLayer.
-              </p>
+              <span>{{ gtmGuide.recommended ? 'Alternativa disponível' : 'Fallback assistido' }}</span>
+              <p>{{ gtmGuide.when_to_use }}</p>
             </div>
             <ol class="guide-steps">
-              <li>Crie o container visual no template da página de produto: <code>&lt;div id="provador-virtual-container"&gt;&lt;/div&gt;</code>.</li>
-              <li>No GTM, crie uma tag HTML personalizada com o snippet desta plataforma.</li>
-              <li>Configure o gatilho somente para páginas de produto e valide no modo Preview/Tag Assistant antes de publicar.</li>
+              <li>Gatilho: {{ gtmGuide.trigger }}.</li>
+              <li>Dados obrigatórios: {{ gtmGuide.required_data.join(', ') }}.</li>
+              <li>{{ gtmGuide.validation }}</li>
             </ol>
+          </div>
+        </section>
+
+        <section v-if="apiExamples.length" class="panel-main integration-section">
+          <div class="subsection-heading">
+            <h2>API e webhook</h2>
+            <span>{{ webhookGuide?.enabled ? 'Assinado' : 'Opcional' }}</span>
+          </div>
+
+          <div class="api-example-grid">
+            <article v-for="example in apiExamples" :key="`${example.method}-${example.path}`">
+              <small>{{ example.label }}</small>
+              <strong><em>{{ example.method }}</em> {{ example.path }}</strong>
+              <p>{{ example.description }}</p>
+            </article>
+          </div>
+
+          <div v-if="webhookGuide" class="webhook-test-panel">
+            <div>
+              <strong>{{ webhookGuide.signature_algorithm }} via {{ webhookGuide.signature_header }}</strong>
+              <small>{{ webhookGuide.notes }}</small>
+              <small>Teste protegido: {{ webhookGuide.test_endpoint }}</small>
+            </div>
+            <button class="btn btn-secondary" type="button" :disabled="testingWebhook || !canTestWebhook" @click="testWebhook">
+              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+              {{ testingWebhook ? 'Testando...' : 'Testar webhook' }}
+            </button>
+          </div>
+
+          <div v-if="webhookTest" class="validation-result">
+            <strong>{{ webhookTest.signature_header }} {{ webhookTest.signature_masked }}</strong>
+            <small>Payload: {{ Object.keys(webhookTest.payload).join(', ') }}</small>
+          </div>
+
+          <div v-if="recentWebhookLogs.length" class="webhook-log-list">
+            <article v-for="log in recentWebhookLogs" :key="log.id">
+              <span>
+                <strong>{{ log.event_type }}</strong>
+                <small>{{ log.signature_masked || 'assinatura mascarada' }}</small>
+              </span>
+              <em>{{ statusLabel(log.status) }}</em>
+              <small>{{ log.occurred_at ? shortDate(log.occurred_at) : '-' }}</small>
+            </article>
           </div>
         </section>
 

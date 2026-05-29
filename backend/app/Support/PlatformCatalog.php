@@ -360,6 +360,9 @@ HTML
                 'snippet' => $snippet,
                 'checklist' => self::checklist(),
                 'data_support' => $dataSupport,
+                'api_examples' => self::apiExamples($key),
+                'webhook' => self::webhookGuide($key),
+                'gtm' => self::gtmGuide($key, $installMode),
             ],
         ];
     }
@@ -555,7 +558,99 @@ HTML
             ['key' => 'container_found', 'label' => 'Container do Provador Virtual encontrado'],
             ['key' => 'script_found', 'label' => 'Script do widget carregado'],
             ['key' => 'platform_hint', 'label' => 'Plataforma informada no snippet'],
-            ['key' => 'product_identifiers', 'label' => 'Produto, variação ou SKU informados'],
+            ['key' => 'product_id_found', 'label' => 'Produto informado'],
+            ['key' => 'variant_id_found', 'label' => 'Variação informada'],
+            ['key' => 'sku_found', 'label' => 'SKU informado'],
+            ['key' => 'buttons_rendered', 'label' => 'Botões renderizados'],
+        ];
+    }
+
+    private static function apiExamples(string $key): array
+    {
+        return match ($key) {
+            'bigshop' => [
+                [
+                    'label' => 'Produtos BigShop',
+                    'method' => 'GET',
+                    'path' => '/products',
+                    'description' => 'Ler catálogo com Store-Id e token x-api, sem gravar antes do dry-run.',
+                ],
+                [
+                    'label' => 'Grades BigShop',
+                    'method' => 'GET',
+                    'path' => '/product_grids',
+                    'description' => 'Cruzar grades por produto para variação, tamanho, SKU e disponibilidade.',
+                ],
+            ],
+            'xml_feed' => [
+                [
+                    'label' => 'Feed Google XML',
+                    'method' => 'GET',
+                    'path' => 'https://loja.com.br/feed.xml',
+                    'description' => 'Usar g:item_group_id, g:id, g:size, g:brand, g:product_type e imagem como fonte de catálogo.',
+                ],
+            ],
+            'api' => [
+                [
+                    'label' => 'Lista de produtos',
+                    'method' => 'GET',
+                    'path' => '/products?updated_since=2026-05-01T00:00:00Z',
+                    'description' => 'Retornar produto, variações, SKU, tamanhos, categoria, marca, gênero, imagem e status.',
+                ],
+                [
+                    'label' => 'Detalhe de produto',
+                    'method' => 'GET',
+                    'path' => '/products/{product_id}',
+                    'description' => 'Permitir reprocessar um produto específico quando o widget apontar divergência.',
+                ],
+                [
+                    'label' => 'Pedido/devolução autorizado',
+                    'method' => 'POST',
+                    'path' => '/webhooks/orders',
+                    'description' => 'Enviar apenas eventos contratados e minimizados, assinados com HMAC.',
+                ],
+            ],
+            default => [
+                [
+                    'label' => 'Catálogo autorizado',
+                    'method' => 'GET',
+                    'path' => '/products',
+                    'description' => 'Quando houver API, mapear produto, variação, SKU, tamanho, categoria, marca e imagem para o contrato canônico.',
+                ],
+                [
+                    'label' => 'Evento assinado',
+                    'method' => 'POST',
+                    'path' => '/webhooks/orders',
+                    'description' => 'Usar somente quando a plataforma puder assinar payloads e o cliente autorizar tracking.',
+                ],
+            ],
+        };
+    }
+
+    private static function webhookGuide(string $key): array
+    {
+        return [
+            'enabled' => ! in_array($key, ['xml_feed', 'loja_integrada'], true),
+            'test_endpoint' => "/api/v1/integrations/{$key}/test-webhook",
+            'signature_header' => 'X-Provador-Signature',
+            'signature_algorithm' => 'HMAC-SHA256',
+            'secret_storage' => 'write-only encrypted',
+            'events' => ['catalog.updated', 'order.paid', 'return.created'],
+            'notes' => 'Webhook é opcional e só deve ser ativado quando houver contrato, autorização e segredo rotacionável.',
+        ];
+    }
+
+    private static function gtmGuide(string $key, string $installMode): array
+    {
+        return [
+            'default' => false,
+            'recommended' => $installMode !== 'one_click' && ! in_array($key, ['bigshop'], true),
+            'trigger' => 'Somente páginas de produto',
+            'required_data' => ['data-product-id', 'data-variant-id', 'data-sku', 'data-platform'],
+            'when_to_use' => $installMode === 'one_click'
+                ? 'Fallback assistido quando app, tema oficial ou instalação nativa não estiverem disponíveis.'
+                : 'Alternativa para lojas sem app nativo ou sem edição simples do template da página de produto.',
+            'validation' => 'Validar no Preview/Tag Assistant e depois no validador de instalação do Provador Virtual.',
         ];
     }
 

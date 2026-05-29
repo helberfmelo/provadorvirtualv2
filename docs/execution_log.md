@@ -1523,3 +1523,16 @@
 - Varredura de segredos, `git diff --check` e `git diff --cached --check` passaram; os achados foram falsos positivos em testes, documentação e textos de UI sobre não expor tokens/credenciais.
 - Commit `e5cd59e` enviado para `main`; o run `26649251806` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/saas/trocas-bigshop`, `/app/integracoes`, `GET /api/v1/merchant/integration-change-requests/current`, páginas públicas, SaaS, portal, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 141 API, webhook, GTM e validação de instalação
+
+- Relida a documentação obrigatória antes da sprint, incluindo `docs/credentials.local.md` somente em modo mascarado por envolver integrações, produção/deploy e segredos. Não houve novo acesso ao portal Sizebay nem uso de credenciais.
+- `PlatformCatalog` passou a devolver exemplos de API por plataforma, guia de webhook assinado com `X-Provador-Signature`, algoritmo HMAC-SHA256, endpoint protegido de teste e guia GTM marcado como alternativa/fallback, nunca como padrão.
+- `GET /api/v1/integrations` agora inclui último diagnóstico de instalação por plataforma e logs recentes de webhook testado, sempre sanitizados e sem segredo em claro.
+- `POST /api/v1/integrations/{platform}/validate-install` passou a retornar diagnóstico granular da URL validada: container, script, plataforma esperada, produto, variação, SKU, botões renderizados e indício de GTM, gravando resumo em `integration_events`.
+- Criado `POST /api/v1/integrations/{platform}/test-webhook`, que usa o segredo criptografado para assinar um payload de exemplo, retorna apenas assinatura mascarada, registra log/auditoria e nunca devolve o segredo.
+- `/app/integracoes` ganhou blocos de exemplos de API, webhook, logs recentes, mascaramento/rotação write-only de token/segredo, diagnóstico visual da URL validada e guia GTM opcional.
+- `scripts/validate-production.ps1` passou a verificar que `GET /api/v1/integrations` expõe exemplos de API, webhook assinado, GTM não padrão e checklist granular de produto, variação, SKU e botões.
+- Validações locais já executadas: `php -l` nos PHP alterados, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest` (`10 tests`, `140 assertions`), suíte focada de integrações/widget/recomendação/BigShop/SaaS/importações (`41 tests`, `443 assertions`), PHPUnit completo (`122 tests`, `1318 assertions`), `php vendor/bin/pint --dirty --test` e `npm --prefix frontend run build` com o aviso conhecido de bundle acima de 500 kB.
+- Validação visual local rodou em `http://127.0.0.1:5177/app/integracoes`, com backend local em `8002`, Chrome headless/CDP, plataforma API, teste de webhook, desktop e mobile sem erros de console. As capturas ficaram em `.tmp/sprint141-integracoes-api-webhook-*.png` e não devem ser versionadas.
+- Commit, push, run do GitHub Actions e validação final de produção serão registrados após publicação da sprint.

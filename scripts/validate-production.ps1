@@ -265,6 +265,14 @@ Assert-True ($xmlFeedIntegration.setup.fields.feed_url.required -eq $true) "xml_
 Assert-True ($null -eq $xmlFeedIntegration.setup.fields.access_token) "xml_feed expôs token indevido"
 Assert-True ($apiIntegration.setup.fields.api_base_url.required -eq $true) "api sem api_base_url obrigatoria"
 Assert-True ($apiIntegration.setup.fields.access_token.secret -eq $true) "api sem token secreto"
+Assert-True ($apiIntegration.guide.webhook.signature_header -eq "X-Provador-Signature") "api sem webhook assinado"
+Assert-True ($apiIntegration.guide.gtm.default -eq $false) "GTM nao deve ser padrao"
+Assert-True (@($apiIntegration.guide.api_examples).Count -gt 0) "api sem exemplos de API"
+$checkKeys = @($apiIntegration.guide.checklist | ForEach-Object { $_.key })
+Assert-True ($checkKeys -contains "product_id_found") "checklist sem produto"
+Assert-True ($checkKeys -contains "variant_id_found") "checklist sem variacao"
+Assert-True ($checkKeys -contains "sku_found") "checklist sem SKU"
+Assert-True ($checkKeys -contains "buttons_rendered") "checklist sem botoes renderizados"
 "API integrations OK"
 
 $integrationChangeCurrent = Invoke-RestMethod -Uri "$ApiBase/merchant/integration-change-requests/current" -Headers $headers

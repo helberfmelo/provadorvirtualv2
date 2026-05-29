@@ -5957,6 +5957,13 @@ textarea {
   color: #047857;
 }
 
+.secret-field-note {
+  margin-top: -2px;
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
 .check-list.stacked {
   display: grid;
   gap: 9px;
@@ -6019,6 +6026,123 @@ textarea {
 .validation-result small,
 .validation-result p {
   color: #6b7280;
+}
+
+.install-diagnostics-grid,
+.api-example-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.install-diagnostics-grid span,
+.api-example-grid article {
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.install-diagnostics-grid span.ok {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.install-diagnostics-grid small,
+.api-example-grid small,
+.webhook-test-panel small,
+.webhook-log-list small,
+.gtm-guide span {
+  color: #64748b;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.install-diagnostics-grid strong,
+.api-example-grid strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #0f172a;
+}
+
+.api-example-grid strong em {
+  color: #0f766e;
+  font-style: normal;
+}
+
+.api-example-grid p {
+  margin: 0;
+  color: #4b5563;
+  line-height: 1.45;
+}
+
+.webhook-test-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.webhook-test-panel > div,
+.webhook-log-list article span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.webhook-test-panel strong,
+.webhook-log-list strong {
+  overflow-wrap: anywhere;
+  color: #0f172a;
+}
+
+.webhook-log-list {
+  display: grid;
+  gap: 8px;
+}
+
+.webhook-log-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+}
+
+.webhook-log-list em {
+  color: #047857;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.gtm-guide {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1fr);
+  gap: 14px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.gtm-guide h3,
+.gtm-guide p {
+  margin: 0;
+}
+
+.gtm-guide p {
+  margin-top: 5px;
+  color: #475569;
+  line-height: 1.5;
 }
 
 .inline-action-label {
@@ -7789,6 +7913,11 @@ td small {
   .integration-validation-grid,
   .integration-guide-columns,
   .integration-actions,
+  .install-diagnostics-grid,
+  .api-example-grid,
+  .webhook-test-panel,
+  .webhook-log-list article,
+  .gtm-guide,
   .import-rule-editor-grid,
   .alias-row,
   .smart-catalog-panel,

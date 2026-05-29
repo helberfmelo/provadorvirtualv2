@@ -38,11 +38,21 @@ class IntegrationController extends Controller
             ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->get()
             ->keyBy('platform');
+        $events = IntegrationEvent::query()
+            ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->whereIn('event_type', ['install_validation', 'webhook_test'])
+            ->orderByDesc('occurred_at')
+            ->orderByDesc('id')
+            ->limit(80)
+            ->get()
+            ->groupBy('platform');
 
-        $data = collect($this->catalogForCompany($company))->map(function (array $platform) use ($connections): array {
+        $data = collect($this->catalogForCompany($company))->map(function (array $platform) use ($connections, $events): array {
             $connection = $connections->get($platform['key']);
             $status = $connection ? $this->effectiveConnectionStatus($connection) : $platform['status'];
             $connectionData = $connection ? (new PlatformConnectionResource($connection))->resolve() : null;
+            $platformEvents = $events->get($platform['key'], collect());
 
             if ($connectionData) {
                 $connectionData['status'] = $status;
@@ -52,6 +62,15 @@ class IntegrationController extends Controller
                 'connection' => $connectionData,
                 'status' => $status,
                 'has_connection' => (bool) $connection,
+                'diagnostics' => [
+                    'last_install_validation' => $this->lastInstallValidation($platformEvents),
+                    'recent_webhook_logs' => $platformEvents
+                        ->where('event_type', 'webhook_test')
+                        ->take(5)
+                        ->map(fn (IntegrationEvent $event): array => $this->webhookLogItem($event))
+                        ->values()
+                        ->all(),
+                ],
             ]);
         })->values();
 
@@ -214,6 +233,7 @@ class IntegrationController extends Controller
             allowedDomains: $install?->allowed_domains ?? [],
             reachable: $httpStatus !== null && $httpStatus >= 200 && $httpStatus < 400
         );
+        $diagnostics = $this->installationDiagnostics($body, $platform, $host, $httpStatus !== null && $httpStatus >= 200 && $httpStatus < 400);
         $status = collect($checks)->contains(fn (array $check): bool => $check['status'] === 'failed')
             ? 'failed'
             : (collect($checks)->contains(fn (array $check): bool => $check['status'] === 'warning') ? 'warning' : 'passed');
@@ -235,6 +255,7 @@ class IntegrationController extends Controller
                 'host' => $host,
                 'http_status' => $httpStatus,
                 'checks' => collect($checks)->mapWithKeys(fn (array $check): array => [$check['key'] => $check['status']])->all(),
+                'diagnostics' => $diagnostics,
             ],
             'error' => $error,
             'occurred_at' => now(),
@@ -255,6 +276,89 @@ class IntegrationController extends Controller
                 'url' => $url,
                 'http_status' => $httpStatus,
                 'checks' => $checks,
+                'diagnostics' => $diagnostics,
+                'checked_at' => now()->toISOString(),
+            ],
+        ]);
+    }
+
+    public function testWebhook(Request $request, string $platform)
+    {
+        if (! PlatformCatalog::find($platform)) {
+            throw new NotFoundHttpException('Integração não encontrada.');
+        }
+
+        $merchant = $this->currentMerchant($request);
+        $company = $this->activeCompany($request, $merchant);
+        $this->guardPlatformAllowed($company, $platform);
+
+        $data = $request->validate([
+            'event' => ['nullable', 'string', 'max:80'],
+            'product_id' => ['nullable', 'string', 'max:120'],
+            'variant_id' => ['nullable', 'string', 'max:120'],
+            'sku' => ['nullable', 'string', 'max:120'],
+        ]);
+
+        $connection = $this->connectionFor($merchant->id, $company?->id, $platform);
+
+        if (! $connection || blank($connection->webhook_secret_encrypted)) {
+            throw ValidationException::withMessages([
+                'webhook_secret' => ['Salve um webhook secret antes de executar o teste. O segredo é write-only e não volta em claro.'],
+            ]);
+        }
+
+        $secret = Crypt::decryptString($connection->webhook_secret_encrypted);
+        $payload = [
+            'event' => $data['event'] ?? 'provadorvirtual.webhook_test',
+            'platform' => $platform,
+            'store_id' => $connection->external_store_id,
+            'product_id' => $data['product_id'] ?? 'PRODUCT-ID',
+            'variant_id' => $data['variant_id'] ?? 'VARIANT-ID',
+            'sku' => $data['sku'] ?? 'SKU-TESTE',
+            'occurred_at' => now()->toISOString(),
+        ];
+        $encodedPayload = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}';
+        $signature = hash_hmac('sha256', $encodedPayload, $secret);
+        $signatureMasked = 'sha256:'.substr($signature, 0, 6).'...'.substr($signature, -6);
+
+        $event = IntegrationEvent::query()->create([
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $company?->id,
+            'platform_connection_id' => $connection->id,
+            'platform' => $platform,
+            'event_type' => 'webhook_test',
+            'direction' => 'inbound',
+            'status' => 'passed',
+            'summary' => [
+                'secret' => 'stored_write_only',
+                'signature_masked' => $signatureMasked,
+                'signature_header' => 'X-Provador-Signature',
+                'payload_keys' => array_keys($payload),
+                'store_id' => $connection->external_store_id,
+            ],
+            'payload' => $payload,
+            'occurred_at' => now(),
+        ]);
+
+        app(AuditLogger::class)->log($request, $merchant, 'integration.webhook_tested', 'integrations', 'info', [
+            'platform' => $platform,
+            'merchant_company_id' => $company?->id,
+            'module' => 'integrations',
+            'action' => 'test_webhook',
+            'signature_masked' => $signatureMasked,
+            'payload_keys' => array_keys($payload),
+        ], $connection);
+
+        return response()->json([
+            'data' => [
+                'status' => 'passed',
+                'platform' => $platform,
+                'has_webhook_secret' => true,
+                'signature_header' => 'X-Provador-Signature',
+                'signature_masked' => $signatureMasked,
+                'payload' => $payload,
+                'log' => $this->webhookLogItem($event),
+                'recent_logs' => $this->recentWebhookLogs($merchant->id, $company?->id, $platform),
             ],
         ]);
     }
@@ -328,6 +432,70 @@ class IntegrationController extends Controller
         }
 
         return $hasFeed || ($hasApi && $hasToken) || $hasStore;
+    }
+
+    private function connectionFor(int $merchantId, ?int $companyId, string $platform): ?PlatformConnection
+    {
+        return PlatformConnection::query()
+            ->where('merchant_id', $merchantId)
+            ->when($companyId, function ($query) use ($companyId): void {
+                $query->where(function ($innerQuery) use ($companyId): void {
+                    $innerQuery->where('merchant_company_id', $companyId)
+                        ->orWhereNull('merchant_company_id');
+                });
+            })
+            ->where('platform', $platform)
+            ->orderByRaw('merchant_company_id is null')
+            ->first();
+    }
+
+    private function lastInstallValidation($events): ?array
+    {
+        $event = $events->where('event_type', 'install_validation')->first();
+
+        if (! $event instanceof IntegrationEvent) {
+            return null;
+        }
+
+        return [
+            'id' => $event->id,
+            'status' => $event->status,
+            'url' => data_get($event->summary, 'url'),
+            'host' => data_get($event->summary, 'host'),
+            'http_status' => data_get($event->summary, 'http_status'),
+            'checks' => data_get($event->summary, 'checks', []),
+            'diagnostics' => data_get($event->summary, 'diagnostics', []),
+            'checked_at' => $event->occurred_at?->toISOString(),
+        ];
+    }
+
+    private function recentWebhookLogs(int $merchantId, ?int $companyId, string $platform): array
+    {
+        return IntegrationEvent::query()
+            ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompany($query, $companyId ? MerchantCompany::query()->find($companyId) : null))
+            ->where('platform', $platform)
+            ->where('event_type', 'webhook_test')
+            ->orderByDesc('occurred_at')
+            ->orderByDesc('id')
+            ->limit(5)
+            ->get()
+            ->map(fn (IntegrationEvent $event): array => $this->webhookLogItem($event))
+            ->values()
+            ->all();
+    }
+
+    private function webhookLogItem(IntegrationEvent $event): array
+    {
+        return [
+            'id' => $event->id,
+            'status' => $event->status,
+            'event_type' => data_get($event->payload, 'event', $event->event_type),
+            'signature_masked' => data_get($event->summary, 'signature_masked'),
+            'store_id' => data_get($event->summary, 'store_id'),
+            'payload_keys' => data_get($event->summary, 'payload_keys', []),
+            'occurred_at' => $event->occurred_at?->toISOString(),
+        ];
     }
 
     private function syncHistoryItem(IntegrationEvent $event, ?ImportJob $job): array
@@ -506,8 +674,7 @@ class IntegrationController extends Controller
 
     private function installationChecks(string $body, string $platform, string $host, array $allowedDomains, bool $reachable): array
     {
-        $content = mb_strtolower($body);
-        $platformHint = 'data-platform="'.$platform.'"';
+        $diagnostics = $this->installationDiagnostics($body, $platform, $host, $reachable);
 
         return [
             $this->check(
@@ -525,31 +692,117 @@ class IntegrationController extends Controller
             $this->check(
                 'container_found',
                 'Container do Provador Virtual encontrado',
-                str_contains($content, 'provador-virtual-container') || str_contains($content, 'data-container-id'),
+                (bool) data_get($diagnostics, 'container.found'),
                 'Inclua o container perto do seletor de tamanho.',
                 warning: true
             ),
             $this->check(
                 'script_found',
                 'Script do widget carregado',
-                str_contains($content, 'provadorvirtualscript') || str_contains($content, 'provador-virtual.js'),
+                (bool) data_get($diagnostics, 'script.found'),
                 'Inclua o script oficial do widget na página de produto.'
             ),
             $this->check(
                 'platform_hint',
                 'Plataforma informada no snippet',
-                str_contains($content, $platformHint) || str_contains($content, "data-platform='{$platform}'"),
+                (bool) data_get($diagnostics, 'platform.found'),
                 'Defina data-platform="'.$platform.'" no script.',
                 warning: true
             ),
             $this->check(
-                'product_identifiers',
-                'Produto, variação ou SKU informados',
-                str_contains($content, 'data-product-id') || str_contains($content, 'data-sku'),
-                'Informe data-product-id e data-sku para identificar o produto.',
+                'product_id_found',
+                'Produto informado',
+                (bool) data_get($diagnostics, 'product_id.found'),
+                'Informe data-product-id com o identificador do produto na plataforma.'
+            ),
+            $this->check(
+                'variant_id_found',
+                'Variação informada',
+                (bool) data_get($diagnostics, 'variant_id.found'),
+                'Informe data-variant-id quando houver grade, cor ou tamanho selecionável.',
+                warning: true
+            ),
+            $this->check(
+                'sku_found',
+                'SKU informado',
+                (bool) data_get($diagnostics, 'sku.found'),
+                'Informe data-sku para cruzar widget, catálogo e relatórios.',
+                warning: true
+            ),
+            $this->check(
+                'buttons_rendered',
+                'Botões do provador renderizados',
+                (bool) data_get($diagnostics, 'buttons.found'),
+                'Após o script carregar, confirme os botões Descubra seu tamanho e Tabela de Medidas na página. Se usar GTM, valide também no Preview/Tag Assistant.',
                 warning: true
             ),
         ];
+    }
+
+    private function installationDiagnostics(string $body, string $platform, string $host, bool $reachable): array
+    {
+        $content = mb_strtolower($body);
+        $platformValue = $this->extractAttribute($body, 'data-platform');
+        $productId = $this->extractAttribute($body, 'data-product-id');
+        $variantId = $this->extractAttribute($body, 'data-variant-id');
+        $sku = $this->extractAttribute($body, 'data-sku');
+        preg_match('/<script[^>]+src=["\']([^"\']*provador-virtual\.js[^"\']*)["\']/i', $body, $scriptMatch);
+
+        return [
+            'host' => $host,
+            'reachable' => $reachable,
+            'container' => [
+                'found' => str_contains($content, 'provador-virtual-container') || str_contains($content, 'data-container-id'),
+                'selector' => str_contains($content, 'provador-virtual-container') ? '#provador-virtual-container' : null,
+            ],
+            'script' => [
+                'found' => str_contains($content, 'provadorvirtualscript') || str_contains($content, 'provador-virtual.js'),
+                'src' => $scriptMatch[1] ?? null,
+            ],
+            'platform' => [
+                'found' => $platformValue === $platform,
+                'value' => $platformValue,
+                'expected' => $platform,
+            ],
+            'product_id' => [
+                'found' => filled($productId),
+                'value' => $productId,
+            ],
+            'variant_id' => [
+                'found' => filled($variantId),
+                'value' => $variantId,
+            ],
+            'sku' => [
+                'found' => filled($sku),
+                'value' => $sku,
+            ],
+            'buttons' => [
+                'found' => str_contains($content, 'descubra seu tamanho')
+                    || str_contains($content, 'tabela de medidas')
+                    || str_contains($content, 'pv-main-button')
+                    || str_contains($content, 'pv-size-table'),
+                'labels' => collect(['descubra seu tamanho', 'tabela de medidas'])
+                    ->filter(fn (string $label): bool => str_contains($content, $label))
+                    ->values()
+                    ->all(),
+            ],
+            'gtm' => [
+                'detected' => str_contains($content, 'googletagmanager.com/gtm.js')
+                    || str_contains($content, 'gtm-')
+                    || str_contains($content, 'datalayer'),
+            ],
+        ];
+    }
+
+    private function extractAttribute(string $body, string $attribute): ?string
+    {
+        if (! preg_match('/\s'.preg_quote($attribute, '/').'\s*=\s*(["\'])(.*?)\1/i', $body, $match)) {
+            return null;
+        }
+
+        $value = trim(html_entity_decode($match[2], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+
+        return $value === '' ? null : $value;
     }
 
     private function check(string $key, string $label, bool $passed, string $action, bool $warning = false): array

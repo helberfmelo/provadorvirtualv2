@@ -22,6 +22,8 @@ class PlatformConnectionResource extends JsonResource
             'status' => $this->status,
             'has_access_token' => filled($this->access_token_encrypted),
             'has_webhook_secret' => filled($this->webhook_secret_encrypted),
+            'access_token_hint' => filled($this->access_token_encrypted) ? '********' : null,
+            'webhook_secret_hint' => filled($this->webhook_secret_encrypted) ? '********' : null,
             'last_sync_at' => $this->last_sync_at?->toISOString(),
             'last_error' => $this->last_error,
             'updated_at' => $this->updated_at?->toISOString(),

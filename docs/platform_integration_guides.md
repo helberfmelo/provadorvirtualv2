@@ -32,6 +32,16 @@ Implementado localmente para publicação:
 - auditoria cobre solicitação, aceite, atualização, pagamento solicitado, conclusão/cancelamento e aplicação da nova plataforma;
 - e-mails transacionais avisam solicitação recebida, pagamento pendente e troca concluída, sempre respeitando SMTP inativo como `skipped`.
 
+## Status Sprint 141
+
+Implementado localmente para publicação:
+
+- `GET /api/v1/integrations` expõe exemplos de API por plataforma, guia de webhook assinado, guia GTM opcional/fallback e estado diagnóstico recente por plataforma;
+- `POST /api/v1/integrations/{platform}/validate-install` retorna diagnóstico granular de container, script, plataforma, produto, variação, SKU, botões renderizados e indício de GTM;
+- `POST /api/v1/integrations/{platform}/test-webhook` testa o segredo salvo sem expô-lo: assina payload de exemplo com HMAC-SHA256, retorna assinatura mascarada, grava log em `integration_events` e auditoria `integration.webhook_tested`;
+- `/app/integracoes` mostra exemplos de API, teste de webhook, logs recentes, token/segredo write-only com rotação por substituição e diagnóstico visual da URL validada;
+- `scripts/validate-production.ps1` valida exemplos de API, webhook assinado, GTM não padrão e checklist granular.
+
 ## Onde a plataforma é informada
 
 A plataforma da loja é gravada em `merchant_companies.platform`.
@@ -97,7 +107,10 @@ Todo guia usa os mesmos pontos de validação:
 - container do Provador Virtual encontrado;
 - script do widget carregado;
 - plataforma informada no snippet;
-- produto, variação ou SKU informados.
+- produto informado;
+- variação informada;
+- SKU informado;
+- botões renderizados.
 
 ## Local correto de instalação
 
@@ -156,7 +169,17 @@ Resposta:
     "status": "passed",
     "url": "https://loja.com.br/produto-exemplo",
     "http_status": 200,
-    "checks": []
+    "checks": [],
+    "diagnostics": {
+      "container": { "found": true, "selector": "#provador-virtual-container" },
+      "script": { "found": true, "src": "https://provadorvirtual.online/provadorvirtual_v2/widget/v1/provador-virtual.js" },
+      "platform": { "found": true, "value": "shopify", "expected": "shopify" },
+      "product_id": { "found": true, "value": "123" },
+      "variant_id": { "found": true, "value": "456" },
+      "sku": { "found": true, "value": "SKU-123" },
+      "buttons": { "found": true, "labels": ["descubra seu tamanho"] },
+      "gtm": { "detected": false }
+    }
   }
 }
 ```
@@ -165,8 +188,24 @@ Regras:
 
 - aceita somente URL pública `http` ou `https`;
 - bloqueia `localhost`, IPs privados/reservados e hosts `.local`;
-- não salva HTML da loja, apenas resumo dos checks;
+- não salva HTML da loja, apenas resumo dos checks e diagnóstico sanitizado;
 - falha remota gera `status=failed` e erro operacional em `integration_events`.
+
+## Teste de webhook
+
+Rota protegida:
+
+```http
+POST /api/v1/integrations/{platform}/test-webhook
+```
+
+Regras:
+
+- exige `webhook_secret` já salvo na conexão;
+- usa o segredo criptografado para assinar payload de exemplo com HMAC-SHA256;
+- retorna `signature_masked`, `signature_header`, payload sanitizado e logs recentes;
+- nunca retorna o segredo salvo, token de API ou cookie/sessão;
+- para rotacionar, o lojista cola um novo segredo no campo write-only e salva a integração.
 
 ## Matriz de dados
 
