@@ -1414,3 +1414,20 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
 - Commit `d816f41` enviado para `main`; o run `26635156508` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 135 Modelagens com diagnóstico e correção guiada
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy, API pública, integrações e sessão Sizebay.
+- Acessado o MySizebay da Zak em modo somente leitura em `/modelings`, `/modelings/form/new`, `/settings/sync` e `/settings/sync/importation-rules`, sem alterar dados, sem preencher formulário, sem sincronizar, sem salvar e sem acionar suporte.
+- O benchmark Sizebay mostrou que `/modelings` e `/modelings/form/new` reaproveitam Measurement Table, e que o valor real está em `Settings > Sync`: erros `[API] 500: "Modeling not found"` por produto com categoria, marca, gênero, faixa etária, tamanhos e botão `See more`.
+- Criados `GET /api/v1/fit-profiles/diagnostics` e `POST /api/v1/fit-profiles/diagnostics/apply` para listar modelagens ausentes, desconhecidas, inativas ou incompatíveis e aplicar correção em lote.
+- O diagnóstico sempre retorna causa, ação e sugestão: aplicar modelagem existente quando há confiança ou criar a modelagem ausente recebida da sincronização.
+- A aplicação guiada cria modelagem quando necessário, aplica em massa nos produtos afetados, grava `metadata.fit_profile_diagnostic`, histórico no produto e auditoria `fit_profile.diagnostic_applied`.
+- `FitProfileResource` passou a expor `guidance` com contexto para regras, IA e impacto na recomendação; a API pública de recomendação/config-check passa a registrar `modeling_context`, notas e avisos quando a modelagem está ausente, desconhecida ou inativa.
+- A tela `/app/modelagens` ganhou painel de diagnóstico com métricas, grupos, amostras de produtos, confiança da sugestão e botão de aplicação em massa, além de bloco de impacto da modelagem na recomendação.
+- Corrigido CORS local para permitir portas Vite alternativas `5174` a `5177` e incluir `/api/v1/fit-profiles*`, necessário porque `5173` estava ocupada nesta máquina.
+- Validação visual local rodou em `http://127.0.0.1:5177/app/modelagens`, com backend local em `8002`, cobrindo desktop, mobile e grupo temporário de diagnóstico restaurado em seguida, sem overflow horizontal.
+- Validações locais passaram com `php -l`, `php vendor\bin\pint --dirty`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter 'FitProfilesApiTest|RecommendationApiTest'`, PHPUnit completo (`111 tests`, `1097 assertions`) e `npm --prefix frontend run build` (com o aviso conhecido de bundle acima de 500 kB).
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
+- Commit `9a69f27` enviado para `main`; o run `26636901205` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.

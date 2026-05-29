@@ -2366,7 +2366,7 @@ Critérios de aceite:
 - modelagem criada pode ser aplicada em massa;
 - alterações ficam auditadas.
 
-Status: planejada.
+Status: implementado na Sprint 135 no commit `9a69f27`, publicado com sucesso no run `26636901205`. O benchmark read-only da Sizebay em `/modelings`, `/modelings/form/new`, `/settings/sync` e `/settings/sync/importation-rules` mostrou que a tela de modelagens reaproveita Measurement Table, enquanto a tela de sincronização aponta erros `[API] 500: "Modeling not found"` por produto com categoria, marca, gênero, faixa etária, tamanhos e ação de expansão. O Provador Virtual evoluiu esse fluxo com diagnóstico dedicado de modelagens, grupos de correção com sugestão sempre presente, criação e aplicação em massa de modelagem, auditoria por lote, histórico no produto, metadados para regras/IA e contexto de modelagem registrado no config-check/recomendação pública. Validações locais passaram com PHPUnit completo (`111 tests`, `1097 assertions`), testes focados de modelagens/recomendação, Pint, PHP lint, build frontend, varredura de segredos, `git diff --check` e inspeção visual desktop/mobile em `5177`; o GitHub Actions finalizou com deploy e smoke público com sucesso, e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
 
 ### Sprint 136 - Marcas locais e marcas normalizadas
 
