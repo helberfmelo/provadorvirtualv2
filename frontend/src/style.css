@@ -4574,24 +4574,24 @@ textarea {
   background: #f9fafb;
 }
 
-.integration-platform-summary span,
-.integration-platform-summary strong,
-.integration-platform-summary small {
+.integration-platform-copy,
+.integration-platform-copy strong,
+.integration-platform-copy small {
   display: block;
   min-width: 0;
 }
 
-.integration-platform-summary strong {
+.integration-platform-copy strong {
   color: #0f172a;
 }
 
-.integration-platform-summary small {
+.integration-platform-copy small {
   margin-top: 3px;
   color: #4b5563;
   line-height: 1.45;
 }
 
-.integration-platform-summary em {
+.integration-status-pill {
   justify-self: end;
   padding: 6px 9px;
   border-radius: 999px;
@@ -5545,7 +5545,7 @@ td small {
     white-space: normal;
   }
 
-  .integration-platform-summary em {
+  .integration-status-pill {
     justify-self: start;
   }
 

@@ -139,6 +139,26 @@ const form = reactive({
 })
 
 const selected = computed(() => platforms.value.find((platform) => platform.key === selectedKey.value) || platforms.value[0] || null)
+const selectedPlatformName = computed(() => selected.value?.name || (selected.value?.key === 'bigshop' ? 'BigShop' : 'Plataforma'))
+const selectedPlatformSummary = computed(() => selected.value?.summary || (selected.value?.key === 'bigshop'
+  ? 'Integração BigShop para API, XML/feed, validação de instalação e sincronização de catálogo.'
+  : 'Configure credenciais, validação e sincronização desta plataforma.'))
+const selectedPlatformIcon = computed(() => selected.value?.icon || (selected.value?.key === 'bigshop' ? 'fa-bolt' : 'fa-plug'))
+const guideSteps = computed(() => {
+  if (selected.value?.guide?.steps?.length) {
+    return selected.value.guide.steps
+  }
+
+  return [
+    'Salve a conexão da plataforma com loja, API, XML/feed e credenciais.',
+    'Valide uma URL pública de produto para confirmar container, script e identificadores.',
+    selected.value?.key === 'bigshop'
+      ? 'Execute a prévia segura BigShop antes de sincronizar produtos pela API.'
+      : 'Sincronize o XML/feed e revise os produtos importados.',
+  ]
+})
+const dataSupportEntries = computed<[string, string][]>(() => Object.entries(selected.value?.guide?.data_support || {}))
+const guideSnippet = computed(() => selected.value?.guide?.snippet || '')
 const feedPlaceholder = computed(() => selected.value?.key === 'bigshop'
   ? 'https://domínio-da-loja.com.br/feed.xml'
   : 'https://loja.com.br/feed.xml')
@@ -430,11 +450,11 @@ async function validateInstall() {
 }
 
 async function copyGuideSnippet() {
-  if (!selected.value?.guide?.snippet) {
+  if (!guideSnippet.value) {
     return
   }
 
-  await navigator.clipboard.writeText(selected.value.guide.snippet)
+  await navigator.clipboard.writeText(guideSnippet.value)
   copied.value = true
   window.setTimeout(() => {
     copied.value = false
@@ -543,13 +563,13 @@ function canRunBigShopApiAction() {
 
           <div class="integration-platform-summary">
             <span class="platform-icon">
-              <i class="fa-solid" :class="selected?.icon" aria-hidden="true"></i>
+              <i class="fa-solid" :class="selectedPlatformIcon" aria-hidden="true"></i>
             </span>
-            <span>
-              <strong>{{ selected?.name }}</strong>
-              <small>{{ selected?.summary }}</small>
+            <span class="integration-platform-copy">
+              <strong>{{ selectedPlatformName }}</strong>
+              <small>{{ selectedPlatformSummary }}</small>
             </span>
-            <em>{{ statusLabel(selected?.status || form.status) }}</em>
+            <em class="integration-status-pill">{{ statusLabel(selected?.status || form.status) }}</em>
           </div>
 
           <div v-if="platforms.length > 1 && !isBigShopContract" class="integration-platform-picker" role="list">
@@ -702,7 +722,7 @@ function canRunBigShopApiAction() {
             <div>
               <h3>Passo a passo</h3>
               <ol class="guide-steps">
-                <li v-for="step in selected?.guide.steps" :key="step">{{ step }}</li>
+                <li v-for="step in guideSteps" :key="step">{{ step }}</li>
               </ol>
             </div>
             <div>
@@ -720,27 +740,27 @@ function canRunBigShopApiAction() {
 })</code></pre>
         </section>
 
-        <section class="panel-main integration-section">
+        <section v-if="dataSupportEntries.length" class="panel-main integration-section">
           <div class="subsection-heading">
             <h2>Dados suportados</h2>
             <span>Matriz</span>
           </div>
           <div class="data-support-grid">
-            <span v-for="(value, key) in selected?.guide.data_support" :key="key">
+            <span v-for="[key, value] in dataSupportEntries" :key="key">
               <small>{{ key }}</small>
               <strong>{{ value }}</strong>
             </span>
           </div>
         </section>
 
-        <section class="panel-main integration-section">
+        <section v-if="guideSnippet" class="panel-main integration-section">
           <div class="subsection-heading">
             <h2>Snippet</h2>
             <button class="icon-link" type="button" :title="copied ? 'Copiado' : 'Copiar snippet'" @click="copyGuideSnippet">
               <i class="fa-solid" :class="copied ? 'fa-check' : 'fa-copy'" aria-hidden="true"></i>
             </button>
           </div>
-          <pre class="guide-snippet"><code>{{ selected?.guide.snippet }}</code></pre>
+          <pre class="guide-snippet"><code>{{ guideSnippet }}</code></pre>
         </section>
 
         <section class="panel-main integration-section">
