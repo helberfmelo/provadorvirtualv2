@@ -67,6 +67,30 @@ type PlatformGuide = {
   }
 }
 
+type ModalTableStyle = 'clean' | 'compact' | 'cards'
+
+type WidgetModalTheme = {
+  logo_text: string
+  logo_url: string
+  kicker: string
+  title: string
+  subtitle: string
+  step_labels: string[]
+  table_title: string
+  table_unit_label: string
+  footer_note: string
+  background: string
+  surface: string
+  text: string
+  accent: string
+  border: string
+  radius: string
+  font_family: string
+  font_size: string
+  font_weight: string
+  table_style: ModalTableStyle
+}
+
 type WidgetInstall = {
   id: number
   merchant_id: number
@@ -93,6 +117,7 @@ type WidgetInstall = {
     confetti_enabled?: boolean | string
     presentation_mode?: 'drawer' | 'modal' | string
     placement?: WidgetPlacement
+    modal?: Partial<WidgetModalTheme>
   }
   draft?: {
     platform: string
@@ -146,6 +171,7 @@ type WidgetForm = {
     confetti_enabled: boolean
     presentation_mode: 'drawer' | 'modal'
     placement: WidgetPlacement
+    modal: WidgetModalTheme
   }
 }
 
@@ -161,6 +187,28 @@ const placementTesting = ref(false)
 const placementPreview = ref<PlacementPreview | null>(null)
 const placementPreviewUrl = ref('')
 let confettiPreviewTimeout: number | null = null
+
+const defaultModalTheme: WidgetModalTheme = {
+  logo_text: 'Provador Virtual',
+  logo_url: '',
+  kicker: 'Provador Virtual',
+  title: 'Descubra seu tamanho',
+  subtitle: 'Uma jornada rápida para melhorar a precisão da recomendação.',
+  step_labels: ['Medidas', 'Corpo', 'Detalhes', 'Resultado'],
+  table_title: 'Tabela de Medidas',
+  table_unit_label: 'cm',
+  footer_note: 'Toque no tamanho para aplicar na página do produto.',
+  background: '#ffffff',
+  surface: '#f8fafc',
+  text: '#111827',
+  accent: '#ff4d5e',
+  border: '#e5e7eb',
+  radius: '16',
+  font_family: 'Manrope, Inter, Arial, sans-serif',
+  font_size: '15',
+  font_weight: '700',
+  table_style: 'clean',
+}
 
 const form = reactive<WidgetForm>({
   platform: 'custom',
@@ -192,6 +240,7 @@ const form = reactive<WidgetForm>({
         status: 'untested' as const,
       },
     },
+    modal: { ...defaultModalTheme, step_labels: [...defaultModalTheme.step_labels] },
   },
 })
 
@@ -240,6 +289,12 @@ const platformOptions = computed(() => {
 const presentationModeOptions: Array<{ value: 'drawer' | 'modal'; label: string; icon: string }> = [
   { value: 'drawer', label: 'Drawer lateral', icon: 'fa-table-columns' },
   { value: 'modal', label: 'Modal central', icon: 'fa-window-maximize' },
+]
+
+const modalTableStyleOptions: Array<{ value: ModalTableStyle; label: string; icon: string; description: string }> = [
+  { value: 'clean', label: 'Limpo', icon: 'fa-table', description: 'Visual leve, com leitura mais próxima do padrão atual.' },
+  { value: 'compact', label: 'Compacto', icon: 'fa-compress', description: 'Linhas mais densas para tabelas longas.' },
+  { value: 'cards', label: 'Cards', icon: 'fa-layer-group', description: 'Cada linha ganha sensação de cartão com mais presença visual.' },
 ]
 
 const placementModeOptions: Array<{ value: PlacementMode; label: string; icon: string }> = [
@@ -515,6 +570,46 @@ const previewStyle = computed(() => ({
   fontSize: `${form.theme.font_size}px`,
 }))
 
+const modalPreviewStyle = computed(() => ({
+  '--pv-modal-bg': form.theme.modal.background,
+  '--pv-modal-surface': form.theme.modal.surface,
+  '--pv-modal-text': form.theme.modal.text,
+  '--pv-modal-accent': form.theme.modal.accent,
+  '--pv-modal-border': form.theme.modal.border,
+  '--pv-modal-radius': `${form.theme.modal.radius}px`,
+  '--pv-modal-font-family': form.theme.modal.font_family,
+  '--pv-modal-font-size': `${form.theme.modal.font_size}px`,
+  '--pv-modal-font-weight': form.theme.modal.font_weight,
+  fontFamily: form.theme.modal.font_family,
+  fontSize: `${form.theme.modal.font_size}px`,
+  fontWeight: form.theme.modal.font_weight,
+}))
+
+const modalAccessibility = computed(() => {
+  const surfaceContrast = contrastRatio(form.theme.modal.text, form.theme.modal.surface)
+  const accentContrast = contrastRatio(form.theme.modal.accent, form.theme.modal.background)
+  const warnings: string[] = []
+
+  if (surfaceContrast < 4.5) {
+    warnings.push('O texto do modal precisa de mais contraste com a superfície.')
+  }
+
+  if (accentContrast < 3) {
+    warnings.push('A cor de destaque do modal precisa de mais contraste com o fundo.')
+  }
+
+  if (form.theme.modal.logo_text.trim() === '' && form.theme.modal.logo_url.trim() === '') {
+    warnings.push('Defina um texto ou logo para o cabeçalho do modal.')
+  }
+
+  return {
+    status: warnings.length === 0 ? 'ok' : 'warning',
+    warnings,
+    surfaceContrast,
+    accentContrast,
+  }
+})
+
 onMounted(() => {
   loadInstall()
 })
@@ -583,6 +678,7 @@ function fillForm(data: WidgetInstall) {
     || theme.confetti_enabled === 'true'
     || theme.confetti_enabled === '1'
   form.theme.placement = normalizePlacement(theme.placement)
+  form.theme.modal = normalizeModal(theme.modal)
   placementPreview.value = null
   placementPreviewUrl.value = form.theme.placement.validation?.url || data.company?.domain || ''
   savedFormSnapshot.value = JSON.stringify(formState())
@@ -604,6 +700,122 @@ function normalizePlacement(value: WidgetPlacement | undefined): WidgetPlacement
       message: value?.validation?.message || null,
     },
   }
+}
+
+function normalizeModal(value: Partial<WidgetModalTheme> | undefined): WidgetModalTheme {
+  const source = value || {}
+  const defaults = defaultModalTheme
+  const labels = Array.isArray(source.step_labels) ? source.step_labels : defaults.step_labels
+  const stepLabels = labels.map((label, index) => {
+    const text = String(label || '').trim()
+
+    return text || defaults.step_labels[index] || defaults.step_labels[defaults.step_labels.length - 1]
+  })
+
+  while (stepLabels.length < 4) {
+    stepLabels.push(defaults.step_labels[stepLabels.length] || defaults.step_labels[defaults.step_labels.length - 1])
+  }
+
+  return {
+    logo_text: String(source.logo_text || defaults.logo_text).trim() || defaults.logo_text,
+    logo_url: normalizeModalUrl(source.logo_url),
+    kicker: String(source.kicker || defaults.kicker).trim() || defaults.kicker,
+    title: String(source.title || defaults.title).trim() || defaults.title,
+    subtitle: String(source.subtitle || defaults.subtitle).trim() || defaults.subtitle,
+    step_labels: stepLabels.slice(0, 4),
+    table_title: String(source.table_title || defaults.table_title).trim() || defaults.table_title,
+    table_unit_label: String(source.table_unit_label || defaults.table_unit_label).trim() || defaults.table_unit_label,
+    footer_note: String(source.footer_note || defaults.footer_note).trim() || defaults.footer_note,
+    background: normalizeModalColor(source.background, defaults.background),
+    surface: normalizeModalColor(source.surface, defaults.surface),
+    text: normalizeModalColor(source.text, defaults.text),
+    accent: normalizeModalColor(source.accent, defaults.accent),
+    border: normalizeModalColor(source.border, defaults.border),
+    radius: normalizeModalNumber(source.radius, defaults.radius, 0, 28),
+    font_family: String(source.font_family || defaults.font_family).trim() || defaults.font_family,
+    font_size: normalizeModalNumber(source.font_size, defaults.font_size, 12, 20),
+    font_weight: normalizeModalNumber(source.font_weight, defaults.font_weight, 400, 900),
+    table_style: normalizeModalTableStyle(source.table_style),
+  }
+}
+
+function normalizeModalUrl(value: string | undefined | null): string {
+  const raw = String(value || '').trim()
+
+  if (!raw) {
+    return ''
+  }
+
+  if (/^https?:\/\//i.test(raw)) {
+    return raw
+  }
+
+  return `https://${raw}`
+}
+
+function normalizeModalColor(value: string | undefined | null, fallback: string): string {
+  const color = String(value || '').trim()
+
+  return /^#[0-9A-Fa-f]{6}$/.test(color) ? color.toUpperCase() : fallback
+}
+
+function normalizeModalNumber(value: string | number | undefined | null, fallback: string, min: number, max: number): string {
+  const parsed = Number(value)
+
+  if (!Number.isFinite(parsed)) {
+    return fallback
+  }
+
+  const bounded = Math.min(max, Math.max(min, Math.round(parsed)))
+
+  return String(bounded)
+}
+
+function normalizeModalTableStyle(value: string | undefined | null): ModalTableStyle {
+  const allowed: ModalTableStyle[] = ['clean', 'compact', 'cards']
+  const style = String(value || '').toLowerCase()
+
+  return allowed.includes(style as ModalTableStyle) ? (style as ModalTableStyle) : defaultModalTheme.table_style
+}
+
+function contrastRatio(foreground: string, background: string): number {
+  const fg = hexToRgb(foreground)
+  const bg = hexToRgb(background)
+
+  if (!fg || !bg) {
+    return 21
+  }
+
+  const luminance = (rgb: [number, number, number]): number => {
+    const channels = rgb.map((channel) => {
+      const value = channel / 255
+
+      return value <= 0.03928
+        ? value / 12.92
+        : ((value + 0.055) / 1.055) ** 2.4
+    }) as [number, number, number]
+
+    return (0.2126 * channels[0]) + (0.7152 * channels[1]) + (0.0722 * channels[2])
+  }
+
+  const lightest = Math.max(luminance(fg), luminance(bg))
+  const darkest = Math.min(luminance(fg), luminance(bg))
+
+  return (lightest + 0.05) / (darkest + 0.05)
+}
+
+function hexToRgb(color: string): [number, number, number] | null {
+  const match = /^#([0-9A-Fa-f]{6})$/.exec(color.trim())
+
+  if (!match) {
+    return null
+  }
+
+  return [
+    Number.parseInt(match[1].slice(0, 2), 16),
+    Number.parseInt(match[1].slice(2, 4), 16),
+    Number.parseInt(match[1].slice(4, 6), 16),
+  ]
 }
 
 function selectedMeasureIcon(value: string | undefined, fallback: string) {
@@ -1175,6 +1387,229 @@ function removeConfettiPreview() {
             </div>
           </section>
 
+          <section class="widget-modal-customizer" :style="[previewStyle, modalPreviewStyle]" aria-labelledby="widget-modal-style-title">
+            <div class="subsection-heading">
+              <h2 id="widget-modal-style-title">Modal do provador</h2>
+              <span :class="['status-pill', modalAccessibility.status === 'ok' ? 'ok' : 'warning']">
+                {{ modalAccessibility.status === 'ok' ? 'Contraste ok' : 'Revisar contraste' }}
+              </span>
+            </div>
+
+            <div class="widget-modal-layout">
+              <div class="widget-modal-fields">
+                <label>
+                  Texto da marca
+                  <input v-model="form.theme.modal.logo_text" maxlength="48" />
+                </label>
+                <label>
+                  Logo da marca
+                  <input v-model="form.theme.modal.logo_url" placeholder="https://..." maxlength="255" />
+                </label>
+                <label>
+                  Chamada curta
+                  <input v-model="form.theme.modal.kicker" maxlength="64" />
+                </label>
+                <label>
+                  Título principal
+                  <input v-model="form.theme.modal.title" maxlength="96" />
+                </label>
+                <label>
+                  Subtítulo
+                  <textarea v-model="form.theme.modal.subtitle" rows="3" maxlength="180"></textarea>
+                </label>
+
+                <div class="widget-modal-step-grid">
+                  <label v-for="(_, index) in form.theme.modal.step_labels" :key="`modal-step-${index}`">
+                    Etapa {{ index + 1 }}
+                    <input v-model="form.theme.modal.step_labels[index]" maxlength="32" />
+                  </label>
+                </div>
+
+                <div class="widget-modal-copy-grid">
+                  <label>
+                    Título da tabela
+                    <input v-model="form.theme.modal.table_title" maxlength="64" />
+                  </label>
+                  <label>
+                    Unidade da tabela
+                    <input v-model="form.theme.modal.table_unit_label" maxlength="16" />
+                  </label>
+                  <label>
+                    Nota do rodapé
+                    <textarea v-model="form.theme.modal.footer_note" rows="3" maxlength="120"></textarea>
+                  </label>
+                </div>
+
+                <div class="widget-modal-color-grid">
+                  <label>
+                    Fundo
+                    <span class="swatch-field">
+                      <input v-model="form.theme.modal.background" type="color" />
+                      <input v-model="form.theme.modal.background" maxlength="7" />
+                    </span>
+                  </label>
+                  <label>
+                    Superfície
+                    <span class="swatch-field">
+                      <input v-model="form.theme.modal.surface" type="color" />
+                      <input v-model="form.theme.modal.surface" maxlength="7" />
+                    </span>
+                  </label>
+                  <label>
+                    Texto
+                    <span class="swatch-field">
+                      <input v-model="form.theme.modal.text" type="color" />
+                      <input v-model="form.theme.modal.text" maxlength="7" />
+                    </span>
+                  </label>
+                  <label>
+                    Destaque
+                    <span class="swatch-field">
+                      <input v-model="form.theme.modal.accent" type="color" />
+                      <input v-model="form.theme.modal.accent" maxlength="7" />
+                    </span>
+                  </label>
+                  <label>
+                    Borda
+                    <span class="swatch-field">
+                      <input v-model="form.theme.modal.border" type="color" />
+                      <input v-model="form.theme.modal.border" maxlength="7" />
+                    </span>
+                  </label>
+                </div>
+
+                <div class="widget-modal-type-grid">
+                  <label>
+                    Fonte
+                    <select v-model="form.theme.modal.font_family">
+                      <option value="Manrope, Inter, Arial, sans-serif">Manrope</option>
+                      <option value="Inter, Arial, sans-serif">Inter</option>
+                      <option value="Arial, sans-serif">Arial</option>
+                      <option value="Georgia, serif">Georgia</option>
+                    </select>
+                  </label>
+                  <label>
+                    Tamanho
+                    <input v-model="form.theme.modal.font_size" type="number" min="12" max="20" />
+                  </label>
+                  <label>
+                    Peso
+                    <select v-model="form.theme.modal.font_weight">
+                      <option value="400">Regular</option>
+                      <option value="500">Medium</option>
+                      <option value="700">Bold</option>
+                      <option value="800">Extra bold</option>
+                    </select>
+                  </label>
+                  <label>
+                    Raio
+                    <input v-model="form.theme.modal.radius" type="number" min="0" max="28" />
+                  </label>
+                  <label>
+                    Estilo da tabela
+                    <select v-model="form.theme.modal.table_style">
+                      <option v-for="option in modalTableStyleOptions" :key="option.value" :value="option.value">
+                        {{ option.label }}
+                      </option>
+                    </select>
+                  </label>
+                </div>
+              </div>
+
+              <aside class="widget-modal-preview-shell">
+                <div class="subsection-heading compact-heading">
+                  <h3>Prévia ao vivo</h3>
+                  <div class="segmented-control compact-segmented">
+                    <button type="button" :class="{ active: previewDevice === 'desktop' }" @click="previewDevice = 'desktop'">
+                      Desktop
+                    </button>
+                    <button type="button" :class="{ active: previewDevice === 'mobile' }" @click="previewDevice = 'mobile'">
+                      Mobile
+                    </button>
+                  </div>
+                </div>
+
+                <div class="widget-modal-preview" :class="[`preview-device-${previewDevice}`, `preview-table-style-${form.theme.modal.table_style}`]">
+                  <div class="widget-modal-preview-backdrop">
+                    <section class="widget-modal-preview-card">
+                      <header class="widget-modal-preview-header">
+                        <div>
+                          <span class="pv-modal-brand" :class="{ 'pv-modal-brand-image': form.theme.modal.logo_url }">
+                            <img v-if="form.theme.modal.logo_url" :src="normalizeModalUrl(form.theme.modal.logo_url)" :alt="form.theme.modal.logo_text" />
+                            <strong>{{ form.theme.modal.logo_text }}</strong>
+                          </span>
+                          <span class="pv-kicker">{{ form.theme.modal.kicker }}</span>
+                          <h3>{{ form.theme.modal.title }}</h3>
+                          <p>{{ form.theme.modal.subtitle }}</p>
+                        </div>
+                        <button type="button" class="drawer-close" aria-label="Fechar visualização">x</button>
+                      </header>
+
+                      <div class="widget-modal-preview-body">
+                        <nav class="pv-stepper" aria-label="Etapas do modal do provador">
+                          <button v-for="(label, index) in form.theme.modal.step_labels" :key="`preview-step-${index}`" type="button" :class="{ active: index === 0 }">
+                            <strong>{{ index + 1 }}</strong>{{ label }}
+                          </button>
+                        </nav>
+
+                        <div class="widget-modal-preview-copy">
+                          <strong>{{ form.theme.modal.table_title }}</strong>
+                          <span>{{ form.theme.modal.table_unit_label }} por tamanho</span>
+                        </div>
+
+                        <div class="widget-modal-preview-table">
+                          <table class="pv-size-table">
+                            <thead>
+                              <tr>
+                                <th>Tam.</th>
+                                <th>Busto/tórax</th>
+                                <th>Cintura</th>
+                                <th>Quadril</th>
+                                <th>Altura</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td><strong>P</strong></td>
+                                <td>84 - 90</td>
+                                <td>66 - 72</td>
+                                <td>90 - 96</td>
+                                <td>156 - 164</td>
+                              </tr>
+                              <tr>
+                                <td><strong>M</strong></td>
+                                <td>90 - 96</td>
+                                <td>72 - 78</td>
+                                <td>96 - 104</td>
+                                <td>162 - 170</td>
+                              </tr>
+                              <tr>
+                                <td><strong>G</strong></td>
+                                <td>96 - 104</td>
+                                <td>78 - 86</td>
+                                <td>104 - 112</td>
+                                <td>168 - 176</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+
+                        <p class="pv-modal-footer-note">{{ form.theme.modal.footer_note }}</p>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+
+                <div class="widget-modal-alerts" :class="modalAccessibility.status">
+                  <span v-for="warning in modalAccessibility.warnings" :key="warning">{{ warning }}</span>
+                  <small v-if="modalAccessibility.warnings.length === 0">
+                    Contraste mínimo atendido para a leitura do modal.
+                  </small>
+                </div>
+              </aside>
+            </div>
+          </section>
+
           <div class="widget-color-grid">
             <label>
               Primária
@@ -1326,10 +1761,10 @@ function removeConfettiPreview() {
           class="panel-main widget-preview-panel widget-preview-modal"
           role="dialog"
           aria-modal="true"
-          aria-labelledby="widget-preview-title"
+          aria-labelledby="widget-modal-preview-title"
         >
           <div class="subsection-heading">
-            <h2 id="widget-preview-title">Visualizador</h2>
+            <h2 id="widget-modal-preview-title">Prévia do modal</h2>
             <div class="widget-preview-modal-actions">
               <div class="segmented-control compact-segmented">
                 <button
@@ -1354,31 +1789,81 @@ function removeConfettiPreview() {
               </button>
             </div>
           </div>
-          <div :class="['widget-style-preview', `preview-device-${previewDevice}`]" :style="previewStyle">
-            <div class="preview-product-line">
-              <strong>Vestido Midi Aurora</strong>
-              <span>Selecione seu tamanho</span>
+          <div class="widget-modal-preview widget-modal-preview-large" :class="[`preview-device-${previewDevice}`, `preview-table-style-${form.theme.modal.table_style}`]" :style="[previewStyle, modalPreviewStyle]">
+            <div class="widget-modal-preview-backdrop">
+              <section class="widget-modal-preview-card">
+                <header class="widget-modal-preview-header">
+                  <div>
+                    <span class="pv-modal-brand" :class="{ 'pv-modal-brand-image': form.theme.modal.logo_url }">
+                      <img v-if="form.theme.modal.logo_url" :src="normalizeModalUrl(form.theme.modal.logo_url)" :alt="form.theme.modal.logo_text" />
+                      <strong>{{ form.theme.modal.logo_text }}</strong>
+                    </span>
+                    <span class="pv-kicker">{{ form.theme.modal.kicker }}</span>
+                    <h3>{{ form.theme.modal.title }}</h3>
+                    <p>{{ form.theme.modal.subtitle }}</p>
+                  </div>
+                  <button type="button" class="drawer-close" aria-label="Fechar visualização">x</button>
+                </header>
+
+                <div class="widget-modal-preview-body">
+                  <nav class="pv-stepper" aria-label="Etapas do modal do provador">
+                    <button v-for="(label, index) in form.theme.modal.step_labels" :key="`preview-step-large-${index}`" type="button" :class="{ active: index === 0 }">
+                      <strong>{{ index + 1 }}</strong>{{ label }}
+                    </button>
+                  </nav>
+
+                  <div class="widget-modal-preview-copy">
+                    <strong>{{ form.theme.modal.table_title }}</strong>
+                    <span>{{ form.theme.modal.table_unit_label }} por tamanho</span>
+                  </div>
+
+                  <div class="widget-modal-preview-table">
+                    <table class="pv-size-table">
+                      <thead>
+                        <tr>
+                          <th>Tam.</th>
+                          <th>Busto/tórax</th>
+                          <th>Cintura</th>
+                          <th>Quadril</th>
+                          <th>Altura</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>P</strong></td>
+                          <td>84 - 90</td>
+                          <td>66 - 72</td>
+                          <td>90 - 96</td>
+                          <td>156 - 164</td>
+                        </tr>
+                        <tr>
+                          <td><strong>M</strong></td>
+                          <td>90 - 96</td>
+                          <td>72 - 78</td>
+                          <td>96 - 104</td>
+                          <td>162 - 170</td>
+                        </tr>
+                        <tr>
+                          <td><strong>G</strong></td>
+                          <td>96 - 104</td>
+                          <td>78 - 86</td>
+                          <td>104 - 112</td>
+                          <td>168 - 176</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <p class="pv-modal-footer-note">{{ form.theme.modal.footer_note }}</p>
+                </div>
+              </section>
             </div>
-            <div :class="['preview-widget-buttons', `preview-button-style-${form.theme.button_style}`]">
-              <button type="button">
-                <span :class="buttonIconClass('primary')" v-html="buttonIconHtml('primary')"></span>
-                <span class="button-label">Descubra seu tamanho</span>
-              </button>
-              <button type="button">
-                <span :class="buttonIconClass('secondary')" v-html="buttonIconHtml('secondary')"></span>
-                <span class="button-label">Tabela de Medidas</span>
-              </button>
+            <div class="widget-modal-alerts" :class="modalAccessibility.status">
+              <span v-for="warning in modalAccessibility.warnings" :key="`preview-warning-${warning}`">{{ warning }}</span>
+              <small v-if="modalAccessibility.warnings.length === 0">
+                Contraste mínimo atendido para a leitura do modal.
+              </small>
             </div>
-            <div :class="['preview-launch-frame', form.theme.presentation_mode === 'modal' ? 'modal' : 'drawer']">
-              <span>{{ form.theme.presentation_mode === 'modal' ? 'Modal central' : 'Drawer lateral' }}</span>
-              <div></div>
-            </div>
-            <div class="preview-size-table">
-              <div><strong>P</strong><span>84 - 90</span><span>66 - 72</span></div>
-              <div><strong>M</strong><span>90 - 96</span><span>72 - 78</span></div>
-              <div><strong>G</strong><span>96 - 104</span><span>78 - 86</span></div>
-            </div>
-            <a href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>
           </div>
         </section>
       </div>

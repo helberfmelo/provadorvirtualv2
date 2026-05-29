@@ -1611,3 +1611,12 @@
 - Validação local já executada antes do push: `npm --prefix frontend run build` e `git diff --check` passaram; a revisão funcional da tela `/app/widget` confirmou a separação da galeria principal e da área legada.
 - Commit `19bb566` enviado para `main`; o run `26659696245` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/widget`, widget JS/CSS, `GET /api/v1/widget-install`, `POST /api/v1/widget-install/placement-preview`, páginas públicas, SaaS, portal, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+## 2026-05-29 - Sprint 147 Editor completo do modal do Provador
+
+- Relida a documentação obrigatória antes da sprint, incluindo `docs/credentials.local.md` em modo mascarado por envolver produção/deploy e integrações. Não houve novo acesso ao portal Sizebay nem alteração de credenciais; a referência foi usada apenas em leitura para o benchmark de customização do modal.
+- Criado o editor dedicado do modal do provador em `/app/widget`, separando claramente a personalização do botão da personalização da experiência completa.
+- O contrato de tema agora inclui `theme.presentation_mode` e `theme.modal.*`, com logo, textos, etapas, tabela, cores, bordas, tipografia e estilo da tabela, além de normalização segura para dados antigos ou incompletos.
+- `PATCH /api/v1/widget-install` passou a aceitar e persistir a customização do modal em rascunho e publicação, e o widget público consome o novo contrato para desenhar o modal e a tabela de medidas.
+- O fluxo de publicação exige contraste mínimo no texto e no destaque do modal antes de salvar em produção.
+- A tela `/app/widget` ganhou prévia desktop/mobile do modal completo, alerta de contraste e visual de tabela integrado ao editor, mantendo salvar rascunho, publicar e desfazer.
+- Validações locais passaram com `php artisan test` usando o PHP `C:\php\php.exe` com `sqlite3`, `php vendor/bin/pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check` e varredura de segredos. A revisão visual headless abriu `/app/widget` com login demo, confirmou o bloco `Modal do provador` e a prévia aberta em desktop.

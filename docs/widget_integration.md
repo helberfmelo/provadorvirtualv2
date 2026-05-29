@@ -109,6 +109,8 @@ Status Sprint 131: o widget/API pública respeita a ativação individual do pro
 
 Status Sprint 134: a ativação por tabela foi adicionada ao contrato público. Quando `measurement_tables.metadata.activation.virtual_try_on_enabled=false`, `config-check` retorna `configured=true`, `virtual_try_on_enabled=false`, mantém `measurement_table_enabled=true` e inclui a tabela normalizada para o modal público. O widget renderiza somente o botão `Tabela de Medidas`; tentativas de recomendação retornam `table_virtual_try_on_disabled`.
 
+Status Sprint 147: o painel `/app/widget` passou a expor editor dedicado do modal do provador, com `theme.presentation_mode` e `theme.modal.*` para logo, textos, etapas, tabela, cores, bordas, tipografia e estilo da tabela. O preview desktop/mobile mostra o modal completo e a tabela integrada, enquanto o backend normaliza temas antigos e exige contraste mínimo antes de publicar.
+
 ## Evolucao inteligente prevista
 
 Benchmark Sizebay/Zak em `docs/sizebay_benchmark.md` confirmou que o widget deve evoluir para:

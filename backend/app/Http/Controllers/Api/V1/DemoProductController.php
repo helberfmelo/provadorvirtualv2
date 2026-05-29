@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\WidgetInstall;
+use App\Support\WidgetModalCatalog;
 use App\Support\WidgetPlacementCatalog;
 
 class DemoProductController extends Controller
@@ -137,6 +138,7 @@ class DemoProductController extends Controller
             'button_icon_animation' => true,
             'confetti_enabled' => true,
             'presentation_mode' => 'drawer',
+            'modal' => WidgetModalCatalog::default(),
             'placement' => WidgetPlacementCatalog::default(),
         ];
     }

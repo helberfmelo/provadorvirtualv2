@@ -12,6 +12,7 @@ use App\Models\ProductVariant;
 use App\Models\TransactionalEmail;
 use App\Models\User;
 use App\Models\WidgetInstall;
+use App\Support\WidgetModalCatalog;
 use App\Support\WidgetPlacementCatalog;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -209,6 +210,7 @@ class DatabaseSeeder extends Seeder
                     'button_icon_animation' => true,
                     'confetti_enabled' => true,
                     'presentation_mode' => 'drawer',
+                    'modal' => WidgetModalCatalog::default(),
                     'placement' => WidgetPlacementCatalog::default(),
                 ],
                 'is_active' => true,

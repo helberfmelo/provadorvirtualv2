@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\Product;
 use App\Support\PlatformCatalog;
+use App\Support\WidgetModalCatalog;
 use App\Support\WidgetPlacementCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -431,6 +432,12 @@ JS,
 
     private function themeWithDefaults(array $theme): array
     {
+        $theme['presentation_mode'] = in_array($theme['presentation_mode'] ?? null, ['drawer', 'modal'], true)
+            ? $theme['presentation_mode']
+            : 'drawer';
+        $theme['modal'] = WidgetModalCatalog::normalize(
+            is_array($theme['modal'] ?? null) ? $theme['modal'] : null
+        );
         $theme['placement'] = WidgetPlacementCatalog::normalize(
             is_array($theme['placement'] ?? null) ? $theme['placement'] : null
         );

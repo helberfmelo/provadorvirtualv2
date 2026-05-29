@@ -12,6 +12,7 @@ use App\Services\Audit\AuditLogger;
 use App\Support\ActiveTenant;
 use App\Support\PlatformCatalog;
 use App\Support\WidgetButtonStyleCatalog;
+use App\Support\WidgetModalCatalog;
 use App\Support\WidgetPlacementCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -67,6 +68,7 @@ class WidgetInstallController extends Controller
             $baseState = $stateChanges === [] ? $this->draftState($install) : $this->liveState($install);
             $publishState = array_replace($baseState, $stateChanges);
             $this->ensurePlacementCanPublish($publishState['theme'] ?? []);
+            $this->ensureModalCanPublish($publishState['theme'] ?? []);
             $install->update([
                 ...Arr::only($data, ['merchant_company_id']),
                 'platform' => $publishState['platform'],
@@ -256,6 +258,7 @@ class WidgetInstallController extends Controller
                     'button_icon_animation' => true,
                     'confetti_enabled' => true,
                     'presentation_mode' => 'drawer',
+                    'modal' => WidgetModalCatalog::default(),
                     'placement' => WidgetPlacementCatalog::default(),
                 ],
                 'is_active' => true,
@@ -274,6 +277,12 @@ class WidgetInstallController extends Controller
 
     private function normalizeTheme(array $theme): array
     {
+        $theme['presentation_mode'] = in_array($theme['presentation_mode'] ?? null, ['drawer', 'modal'], true)
+            ? $theme['presentation_mode']
+            : 'drawer';
+        $theme['modal'] = WidgetModalCatalog::normalize(
+            is_array($theme['modal'] ?? null) ? $theme['modal'] : null
+        );
         $theme['placement'] = WidgetPlacementCatalog::normalize(
             is_array($theme['placement'] ?? null) ? $theme['placement'] : null
         );
@@ -294,6 +303,78 @@ class WidgetInstallController extends Controller
                 'theme.placement.selector' => ['Teste o seletor novamente antes de publicar; a última validação falhou.'],
             ]);
         }
+    }
+
+    private function ensureModalCanPublish(array $theme): void
+    {
+        $modal = WidgetModalCatalog::normalize(
+            is_array($theme['modal'] ?? null) ? $theme['modal'] : null
+        );
+
+        $checks = [
+            'theme.modal.text' => [
+                'ratio' => $this->contrastRatio($modal['text'], $modal['surface']),
+                'minimum' => 4.5,
+                'message' => 'O texto do modal precisa de mais contraste com a superfície.',
+            ],
+            'theme.modal.accent' => [
+                'ratio' => $this->contrastRatio($modal['accent'], $modal['background']),
+                'minimum' => 3.0,
+                'message' => 'A cor de destaque do modal precisa de mais contraste com o fundo.',
+            ],
+        ];
+
+        foreach ($checks as $field => $check) {
+            if ($check['ratio'] < $check['minimum']) {
+                throw ValidationException::withMessages([
+                    $field => [$check['message']],
+                ]);
+            }
+        }
+    }
+
+    private function contrastRatio(string $foreground, string $background): float
+    {
+        $foregroundRgb = $this->hexToRgb($foreground);
+        $backgroundRgb = $this->hexToRgb($background);
+
+        if ($foregroundRgb === null || $backgroundRgb === null) {
+            return 21.0;
+        }
+
+        $luminance = static function (array $rgb): float {
+            $channels = array_map(static function (int $channel): float {
+                $value = $channel / 255;
+
+                if ($value <= 0.03928) {
+                    return $value / 12.92;
+                }
+
+                return (($value + 0.055) / 1.055) ** 2.4;
+            }, $rgb);
+
+            return (0.2126 * $channels[0]) + (0.7152 * $channels[1]) + (0.0722 * $channels[2]);
+        };
+
+        $foregroundLuminance = $luminance($foregroundRgb);
+        $backgroundLuminance = $luminance($backgroundRgb);
+        $lightest = max($foregroundLuminance, $backgroundLuminance);
+        $darkest = min($foregroundLuminance, $backgroundLuminance);
+
+        return ($lightest + 0.05) / ($darkest + 0.05);
+    }
+
+    private function hexToRgb(string $color): ?array
+    {
+        if (! preg_match('/^#([0-9A-Fa-f]{6})$/', $color, $matches)) {
+            return null;
+        }
+
+        return [
+            hexdec(substr($matches[1], 0, 2)),
+            hexdec(substr($matches[1], 2, 2)),
+            hexdec(substr($matches[1], 4, 2)),
+        ];
     }
 
     private function ensureSelectorSyntax(string $selector, string $field): void

@@ -14,6 +14,15 @@
   --pv-font-size: 14px;
   --pv-font-weight: 800;
   --pv-font-family: Manrope, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --pv-modal-bg: #ffffff;
+  --pv-modal-surface: #f8fafc;
+  --pv-modal-text: #111827;
+  --pv-modal-accent: #ff4d5e;
+  --pv-modal-border: #e5e7eb;
+  --pv-modal-radius: 16px;
+  --pv-modal-font-family: var(--pv-font-family);
+  --pv-modal-font-size: 15px;
+  --pv-modal-font-weight: 700;
   color: var(--pv-text);
   font-family: var(--pv-font-family);
   font-size: var(--pv-font-size);
@@ -622,8 +631,11 @@
 
 .pv-drawer,
 .pv-modal {
-  color: var(--pv-text);
-  background: var(--pv-bg);
+  color: var(--pv-modal-text);
+  background: var(--pv-modal-bg);
+  font-family: var(--pv-modal-font-family);
+  font-size: var(--pv-modal-font-size);
+  font-weight: var(--pv-modal-font-weight);
   box-shadow: 0 26px 90px rgba(15, 23, 42, 0.28);
 }
 
@@ -648,18 +660,18 @@
   width: min(880px, calc(100vw - 56px));
   height: min(760px, calc(100vh - 56px));
   height: min(760px, calc(100dvh - 56px));
-  border-radius: var(--pv-radius);
+  border-radius: var(--pv-modal-radius);
 }
 
 .pv-recommendation-modal .pv-drawer-header {
-  border-radius: var(--pv-radius) var(--pv-radius) 0 0;
+  border-radius: var(--pv-modal-radius) var(--pv-modal-radius) 0 0;
 }
 
 .pv-modal {
   width: min(560px, 100%);
   max-height: min(720px, calc(100vh - 36px));
   overflow: auto;
-  border-radius: var(--pv-radius);
+  border-radius: var(--pv-modal-radius);
 }
 
 .pv-table-modal {
@@ -680,7 +692,11 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid var(--pv-border);
+  border-bottom: 1px solid var(--pv-modal-border);
+}
+
+.pv-header {
+  background: var(--pv-modal-surface);
 }
 
 .pv-drawer-header {
@@ -689,7 +705,7 @@
   z-index: 2;
   border-bottom: 0;
   color: #fff;
-  background: linear-gradient(135deg, var(--pv-secondary), var(--pv-warm));
+  background: linear-gradient(135deg, var(--pv-modal-accent), var(--pv-secondary));
   box-shadow: 0 1px 0 rgba(17, 24, 39, 0.08);
 }
 
@@ -702,22 +718,22 @@
 
 .pv-drawer-footer {
   flex: 0 0 auto;
-  border-top: 1px solid var(--pv-border);
-  background: #fff;
+  border-top: 1px solid var(--pv-modal-border);
+  background: var(--pv-modal-surface);
 }
 
 .pv-drawer-header h2,
 .pv-header h2 {
   margin: 3px 0 5px;
-  color: var(--pv-primary);
-  font-size: 1.28rem;
+  color: var(--pv-modal-text);
+  font-size: 1.28em;
   line-height: 1.15;
 }
 
 .pv-drawer-header p {
   max-width: 320px;
   margin: 0;
-  color: var(--pv-muted);
+  color: rgba(255, 255, 255, 0.88);
   line-height: 1.45;
 }
 
@@ -747,6 +763,41 @@
 .pv-result-card small,
 .pv-help {
   color: var(--pv-muted);
+}
+
+.pv-modal-brand {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.pv-modal-brand strong {
+  color: inherit;
+  font-size: 0.88em;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.pv-modal-brand-image {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.pv-modal-brand-image img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.pv-modal-footer-note {
+  margin: 0;
+  color: var(--pv-muted);
+  font-size: 0.82em;
+  font-style: italic;
+  line-height: 1.45;
 }
 
 .pv-kicker {
@@ -1362,27 +1413,73 @@
 .pv-table-wrap {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid var(--pv-border);
-  border-radius: var(--pv-radius);
+  border: 1px solid var(--pv-modal-border);
+  border-radius: var(--pv-modal-radius);
+  background: var(--pv-modal-surface);
 }
 
 .pv-size-table {
   width: 100%;
   min-width: 720px;
   border-collapse: collapse;
+  color: var(--pv-modal-text);
 }
 
 .pv-size-table th,
 .pv-size-table td {
   padding: 10px;
-  border-bottom: 1px solid var(--pv-border);
+  border-bottom: 1px solid var(--pv-modal-border);
   text-align: left;
 }
 
 .pv-size-table th {
-  color: #4b5563;
-  background: #f9fafb;
+  color: var(--pv-modal-text);
+  background: var(--pv-modal-surface);
   font-size: 0.86em;
+}
+
+.pv-table-style-compact .pv-size-table th,
+.pv-table-style-compact .pv-size-table td {
+  padding: 7px 8px;
+  font-size: 0.9em;
+}
+
+.pv-table-style-cards .pv-table-wrap {
+  border: 0;
+  background: transparent;
+}
+
+.pv-table-style-cards .pv-size-table {
+  min-width: 0;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.pv-table-style-cards .pv-size-table thead th {
+  border-bottom: 0;
+  background: transparent;
+  padding-bottom: 0;
+}
+
+.pv-table-style-cards .pv-size-table tbody tr {
+  background: transparent;
+}
+
+.pv-table-style-cards .pv-size-table td {
+  border: 1px solid var(--pv-modal-border);
+  border-left-width: 0;
+  border-bottom-width: 1px;
+  background: var(--pv-modal-surface);
+}
+
+.pv-table-style-cards .pv-size-table td:first-child {
+  border-left-width: 1px;
+  border-radius: var(--pv-modal-radius) 0 0 var(--pv-modal-radius);
+  color: var(--pv-modal-accent);
+}
+
+.pv-table-style-cards .pv-size-table td:last-child {
+  border-radius: 0 var(--pv-modal-radius) var(--pv-modal-radius) 0;
 }
 
 .pv-attribution {
@@ -1510,7 +1607,7 @@
 
   .pv-modal {
     max-height: 92vh;
-    border-radius: var(--pv-radius) var(--pv-radius) 0 0;
+    border-radius: var(--pv-modal-radius) var(--pv-modal-radius) 0 0;
   }
 
   .pv-grid {

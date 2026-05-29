@@ -8,6 +8,7 @@ use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Models\User;
 use App\Models\WidgetInstall;
+use App\Support\WidgetModalCatalog;
 use App\Support\WidgetPlacementCatalog;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
@@ -107,6 +108,7 @@ class BigShopActivationService
                     'button_icon_animation' => true,
                     'confetti_enabled' => true,
                     'presentation_mode' => 'drawer',
+                    'modal' => WidgetModalCatalog::default(),
                     'placement' => WidgetPlacementCatalog::default(),
                 ],
                 'is_active' => true,

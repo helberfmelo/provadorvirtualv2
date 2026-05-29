@@ -36,6 +36,16 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('button_primary_icon', $scriptContents);
         $this->assertStringContainsString('button_secondary_icon', $scriptContents);
         $this->assertStringContainsString('button_icon_animation', $scriptContents);
+        $this->assertStringContainsString('theme.modal', $scriptContents);
+        $this->assertStringContainsString('modalTheme', $scriptContents);
+        $this->assertStringContainsString('modalPreviewBrandHtml', $scriptContents);
+        $this->assertStringContainsString('modalFooterNoteHtml', $scriptContents);
+        $this->assertStringContainsString('modalTableStyleClass', $scriptContents);
+        $this->assertStringContainsString('pv-modal-brand', $scriptContents);
+        $this->assertStringContainsString('pv-modal-footer-note', $scriptContents);
+        $this->assertStringContainsString('pv-table-style-clean', $scriptContents);
+        $this->assertStringContainsString('pv-table-style-compact', $scriptContents);
+        $this->assertStringContainsString('pv-table-style-cards', $scriptContents);
         $this->assertStringContainsString('placementConfig', $scriptContents);
         $this->assertStringContainsString('resolvePlacementTarget', $scriptContents);
         $this->assertStringContainsString('placeContainer', $scriptContents);
@@ -83,6 +93,9 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('.pv-drawer', $cssContents);
         $this->assertStringContainsString('.pv-recommendation-modal', $cssContents);
         $this->assertStringContainsString('.pv-recommendation-modal-backdrop', $cssContents);
+        $this->assertStringContainsString('.pv-modal-brand', $cssContents);
+        $this->assertStringContainsString('.pv-modal-footer-note', $cssContents);
+        $this->assertStringContainsString('.pv-table-style-cards', $cssContents);
         $this->assertStringContainsString('.pv-confetti-layer', $cssContents);
         $this->assertStringContainsString('.pv-recommendation-inline', $cssContents);
         $this->assertStringContainsString('.pv-stepper button', $cssContents);

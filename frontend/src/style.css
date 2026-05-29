@@ -5263,6 +5263,361 @@ textarea {
   background: var(--pv-preview-bg);
 }
 
+.widget-modal-customizer {
+  display: grid;
+  gap: 14px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.widget-modal-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: 14px;
+  align-items: start;
+}
+
+.widget-modal-fields {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.widget-modal-fields label,
+.widget-modal-fields input,
+.widget-modal-fields select,
+.widget-modal-fields textarea {
+  min-width: 0;
+}
+
+.widget-modal-step-grid,
+.widget-modal-copy-grid,
+.widget-modal-color-grid,
+.widget-modal-type-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.widget-modal-step-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.widget-modal-copy-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.widget-modal-copy-grid label:last-child {
+  grid-column: 1 / -1;
+}
+
+.widget-modal-color-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.widget-modal-type-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.widget-modal-preview-shell {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.widget-modal-preview {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--pv-modal-border);
+  border-radius: var(--pv-modal-radius);
+  background: var(--pv-modal-bg);
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+}
+
+.widget-modal-preview-backdrop {
+  display: flex;
+  justify-content: center;
+  padding: 14px;
+  border-radius: inherit;
+  background: rgba(15, 23, 42, 0.12);
+}
+
+.widget-modal-preview-card {
+  width: min(760px, 100%);
+  overflow: hidden;
+  border: 1px solid var(--pv-modal-border);
+  border-radius: var(--pv-modal-radius);
+  background: var(--pv-modal-surface);
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12);
+}
+
+.widget-modal-preview-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px;
+  color: #fff;
+  background: linear-gradient(135deg, var(--pv-modal-accent), var(--pv-secondary));
+}
+
+.widget-modal-preview-header h3 {
+  margin: 3px 0 5px;
+  color: #fff;
+  font-size: 1.2rem;
+  line-height: 1.15;
+}
+
+.widget-modal-preview-header p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.45;
+}
+
+.widget-modal-preview .drawer-close {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-color: rgba(255, 255, 255, 0.38);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.widget-modal-preview .drawer-close:hover,
+.widget-modal-preview .drawer-close:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.widget-modal-preview-body {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+}
+
+.widget-modal-preview-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.widget-modal-preview-copy strong {
+  color: var(--pv-modal-text);
+}
+
+.widget-modal-preview-copy span {
+  color: #6b7280;
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.widget-modal-preview-table {
+  min-width: 0;
+}
+
+.widget-modal-preview-table .pv-size-table {
+  min-width: 0;
+}
+
+.widget-modal-preview .pv-size-table {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--pv-modal-text);
+}
+
+.widget-modal-preview .pv-size-table th,
+.widget-modal-preview .pv-size-table td {
+  padding: 10px;
+  border-bottom: 1px solid var(--pv-modal-border);
+  text-align: left;
+}
+
+.widget-modal-preview .pv-size-table th {
+  color: var(--pv-modal-text);
+  background: var(--pv-modal-surface);
+  font-size: 0.86rem;
+}
+
+.widget-modal-preview.preview-table-style-compact .pv-size-table th,
+.widget-modal-preview.preview-table-style-compact .pv-size-table td {
+  padding: 7px 8px;
+  font-size: 0.9rem;
+}
+
+.widget-modal-preview.preview-table-style-cards .pv-size-table {
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.widget-modal-preview.preview-table-style-cards .pv-size-table thead th {
+  border-bottom: 0;
+  background: transparent;
+  padding-bottom: 0;
+}
+
+.widget-modal-preview.preview-table-style-cards .pv-size-table tbody tr {
+  background: transparent;
+}
+
+.widget-modal-preview.preview-table-style-cards .pv-size-table td {
+  border: 1px solid var(--pv-modal-border);
+  border-left-width: 0;
+  background: var(--pv-modal-surface);
+}
+
+.widget-modal-preview.preview-table-style-cards .pv-size-table td:first-child {
+  border-left-width: 1px;
+  border-radius: var(--pv-modal-radius) 0 0 var(--pv-modal-radius);
+  color: var(--pv-modal-accent);
+}
+
+.widget-modal-preview.preview-table-style-cards .pv-size-table td:last-child {
+  border-radius: 0 var(--pv-modal-radius) var(--pv-modal-radius) 0;
+}
+
+.widget-modal-preview.preview-device-mobile {
+  padding: 10px;
+  border-width: 8px;
+  border-color: #111827;
+  border-radius: 24px;
+}
+
+.widget-modal-preview.preview-device-mobile .widget-modal-preview-backdrop {
+  padding: 10px;
+}
+
+.widget-modal-preview.preview-device-mobile .widget-modal-preview-card {
+  width: 100%;
+}
+
+.widget-modal-preview.preview-device-mobile .widget-modal-preview-header,
+.widget-modal-preview.preview-device-mobile .widget-modal-preview-body {
+  padding: 14px;
+}
+
+.widget-modal-preview.preview-device-mobile .pv-stepper button {
+  padding: 6px 4px;
+  font-size: 0.62rem;
+}
+
+.widget-modal-preview.preview-device-mobile .pv-size-table th,
+.widget-modal-preview.preview-device-mobile .pv-size-table td {
+  padding: 7px 6px;
+  font-size: 0.68rem;
+}
+
+.widget-modal-alerts {
+  display: grid;
+  gap: 8px;
+}
+
+.widget-modal-alerts span,
+.widget-modal-alerts small {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+.widget-modal-alerts.ok small {
+  color: #065f46;
+  background: #ecfdf5;
+}
+
+.widget-modal-alerts.warning span {
+  color: #92400e;
+  background: #fffbeb;
+}
+
+.widget-modal-alerts.warning small {
+  color: #065f46;
+  background: #ecfdf5;
+}
+
+.widget-modal-alerts.ok span {
+  color: #065f46;
+  background: #ecfdf5;
+}
+
+.widget-modal-preview .pv-stepper {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.widget-modal-preview .pv-stepper button {
+  display: grid;
+  min-width: 0;
+  min-height: 42px;
+  justify-items: center;
+  padding: 7px 6px;
+  border: 1px solid var(--pv-modal-border);
+  border-radius: var(--pv-modal-radius);
+  color: var(--pv-modal-text);
+  background: #fff;
+  font: inherit;
+  font-size: 0.76rem;
+  line-height: 1.15;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.widget-modal-preview .pv-stepper button.active {
+  color: #fff;
+  background: var(--pv-modal-accent);
+}
+
+.widget-modal-preview .pv-stepper strong {
+  display: block;
+  margin-bottom: 2px;
+}
+
+.widget-modal-preview .pv-modal-brand {
+  display: grid;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.widget-modal-preview .pv-modal-brand strong {
+  display: block;
+  color: inherit;
+  font-size: 0.88em;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.widget-modal-preview .pv-modal-brand-image {
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+}
+
+.widget-modal-preview .pv-modal-brand-image img {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.widget-modal-preview .pv-kicker {
+  display: inline-block;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.82em;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.widget-modal-preview .pv-modal-footer-note {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
 .widget-color-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -8545,6 +8900,11 @@ td small {
   .sync-key-values,
   .install-grid,
   .widget-install-summary,
+  .widget-modal-layout,
+  .widget-modal-step-grid,
+  .widget-modal-copy-grid,
+  .widget-modal-color-grid,
+  .widget-modal-type-grid,
   .widget-color-grid,
   .widget-type-grid,
   .widget-data-support,

@@ -36,6 +36,9 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.theme.button_primary_icon', 'hanger')
             ->assertJsonPath('data.theme.button_secondary_icon', 'ruler')
             ->assertJsonPath('data.theme.button_icon_animation', true)
+            ->assertJsonPath('data.theme.modal.title', 'Descubra seu tamanho')
+            ->assertJsonPath('data.theme.modal.step_labels.0', 'Medidas')
+            ->assertJsonPath('data.theme.modal.table_style', 'clean')
             ->assertJsonPath('data.theme.placement.mode', 'inside')
             ->assertJsonPath('data.theme.placement.selector', '#provador-virtual-container')
             ->assertJsonPath('data.draft.has_unpublished_changes', false)
@@ -61,19 +64,31 @@ class WidgetInstallApiTest extends TestCase
                     'button_primary_icon' => 'tape',
                     'button_secondary_icon' => 'chart',
                     'button_icon_animation' => false,
+                    'modal' => [
+                        'title' => 'Provador com modal',
+                        'step_labels' => ['Medidas', 'Corpo', 'Detalhes', 'Resultado'],
+                        'table_style' => 'cards',
+                        'font_size' => '16',
+                        'font_weight' => '800',
+                    ],
                 ],
                 'is_active' => false,
             ])
             ->assertOk()
             ->assertJsonPath('data.platform', 'custom')
             ->assertJsonPath('data.theme.primary', '#0f172a')
+            ->assertJsonPath('data.theme.presentation_mode', 'drawer')
             ->assertJsonPath('data.is_active', true)
             ->assertJsonPath('data.draft.platform', 'bigshop')
             ->assertJsonPath('data.draft.allowed_domains.0', 'preview.loja.com.br')
             ->assertJsonPath('data.draft.theme.primary', '#101820')
+            ->assertJsonPath('data.draft.theme.presentation_mode', 'modal')
             ->assertJsonPath('data.draft.theme.button_primary_icon', 'tape')
             ->assertJsonPath('data.draft.theme.button_secondary_icon', 'chart')
             ->assertJsonPath('data.draft.theme.button_icon_animation', false)
+            ->assertJsonPath('data.draft.theme.modal.title', 'Provador com modal')
+            ->assertJsonPath('data.draft.theme.modal.step_labels.0', 'Medidas')
+            ->assertJsonPath('data.draft.theme.modal.table_style', 'cards')
             ->assertJsonPath('data.draft.is_active', false)
             ->assertJsonPath('data.draft.has_unpublished_changes', true);
 
@@ -100,6 +115,13 @@ class WidgetInstallApiTest extends TestCase
                     'button_primary_icon' => 'hanger',
                     'button_secondary_icon' => 'tape',
                     'button_icon_animation' => true,
+                    'modal' => [
+                        'title' => 'Provador publicado',
+                        'footer_note' => 'Escolha com confiança.',
+                        'table_style' => 'compact',
+                        'background' => '#ffffff',
+                        'surface' => '#f8fafc',
+                    ],
                 ],
                 'is_active' => false,
             ])
@@ -115,6 +137,9 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.theme.button_primary_icon', 'hanger')
             ->assertJsonPath('data.theme.button_secondary_icon', 'tape')
             ->assertJsonPath('data.theme.button_icon_animation', true)
+            ->assertJsonPath('data.theme.modal.title', 'Provador publicado')
+            ->assertJsonPath('data.theme.modal.footer_note', 'Escolha com confiança.')
+            ->assertJsonPath('data.theme.modal.table_style', 'compact')
             ->assertJsonPath('data.is_active', false)
             ->assertJsonPath('data.platform_guide.key', 'bigshop');
 
@@ -129,6 +154,8 @@ class WidgetInstallApiTest extends TestCase
         $this->assertStringContainsString('button_primary_icon', $bigShopSnippet);
         $this->assertStringContainsString('button_secondary_icon', $bigShopSnippet);
         $this->assertStringContainsString('button_icon_animation', $bigShopSnippet);
+        $this->assertStringContainsString('modal', $bigShopSnippet);
+        $this->assertStringContainsString('table_style', $bigShopSnippet);
         $this->assertStringContainsString('data-platform="bigshop"', $bigShopSnippet);
         $this->assertStringContainsString('BIGSHOP_PRODUCT_ID', $bigShopSnippet);
 

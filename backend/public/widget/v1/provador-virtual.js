@@ -455,6 +455,7 @@
 
   function applyTheme(element) {
     var theme = config.theme || {};
+    var modal = theme.modal || {};
     var map = {
       primary: '--pv-primary',
       secondary: '--pv-secondary',
@@ -482,6 +483,42 @@
 
     if (theme.button_radius !== undefined && theme.button_radius !== null && theme.button_radius !== '') {
       element.style.setProperty('--pv-radius', Number(theme.button_radius) + 'px');
+    }
+
+    if (modal.background) {
+      element.style.setProperty('--pv-modal-bg', modal.background);
+    }
+
+    if (modal.surface) {
+      element.style.setProperty('--pv-modal-surface', modal.surface);
+    }
+
+    if (modal.text) {
+      element.style.setProperty('--pv-modal-text', modal.text);
+    }
+
+    if (modal.accent) {
+      element.style.setProperty('--pv-modal-accent', modal.accent);
+    }
+
+    if (modal.border) {
+      element.style.setProperty('--pv-modal-border', modal.border);
+    }
+
+    if (modal.font_family) {
+      element.style.setProperty('--pv-modal-font-family', modal.font_family);
+    }
+
+    if (modal.font_size) {
+      element.style.setProperty('--pv-modal-font-size', Number(modal.font_size) + 'px');
+    }
+
+    if (modal.font_weight) {
+      element.style.setProperty('--pv-modal-font-weight', String(modal.font_weight));
+    }
+
+    if (modal.radius !== undefined && modal.radius !== null && modal.radius !== '') {
+      element.style.setProperty('--pv-modal-radius', Number(modal.radius) + 'px');
     }
   }
 
@@ -543,6 +580,98 @@
     return mode === 'modal' ? 'modal' : 'drawer';
   }
 
+  function modalTheme() {
+    var theme = config.theme && config.theme.modal ? config.theme.modal : {};
+
+    return {
+      logo_text: theme.logo_text || 'Provador Virtual',
+      logo_url: theme.logo_url || '',
+      kicker: theme.kicker || 'Provador Virtual',
+      title: theme.title || 'Descubra seu tamanho',
+      subtitle: theme.subtitle || 'Uma jornada rápida para melhorar a precisão da recomendação.',
+      step_labels: modalStepLabels(theme.step_labels),
+      table_title: theme.table_title || 'Tabela de Medidas',
+      table_unit_label: theme.table_unit_label || 'cm',
+      footer_note: theme.footer_note || 'Toque no tamanho para aplicar na página do produto.',
+      background: theme.background || '#ffffff',
+      surface: theme.surface || '#f8fafc',
+      text: theme.text || '#111827',
+      accent: theme.accent || '#ff4d5e',
+      border: theme.border || '#e5e7eb',
+      radius: theme.radius !== undefined && theme.radius !== null ? Number(theme.radius) : 16,
+      font_family: theme.font_family || 'Manrope, Inter, Arial, sans-serif',
+      font_size: theme.font_size !== undefined && theme.font_size !== null ? Number(theme.font_size) : 15,
+      font_weight: theme.font_weight !== undefined && theme.font_weight !== null ? Number(theme.font_weight) : 700,
+      table_style: ['clean', 'compact', 'cards'].indexOf(String(theme.table_style).toLowerCase()) >= 0
+        ? String(theme.table_style).toLowerCase()
+        : 'clean',
+    };
+  }
+
+  function modalStepLabels(stepLabels) {
+    var defaults = ['Medidas', 'Corpo', 'Detalhes', 'Resultado'];
+    var labels = Array.isArray(stepLabels) ? stepLabels : defaults;
+
+    labels = labels.map(function (label, index) {
+      var value = String(label || '').trim();
+      return value || defaults[index] || defaults[defaults.length - 1];
+    });
+
+    while (labels.length < 4) {
+      labels.push(defaults[labels.length] || defaults[defaults.length - 1]);
+    }
+
+    return labels.slice(0, 4);
+  }
+
+  function modalPreviewBrandHtml() {
+    var modal = modalTheme();
+    var logoUrl = modal.logo_url ? escapeHtml(modal.logo_url) : '';
+
+    if (logoUrl) {
+      return [
+        '<span class="pv-modal-brand pv-modal-brand-image">',
+        '<img src="' + logoUrl + '" alt="' + escapeHtml(modal.logo_text) + '" loading="lazy" decoding="async" />',
+        '<strong>' + escapeHtml(modal.logo_text) + '</strong>',
+        '</span>',
+      ].join('');
+    }
+
+    return '<span class="pv-modal-brand"><strong>' + escapeHtml(modal.logo_text) + '</strong></span>';
+  }
+
+  function modalFooterNoteHtml() {
+    var footerNote = modalTheme().footer_note;
+
+    return footerNote ? '<p class="pv-modal-footer-note">' + escapeHtml(footerNote) + '</p>' : '';
+  }
+
+  function modalTableStyleClass() {
+    var classes = {
+      clean: 'pv-table-style-clean',
+      compact: 'pv-table-style-compact',
+      cards: 'pv-table-style-cards',
+    };
+
+    return classes[modalTheme().table_style] || classes.clean;
+  }
+
+  function modalPreviewTableRows() {
+    var table = state.config && state.config.measurement_table ? state.config.measurement_table : null;
+    var rows = table && Array.isArray(table.rows) ? table.rows.slice(0, 4) : [];
+
+    if (rows.length === 0) {
+      rows = [
+        { size_label: 'P', bust: [84, 90], waist: [66, 72], hip: [90, 96], height: [156, 164], weight: [48, 56], length: [null, null], shoulder: [null, null] },
+        { size_label: 'M', bust: [90, 96], waist: [72, 78], hip: [96, 104], height: [162, 170], weight: [56, 64], length: [null, null], shoulder: [null, null] },
+        { size_label: 'G', bust: [96, 104], waist: [78, 86], hip: [104, 112], height: [168, 176], weight: [64, 74], length: [null, null], shoulder: [null, null] },
+        { size_label: 'GG', bust: [104, 112], waist: [86, 94], hip: [112, 120], height: [174, 182], weight: [74, 84], length: [null, null], shoulder: [null, null] },
+      ];
+    }
+
+    return rows;
+  }
+
   function recommendationBackdropClass() {
     return presentationMode() === 'modal'
       ? 'pv-drawer-backdrop pv-recommendation-modal-backdrop'
@@ -553,14 +682,16 @@
     var frameClass = presentationMode() === 'modal'
       ? 'pv-drawer pv-recommendation-modal'
       : 'pv-drawer';
+    var modal = modalTheme();
 
     return [
       '<section class="' + frameClass + '" role="dialog" aria-modal="true" aria-labelledby="pv-title">',
       '<header class="pv-drawer-header">',
       '<div>',
-      '<span class="pv-kicker">Provador Virtual</span>',
-      '<h2 id="pv-title">Descubra seu tamanho</h2>',
-      '<p>Uma jornada r&aacute;pida para melhorar a precis&atilde;o da recomenda&ccedil;&atilde;o.</p>',
+      modalPreviewBrandHtml(),
+      '<span class="pv-kicker">' + escapeHtml(modal.kicker) + '</span>',
+      '<h2 id="pv-title">' + escapeHtml(modal.title) + '</h2>',
+      '<p>' + escapeHtml(modal.subtitle) + '</p>',
       '</div>',
       '<button class="pv-close" type="button" data-pv-close aria-label="Fechar">x</button>',
       '</header>',
@@ -596,11 +727,12 @@
   }
 
   function stepperHtml() {
+    var labels = modalTheme().step_labels;
     var steps = [
-      [1, 'Medidas'],
-      [2, 'Corpo'],
-      [3, 'Detalhes'],
-      [4, 'Resultado'],
+      [1, labels[0]],
+      [2, labels[1]],
+      [3, labels[2]],
+      [4, labels[3]],
     ];
 
     return [
@@ -608,7 +740,7 @@
       steps.map(function (item) {
         var active = item[0] === state.step ? ' active' : '';
         var disabled = canVisitStep(item[0]) ? '' : ' disabled';
-        return '<button type="button" class="' + active + '" data-pv-step="' + item[0] + '"' + disabled + '><strong>' + item[0] + '</strong>' + item[1] + '</button>';
+        return '<button type="button" class="' + active + '" data-pv-step="' + item[0] + '"' + disabled + '><strong>' + item[0] + '</strong>' + escapeHtml(item[1]) + '</button>';
       }).join(''),
       '</nav>',
     ].join('');
@@ -922,6 +1054,7 @@
     footer.innerHTML = [
       precisionHtml(state.precision),
       '<button type="button" class="' + footerButtonClass() + '" data-pv-footer-action' + (disabled ? ' disabled' : '') + '>' + label + '</button>',
+      modalFooterNoteHtml(),
       attributionHtml(),
     ].join('');
 
@@ -1697,11 +1830,18 @@
   function tableModalHtml() {
     var table = state.config && state.config.measurement_table ? state.config.measurement_table : null;
     var rows = table && Array.isArray(table.rows) ? table.rows : [];
+    var modal = modalTheme();
+    var rowTemplate = modalPreviewTableRows();
 
     return [
-      '<div class="pv-modal pv-table-modal" role="dialog" aria-modal="true" aria-labelledby="pv-table-title">',
+      '<div class="pv-modal pv-table-modal ' + modalTableStyleClass() + '" role="dialog" aria-modal="true" aria-labelledby="pv-table-title">',
       '<div class="pv-header">',
-      '<div><span>Provador Virtual</span><h2 id="pv-table-title">' + escapeHtml(table ? table.name : 'Tabela de Medidas') + '</h2><span>Medidas em ' + escapeHtml(table ? table.unit : 'cm') + '.</span></div>',
+      '<div>',
+      modalPreviewBrandHtml(),
+      '<span>' + escapeHtml(modal.table_title) + '</span>',
+      '<h2 id="pv-table-title">' + escapeHtml(table ? table.name : modal.table_title) + '</h2>',
+      '<span>Medidas em ' + escapeHtml(table ? table.unit : modal.table_unit_label) + '.</span>',
+      '</div>',
       '<button class="pv-close" type="button" data-pv-close title="Fechar">x</button>',
       '</div>',
       '<div class="pv-body">',
@@ -1709,10 +1849,11 @@
       '<table class="pv-size-table">',
       '<thead><tr><th>Tam.</th><th>Busto/t&oacute;rax</th><th>Cintura</th><th>Quadril</th><th>Altura</th><th>Peso</th><th>Compr.</th><th>Ombro</th></tr></thead>',
       '<tbody>',
-      rows.map(tableRowHtml).join('') || '<tr><td colspan="8">Tabela indispon&iacute;vel para este produto.</td></tr>',
+      rows.map(tableRowHtml).join('') || rowTemplate.map(tableRowHtml).join('') || '<tr><td colspan="8">Tabela indispon&iacute;vel para este produto.</td></tr>',
       '</tbody>',
       '</table>',
       '</div>',
+      modalFooterNoteHtml(),
       attributionHtml(),
       '</div>',
       '</div>',

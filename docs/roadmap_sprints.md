@@ -2736,7 +2736,7 @@ Critérios de aceite:
 - mudanças só afetam produção após publicar;
 - visual gerado não quebra o widget público.
 
-Status: planejada.
+Status: implementada localmente na Sprint 147. O editor dedicado do modal já cobre `theme.modal.*`, `theme.presentation_mode`, prévia desktop/mobile, contraste mínimo e separação entre rascunho e publicação. Validações locais passaram com `php artisan test` usando o PHP com `sqlite3` habilitado, `php vendor/bin/pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check` e revisão visual headless do portal em `/app/widget`. A publicação para produção, o commit e o monitoramento do deploy ainda serão fechados antes de avançar para a Sprint 148.
 
 ### Sprint 148 - Relatórios de uso do widget
 
