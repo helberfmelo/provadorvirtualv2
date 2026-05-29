@@ -20,25 +20,24 @@ Antes de desenvolver qualquer sprint, ajuste, correção ou deploy, reler nesta 
 11. `docs/v1_intelligence_migration.md`
 12. `docs/sizebay_benchmark.md`
 13. `docs/sizebay_zak_hyper_benchmark.md`
-14. `docs/sizebay_vs_provador_virtual_comparison.html`
-15. `docs/data_learning_lgpd_outliers.md`
-16. `docs/analytics_admin.md`
-17. `docs/user_access_permissions.md`
-18. `docs/portal_ui_guidelines.md`
-19. `docs/transactional_email_automation.md`
-20. `docs/hardening_lgpd_observability.md`
-21. `docs/go_live_cutover.md`
-22. `docs/bigshop_integration.md`
-23. `docs/bigshop_model3_pro_widget.md`
-24. `docs/bigshop_one_click_contract.md`
-25. `docs/commercial_pilot_package.md`
-26. `docs/deploy_runbook.md`
-27. `docs/sprint_governance.md`
-28. `docs/roadmap_sprints.md`
-29. `docs/intelligent_sizing_roadmap.md`
-30. `docs/product_backlog.md`
-31. `docs/security_compliance.md`
-32. `docs/credentials.local.md`, somente quando a sprint envolver produção, banco, SMTP, deploy, IA ou integrações.
+14. `docs/data_learning_lgpd_outliers.md`
+15. `docs/analytics_admin.md`
+16. `docs/user_access_permissions.md`
+17. `docs/portal_ui_guidelines.md`
+18. `docs/transactional_email_automation.md`
+19. `docs/hardening_lgpd_observability.md`
+20. `docs/go_live_cutover.md`
+21. `docs/bigshop_integration.md`
+22. `docs/bigshop_model3_pro_widget.md`
+23. `docs/bigshop_one_click_contract.md`
+24. `docs/commercial_pilot_package.md`
+25. `docs/deploy_runbook.md`
+26. `docs/sprint_governance.md`
+27. `docs/roadmap_sprints.md`
+28. `docs/intelligent_sizing_roadmap.md`
+29. `docs/product_backlog.md`
+30. `docs/security_compliance.md`
+31. `docs/credentials.local.md`, somente quando a sprint envolver produção, banco, SMTP, deploy, IA ou integrações.
 
 Nenhuma sprint deve começar sem essa releitura. Depois de executar uma sprint, é obrigatório fazer commit, push, acompanhar GitHub Actions/deploy até o status final e somente então passar para a próxima sprint.
 
@@ -55,7 +54,6 @@ Todo commit criado para uma sprint deve ter o título iniciado exatamente com `S
 - Documentação pública: `https://documenter.getpostman.com/view/4253101/2s93sdYrsi`
 - Documentação pública Sizebay: `https://docs.sizebay.com/`
 - Portal Sizebay do cliente Zak, estudado somente em leitura, registrado em `docs/sizebay_zak_hyper_benchmark.md`
-- Comparativo Sizebay x Provador Virtual registrado em `docs/sizebay_vs_provador_virtual_comparison.html`
 - Galeria pública de botões Sizebay: `https://sizebay-buttons-gallery.vercel.app/`
 - Captura tecnica pública Zak/Sizebay em `https://www.zak.com.br/`
 
