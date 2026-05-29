@@ -25,6 +25,28 @@ const isSaasRoute = computed(() => (route.path === '/saas' || route.path.startsW
 const isProductTestRoute = computed(() => route.path === '/produto-teste' || route.path.startsWith('/produto-teste/'))
 const isWorkRoute = computed(() => isCompanyRoute.value || isSaasRoute.value)
 const contextLabel = computed(() => isSaasRoute.value ? 'SaaS admin' : 'Portal da empresa')
+const brandTarget = computed(() => {
+  if (isSaasRoute.value) {
+    return '/saas'
+  }
+
+  if (isCompanyRoute.value) {
+    return '/app'
+  }
+
+  return '/'
+})
+const brandAriaLabel = computed(() => {
+  if (isSaasRoute.value) {
+    return 'Provador Virtual - página inicial do SaaS'
+  }
+
+  if (isCompanyRoute.value) {
+    return 'Provador Virtual - página inicial do portal'
+  }
+
+  return 'Provador Virtual - página inicial do site'
+})
 const workNavTitle = computed(() => isSaasRoute.value ? 'Operação SaaS' : 'Operação da loja')
 const activeCompanyName = computed(() => auth.activeCompany?.name || 'Sem empresa ativa')
 const publicPlatformLink = computed<NavLink | null>(() => {
@@ -127,12 +149,21 @@ function acceptCookieNotice() {
   document.cookie = 'pv_cookie_notice_ok=1; Max-Age=31536000; Path=/; SameSite=Lax'
   cookieNoticeVisible.value = false
 }
+
+function handleBrandClick(event: MouseEvent) {
+  navOpen.value = false
+
+  if (brandTarget.value === '/' && route.path === '/') {
+    event.preventDefault()
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
 </script>
 
 <template>
   <div class="shell" :class="{ 'shell-work': isWorkRoute, 'shell-company': isCompanyRoute, 'shell-saas': isSaasRoute, 'nav-open': navOpen }">
     <header class="topbar" :class="{ 'topbar-work': isWorkRoute }">
-      <RouterLink to="/" class="brand" aria-label="Provador Virtual">
+      <RouterLink :to="brandTarget" class="brand" :aria-label="brandAriaLabel" @click="handleBrandClick">
         <img class="brand-logo" :src="brandLogoUrl" alt="Provador Virtual" />
         <small v-if="isWorkRoute" class="brand-context">{{ contextLabel }}</small>
       </RouterLink>
@@ -153,7 +184,9 @@ function acceptCookieNotice() {
       <nav v-if="!isWorkRoute" id="main-navigation" class="nav public-nav" :class="{ open: navOpen }" aria-label="Principal">
         <div class="public-nav-header">
           <div class="drawer-header-row">
-            <img :src="brandLogoUrl" alt="Provador Virtual" />
+            <RouterLink :to="brandTarget" :aria-label="brandAriaLabel" @click="handleBrandClick">
+              <img :src="brandLogoUrl" alt="Provador Virtual" />
+            </RouterLink>
             <button class="drawer-close" type="button" aria-label="Fechar menu" @click="navOpen = false">
               <i class="fa-solid fa-xmark" aria-hidden="true"></i>
             </button>

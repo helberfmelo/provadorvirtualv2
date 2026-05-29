@@ -1202,3 +1202,14 @@
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter ProductsApiTest`, PHPUnit completo com 93 testes e 863 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
 - Commit `e802ad6` enviado para `main`; o run `26609619782` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/produtos`, `/app/produtos/novo`, páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 117 Navegação contextual do logo
+
+- Ajustado o logo principal para respeitar o contexto atual.
+- Em rotas SaaS, o logo aponta para `/saas`.
+- Em rotas do portal da empresa, o logo aponta para `/app`.
+- Em login e páginas públicas, o logo aponta para `/`.
+- Na home do site, clicar no logo rola a página para o topo sem trocar de rota.
+- O logo mostrado no cabeçalho do menu mobile público passa a usar a mesma regra.
+- Validação local passou com `npm --prefix frontend run build`.
+- Commit, push, Actions/deploy e validação de produção pendentes.

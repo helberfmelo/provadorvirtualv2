@@ -1902,3 +1902,25 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 116 no commit `e802ad6`, publicado com sucesso no run `26609619782`. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter ProductsApiTest`, PHPUnit completo com 93 testes e 863 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/produtos`, `/app/produtos/novo`, páginas públicas, SaaS, portal, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 117 - Navegação contextual do logo
+
+Objetivo: ajustar o destino do logo do Provador Virtual conforme o contexto de navegação, evitando que usuários do SaaS ou do portal da empresa saiam para o site ao clicar na marca.
+
+Entregas:
+
+- logo dentro do SaaS aponta para `/saas`;
+- logo dentro do portal da empresa aponta para `/app`;
+- logo no login e nas páginas públicas aponta para `/`;
+- quando o usuário já está na home do site, clique no logo rola para o topo;
+- logo do cabeçalho mobile público segue o mesmo comportamento.
+
+Validação:
+
+- `npm --prefix frontend run build`;
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Build frontend passou; commit, push, Actions/deploy e validação de produção pendentes.
