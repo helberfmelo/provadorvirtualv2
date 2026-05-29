@@ -1620,3 +1620,5 @@
 - O fluxo de publicação exige contraste mínimo no texto e no destaque do modal antes de salvar em produção.
 - A tela `/app/widget` ganhou prévia desktop/mobile do modal completo, alerta de contraste e visual de tabela integrado ao editor, mantendo salvar rascunho, publicar e desfazer.
 - Validações locais passaram com `php artisan test` usando o PHP `C:\php\php.exe` com `sqlite3`, `php vendor/bin/pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check` e varredura de segredos. A revisão visual headless abriu `/app/widget` com login demo, confirmou o bloco `Modal do provador` e a prévia aberta em desktop.
+- Commit `fe82320` enviado para `main`; o run `26663180067` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/widget`, widget JS/CSS, APIs públicas, APIs protegidas, CORS, login demo, go-live readiness, integrações, sincronização, taxonomia e `PRODUCTION VALIDATION OK`.
