@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from 'vue'
-import { RouterLink } from 'vue-router'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { RouterLink, useRoute } from 'vue-router'
 import { api } from '../services/api'
 import type { MeasurementTableOption, Product } from '../services/merchantTypes'
 import { showFeedback } from '../services/saveFeedback'
@@ -8,6 +8,7 @@ import { showFeedback } from '../services/saveFeedback'
 const products = ref<Product[]>([])
 const measurementTables = ref<MeasurementTableOption[]>([])
 const selectedProductIds = ref<number[]>([])
+const route = useRoute()
 const loading = ref(false)
 const linking = ref(false)
 const error = ref('')
@@ -16,6 +17,7 @@ const filters = reactive({
   search: '',
   status: '',
   table: '',
+  readiness: '',
 })
 
 const bulkMeasurementTableId = ref<number | ''>('')
@@ -36,8 +38,15 @@ const filteredProducts = computed(() => {
       || (filters.table === 'with_table' && Boolean(product.measurement_table_id))
       || (filters.table === 'without_table' && !product.measurement_table_id)
       || String(product.measurement_table_id || '') === filters.table
+    const matchesReadiness = !filters.readiness
+      || (filters.readiness === 'ready' && product.readiness_status === 'ready')
+      || (filters.readiness === 'pending' && product.readiness_status !== 'ready')
+      || (filters.readiness === 'without_measurement_table' && !product.measurement_table_id)
+      || (filters.readiness === 'without_modeling' && !product.fit_profile)
+      || (filters.readiness === 'without_category' && !product.category)
+      || (filters.readiness === 'sync_error' && Boolean(product.has_sync_error))
 
-    return matchesSearch && matchesStatus && matchesTable
+    return matchesSearch && matchesStatus && matchesTable && matchesReadiness
   })
 })
 
@@ -48,10 +57,50 @@ const allVisibleSelected = computed(() => (
   visibleProductIds.value.length > 0
   && visibleProductIds.value.every((id) => selectedProductIds.value.includes(id))
 ))
+const activeShortcutLabel = computed(() => {
+  const labels: Record<string, string> = {
+    ready: 'Prontos para publicar',
+    pending: 'Pendentes',
+    without_measurement_table: 'Sem tabela',
+    without_modeling: 'Sem modelagem',
+    without_category: 'Sem categoria',
+    sync_error: 'Com erro de sincronização',
+  }
+
+  return filters.readiness ? labels[filters.readiness] || '' : ''
+})
 
 onMounted(() => {
+  applyRouteFilters()
   loadData()
 })
+
+watch(() => route.query, () => {
+  applyRouteFilters()
+}, { deep: true })
+
+function applyRouteFilters() {
+  const shortcut = typeof route.query.filtro === 'string' ? route.query.filtro : ''
+  const status = typeof route.query.status === 'string' ? route.query.status : ''
+  const table = typeof route.query.tabela === 'string' ? route.query.tabela : ''
+
+  filters.status = status
+  filters.table = table
+  filters.readiness = {
+    prontos: 'ready',
+    pendentes: 'pending',
+    sem_tabela: 'without_measurement_table',
+    sem_modelagem: 'without_modeling',
+    sem_categoria: 'without_category',
+    erro_sync: 'sync_error',
+  }[shortcut] || ''
+}
+
+function clearOperationalFilter() {
+  filters.readiness = ''
+  filters.status = ''
+  filters.table = ''
+}
 
 async function loadData() {
   loading.value = true
@@ -193,6 +242,15 @@ async function removeProduct(product: Product) {
             {{ table.name }}
           </option>
         </select>
+        <select v-model="filters.readiness" aria-label="Filtrar pendência">
+          <option value="">Pendência</option>
+          <option value="ready">Prontos</option>
+          <option value="pending">Pendentes</option>
+          <option value="without_measurement_table">Sem tabela</option>
+          <option value="without_modeling">Sem modelagem</option>
+          <option value="without_category">Sem categoria</option>
+          <option value="sync_error">Erro de sync</option>
+        </select>
         <span class="toolbar-divider"></span>
         <select v-model.number="bulkMeasurementTableId" :disabled="!hasSelection" aria-label="Tabela para vincular">
           <option value="">Vincular tabela</option>
@@ -212,6 +270,10 @@ async function removeProduct(product: Product) {
         </button>
         <strong>{{ selectedCount }} sel.</strong>
       </div>
+      <p v-if="activeShortcutLabel" class="filter-hint">
+        Filtro aplicado pelo painel: <strong>{{ activeShortcutLabel }}</strong>
+        <button type="button" @click="clearOperationalFilter">Limpar</button>
+      </p>
       <div class="table-wrap products-table-wrap">
         <table>
           <thead>

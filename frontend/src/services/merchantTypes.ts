@@ -37,6 +37,9 @@ export type Product = {
   gender: string | null
   fit_profile: string | null
   status: string
+  has_sync_error?: boolean
+  readiness_status?: 'ready' | 'pending'
+  readiness_issues?: string[]
   variants_count?: number
   variants?: ProductVariant[]
   measurement_table?: MeasurementTableOption | null

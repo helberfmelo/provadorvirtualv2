@@ -2181,7 +2181,7 @@ Critérios de aceite:
 - todos os números levam para a lista filtrada correspondente;
 - resultado funciona para loja vazia, loja em implantação e loja com grande catálogo.
 
-Status: planejada.
+Status: implementado na Sprint 129. O Painel recebeu um placar operacional de cobertura com produtos totais, cobertos, ativos, pendentes, inativos, sem tabela, sem modelagem, sem categoria, com erro de sincronização e com instalação pendente. O agregado vem de `GET /api/v1/merchant/overview`, evitando cálculo espalhado no frontend, e os números levam a filtros acionáveis em `/app/produtos` ou ao checklist de publicação. A lista de próximas ações prioriza pendências e a evolução de cobertura aparece quando houver histórico suficiente.
 
 ### Sprint 130 - Produtos com status, colunas e filtros superiores
 

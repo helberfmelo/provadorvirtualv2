@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import { useAuthStore } from '../stores/auth'
@@ -26,6 +26,37 @@ type BillingSubscription = {
   next_charge_at: string | null
   cancel_requested_at: string | null
 }
+type CoverageSummary = {
+  total_products: number
+  covered_products: number
+  active_products: number
+  pending_products: number
+  inactive_products: number
+  without_measurement_table: number
+  without_modeling: number
+  without_category: number
+  sync_errors: number
+  installation_not_validated: number
+  coverage_rate: number
+}
+type NextAction = {
+  key: string
+  title: string
+  description: string
+  to: string
+  priority: 'high' | 'medium' | 'low'
+}
+type CoverageTrend = {
+  available: boolean
+  period_days: number
+  message: string | null
+  series: Array<{
+    date: string
+    covered_products: number
+    total_products: number
+    coverage_rate: number
+  }>
+}
 const summary = reactive({
   products: 0,
   measurement_tables: 0,
@@ -33,6 +64,26 @@ const summary = reactive({
   widget_active: false,
   integrations_configured: 0,
   recommendations_today: 0,
+})
+const coverage = reactive<CoverageSummary>({
+  total_products: 0,
+  covered_products: 0,
+  active_products: 0,
+  pending_products: 0,
+  inactive_products: 0,
+  without_measurement_table: 0,
+  without_modeling: 0,
+  without_category: 0,
+  sync_errors: 0,
+  installation_not_validated: 0,
+  coverage_rate: 0,
+})
+const nextActions = ref<NextAction[]>([])
+const coverageTrend = reactive<CoverageTrend>({
+  available: false,
+  period_days: 7,
+  message: null,
+  series: [],
 })
 const billing = reactive({
   loading: false,
@@ -62,16 +113,118 @@ const profileState = reactive({
 })
 const showCompanyProfile = computed(() => Boolean(auth.activeCompany && !auth.activeCompany.profile_completed))
 const activeCompanyDocument = computed(() => auth.activeCompany?.document || '')
+const coverageRateLabel = computed(() => `${Math.round(coverage.coverage_rate || 0)}%`)
+const coverageRingStyle = computed(() => ({
+  background: `conic-gradient(#ff4d5e 0 ${coverage.coverage_rate || 0}%, #e5e7eb ${coverage.coverage_rate || 0}% 100%)`,
+}))
+const coverageCards = computed(() => [
+  {
+    key: 'total',
+    label: 'Produtos totais',
+    value: coverage.total_products,
+    hint: 'Catálogo monitorado',
+    icon: 'fa-boxes-stacked',
+    to: '/app/produtos',
+    tone: 'neutral',
+  },
+  {
+    key: 'covered',
+    label: 'Cobertos',
+    value: coverage.covered_products,
+    hint: 'Ativos com tabela, categoria e modelagem',
+    icon: 'fa-circle-check',
+    to: '/app/produtos?filtro=prontos',
+    tone: 'good',
+  },
+  {
+    key: 'active',
+    label: 'Ativos',
+    value: coverage.active_products,
+    hint: 'Produtos publicados no catálogo',
+    icon: 'fa-toggle-on',
+    to: '/app/produtos?status=active',
+    tone: 'neutral',
+  },
+  {
+    key: 'pending',
+    label: 'Pendentes',
+    value: coverage.pending_products,
+    hint: 'Precisam de revisão antes da publicação',
+    icon: 'fa-triangle-exclamation',
+    to: '/app/produtos?filtro=pendentes',
+    tone: coverage.pending_products > 0 ? 'warning' : 'good',
+  },
+  {
+    key: 'without_table',
+    label: 'Sem tabela',
+    value: coverage.without_measurement_table,
+    hint: 'Vincule tabela em lote',
+    icon: 'fa-ruler-combined',
+    to: '/app/produtos?filtro=sem_tabela',
+    tone: coverage.without_measurement_table > 0 ? 'warning' : 'good',
+  },
+  {
+    key: 'without_modeling',
+    label: 'Sem modelagem',
+    value: coverage.without_modeling,
+    hint: 'Complete o caimento',
+    icon: 'fa-sliders',
+    to: '/app/produtos?filtro=sem_modelagem',
+    tone: coverage.without_modeling > 0 ? 'warning' : 'good',
+  },
+  {
+    key: 'without_category',
+    label: 'Sem categoria',
+    value: coverage.without_category,
+    hint: 'Base para regras e relatórios',
+    icon: 'fa-tags',
+    to: '/app/produtos?filtro=sem_categoria',
+    tone: coverage.without_category > 0 ? 'warning' : 'good',
+  },
+  {
+    key: 'sync_errors',
+    label: 'Erro de sync',
+    value: coverage.sync_errors,
+    hint: 'Corrija a origem antes de importar',
+    icon: 'fa-rotate',
+    to: '/app/produtos?filtro=erro_sync',
+    tone: coverage.sync_errors > 0 ? 'danger' : 'good',
+  },
+  {
+    key: 'install',
+    label: 'Instalação pendente',
+    value: coverage.installation_not_validated,
+    hint: 'Produtos ativos afetados',
+    icon: 'fa-code',
+    to: '/app/go-live',
+    tone: coverage.installation_not_validated > 0 ? 'warning' : 'good',
+  },
+])
+const trendBars = computed(() => coverageTrend.series.map((point) => ({
+  ...point,
+  height: `${Math.max(8, Math.round(point.coverage_rate || 0))}%`,
+  label: new Date(`${point.date}T00:00:00`).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }),
+})))
 
 onMounted(() => {
   auth.loadMe()
     .then(syncCompanyProfile)
     .catch(() => syncCompanyProfile())
-  api.get('/merchant/overview')
-    .then(({ data }) => Object.assign(summary, data.summary))
-    .catch(() => undefined)
+  loadOverview()
   loadBillingSubscription()
 })
+
+async function loadOverview() {
+  try {
+    const { data } = await api.get('/merchant/overview')
+    Object.assign(summary, data.summary)
+    Object.assign(coverage, data.coverage || {})
+    nextActions.value = data.next_actions || []
+    Object.assign(coverageTrend, data.coverage_trend || {})
+  } catch {
+    // O painel preserva os atalhos básicos se o agregado ainda não estiver disponível.
+  }
+}
 
 function syncCompanyProfile() {
   const company = auth.activeCompany
@@ -186,6 +339,14 @@ function price(cents: number) {
 function isPlaceholderCompanyName(name: string | undefined) {
   return Boolean(name?.startsWith('Empresa CNPJ '))
 }
+
+function priorityLabel(priority: NextAction['priority']) {
+  return {
+    high: 'Alta',
+    medium: 'Média',
+    low: 'Baixa',
+  }[priority]
+}
 </script>
 
 <template>
@@ -273,27 +434,77 @@ function isPlaceholderCompanyName(name: string | undefined) {
       </form>
     </section>
 
-    <div class="metric-grid">
-      <article class="metric-card">
-        <i class="fa-solid fa-box-open" aria-hidden="true"></i>
-        <strong>{{ summary.products }} produto{{ summary.products === 1 ? '' : 's' }}</strong>
-        <span>Cadastre e vincule tabelas aos produtos que vão usar o provador.</span>
-      </article>
-      <article class="metric-card">
-        <i class="fa-solid fa-table-cells" aria-hidden="true"></i>
-        <strong>{{ summary.measurement_tables }} tabela{{ summary.measurement_tables === 1 ? '' : 's' }}</strong>
-        <span>Organize faixas por tamanho, produto e modelagem.</span>
-      </article>
-      <article class="metric-card">
-        <i class="fa-solid fa-plug" aria-hidden="true"></i>
-        <strong>{{ summary.widget_active ? 'Provador ativo' : 'Provador pendente' }}</strong>
-        <span>{{ summary.recommendations_today }} recomendações registradas hoje.</span>
-      </article>
-      <article class="metric-card">
-        <i class="fa-solid fa-link" aria-hidden="true"></i>
-        <strong>{{ summary.integrations_configured }} integração{{ summary.integrations_configured === 1 ? '' : 'es' }}</strong>
-        <span>BigShop, lojas externas e instalações manuais.</span>
-      </article>
+    <div class="overview-command-grid">
+      <section class="panel-main coverage-panel" aria-label="Cobertura do catálogo">
+        <div class="coverage-hero">
+          <div class="coverage-ring" :style="coverageRingStyle">
+            <span>
+              <strong>{{ coverageRateLabel }}</strong>
+              <small>cobertura</small>
+            </span>
+          </div>
+          <div>
+            <span class="eyebrow">Prontidão operacional</span>
+            <h2>Cobertura do catálogo</h2>
+            <p>
+              Produtos cobertos têm status ativo, tabela vinculada, categoria, modelagem e nenhum erro de sincronização.
+            </p>
+          </div>
+        </div>
+
+        <div class="coverage-metrics-grid">
+          <RouterLink
+            v-for="card in coverageCards"
+            :key="card.key"
+            class="coverage-metric-card"
+            :class="`tone-${card.tone}`"
+            :to="card.to"
+          >
+            <i class="fa-solid" :class="card.icon" aria-hidden="true"></i>
+            <span>
+              <strong>{{ card.value }}</strong>
+              <small>{{ card.label }}</small>
+            </span>
+            <em>{{ card.hint }}</em>
+          </RouterLink>
+        </div>
+      </section>
+
+      <section class="panel-main next-actions-panel" aria-label="Próximas ações">
+        <div class="subsection-heading">
+          <h2>Próximas ações</h2>
+          <span>{{ nextActions.length }} prioridade{{ nextActions.length === 1 ? '' : 's' }}</span>
+        </div>
+        <div class="next-action-list">
+          <RouterLink
+            v-for="action in nextActions"
+            :key="action.key"
+            class="next-action-row"
+            :class="`priority-${action.priority}`"
+            :to="action.to"
+          >
+            <span>
+              <strong>{{ action.title }}</strong>
+              <small>{{ action.description }}</small>
+            </span>
+            <em>{{ priorityLabel(action.priority) }}</em>
+          </RouterLink>
+        </div>
+
+        <div class="trend-strip">
+          <div class="subsection-heading compact-heading">
+            <h3>Evolução de cobertura</h3>
+            <span>{{ coverageTrend.period_days }} dias</span>
+          </div>
+          <div v-if="coverageTrend.available" class="trend-bars" aria-label="Evolução dos últimos dias">
+            <span v-for="point in trendBars" :key="point.date">
+              <i :style="{ height: point.height }"></i>
+              <small>{{ point.label }}</small>
+            </span>
+          </div>
+          <p v-else>{{ coverageTrend.message || 'A evolução aparece quando houver histórico suficiente.' }}</p>
+        </div>
+      </section>
     </div>
 
     <div class="onboarding-grid">

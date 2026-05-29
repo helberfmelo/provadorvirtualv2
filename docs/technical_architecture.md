@@ -46,7 +46,7 @@ Módulos:
 
 APIs protegidas já implementadas:
 
-- `GET /api/v1/merchant/overview`
+- `GET /api/v1/merchant/overview`: agrega resumo do painel, cobertura do catálogo, pendências operacionais, próximas ações e evolução de cobertura por empresa ativa.
 - `GET /api/v1/billing/subscription`
 - `PATCH /api/v1/billing/subscription/auto-renewal`
 - `GET|POST|PATCH|DELETE /api/v1/products`

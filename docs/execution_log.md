@@ -1325,3 +1325,15 @@
 - Varredura de segredos nos arquivos versionados alterados e `git diff --check` passaram.
 - Commit `001275b` enviado para `main`; o run `26625998268` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` foi tentada após o deploy, mas esta máquina local voltou a falhar ao conectar via HTTPS à produção; o bloqueio foi registrado como conectividade local, não como erro de aplicação.
+
+## 2026-05-29 - Sprint 129 Painel de cobertura e prontidão operacional
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver backend/deploy.
+- Acessado o MySizebay da Zak em modo somente leitura nas telas Dashboard e Products, sem alterar dados, sem salvar e sem acionar suporte. O benchmark confirmou donut de cobertura, contadores Active/Pending, abas All/Pending/Active/Inactive e tabela de produtos com categoria, chart, tamanhos, marca, faixa etária e modelagem.
+- Criado `MerchantOverviewController` para consolidar `GET /api/v1/merchant/overview` no backend, com escopo por empresa ativa.
+- O agregado retorna produtos totais, cobertos, ativos, pendentes, inativos, sem tabela, sem modelagem, sem categoria, com erro de sincronização, instalação pendente, taxa de cobertura, próximas ações e série de evolução quando houver histórico suficiente.
+- `ProductResource` passou a expor `readiness_status`, `readiness_issues` e `has_sync_error` para filtros operacionais.
+- O Painel agora mostra um placar acionável de cobertura, lista compacta de próximas ações e evolução de cobertura; os números levam para Produtos filtrados ou Publicação.
+- `/app/produtos` entende filtros vindos do painel por query string, como `?filtro=sem_tabela`, `?filtro=sem_modelagem`, `?filtro=sem_categoria`, `?filtro=erro_sync`, `?filtro=pendentes` e `?filtro=prontos`.
+- Validação visual local em `http://127.0.0.1:5174` cobriu dashboard desktop/mobile e lista de produtos filtrada com dados de preview injetados apenas no navegador.
+- Validações locais passaram com `npm --prefix frontend run build`, `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter 'MerchantOverviewApiTest|ProductsApiTest'`, `php vendor/bin/pint --dirty`.

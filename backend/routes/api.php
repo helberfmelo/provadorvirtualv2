@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\MeasurementTableController;
 use App\Http\Controllers\Api\V1\MeasurementTemplateController;
 use App\Http\Controllers\Api\V1\MerchantCompanyProfileController;
+use App\Http\Controllers\Api\V1\MerchantOverviewController;
 use App\Http\Controllers\Api\V1\OperationalStatusController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
@@ -28,13 +29,6 @@ use App\Http\Controllers\Api\V1\SaasCheckoutOrderController;
 use App\Http\Controllers\Api\V1\SaasEmailController;
 use App\Http\Controllers\Api\V1\UserAccessController;
 use App\Http\Controllers\Api\V1\WidgetInstallController;
-use App\Models\MeasurementTable;
-use App\Models\PlatformConnection;
-use App\Models\Product;
-use App\Models\RecommendationLog;
-use App\Models\WidgetInstall;
-use App\Support\ActiveTenant;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
@@ -81,41 +75,8 @@ Route::prefix('v1')->group(function (): void {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::post('/auth/select-company', [AuthController::class, 'selectCompany']);
         Route::get('/me', [AuthController::class, 'me']);
-        Route::get('/merchant/overview', function (Request $request) {
-            $merchant = app(ActiveTenant::class)->merchant($request);
-            $company = app(ActiveTenant::class)->company($request, $merchant);
-            $scopeCompany = function ($query) use ($company): void {
-                if ($company) {
-                    $query->where(function ($innerQuery) use ($company): void {
-                        $innerQuery->where('merchant_company_id', $company->id)
-                            ->orWhereNull('merchant_company_id');
-                    });
-                }
-            };
-
-            return response()->json([
-                'summary' => [
-                    'products' => Product::query()->where('merchant_id', $merchant->id)->tap($scopeCompany)->count(),
-                    'measurement_tables' => MeasurementTable::query()->where('merchant_id', $merchant->id)->tap($scopeCompany)->count(),
-                    'widget_status' => 'demo-ready',
-                    'widget_active' => WidgetInstall::query()
-                        ->where('merchant_id', $merchant->id)
-                        ->tap($scopeCompany)
-                        ->where('is_active', true)
-                        ->exists(),
-                    'integrations_configured' => PlatformConnection::query()
-                        ->where('merchant_id', $merchant->id)
-                        ->tap($scopeCompany)
-                        ->whereIn('status', ['configured', 'connected'])
-                        ->count(),
-                    'recommendations_today' => RecommendationLog::query()
-                        ->where('merchant_id', $merchant->id)
-                        ->tap($scopeCompany)
-                        ->whereDate('created_at', now()->toDateString())
-                        ->count(),
-                ],
-            ]);
-        })->middleware('portal.permission:merchant,dashboard,view');
+        Route::get('/merchant/overview', MerchantOverviewController::class)
+            ->middleware('portal.permission:merchant,dashboard,view');
         Route::get('/billing/subscription', [BillingSubscriptionController::class, 'show'])
             ->middleware('portal.permission:merchant,dashboard,view');
         Route::patch('/billing/subscription/auto-renewal', [BillingSubscriptionController::class, 'updateAutoRenewal'])
