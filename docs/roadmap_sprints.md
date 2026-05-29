@@ -2272,7 +2272,7 @@ Critérios de aceite:
 - vínculo aparece imediatamente na linha do produto;
 - há confirmação quando a ação substituir vínculo existente.
 
-Status: implementada localmente na Sprint 132. O benchmark read-only da Sizebay confirmou coluna `Chart`, seleção por checkbox e clareza de produtos sem tabela; o Provador Virtual evoluiu esse padrão com fila operacional de sem tabela, prévia em massa com conflitos e recomendações, confirmação explícita para substituir vínculos, desfazer por `batch_id`, histórico por produto e auditoria. Validações locais passaram com build frontend, `ProductsApiTest`, Pint, PHP lint e inspeção visual desktop/mobile em `5175`; commit, push, GitHub Actions e validação de produção serão registrados ao concluir a sprint.
+Status: implementado na Sprint 132 no commit `ea5b06b`, publicado com sucesso no run `26632065139`. O benchmark read-only da Sizebay confirmou coluna `Chart`, seleção por checkbox e clareza de produtos sem tabela; o Provador Virtual evoluiu esse padrão com fila operacional de sem tabela, prévia em massa com conflitos e recomendações, confirmação explícita para substituir vínculos, desfazer por `batch_id`, histórico por produto e auditoria. Validações locais passaram com build frontend, `ProductsApiTest`, Pint, PHP lint, varredura de segredos, `git diff --check` e inspeção visual desktop/mobile em `5175`; `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK` após repetição por reset TCP transitório na primeira tentativa.
 
 ### Sprint 133 - Tabelas com importar, exportar e observações
 

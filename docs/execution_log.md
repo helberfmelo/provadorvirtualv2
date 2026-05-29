@@ -1381,4 +1381,6 @@
 - `/app/produtos` ganhou fila operacional de produtos sem tabela, botão de prévia para vínculo em lote, painel de conflitos/recomendações e ação de desfazer o último lote aplicado.
 - Validação visual local rodou em `http://127.0.0.1:5175/app/produtos`, com backend local em `8001`, cobrindo desktop e mobile do painel de prévia, sem sobreposição incoerente.
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter ProductsApiTest`, `php vendor\bin\pint --dirty` e `npm --prefix frontend run build` (com o aviso conhecido de bundle acima de 500 kB).
-- Varredura de segredos, `git diff --check`, commit, push, GitHub Actions e validação de produção ainda serão registrados ao finalizar a sprint.
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
+- Commit `ea5b06b` enviado para `main`; o run `26632065139` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A primeira tentativa de `scripts/validate-production.ps1` sofreu reset de conexão pelo host remoto após `/login`; a repetição passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
