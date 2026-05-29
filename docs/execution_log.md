@@ -1351,3 +1351,6 @@
 - `/app/produtos` ganhou abas com contadores para Todos, Prontos, Pendentes, Sem tabela, Com erro e Desativados; filtros superiores compactos; colunas ampliadas; paginação; e preservou a seleção em massa para vínculo de tabela.
 - Validação visual local rodou em `http://127.0.0.1:5175/app/produtos`, com backend local em `8001`, cobrindo desktop `1366x900` e mobile `390x844`, sem sobreposição incoerente.
 - Validações locais passaram com `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter 'ProductsApiTest|MerchantOverviewApiTest'`, `php vendor\bin\pint --dirty` e `npm --prefix frontend run build`.
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
+- Commit `84ea4be` enviado para `main`; o run `26629170275` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente. Resultado final: `PRODUCTION VALIDATION OK`.
