@@ -1298,3 +1298,13 @@
 - O segundo push passou na validação backend, mas o deploy remoto falhou em MySQL strict mode por `timestamp not null` sem default em `requested_at`; ajustado para `dateTime` em `49c94e4`.
 - Commit final `49c94e4` enviado para `main`; o run `26617845717` do GitHub Actions finalizou com sucesso, incluindo validação backend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, SaaS, portal da empresa, páginas públicas, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-29 - Sprint 127 Roadmap Sizebay para evoluir o Provador Virtual
+
+- Mantido o comparativo Sizebay x Provador Virtual apenas local e ignorado pelo Git, conforme orientação do usuário.
+- Acessado novamente o portal MySizebay da Zak em modo somente leitura, sem alterar dados, sem salvar configurações e sem registrar credenciais ou tokens.
+- `docs/roadmap_sprints.md` recebeu um roadmap de implementação baseado em todos os itens do comparativo, não apenas nas prioridades finais.
+- A criação do roadmap ficou registrada como Sprint 127; as sprints de implementação começam na Sprint 128.
+- O roadmap define uma regra obrigatória para todas as sprints futuras: antes de codar, acessar a tela correspondente da Sizebay em modo leitura e implementar no Provador Virtual uma versão igual ou melhor.
+- Foram planejadas sprints para navegação, painel de cobertura, produtos, vínculo de tabelas, tabelas avançadas, modelagens, marcas, categorias, taxonomia, integrações, BigShop, API/webhook/GTM, posicionamento do widget, sincronização, erros por produto, regras, widget, modal do provador, relatórios, pedidos, devoluções, IA, publicação, usuários, cobrança, auditoria, suporte e polimento geral.
+- Validação local documental passou com varredura de segredos e `git diff --check`.

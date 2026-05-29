@@ -2089,3 +2089,1015 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 123 nos commits `9e16705`, `c5b90e6` e `49c94e4`, publicado com sucesso no run `26617845717`. Validações locais passaram com PHPUnit completo (102 testes, 927 assertions), build frontend, `php -l`, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 127 - Roadmap Sizebay para evoluir o Provador Virtual
+
+Objetivo: transformar o comparativo local Sizebay x Provador Virtual em um roadmap de implementação, usando todos os itens comparados e mantendo a regra de benchmark real antes de cada sprint.
+
+Regra obrigatória para todas as sprints deste roadmap:
+
+- antes de codar, reler a documentação obrigatória do projeto listada em `docs/README.md`;
+- acessar o portal MySizebay da Zak em modo somente leitura nas telas relacionadas à sprint;
+- não alterar nada na Sizebay, não publicar, não salvar, não enviar mensagens e não acionar suporte;
+- registrar internamente, sem credenciais ou tokens, o que a Sizebay faz bem e o que o Provador fará melhor;
+- implementar no Provador Virtual uma versão igual ou superior em clareza, organização, usabilidade e capacidade operacional;
+- validar localmente com testes proporcionais ao risco, build frontend quando houver UI, varredura de segredos e `git diff --check`;
+- commitar com título `Sprint <numero> - <titulo>`, fazer push, acompanhar GitHub Actions/deploy até o status final e rodar `scripts/validate-production.ps1`;
+- seguir para a próxima sprint do roadmap sem parar, exceto se o usuário pedir pausa, mudança de prioridade ou encerramento.
+
+Entregas:
+
+- roadmap criado a partir de todos os grupos do comparativo: navegação, painel, produtos, tabelas, modelagens, marcas, categorias, taxonomias, integrações, sincronização, regras, widget, relatórios, pedidos, devoluções, IA, publicação, usuários, cobrança, auditoria e suporte;
+- sprints futuras numeradas a partir da Sprint 128;
+- cada sprint contém telas Sizebay a consultar, itens do comparativo cobertos, entregas esperadas e critérios de aceite.
+
+Validação:
+
+- recaptura read-only da Sizebay executada em 2026-05-29;
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: em validação.
+
+### Sprint 128 - Navegação limpa e ajuda contextual
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/dashboard`, menu lateral, cabeçalho e área de suporte/chat;
+- observar como a Sizebay reduz ruído visual, organiza o menu e deixa ajuda acessível.
+
+Itens do comparativo cobertos:
+
+- clareza visual;
+- menu do portal;
+- cabeçalho e identidade;
+- linguagem da interface;
+- ajuda e suporte.
+
+Entregas:
+
+- reorganizar a navegação do portal da empresa por jornadas: Operação, Catálogo, Provador, Resultados e Conta;
+- reduzir termos técnicos visíveis e trocar textos americanizados por linguagem do lojista brasileiro;
+- criar ajuda contextual discreta por tela, com links para manual, suporte e próximos passos;
+- revisar cabeçalho, estados ativos e atalhos para manter a tela mais limpa do que a Sizebay;
+- garantir que admin SaaS continue entendendo claramente quando está no portal da empresa.
+
+Critérios de aceite:
+
+- menus continuam cobrindo todas as funcionalidades atuais;
+- a navegação fica mais curta visualmente sem perder acesso;
+- cada tela crítica tem ajuda contextual, mas sem blocos longos de texto;
+- layout responsivo sem sobreposição.
+
+Status: planejada.
+
+### Sprint 129 - Painel de cobertura e prontidão operacional
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/dashboard` e `/products`;
+- observar os indicadores de produtos cobertos, ativos, pendentes e o caminho visual para resolver pendências.
+
+Itens do comparativo cobertos:
+
+- painel inicial;
+- cobertura do catálogo;
+- pendências operacionais;
+- prontidão para publicar.
+
+Entregas:
+
+- criar no Painel um placar de cobertura com produtos totais, cobertos, ativos, pendentes, sem tabela, sem modelagem, sem categoria, com erro de sincronização e com instalação não validada;
+- adicionar uma lista compacta de próximas ações priorizadas;
+- conectar o painel com Sincronização, Produtos, Tabelas, Modelagens, Regras e Publicação;
+- mostrar evolução de cobertura por período quando houver dados suficientes;
+- criar endpoint agregado para evitar cálculo espalhado no frontend.
+
+Critérios de aceite:
+
+- lojista entende em até uma tela o que falta para publicar;
+- todos os números levam para a lista filtrada correspondente;
+- resultado funciona para loja vazia, loja em implantação e loja com grande catálogo.
+
+Status: planejada.
+
+### Sprint 130 - Produtos com status, colunas e filtros superiores
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/products`;
+- observar abas, colunas Product, Category, Chart, Sizes, Brand, Age group, Modeling e filtros.
+
+Itens do comparativo cobertos:
+
+- listagem de produtos;
+- colunas da lista;
+- filtros;
+- produto com categoria, marca, faixa etária, modelagem, tamanhos, tabela e status.
+
+Entregas:
+
+- evoluir a listagem de produtos com colunas de categoria, marca, faixa etária, gênero, modelagem, tamanhos, tabela vinculada e prontidão;
+- criar filtros compactos por status, tabela, categoria, marca, gênero, faixa etária, modelagem, origem do dado e erro;
+- manter a barra de seleção em massa já planejada/implementada, com seleção de tabela e ações rápidas;
+- adicionar contadores por aba: todos, prontos, pendentes, sem tabela, com erro e desativados;
+- garantir que a tabela continue densa, rápida e legível.
+
+Critérios de aceite:
+
+- a lista permite encontrar produtos problemáticos mais rápido que na Sizebay;
+- filtros não quebram em mobile;
+- seleção em massa continua funcionando;
+- backend pagina e filtra sem carregar catálogo inteiro no cliente.
+
+Status: planejada.
+
+### Sprint 131 - Detalhe do produto, origem dos dados e ativação por produto
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/products/form/new` e detalhes de produto existentes, sem salvar;
+- observar blocos de integração, imagem, ativação do provador e tamanhos.
+
+Itens do comparativo cobertos:
+
+- detalhe do produto;
+- ativar/desativar provador por produto;
+- origem dos dados;
+- separação entre dado importado e ajuste manual.
+
+Entregas:
+
+- criar/expandir a tela de detalhe do produto com abas ou seções: resumo, dados importados, tabela/modelagem, tamanhos, mídia, diagnóstico e histórico;
+- mostrar origem de cada dado: API, XML/feed, BigShop, regra, IA ou ajuste manual;
+- permitir ativar/desativar Provador Virtual e Tabela de Medidas por produto, com auditoria;
+- permitir ajustes manuais controlados sem perder a informação importada original;
+- exibir diagnóstico acionável do produto.
+
+Critérios de aceite:
+
+- produto com erro mostra causa e ação recomendada;
+- alterações manuais não sobrescrevem silenciosamente dados importados;
+- ativação por produto reflete no widget/API pública.
+
+Status: planejada.
+
+### Sprint 132 - Vínculo de tabelas melhor que Sizebay
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/products` e `/table-measurements`;
+- observar como a coluna de tabela aparece no produto e como o vínculo fica visível.
+
+Itens do comparativo cobertos:
+
+- vínculo de tabela ao produto;
+- visualização da tabela vinculada;
+- ação em massa de vincular;
+- clareza de produtos sem tabela.
+
+Entregas:
+
+- combinar o melhor dos dois mundos: coluna clara como a Sizebay e ação em massa mais rápida que a Sizebay;
+- criar prévia antes de vincular tabela em massa, mostrando produtos afetados e conflitos;
+- permitir desfazer vínculo em massa com auditoria;
+- adicionar recomendações de tabela por categoria, marca, modelagem e tamanhos;
+- expor produtos sem tabela como fila operacional.
+
+Critérios de aceite:
+
+- seleção de produtos e vínculo em massa são rápidos e seguros;
+- vínculo aparece imediatamente na linha do produto;
+- há confirmação quando a ação substituir vínculo existente.
+
+Status: planejada.
+
+### Sprint 133 - Tabelas com importar, exportar e observações
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/table-measurements` e `/modelings`;
+- observar botões Export, Import, Create e filtros.
+
+Itens do comparativo cobertos:
+
+- lista de tabelas;
+- importação manual;
+- exportação de catálogo;
+- observações;
+- filtros de tabelas.
+
+Entregas:
+
+- adicionar importação e exportação CSV/XLSX para tabelas de medidas;
+- criar modelos de planilha para medidas do corpo, medidas da peça e sistema de tamanho;
+- padronizar observações por tabela, tamanho e medida;
+- adicionar filtros por tipo de tabela, status, categoria, modelagem e uso;
+- criar validação visual antes de importar.
+
+Critérios de aceite:
+
+- lojista consegue baixar, editar e reenviar uma tabela;
+- erros de importação apontam linha, coluna, campo e correção sugerida;
+- exportação respeita filtros aplicados.
+
+Status: planejada.
+
+### Sprint 134 - Editor avançado de medidas e variações
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/table-measurements/form/new` e `/modelings/form/new`;
+- observar medidas do corpo, medidas da peça, sistema de tamanhos, faixas, medidas compostas, variação personalizada e desativação do provador.
+
+Itens do comparativo cobertos:
+
+- medidas do corpo;
+- medidas da peça;
+- sistema de tamanhos;
+- faixas de medida;
+- medidas compostas;
+- variação personalizada;
+- desativar provador por tabela.
+
+Entregas:
+
+- revisar o editor de tabelas para deixar os tipos de medida mais claros e guiados;
+- criar blocos específicos para medida do corpo, medida da peça, sistema de tamanho, faixas e medidas compostas;
+- adicionar variação personalizada com exemplos e validação;
+- permitir desativar o provador por tabela, mantendo apenas tabela de medidas quando necessário;
+- criar prévia da tabela como o consumidor verá no widget.
+
+Critérios de aceite:
+
+- o lojista entende quando usar cada tipo de medida;
+- medidas compostas e faixas validam unidade, mínimo, máximo e consistência;
+- desativar provador por tabela afeta corretamente o produto vinculado.
+
+Status: planejada.
+
+### Sprint 135 - Modelagens com diagnóstico e correção guiada
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/modelings`, `/modelings/form/new` e tela de sincronização com erros de modelagem;
+- observar como a Sizebay aponta modelagem ausente.
+
+Itens do comparativo cobertos:
+
+- modelagens;
+- erros de modelagem;
+- diagnóstico por produto;
+- sugestão de correção.
+
+Entregas:
+
+- transformar modelagens em entidade central para diagnóstico, regras e IA;
+- mostrar produtos sem modelagem ou com modelagem incompatível;
+- criar ação rápida para criar modelagem a partir de produtos afetados;
+- sugerir modelagem por categoria, marca, gênero, faixa etária e histórico;
+- registrar impacto da modelagem nas recomendações.
+
+Critérios de aceite:
+
+- erro de modelagem nunca aparece sozinho: sempre tem sugestão de correção;
+- modelagem criada pode ser aplicada em massa;
+- alterações ficam auditadas.
+
+Status: planejada.
+
+### Sprint 136 - Marcas locais e marcas normalizadas
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/brands` e `/sizebay-brands`;
+- observar Name, Associated brand, importação, exportação e criação.
+
+Itens do comparativo cobertos:
+
+- marcas do lojista;
+- marca normalizada;
+- mapeamento local para marca global;
+- importar e exportar cadastros.
+
+Entregas:
+
+- criar tela de Marcas no portal da empresa;
+- mapear marca importada para marca normalizada do Provador Virtual;
+- permitir criar, editar, importar, exportar e mesclar marcas;
+- sugerir normalização por nome parecido, domínio, feed e histórico;
+- usar marca normalizada nas regras, IA, relatórios e filtros.
+
+Critérios de aceite:
+
+- produtos importados agrupam marcas duplicadas corretamente;
+- lojista pode revisar sugestões antes de aplicar;
+- regras e filtros usam marca normalizada sem perder o nome original.
+
+Status: planejada.
+
+### Sprint 137 - Categorias locais e taxonomia do Provador
+
+Benchmark Sizebay antes de codar:
+
+- abrir `/categories` e `/sizebay-categories`;
+- observar categoria local, tipo, subcategorias e traduções.
+
+Itens do comparativo cobertos:
+
+- categorias do lojista;
+- categoria normalizada;
+- taxonomia global;
+- traduções de categorias;
+- tipo da categoria.
+
+Entregas:
+
+- criar tela de Categorias no portal da empresa;
+- mapear categoria importada para taxonomia normalizada do Provador;
+- criar árvore inicial de categorias, subcategorias, tipo, gênero e faixa etária;
+- permitir importação/exportação de categorias;
+- preparar campo de tradução como base futura, sem poluir a UX brasileira.
+
+Critérios de aceite:
+
+- produto importado pode ser filtrado por categoria original e normalizada;
+- categorias sem mapeamento aparecem como pendência operacional;
+- taxonomia alimenta regras, modelagens, IA e relatórios.
+
+Status: planejada.
+
+### Sprint 138 - Taxonomia inteligente e base de aprendizado
+
+Benchmark Sizebay antes de codar:
+
+- revisar `/sizebay-categories`, `/sizebay-brands`, regras e relatórios;
+- observar como taxonomias sustentam diagnóstico e recomendação.
+
+Itens do comparativo cobertos:
+
+- taxonomia normalizada;
+- marca normalizada;
+- categorias traduzíveis;
+- base de IA;
+- qualidade de recomendação.
+
+Entregas:
+
+- criar base interna de taxonomia com versionamento;
+- alimentar IA e regras com categoria, marca, gênero, faixa etária, modelagem e sistema de tamanho;
+- criar fila de revisão para mapeamentos sugeridos pela IA;
+- medir confiança da sugestão e impacto nos produtos afetados;
+- registrar aprendizados sem expor dados sensíveis.
+
+Critérios de aceite:
+
+- IA não aplica mapeamento crítico sem confirmação quando confiança for baixa;
+- toda sugestão mostra motivo;
+- mapeamentos aprovados melhoram próximas importações.
+
+Status: planejada.
+
+### Sprint 139 - Integrações por plataforma melhores que Sizebay
+
+Benchmark Sizebay antes de codar:
+
+- abrir Settings/Data Sources da captura autenticada e guias públicos da Sizebay;
+- comparar instruções de plataforma, fonte de dados e instalação.
+
+Itens do comparativo cobertos:
+
+- escolha de plataforma;
+- fontes de dados;
+- XML/feed;
+- API;
+- instruções por plataforma;
+- cadastro de plataforma no cliente.
+
+Entregas:
+
+- transformar `/app/integracoes` em experiência 100% adaptada por plataforma;
+- criar guias específicos para BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart, XML/feed, API e personalizada;
+- mostrar somente campos relevantes para a plataforma escolhida;
+- separar catálogo, instalação do widget e rastreamento de pedidos/devoluções;
+- criar matriz de dados suportados por plataforma.
+
+Critérios de aceite:
+
+- lojista não vê campo irrelevante para sua plataforma;
+- cada plataforma tem passo a passo próprio;
+- admin SaaS consegue ver o estado técnico e comercial da integração.
+
+Status: planejada.
+
+### Sprint 140 - BigShop com governança comercial superior
+
+Benchmark Sizebay antes de codar:
+
+- revisar Data Sources e fluxo de plataforma da Sizebay;
+- comparar com o modelo BigShop do Provador, que precisa ser melhor por ser diferencial próprio.
+
+Itens do comparativo cobertos:
+
+- integração BigShop;
+- benefício BigShop;
+- troca de integração;
+- termos e governança;
+- solicitação para SaaS.
+
+Entregas:
+
+- polir a experiência BigShop no portal para deixar explícito desconto, benefício e limitações de troca;
+- melhorar o modal de troca protegida com resumo financeiro, termos, aceite e próximos passos;
+- criar tela SaaS dedicada de solicitações de troca com filtros, status e histórico;
+- registrar auditoria completa da solicitação, aceite e aplicação;
+- adicionar mensagens transacionais para solicitação, pagamento pendente e troca concluída.
+
+Critérios de aceite:
+
+- loja BigShop entende por que está travada e como solicitar troca;
+- SaaS consegue operar a solicitação sem acessar banco;
+- nenhum dado sensível aparece no portal.
+
+Status: planejada.
+
+### Sprint 141 - API, webhook, GTM e validação de instalação
+
+Benchmark Sizebay antes de codar:
+
+- revisar Settings/Data Sources, documentação pública Sizebay API, XML/feed, Shopify e rastreamento;
+- observar como a Sizebay separa catálogo, widget e eventos.
+
+Itens do comparativo cobertos:
+
+- API;
+- webhook;
+- validação de instalação;
+- Google Tag Manager;
+- código de instalação;
+- segurança de credenciais.
+
+Entregas:
+
+- criar guias e exemplos de API por plataforma;
+- permitir teste de webhook com logs recentes, mascaramento e rotação de segredo;
+- criar guia GTM opcional para lojas sem app/tema simples;
+- melhorar validação de instalação para mostrar script encontrado, container encontrado, produto, variação, SKU e botões renderizados;
+- criar estado de diagnóstico por URL validada.
+
+Critérios de aceite:
+
+- validação informa exatamente o que falta na página de produto;
+- segredo nunca aparece em texto puro após salvo;
+- GTM é apresentado como alternativa, não como padrão quando há integração nativa.
+
+Status: planejada.
+
+### Sprint 142 - Posicionamento visual do botão na página de produto
+
+Benchmark Sizebay antes de codar:
+
+- revisar Settings/Service e configurações de posição antes/depois/dentro de seletor;
+- observar uso de âncora, tag e seletor.
+
+Itens do comparativo cobertos:
+
+- local do botão na página;
+- seletor/âncora CSS;
+- pré-visualização da instalação;
+- validação de container.
+
+Entregas:
+
+- criar configurador de posição do widget com opções antes, depois e dentro de um seletor;
+- adicionar teste visual do seletor na URL da página de produto;
+- sugerir seletores comuns por plataforma;
+- validar se o container existe antes do script carregar;
+- salvar configurações por plataforma/tema.
+
+Critérios de aceite:
+
+- lojista consegue testar posição antes de publicar;
+- seletor inválido bloqueia publicação com mensagem clara;
+- widget não duplica botões.
+
+Status: planejada.
+
+### Sprint 143 - Histórico de sincronização e contadores por execução
+
+Benchmark Sizebay antes de codar:
+
+- abrir Settings/Sync na captura autenticada;
+- observar histórico, totais, inseridos, atualizados, desconhecidos e erros.
+
+Itens do comparativo cobertos:
+
+- histórico de sincronização;
+- contadores por execução;
+- status da importação;
+- logs operacionais.
+
+Entregas:
+
+- padronizar histórico de sincronização por execução;
+- exibir totais, inseridos, atualizados, ignorados, desconhecidos, com erro e sem alteração;
+- permitir comparar duas execuções;
+- criar timeline compacta de sincronizações;
+- registrar origem: manual, agendada, BigShop, XML/feed, API ou webhook.
+
+Critérios de aceite:
+
+- cada execução tem resumo e detalhe;
+- erros levam para produto ou regra relacionada;
+- histórico continua performático com muitos eventos.
+
+Status: planejada.
+
+### Sprint 144 - Erros por produto com ações de correção
+
+Benchmark Sizebay antes de codar:
+
+- abrir Settings/Sync e erros por produto na captura autenticada;
+- observar permalink, contexto e detalhes de tamanhos.
+
+Itens do comparativo cobertos:
+
+- erros por produto;
+- detalhes de tamanho;
+- ação de correção;
+- diagnóstico de modelagem, categoria, marca e tabela.
+
+Entregas:
+
+- criar lista de erros por produto com severidade, causa e ação recomendada;
+- adicionar botões: vincular tabela, criar modelagem, revisar categoria, revisar marca, ignorar com motivo e reprocessar;
+- mostrar contexto do dado recebido: produto, variação, SKU, tamanhos, categoria, marca e URL;
+- criar agrupamento por causa raiz;
+- permitir exportar erros.
+
+Critérios de aceite:
+
+- nenhum erro crítico fica sem próxima ação;
+- lojista consegue resolver erros em lote;
+- resolução atualiza cobertura do painel.
+
+Status: planejada.
+
+### Sprint 145 - Simulação de importação e impacto das regras
+
+Benchmark Sizebay antes de codar:
+
+- revisar Settings/Importation Rules e Sync;
+- observar lógica visual de condições e ações.
+
+Itens do comparativo cobertos:
+
+- simulação antes de importar;
+- regras de importação;
+- ações das regras;
+- impacto de regras no catálogo.
+
+Entregas:
+
+- expandir simulação de importação para plataformas além da BigShop;
+- mostrar antes/depois de cada regra aplicada;
+- calcular produtos afetados por regra antes de salvar;
+- permitir testar regra contra amostra real do catálogo;
+- criar aviso para regras conflitantes ou muito amplas.
+
+Critérios de aceite:
+
+- lojista entende o impacto antes de publicar uma regra;
+- regras conflitantes são bloqueadas ou sinalizadas;
+- simulação não altera dados permanentes.
+
+Status: planejada.
+
+### Sprint 146 - Galeria de botões e personalização mais polida
+
+Benchmark Sizebay antes de codar:
+
+- abrir galeria pública de botões Sizebay e Settings/Buttons Customization;
+- comparar modelos, animações, prévia, publicar e desfazer.
+
+Itens do comparativo cobertos:
+
+- personalização de botões;
+- galeria de modelos;
+- ícones dos botões;
+- animação;
+- cores;
+- pré-visualização;
+- publicar/desfazer.
+
+Entregas:
+
+- revisar os 12 modelos do Provador com acabamento visual mais refinado;
+- melhorar estados de hover, foco, carregamento e desabilitado;
+- adicionar prévia lado a lado com contexto de página de produto;
+- reforçar publicar, desfazer e rascunho;
+- validar animação do cabide, acessibilidade e `prefers-reduced-motion`.
+
+Critérios de aceite:
+
+- cada modelo parece pronto para produção;
+- botão mantém legibilidade com cores extremas;
+- publicação/desfazer é auditável.
+
+Status: planejada.
+
+### Sprint 147 - Editor completo do modal do Provador
+
+Benchmark Sizebay antes de codar:
+
+- abrir Settings/VFR Customization na captura autenticada;
+- observar separação entre botões e experiência completa do provador.
+
+Itens do comparativo cobertos:
+
+- customização do provador;
+- modal do provador;
+- pré-visualização desktop/mobile;
+- publicar/desfazer.
+
+Entregas:
+
+- criar editor dedicado para o modal do Provador Virtual;
+- permitir personalizar cores, cantos, tipografia controlada, logo, textos, etapas e estilo da tabela;
+- criar prévia desktop/mobile do modal completo;
+- separar rascunho e versão publicada;
+- validar contraste e acessibilidade.
+
+Critérios de aceite:
+
+- lojista diferencia claramente personalização do botão e do modal;
+- mudanças só afetam produção após publicar;
+- visual gerado não quebra o widget público.
+
+Status: planejada.
+
+### Sprint 148 - Relatórios de uso do widget
+
+Benchmark Sizebay antes de codar:
+
+- abrir Reports/Usage Data na captura autenticada;
+- observar impressões, recomendações, consultas de tabela, taxa de uso, período e dispositivo.
+
+Itens do comparativo cobertos:
+
+- relatório de uso;
+- uso por dispositivo;
+- funil do widget;
+- filtros por período.
+
+Entregas:
+
+- criar funil do widget: impressões, cliques, abertura do provador, recomendação gerada, consulta de tabela e conversão quando houver pedido;
+- segmentar por computador, celular e tablet;
+- criar filtros por período, produto, categoria, marca, tabela e plataforma;
+- mostrar taxa de uso e evolução temporal;
+- preparar eventos públicos necessários no widget.
+
+Critérios de aceite:
+
+- relatório prova uso real do widget;
+- eventos são idempotentes e não duplicam contagem;
+- filtros carregam rápido.
+
+Status: planejada.
+
+### Sprint 149 - Ranking de produtos e relatório de recomendações
+
+Benchmark Sizebay antes de codar:
+
+- abrir Reports/Recommendations e Usage Data na captura autenticada;
+- observar ranking de produtos e recomendações emitidas.
+
+Itens do comparativo cobertos:
+
+- ranking de produtos;
+- recomendações emitidas;
+- produtos com maior uso;
+- produtos com maior erro.
+
+Entregas:
+
+- criar ranking de produtos por impressões, cliques, recomendações, consultas, erros, devoluções e taxa de uso;
+- criar relatório de recomendações emitidas com tamanho recomendado, tabela usada, confiança e origem;
+- permitir drill-down para produto e tabela;
+- destacar produtos de alto tráfego sem tabela ou com alto erro;
+- exportar relatórios.
+
+Critérios de aceite:
+
+- lojista identifica onde o Provador gera mais valor;
+- relatório ajuda priorizar correções;
+- dados não expõem informação pessoal desnecessária.
+
+Status: planejada.
+
+### Sprint 150 - Pedidos no portal da empresa
+
+Benchmark Sizebay antes de codar:
+
+- abrir Orders e Reports/Orders Overview na captura autenticada;
+- observar status, data, quantidade, preço e uso do assistente.
+
+Itens do comparativo cobertos:
+
+- pedidos;
+- visão geral de pedidos;
+- relação pedido x uso do assistente;
+- rastreamento comercial.
+
+Entregas:
+
+- levar pedidos relevantes para o portal da empresa;
+- mostrar status, data, itens, valor, produto, tamanho comprado e se houve uso do Provador;
+- criar indicadores de conversão assistida;
+- integrar pedidos por plataforma quando disponível;
+- criar fallback de importação CSV quando não houver API.
+
+Critérios de aceite:
+
+- lojista consegue ver pedidos relacionados ao Provador;
+- dados sensíveis são minimizados;
+- pedido alimenta relatórios e IA.
+
+Status: planejada.
+
+### Sprint 151 - Devoluções e trocas com mapeamento de motivos
+
+Benchmark Sizebay antes de codar:
+
+- abrir Returns e Reports/Returns na captura autenticada;
+- observar upload CSV e mapeamento de método/motivo.
+
+Itens do comparativo cobertos:
+
+- devoluções;
+- upload de devoluções;
+- motivo de troca/devolução;
+- aprendizado com resultado real.
+
+Entregas:
+
+- criar importação de devoluções por CSV/XLSX e API quando disponível;
+- mapear motivo, tamanho comprado, tamanho ideal, produto, pedido e status;
+- criar assistente de mapeamento de colunas;
+- mostrar devoluções relacionadas ao uso ou não uso do Provador;
+- alimentar relatórios e IA.
+
+Critérios de aceite:
+
+- arquivo com erro aponta linha e coluna;
+- motivo de devolução fica normalizado;
+- dados alimentam indicadores sem expor informação pessoal desnecessária.
+
+Status: planejada.
+
+### Sprint 152 - Aprendizado com pedidos, devoluções e feedback
+
+Benchmark Sizebay antes de codar:
+
+- revisar Reports, Orders, Returns e documentação de rastreamento;
+- observar como dados reais retroalimentam recomendação.
+
+Itens do comparativo cobertos:
+
+- aprendizado com dados reais;
+- feedback do consumidor;
+- pedidos/devoluções/feedback para IA;
+- melhoria de recomendações.
+
+Entregas:
+
+- criar pipeline de aprendizado com pedidos, devoluções, trocas, feedback e uso do widget;
+- detectar padrões por produto, tabela, categoria, marca e modelagem;
+- criar sugestões de ajuste de tabela com explicação;
+- separar aprendizado automático de recomendação aplicada;
+- aplicar regras LGPD, retenção e anonimização.
+
+Critérios de aceite:
+
+- IA explica por que sugeriu ajuste;
+- sugestão não altera tabela sem aprovação;
+- dados sensíveis são minimizados e auditáveis.
+
+Status: planejada.
+
+### Sprint 153 - Assistente IA para criação e revisão de tabelas
+
+Benchmark Sizebay antes de codar:
+
+- revisar Measurement Guide, Modelings, Products e relatórios;
+- observar como a Sizebay organiza dados para que o Provador faça melhor com IA.
+
+Itens do comparativo cobertos:
+
+- assistente para o lojista;
+- sugestão de tabela;
+- base de aprendizado;
+- revisão humana.
+
+Entregas:
+
+- evoluir o Assistente IA para sugerir criação/revisão de tabelas por categoria, marca, modelagem e dados reais;
+- criar fluxo de revisão guiada antes de aplicar;
+- mostrar confiança, dados usados e riscos;
+- gerar tabela inicial com medidas do corpo, peça, sistema de tamanho e faixas quando aplicável;
+- criar modo "explicar para o lojista" com linguagem simples.
+
+Critérios de aceite:
+
+- assistente nunca aplica mudança crítica sem confirmação;
+- sugestão inclui justificativa;
+- lojista consegue comparar tabela atual e sugerida.
+
+Status: planejada.
+
+### Sprint 154 - Publicação e checklist conectado a dados reais
+
+Benchmark Sizebay antes de codar:
+
+- revisar Dashboard, Settings/Service, Settings/Data Sources e validações;
+- observar como cobertura e configuração indicam maturidade operacional.
+
+Itens do comparativo cobertos:
+
+- publicação;
+- prontidão;
+- go-live;
+- instalação validada;
+- cobertura do catálogo.
+
+Entregas:
+
+- conectar tela de Publicação aos dados reais do Painel, Sincronização, Widget e Produtos;
+- criar checklist com bloqueios, alertas e recomendações;
+- diferenciar pronto, pronto com avisos e bloqueado;
+- gerar relatório de publicação para o lojista;
+- criar botão para revalidar tudo.
+
+Critérios de aceite:
+
+- publicação não é liberada quando item crítico está quebrado;
+- avisos explicam impacto;
+- checklist tem links diretos para resolver.
+
+Status: planejada.
+
+### Sprint 155 - Usuários, permissões e contexto de empresa
+
+Benchmark Sizebay antes de codar:
+
+- revisar portal cliente e comportamento de conta;
+- comparar com admin SaaS acessando portal da empresa.
+
+Itens do comparativo cobertos:
+
+- usuários;
+- seletor de empresa para admin;
+- conta;
+- permissões;
+- contexto ativo.
+
+Entregas:
+
+- endurecer permissões por papel no portal da empresa;
+- revisar seletor de empresa, persistência e troca de contexto;
+- adicionar trilha visual quando admin SaaS estiver impersonando/acessando empresa;
+- criar logs de ações sensíveis por usuário;
+- revisar usuários da empresa com convites e status.
+
+Critérios de aceite:
+
+- refresh não perde empresa ativa;
+- usuário sem permissão não vê ações sensíveis;
+- ações críticas registram ator e contexto.
+
+Status: planejada.
+
+### Sprint 156 - Cobranca, plano e autonomia do cliente
+
+Benchmark Sizebay antes de codar:
+
+- abrir Billing/Charges na captura autenticada;
+- observar autonomia de cobrança no portal cliente.
+
+Itens do comparativo cobertos:
+
+- cobrança;
+- plano;
+- checkout;
+- diferença entre portal cliente e Admin.
+
+Entregas:
+
+- criar área de Plano e Cobrança no portal da empresa;
+- mostrar plano atual, plataforma, benefício BigShop, status comercial e próximos vencimentos quando aplicável;
+- permitir acessar faturas/links de pagamento gerados pelo SaaS;
+- mostrar histórico de solicitações comerciais;
+- manter ações financeiras críticas controladas pelo Admin.
+
+Critérios de aceite:
+
+- lojista entende plano e cobrança sem acessar Admin;
+- BigShop com desconto fica claro;
+- links de pagamento são seguros e auditados.
+
+Status: planejada.
+
+### Sprint 157 - Auditoria, termos e segurança operacional
+
+Benchmark Sizebay antes de codar:
+
+- revisar histórico de sincronização, conta, termos e operações sensíveis;
+- comparar como eventos críticos ficam rastreáveis.
+
+Itens do comparativo cobertos:
+
+- termos e governança;
+- auditoria;
+- segurança de credenciais;
+- logs de ações.
+
+Entregas:
+
+- criar trilha de auditoria para publicar widget, desfazer publicação, mudar integração, vincular tabela, alterar regra, alterar tabela, importar dados e aceitar termos;
+- mascarar e rotacionar segredos onde aplicável;
+- centralizar aceites de termos por empresa, usuário, IP e data;
+- criar tela SaaS de auditoria por empresa;
+- adicionar exportação de auditoria.
+
+Critérios de aceite:
+
+- ação crítica sempre tem ator, data, antes/depois e contexto;
+- credencial sensível não aparece em texto puro;
+- auditoria não expõe dados pessoais desnecessários.
+
+Status: planejada.
+
+### Sprint 158 - Base de conhecimento e suporte contextual
+
+Benchmark Sizebay antes de codar:
+
+- abrir Support, manuais e documentação pública Sizebay;
+- observar como suporte e manual reduzem dúvidas do cliente.
+
+Itens do comparativo cobertos:
+
+- ajuda e suporte;
+- documentação dentro da tela;
+- manual/base de conhecimento;
+- instruções por plataforma.
+
+Entregas:
+
+- criar base de conhecimento do Provador no portal;
+- adicionar artigos por plataforma, widget, tabelas, modelagens, regras, sincronização, relatórios e cobrança;
+- criar busca interna;
+- ligar ajuda contextual de cada tela ao artigo correspondente;
+- criar CTA de suporte com contexto da tela e empresa.
+
+Critérios de aceite:
+
+- cada tela crítica tem artigo relacionado;
+- suporte recebe contexto sem o lojista precisar explicar tudo;
+- base não contém credenciais nem dados sensíveis.
+
+Status: planejada.
+
+### Sprint 159 - Polimento final Sizebay-plus do portal
+
+Benchmark Sizebay antes de codar:
+
+- percorrer todas as telas Sizebay estudadas e as telas equivalentes do Provador;
+- comparar clareza, densidade, navegação, estados vazios, textos, loading e responsividade.
+
+Itens do comparativo cobertos:
+
+- densidade de informação;
+- operação por etapas;
+- limpeza visual geral;
+- linguagem;
+- consistência entre telas.
+
+Entregas:
+
+- revisar todo o portal para reduzir ruído visual;
+- padronizar estados vazios, carregamento, erro, sucesso e permissões;
+- revisar textos para português claro e objetivo;
+- validar responsividade e ausência de sobreposição;
+- criar checklist visual Sizebay-plus para futuras telas.
+
+Critérios de aceite:
+
+- telas críticas parecem uma plataforma única, limpa e organizada;
+- estados vazios orientam ação;
+- nenhuma tela tem texto ou card desnecessário;
+- build, testes, smoke e validação de produção passam.
+
+Status: planejada.
