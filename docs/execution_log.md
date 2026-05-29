@@ -1212,4 +1212,5 @@
 - Na home do site, clicar no logo rola a página para o topo sem trocar de rota.
 - O logo mostrado no cabeçalho do menu mobile público passa a usar a mesma regra.
 - Validação local passou com `npm --prefix frontend run build`.
-- Commit, push, Actions/deploy e validação de produção pendentes.
+- Commit `98c24b8` enviado para `main`; o run `26609952186` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo login, SaaS, portal da empresa, páginas públicas, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.

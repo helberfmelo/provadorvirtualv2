@@ -1923,4 +1923,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente. Build frontend passou; commit, push, Actions/deploy e validação de produção pendentes.
+Status: implementado na Sprint 117 no commit `98c24b8`, publicado com sucesso no run `26609952186`. Validação local passou com `npm --prefix frontend run build`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo login, SaaS, portal da empresa, páginas públicas, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
