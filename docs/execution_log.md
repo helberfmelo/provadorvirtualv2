@@ -1431,3 +1431,20 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
 - Commit `9a69f27` enviado para `main`; o run `26636901205` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 136 Marcas locais e marcas normalizadas
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy, API pública, integrações e sessão Sizebay.
+- Acessado o MySizebay da Zak em modo somente leitura em `/brands` e `/sizebay-brands`, sem alterar dados, sem importar/exportar, sem criar marca, sem salvar e sem acionar suporte.
+- O benchmark Sizebay confirmou `/brands` com Name, Associated brand e ações Export all, Import, Create brand e Clear filters; `/sizebay-brands` mostrou a lista global Sizebay Brand com status Active, filtros e Create Sizebay Brand.
+- Criadas as entidades `merchant_brands` e `normalized_brands`, com API `/api/v1/brands` para descobrir marcas vindas dos produtos, criar/editar, importar/exportar CSV, mesclar duplicidades e aplicar normalização em produtos.
+- A normalização preserva `metadata.brand` e grava `metadata.brand_original`, `metadata.normalized_brand`, `metadata.rules_context.brand` e `metadata.ai_context.brand`, permitindo regras, IA, relatórios e filtros usarem a marca normalizada sem perder o nome recebido da loja.
+- Importações CSV/XML e sincronização BigShop passam a registrar a marca local e reaplicar automaticamente a marca normalizada quando o mapeamento já foi revisado.
+- `/app/marcas` ganhou painel de saúde do catálogo, lista de pendências, sugestões revisáveis com confiança, criação/edição, mescla de variações, importação com prévia e exportação/modelo CSV.
+- `/app/produtos` ganhou filtro por marca normalizada e exibição conjunta da marca original com a normalizada; analytics e config-check/recomendação pública passam a expor contexto de marca normalizada.
+- O script `scripts/validate-production.ps1` passou a validar `/app/marcas`, redirect legado para `/app/marcas` e `GET /api/v1/brands`.
+- Validação visual local rodou em `http://127.0.0.1:5177/app/marcas`, com backend local em `8002`, cobrindo desktop e mobile com dados temporários locais, após ajuste do painel de sugestão para eliminar sobreposição.
+- Validações locais passaram com `php -l`, `php vendor\bin\pint --dirty --test`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter 'BrandManagementApiTest|ProductsApiTest|RecommendationApiTest|ImportsApiTest|IntegrationsApiTest'`, PHPUnit completo (`114 tests`, `1149 assertions`) e `npm --prefix frontend run build` (com o aviso conhecido de bundle acima de 500 kB).
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
+- Commit `e5c3cc2` enviado para `main`; o run `26638565143` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente após incluir `/app/marcas` e `API brands`. Resultado final: `PRODUCTION VALIDATION OK`.

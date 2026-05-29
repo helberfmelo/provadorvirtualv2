@@ -92,6 +92,7 @@ Assert-Page "/app/produtos/novo"
 Assert-Page "/app/tabelas-de-medidas"
 Assert-Page "/app/tabelas-de-medidas/nova"
 Assert-Page "/app/modelagens"
+Assert-Page "/app/marcas"
 Assert-Page "/app/regras-de-importacao"
 Assert-Page "/app/integracoes"
 Assert-Page "/app/sincronizacao"
@@ -102,6 +103,7 @@ if (-not $BaseUrl.EndsWith("/provadorvirtual_v2")) {
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/" "/"
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/login" "/login"
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/produtos/novo" "/app/produtos/novo"
+    Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/marcas" "/app/marcas"
 }
 
 $WidgetBase = if ($BaseUrl.EndsWith("/provadorvirtual_v2")) {
@@ -236,5 +238,10 @@ $readiness = Invoke-RestMethod -Uri "$ApiBase/go-live/readiness" -Headers $heade
 Assert-True ($readiness.summary.status -ne "blocked") "readiness bloqueado"
 Assert-True ([string]::IsNullOrWhiteSpace($readiness.pilot_package.status) -eq $false) "pacote de piloto ausente"
 "Go-live readiness $($readiness.summary.status)"
+
+$brands = Invoke-RestMethod -Uri "$ApiBase/brands" -Headers $headers
+Assert-True ($null -ne $brands.summary) "brands summary ausente"
+Assert-True ($null -ne $brands.data) "brands data ausente"
+"API brands OK"
 
 "PRODUCTION VALIDATION OK"

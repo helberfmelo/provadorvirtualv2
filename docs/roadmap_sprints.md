@@ -2396,7 +2396,7 @@ Critérios de aceite:
 - lojista pode revisar sugestões antes de aplicar;
 - regras e filtros usam marca normalizada sem perder o nome original.
 
-Status: planejada.
+Status: implementado na Sprint 136 no commit `e5c3cc2`, publicado com sucesso no run `26638565143`. O benchmark read-only da Sizebay em `/brands` e `/sizebay-brands` mostrou uma gestão simples de marca local com Associated brand, importação/exportação e cadastro de marca global; o Provador Virtual evoluiu esse padrão com tela dedicada `/app/marcas`, descoberta automática das marcas vindas dos produtos, sugestões revisáveis de normalização, criação/edição/importação/exportação/mescla, preservação da marca original e aplicação da marca normalizada em metadados para regras, IA, relatórios, recomendação pública e filtros de produtos. Validações locais passaram com PHPUnit completo (`114 tests`, `1149 assertions`), testes focados de marcas/produtos/recomendação/importações/integrações, Pint, PHP lint, build frontend, varredura de segredos, `git diff --check` e inspeção visual desktop/mobile em `5177`; o GitHub Actions finalizou com deploy e smoke público com sucesso, e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK` incluindo `/app/marcas` e `GET /api/v1/brands`.
 
 ### Sprint 137 - Categorias locais e taxonomia do Provador
 
