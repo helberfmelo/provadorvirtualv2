@@ -46,6 +46,11 @@ class Merchant extends Model
         return $this->hasMany(MerchantBrand::class);
     }
 
+    public function categories()
+    {
+        return $this->hasMany(MerchantCategory::class);
+    }
+
     public function widgetInstalls()
     {
         return $this->hasMany(WidgetInstall::class);

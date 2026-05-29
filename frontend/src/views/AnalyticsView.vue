@@ -31,10 +31,15 @@ type AnalyticsPayload = {
   products: {
     product_id: number
     name: string | null
+    brand?: string | null
+    normalized_brand?: string | null
+    normalized_category?: string | null
     recommendations: number
     average_confidence: number
     average_outlier_score: number
   }[]
+  brands: { brand: string; normalized: boolean; recommendations: number; average_confidence: number }[]
+  categories: { category: string; normalized: boolean; category_type?: string | null; recommendations: number; average_confidence: number }[]
   products_without_measurement_table: { id: number; name: string; sku: string | null; category: string | null }[]
   learning_statuses: { status: string; count: number }[]
   commerce_signals: { signal: string; count: number }[]
@@ -218,6 +223,36 @@ function actionLabel(action: string) {
       <div class="analytics-grid">
         <section class="panel-main">
           <div class="subsection-heading">
+            <h2>Categorias</h2>
+            <span>{{ analytics.categories.length }} com uso</span>
+          </div>
+          <div v-if="!analytics.categories.length" class="empty-state">Sem categorias nas recomendações.</div>
+          <div v-else class="summary-strip">
+            <span v-for="category in analytics.categories.slice(0, 6)" :key="category.category">
+              <strong>{{ category.recommendations }}</strong>
+              <small>{{ category.category }}{{ category.normalized ? ' · normalizada' : '' }}</small>
+            </span>
+          </div>
+        </section>
+
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Marcas</h2>
+            <span>{{ analytics.brands.length }} com uso</span>
+          </div>
+          <div v-if="!analytics.brands.length" class="empty-state">Sem marcas nas recomendações.</div>
+          <div v-else class="summary-strip">
+            <span v-for="brand in analytics.brands.slice(0, 6)" :key="brand.brand">
+              <strong>{{ brand.recommendations }}</strong>
+              <small>{{ brand.brand }}{{ brand.normalized ? ' · normalizada' : '' }}</small>
+            </span>
+          </div>
+        </section>
+      </div>
+
+      <div class="analytics-grid">
+        <section class="panel-main">
+          <div class="subsection-heading">
             <h2>Volume diario</h2>
             <span>{{ analytics.summary.average_confidence }} confiança média</span>
           </div>
@@ -266,7 +301,10 @@ function actionLabel(action: string) {
                   <td colspan="4">Sem dados.</td>
                 </tr>
                 <tr v-for="product in analytics.products" :key="product.product_id">
-                  <td>{{ product.name || product.product_id }}</td>
+                  <td>
+                    <strong>{{ product.name || product.product_id }}</strong>
+                    <small>{{ product.normalized_category || product.normalized_brand || product.brand || '-' }}</small>
+                  </td>
                   <td>{{ product.recommendations }}</td>
                   <td>{{ product.average_confidence }}</td>
                   <td>{{ product.average_outlier_score }}</td>

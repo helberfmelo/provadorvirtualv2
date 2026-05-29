@@ -114,6 +114,8 @@ class AnalyticsController extends Controller
                         'brand' => data_get($group->first()->product?->metadata ?? [], 'brand'),
                         'normalized_brand' => data_get($group->first()->product?->metadata ?? [], 'normalized_brand.name')
                             ?: data_get($group->first()->product?->metadata ?? [], 'normalized_brand_name'),
+                        'normalized_category' => data_get($group->first()->product?->metadata ?? [], 'normalized_category.name')
+                            ?: data_get($group->first()->product?->metadata ?? [], 'normalized_category_name'),
                         'recommendations' => $group->count(),
                         'average_confidence' => round((float) $group->avg('confidence'), 2),
                         'average_outlier_score' => round((float) $group->avg('outlier_score'), 2),
@@ -122,6 +124,7 @@ class AnalyticsController extends Controller
                     ->values()
                     ->all(),
                 'brands' => $this->brandSeries($logs),
+                'categories' => $this->categorySeries($logs),
                 'products_without_measurement_table' => $productsWithoutTable
                     ->take(8)
                     ->map(fn (Product $product): array => [
@@ -192,6 +195,32 @@ class AnalyticsController extends Controller
                     data_get($group->first()->product?->metadata ?? [], 'normalized_brand.name')
                     ?: data_get($group->first()->product?->metadata ?? [], 'normalized_brand_name')
                 ),
+                'recommendations' => $group->count(),
+                'average_confidence' => round((float) $group->avg('confidence'), 2),
+            ])
+            ->sortByDesc('recommendations')
+            ->values()
+            ->all();
+    }
+
+    private function categorySeries($logs): array
+    {
+        return $logs
+            ->whereNotNull('product_id')
+            ->groupBy(function (RecommendationLog $log): string {
+                return data_get($log->product?->metadata ?? [], 'normalized_category.name')
+                    ?: data_get($log->product?->metadata ?? [], 'normalized_category_name')
+                    ?: $log->product?->category
+                    ?: 'Sem categoria';
+            })
+            ->map(fn ($group, string $category): array => [
+                'category' => $category,
+                'normalized' => (bool) (
+                    data_get($group->first()->product?->metadata ?? [], 'normalized_category.name')
+                    ?: data_get($group->first()->product?->metadata ?? [], 'normalized_category_name')
+                ),
+                'category_type' => data_get($group->first()->product?->metadata ?? [], 'normalized_category.type')
+                    ?: data_get($group->first()->product?->metadata ?? [], 'category_mapping.category_type'),
                 'recommendations' => $group->count(),
                 'average_confidence' => round((float) $group->avg('confidence'), 2),
             ])

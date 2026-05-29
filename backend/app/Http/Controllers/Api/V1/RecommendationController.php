@@ -42,6 +42,7 @@ class RecommendationController extends Controller
         $virtualTryOnEnabled = $this->measurementTableVirtualTryOnEnabled($product->measurementTable);
         $modelingContext = $this->modelingContext($product);
         $brandContext = $this->brandContext($product);
+        $categoryContext = $this->categoryContext($product);
 
         return response()->json([
             'configured' => true,
@@ -73,6 +74,7 @@ class RecommendationController extends Controller
             ],
             'modeling_context' => $modelingContext,
             'brand_context' => $brandContext,
+            'category_context' => $categoryContext,
             'theme' => WidgetInstall::query()
                 ->where('merchant_id', $product->merchant_id)
                 ->when($product->merchant_company_id, fn ($query, $companyId) => $query->where('merchant_company_id', $companyId))
@@ -103,6 +105,7 @@ class RecommendationController extends Controller
         $result = $engine->recommend($product->measurementTable, $data['measurements']);
         $modelingContext = $this->modelingContext($product);
         $brandContext = $this->brandContext($product);
+        $categoryContext = $this->categoryContext($product);
         $fitNotes = $this->fitNotesWithModeling($result->fitNotes, $modelingContext);
         $warnings = $this->warningsWithModeling($result->warnings, $modelingContext);
         $recommendedVariant = $this->variantForRecommendation($product, $result->recommendedSize);
@@ -166,6 +169,7 @@ class RecommendationController extends Controller
                 'warnings' => $warnings,
                 'modeling_context' => $modelingContext,
                 'brand_context' => $brandContext,
+                'category_context' => $categoryContext,
             ],
         ], 201);
     }
@@ -423,6 +427,63 @@ class RecommendationController extends Controller
             'normalized_name' => null,
             'source' => null,
             'message' => 'Produto sem marca informada.',
+        ];
+    }
+
+    private function categoryContext(Product $product): array
+    {
+        $metadata = $product->metadata ?? [];
+        $original = $product->category;
+        $normalized = data_get($metadata, 'normalized_category');
+
+        if (is_array($normalized) && filled($normalized['name'] ?? null)) {
+            return [
+                'status' => 'normalized',
+                'original_name' => $normalized['original_name'] ?? $original,
+                'taxonomy_category_id' => $normalized['id'] ?? data_get($metadata, 'normalized_category_id'),
+                'normalized_name' => $normalized['name'],
+                'category_type' => $normalized['type'] ?? data_get($metadata, 'category_mapping.category_type'),
+                'parent_name' => $normalized['parent_name'] ?? null,
+                'source' => $normalized['source'] ?? data_get($metadata, 'category_mapping.source'),
+                'message' => 'Categoria normalizada usada em regras, filtros, IA e relatórios.',
+            ];
+        }
+
+        if (filled(data_get($metadata, 'normalized_category_name'))) {
+            return [
+                'status' => 'normalized',
+                'original_name' => $original,
+                'taxonomy_category_id' => data_get($metadata, 'normalized_category_id'),
+                'normalized_name' => data_get($metadata, 'normalized_category_name'),
+                'category_type' => data_get($metadata, 'category_mapping.category_type'),
+                'parent_name' => null,
+                'source' => data_get($metadata, 'category_mapping.source'),
+                'message' => 'Categoria normalizada usada em regras, filtros, IA e relatórios.',
+            ];
+        }
+
+        if (filled($original)) {
+            return [
+                'status' => 'pending_review',
+                'original_name' => $original,
+                'taxonomy_category_id' => null,
+                'normalized_name' => null,
+                'category_type' => null,
+                'parent_name' => null,
+                'source' => null,
+                'message' => 'Categoria original preservada; revise a taxonomia para melhorar filtros, regras e IA.',
+            ];
+        }
+
+        return [
+            'status' => 'missing',
+            'original_name' => null,
+            'taxonomy_category_id' => null,
+            'normalized_name' => null,
+            'category_type' => null,
+            'parent_name' => null,
+            'source' => null,
+            'message' => 'Produto sem categoria informada.',
         ];
     }
 

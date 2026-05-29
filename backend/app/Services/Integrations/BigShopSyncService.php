@@ -9,6 +9,7 @@ use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Models\Product;
 use App\Services\Catalog\BrandCatalogService;
+use App\Services\Catalog\CategoryCatalogService;
 use App\Services\Imports\ImportRuleMapper;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -19,7 +20,8 @@ class BigShopSyncService
     public function __construct(
         private readonly BigShopClient $client,
         private readonly ImportRuleMapper $ruleMapper,
-        private readonly BrandCatalogService $brands
+        private readonly BrandCatalogService $brands,
+        private readonly CategoryCatalogService $categories
     ) {}
 
     public function probe(Merchant $merchant, PlatformConnection $connection): array
@@ -146,6 +148,13 @@ class BigShopSyncService
             $company,
             $product,
             $mapped['brand'] ?? $this->first($payload, ['brand', 'marca']),
+            'bigshop'
+        );
+        $this->categories->syncProductCategory(
+            $merchant,
+            $company,
+            $product,
+            $mapped['category'] ?? $this->first($payload, ['category', 'categoria', 'product_type']),
             'bigshop'
         );
 

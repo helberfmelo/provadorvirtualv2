@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\V1\BigShopActivationController;
 use App\Http\Controllers\Api\V1\BigShopIntegrationController;
 use App\Http\Controllers\Api\V1\BillingSubscriptionController;
 use App\Http\Controllers\Api\V1\BrandController;
+use App\Http\Controllers\Api\V1\CategoryController;
 use App\Http\Controllers\Api\V1\DemoProductController;
 use App\Http\Controllers\Api\V1\FitProfileController;
 use App\Http\Controllers\Api\V1\GoLiveReadinessController;
@@ -218,6 +219,20 @@ Route::prefix('v1')->group(function (): void {
             ->only(['index'])
             ->middleware('portal.permission:merchant,products,view');
         Route::apiResource('brands', BrandController::class)
+            ->only(['store', 'update', 'destroy'])
+            ->middleware('portal.permission:merchant,products,edit');
+        Route::get('/categories/export', [CategoryController::class, 'export'])
+            ->middleware('portal.permission:merchant,products,view');
+        Route::get('/categories/template', [CategoryController::class, 'template'])
+            ->middleware('portal.permission:merchant,products,view');
+        Route::post('/categories/import', [CategoryController::class, 'import'])
+            ->middleware('portal.permission:merchant,products,edit');
+        Route::post('/categories/merge', [CategoryController::class, 'merge'])
+            ->middleware('portal.permission:merchant,products,edit');
+        Route::apiResource('categories', CategoryController::class)
+            ->only(['index'])
+            ->middleware('portal.permission:merchant,products,view');
+        Route::apiResource('categories', CategoryController::class)
             ->only(['store', 'update', 'destroy'])
             ->middleware('portal.permission:merchant,products,edit');
         Route::apiResource('products', ProductController::class)

@@ -24,6 +24,7 @@ class ProductResource extends JsonResource
             'slug' => $this->slug,
             'description' => $this->description,
             'category' => $this->category,
+            'normalized_category' => $this->normalizedCategoryPayload(),
             'gender' => $this->gender,
             'fit_profile' => $this->fit_profile,
             'brand' => data_get($this->metadata ?? [], 'brand'),
@@ -161,6 +162,50 @@ class ProductResource extends JsonResource
             'merchant_brand_id' => data_get($metadata, 'brand_mapping.local_brand_id'),
             'source' => data_get($metadata, 'brand_mapping.source'),
             'applied_at' => data_get($metadata, 'brand_mapping.updated_at'),
+        ];
+    }
+
+    private function normalizedCategoryPayload(): ?array
+    {
+        $metadata = $this->metadata ?? [];
+        $normalized = data_get($metadata, 'normalized_category');
+
+        if (is_array($normalized) && filled($normalized['name'] ?? null)) {
+            return [
+                'id' => $normalized['id'] ?? data_get($metadata, 'normalized_category_id'),
+                'name' => $normalized['name'],
+                'slug' => $normalized['slug'] ?? null,
+                'type' => $normalized['type'] ?? data_get($metadata, 'category_mapping.category_type'),
+                'parent_id' => $normalized['parent_id'] ?? null,
+                'parent_name' => $normalized['parent_name'] ?? null,
+                'gender' => $normalized['gender'] ?? null,
+                'age_group' => $normalized['age_group'] ?? null,
+                'original_name' => $normalized['original_name'] ?? $this->category,
+                'merchant_category_id' => $normalized['merchant_category_id'] ?? null,
+                'source' => $normalized['source'] ?? data_get($metadata, 'category_mapping.source'),
+                'applied_at' => $normalized['applied_at'] ?? data_get($metadata, 'category_mapping.updated_at'),
+            ];
+        }
+
+        $name = data_get($metadata, 'normalized_category_name');
+
+        if (blank($name)) {
+            return null;
+        }
+
+        return [
+            'id' => data_get($metadata, 'normalized_category_id'),
+            'name' => $name,
+            'slug' => null,
+            'type' => data_get($metadata, 'category_mapping.category_type'),
+            'parent_id' => null,
+            'parent_name' => null,
+            'gender' => null,
+            'age_group' => null,
+            'original_name' => $this->category,
+            'merchant_category_id' => data_get($metadata, 'category_mapping.local_category_id'),
+            'source' => data_get($metadata, 'category_mapping.source'),
+            'applied_at' => data_get($metadata, 'category_mapping.updated_at'),
         ];
     }
 

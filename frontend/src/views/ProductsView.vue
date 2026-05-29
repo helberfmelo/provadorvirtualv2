@@ -20,6 +20,7 @@ const filters = reactive({
   table: '',
   readiness: '',
   category: '',
+  normalized_category: '',
   brand: '',
   normalized_brand: '',
   gender: '',
@@ -78,6 +79,7 @@ type BulkPreview = {
 
 type ProductFilterOptions = {
   categories: string[]
+  normalized_categories: string[]
   brands: string[]
   normalized_brands: string[]
   genders: string[]
@@ -98,6 +100,7 @@ const emptyTabs = () => ({
 
 const emptyFilterOptions = (): ProductFilterOptions => ({
   categories: [],
+  normalized_categories: [],
   brands: [],
   normalized_brands: [],
   genders: [],
@@ -245,6 +248,7 @@ function clearAllFilters() {
   filters.table = ''
   filters.readiness = ''
   filters.category = ''
+  filters.normalized_category = ''
   filters.brand = ''
   filters.normalized_brand = ''
   filters.gender = ''
@@ -701,7 +705,7 @@ function previewStatusText(item: BulkPreviewItem) {
       </div>
 
       <div class="product-list-toolbar">
-        <input v-model="filters.search" type="search" placeholder="Buscar produto, SKU, tabela ou marca" />
+        <input v-model="filters.search" type="search" placeholder="Buscar produto, SKU, categoria ou marca" />
         <select v-model="filters.status" aria-label="Filtrar status">
           <option value="">Status</option>
           <option value="active">Ativos</option>
@@ -728,6 +732,12 @@ function previewStatusText(item: BulkPreviewItem) {
         <select v-model="filters.category" aria-label="Filtrar categoria">
           <option value="">Categoria</option>
           <option v-for="category in filterOptions.categories" :key="category" :value="category">
+            {{ category }}
+          </option>
+        </select>
+        <select v-model="filters.normalized_category" aria-label="Filtrar categoria normalizada">
+          <option value="">Categoria normalizada</option>
+          <option v-for="category in filterOptions.normalized_categories" :key="category" :value="category">
             {{ category }}
           </option>
         </select>
@@ -922,7 +932,10 @@ function previewStatusText(item: BulkPreviewItem) {
                 <strong>{{ product.name }}</strong>
                 <small>{{ product.sku || product.external_product_id || 'sem SKU' }}</small>
               </td>
-              <td>{{ product.category || '-' }}</td>
+              <td>
+                <strong class="brand-cell-name">{{ product.category || '-' }}</strong>
+                <small v-if="product.normalized_category?.name">Normalizada: {{ product.normalized_category.name }}</small>
+              </td>
               <td>
                 <strong class="brand-cell-name">{{ product.brand || '-' }}</strong>
                 <small v-if="product.normalized_brand?.name">Normalizada: {{ product.normalized_brand.name }}</small>

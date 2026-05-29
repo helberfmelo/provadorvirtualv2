@@ -24,6 +24,7 @@ return [
         'api/v1/merchant/*',
         'api/v1/products*',
         'api/v1/brands*',
+        'api/v1/categories*',
         'api/v1/fit-profiles*',
         'api/v1/measurement-*',
         'api/v1/widget-install',

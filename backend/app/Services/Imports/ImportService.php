@@ -8,6 +8,7 @@ use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\Product;
 use App\Services\Catalog\BrandCatalogService;
+use App\Services\Catalog\CategoryCatalogService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -18,7 +19,8 @@ class ImportService
 {
     public function __construct(
         private readonly ImportRuleMapper $ruleMapper,
-        private readonly BrandCatalogService $brands
+        private readonly BrandCatalogService $brands,
+        private readonly CategoryCatalogService $categories
     ) {}
 
     public function preview(Merchant $merchant, ?MerchantCompany $company, array $input): array
@@ -354,6 +356,7 @@ class ImportService
             ]);
             $product->save();
             $this->brands->syncProductBrand($merchant, $company, $product, $data['brand'] ?? null, 'import');
+            $this->categories->syncProductCategory($merchant, $company, $product, $data['category'] ?? null, 'import');
             $imported++;
 
             if ($data['size_label'] ?? null) {

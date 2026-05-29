@@ -145,6 +145,51 @@ export type MerchantBrand = {
   normalized_brand?: NormalizedBrand | null
 }
 
+export type TaxonomyCategory = {
+  id: number
+  parent_id: number | null
+  name: string
+  slug: string
+  category_type: string
+  gender?: string | null
+  age_group?: string | null
+  translations?: Record<string, string>
+  status: string
+  metadata?: Record<string, unknown>
+  parent?: {
+    id?: number | null
+    name?: string | null
+    slug?: string | null
+    category_type?: string | null
+  } | null
+  children?: TaxonomyCategory[]
+}
+
+export type MerchantCategorySuggestion = {
+  mode: 'mapped' | 'existing' | 'create'
+  taxonomy_category_id?: number | null
+  taxonomy_name: string
+  category_type: string
+  confidence: 'high' | 'medium' | 'low'
+  reasons: string[]
+}
+
+export type MerchantCategory = {
+  id: number
+  merchant_company_id: number | null
+  taxonomy_category_id: number | null
+  name: string
+  slug: string
+  source: string
+  status: string
+  product_count: number
+  normalized_product_count: number
+  aliases: string[]
+  suggestion: MerchantCategorySuggestion | null
+  metadata?: Record<string, unknown>
+  taxonomy_category?: TaxonomyCategory | null
+}
+
 export type Product = {
   id: number
   measurement_table_id: number | null
@@ -153,6 +198,20 @@ export type Product = {
   name: string
   sku: string | null
   category: string | null
+  normalized_category?: {
+    id?: number | null
+    name: string
+    slug?: string | null
+    type?: string | null
+    parent_id?: number | null
+    parent_name?: string | null
+    gender?: string | null
+    age_group?: string | null
+    original_name?: string | null
+    merchant_category_id?: number | null
+    source?: string | null
+    applied_at?: string | null
+  } | null
   gender: string | null
   fit_profile: string | null
   brand?: string | null

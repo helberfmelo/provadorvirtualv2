@@ -12,6 +12,7 @@ use App\Models\MeasurementTable;
 use App\Models\Product;
 use App\Services\Audit\AuditLogger;
 use App\Services\Catalog\BrandCatalogService;
+use App\Services\Catalog\CategoryCatalogService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -122,6 +123,7 @@ class ProductController extends Controller
             'metadata' => $this->metadataForStore($data),
         ]);
         app(BrandCatalogService::class)->syncProductBrand($merchant, $company, $product, $data['brand'] ?? null, 'manual');
+        app(CategoryCatalogService::class)->syncProductCategory($merchant, $company, $product, $data['category'] ?? null, 'manual');
 
         return (new ProductResource($product->load(['company', 'measurementTable', 'variants'])))
             ->response()
@@ -171,6 +173,13 @@ class ProductController extends Controller
             'metadata' => $metadataResult['metadata'],
         ]);
         app(BrandCatalogService::class)->syncProductBrand($merchant, $company, $product->fresh(), $data['brand'] ?? null, 'manual');
+        app(CategoryCatalogService::class)->syncProductCategory(
+            $merchant,
+            $company,
+            $product->fresh(),
+            array_key_exists('category', $data) ? $data['category'] : $product->category,
+            'manual'
+        );
 
         $this->logProductUpdateAudits($request, $merchant, $product, $metadataResult);
 
@@ -565,6 +574,20 @@ class ProductController extends Controller
             });
         }
 
+        if (! $skip('normalized_category') && $value = $this->stringFilter($request, 'normalized_category')) {
+            $query->where(function (Builder $categoryQuery) use ($value): void {
+                $categoryQuery->where('metadata->normalized_category->name', $value)
+                    ->orWhere('metadata->normalized_category_name', $value)
+                    ->orWhere('metadata->normalized_category->slug', $value)
+                    ->orWhere('metadata->normalized_category->type', $value);
+
+                if (ctype_digit($value)) {
+                    $categoryQuery->orWhere('metadata->normalized_category_id', (int) $value)
+                        ->orWhere('metadata->normalized_category->id', (int) $value);
+                }
+            });
+        }
+
         if (! $skip('source') && $source = $this->stringFilter($request, 'source')) {
             $this->applySourceFilter($query, $source);
         }
@@ -668,6 +691,7 @@ class ProductController extends Controller
 
         return [
             'categories' => $this->optionValues($products->pluck('category')),
+            'normalized_categories' => $this->optionValues($products->map(fn (Product $product) => data_get($product->metadata ?? [], 'normalized_category.name') ?: data_get($product->metadata ?? [], 'normalized_category_name'))),
             'brands' => $this->optionValues($products->map(fn (Product $product) => data_get($product->metadata ?? [], 'brand'))),
             'normalized_brands' => $this->optionValues($products->map(fn (Product $product) => data_get($product->metadata ?? [], 'normalized_brand.name') ?: data_get($product->metadata ?? [], 'normalized_brand_name'))),
             'genders' => $this->optionValues($products->pluck('gender')),
