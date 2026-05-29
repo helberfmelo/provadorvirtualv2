@@ -165,6 +165,52 @@ class RecommendationApiTest extends TestCase
             ->assertJsonPath('reason', 'measurement_table_disabled');
     }
 
+    public function test_measurement_table_can_disable_virtual_try_on_and_keep_public_table(): void
+    {
+        $this->seed();
+
+        $product = Product::query()->with('measurementTable')->firstOrFail();
+        $product->measurementTable->update([
+            'metadata' => [
+                'activation' => [
+                    'virtual_try_on_enabled' => false,
+                ],
+                'custom_variations' => [
+                    [
+                        'field' => 'bust',
+                        'mode' => 'restricted',
+                        'min' => 1,
+                        'max' => 3,
+                        'note' => 'Margem curta da tabela',
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->postJson('/api/v1/public/recommendations/config-check', [
+            'merchant_id' => 1,
+            'store_id' => 1,
+            'product_id' => $product->id,
+            'platform' => 'custom',
+        ])
+            ->assertOk()
+            ->assertJsonPath('configured', true)
+            ->assertJsonPath('virtual_try_on_enabled', false)
+            ->assertJsonPath('measurement_table_enabled', true)
+            ->assertJsonPath('measurement_table.custom_variations.0.field', 'bust');
+
+        $this->postJson('/api/v1/public/recommendations', [
+            'merchant_id' => 1,
+            'store_id' => 1,
+            'product_id' => $product->id,
+            'platform' => 'custom',
+            'measurements' => ['bust' => 90],
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('configured', false)
+            ->assertJsonPath('reason', 'table_virtual_try_on_disabled');
+    }
+
     public function test_bigshop_widget_resolves_company_by_external_store_id(): void
     {
         $this->seed();

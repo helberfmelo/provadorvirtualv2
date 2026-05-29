@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class StoreMeasurementTableRequest extends FormRequest
 {
@@ -26,6 +27,13 @@ class StoreMeasurementTableRequest extends FormRequest
             'status' => ['nullable', 'in:active,draft,inactive'],
             'source' => ['nullable', 'in:manual,template,import,bigshop,ai'],
             'notes' => ['nullable', 'string'],
+            'virtual_try_on_enabled' => ['nullable', 'boolean'],
+            'custom_variations' => ['nullable', 'array', 'max:8'],
+            'custom_variations.*.field' => ['required_with:custom_variations', 'in:bust,waist,hip,height,weight,length,shoulder,composite'],
+            'custom_variations.*.mode' => ['nullable', 'in:restricted,wide'],
+            'custom_variations.*.min' => ['nullable', 'numeric', 'min:0', 'max:999.99'],
+            'custom_variations.*.max' => ['nullable', 'numeric', 'min:0', 'max:999.99'],
+            'custom_variations.*.note' => ['nullable', 'string', 'max:500'],
             'rows' => ['nullable', 'array', 'min:1'],
             'rows.*.size_label' => ['required_with:rows', 'string', 'max:40'],
             'rows.*.note' => ['nullable', 'string', 'max:500'],
@@ -61,5 +69,24 @@ class StoreMeasurementTableRequest extends FormRequest
             'rows.*.measurement_notes' => ['nullable', 'array'],
             'rows.*.measurement_notes.*' => ['nullable', 'string', 'max:500'],
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator): void {
+            foreach ((array) $this->input('custom_variations', []) as $index => $variation) {
+                $mode = $variation['mode'] ?? 'restricted';
+                $min = $variation['min'] ?? null;
+                $max = $variation['max'] ?? null;
+
+                if ($mode === 'restricted' && ($min === null || $min === '' || $max === null || $max === '')) {
+                    $validator->errors()->add("custom_variations.{$index}.min", 'Informe mínimo e máximo para variação restrita.');
+                }
+
+                if ($min !== null && $min !== '' && $max !== null && $max !== '' && (float) $min > (float) $max) {
+                    $validator->errors()->add("custom_variations.{$index}.max", 'O máximo da variação precisa ser maior ou igual ao mínimo.');
+                }
+            }
+        });
     }
 }

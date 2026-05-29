@@ -3148,7 +3148,7 @@ tr.is-selected td {
 }
 
 .form-wide .table-wrap table {
-  min-width: 1120px;
+  min-width: 1640px;
 }
 
 .table-input {
@@ -3174,9 +3174,15 @@ tr.is-selected td {
 }
 
 .range-cell {
-  display: grid;
-  grid-template-columns: repeat(2, 68px);
-  gap: 6px;
+  display: table-cell;
+  min-width: 150px;
+  white-space: nowrap;
+}
+
+.range-cell .table-input.mini {
+  display: inline-block;
+  width: 68px;
+  margin-right: 6px;
 }
 
 .row-actions {
@@ -3623,6 +3629,205 @@ tr.is-selected td {
   background: #fff;
   font-size: 0.86rem;
   font-weight: 700;
+}
+
+.measurement-editor-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1.2fr) repeat(4, minmax(150px, 0.7fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.measurement-editor-card {
+  display: grid;
+  gap: 7px;
+  min-height: 128px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.measurement-editor-card.emphasis {
+  cursor: default;
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.measurement-editor-card.active:not(.emphasis) {
+  border-color: #93c5fd;
+  background: #eff6ff;
+}
+
+.measurement-editor-card span {
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.measurement-editor-card strong,
+.measurement-editor-card h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1rem;
+}
+
+.measurement-editor-card small,
+.measurement-editor-card p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.measurement-guided-block,
+.custom-variation-panel,
+.measurement-preview-panel {
+  display: grid;
+  gap: 14px;
+  margin: 18px 0;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.measurement-field-grid,
+.measurement-system-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.measurement-field-grid article,
+.measurement-system-grid article {
+  display: grid;
+  gap: 6px;
+  min-height: 96px;
+  padding: 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.measurement-field-grid strong,
+.measurement-system-grid strong {
+  color: #0f172a;
+}
+
+.measurement-field-grid span,
+.measurement-system-grid span,
+.measurement-field-grid small,
+.measurement-system-grid small {
+  color: #64748b;
+  line-height: 1.45;
+}
+
+.custom-variation-list {
+  display: grid;
+  gap: 10px;
+}
+
+.custom-variation-list article {
+  display: grid;
+  grid-template-columns: minmax(150px, 0.7fr) minmax(120px, 0.55fr) minmax(84px, 0.35fr) minmax(84px, 0.35fr) minmax(220px, 1fr) 38px;
+  gap: 10px;
+  align-items: end;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.custom-variation-list .variation-note {
+  min-width: 0;
+}
+
+.widget-table-preview {
+  display: grid;
+  gap: 12px;
+  max-width: 760px;
+  padding: 14px;
+  border: 1px solid #d1fae5;
+  border-radius: 8px;
+  background: #f0fdf4;
+}
+
+.widget-table-preview > div:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.widget-table-preview strong {
+  color: #0f172a;
+}
+
+.widget-table-preview small {
+  color: #475569;
+  font-weight: 800;
+}
+
+.widget-table-preview table {
+  width: 100%;
+  border-collapse: collapse;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.widget-table-preview th,
+.widget-table-preview td {
+  padding: 9px 10px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+  color: #0f172a;
+}
+
+.widget-table-preview th {
+  color: #475569;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+}
+
+.variation-preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.variation-preview-tags span {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 6px 9px;
+  border: 1px solid #bbf7d0;
+  border-radius: 999px;
+  color: #166534;
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.validation-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #7f1d1d;
+  background: #fef2f2;
+}
+
+.validation-list strong {
+  color: #7f1d1d;
+}
+
+.empty-state.compact {
+  margin: 0;
+  padding: 12px;
+  min-height: 0;
 }
 
 .detail-strip {
@@ -6906,6 +7111,10 @@ td small {
   .import-rule-editor-grid,
   .alias-row,
   .smart-catalog-panel,
+  .measurement-editor-grid,
+  .measurement-field-grid,
+  .measurement-system-grid,
+  .custom-variation-list article,
   .sync-filters,
   .sync-key-values,
   .install-grid,

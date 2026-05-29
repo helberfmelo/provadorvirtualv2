@@ -226,8 +226,9 @@ class MeasurementTableController extends Controller
         $company = array_key_exists('merchant_company_id', $data)
             ? $this->merchantCompany($merchant, $data['merchant_company_id'])
             : $activeCompany;
+        $metadata = $this->tableMetadataPayload($data) ?? [];
 
-        $table = DB::transaction(function () use ($merchant, $company, $data): MeasurementTable {
+        $table = DB::transaction(function () use ($merchant, $company, $data, $metadata): MeasurementTable {
             $table = MeasurementTable::query()->create([
                 'merchant_id' => $merchant->id,
                 'merchant_company_id' => $company?->id,
@@ -242,6 +243,7 @@ class MeasurementTableController extends Controller
                 'status' => $data['status'] ?? 'active',
                 'source' => $data['source'] ?? 'manual',
                 'notes' => $data['notes'] ?? null,
+                'metadata' => $metadata,
             ]);
 
             $this->syncRows($table, $data['rows'] ?? []);
@@ -284,7 +286,13 @@ class MeasurementTableController extends Controller
             }
 
             $rows = $data['rows'] ?? null;
+            $metadata = $this->tableMetadataPayload($data, $measurementTable);
             unset($data['rows']);
+            unset($data['virtual_try_on_enabled'], $data['custom_variations']);
+
+            if ($metadata !== null) {
+                $data['metadata'] = $metadata;
+            }
 
             $measurementTable->update($data);
 
@@ -402,6 +410,55 @@ class MeasurementTableController extends Controller
             'note' => $row['note'] ?? $row['size_note'] ?? null,
             'measurement_notes' => $row['measurement_notes'] ?? null,
         ], fn (mixed $value): bool => $value !== null && $value !== '' && $value !== []);
+    }
+
+    private function tableMetadataPayload(array $data, ?MeasurementTable $table = null): ?array
+    {
+        $hasActivation = array_key_exists('virtual_try_on_enabled', $data);
+        $hasVariations = array_key_exists('custom_variations', $data);
+
+        if (! $hasActivation && ! $hasVariations && $table) {
+            return null;
+        }
+
+        $metadata = $table?->metadata ?? [];
+
+        if ($hasActivation || ! $table) {
+            data_set($metadata, 'activation.virtual_try_on_enabled', (bool) ($data['virtual_try_on_enabled'] ?? true));
+            data_set($metadata, 'activation.virtual_try_on_updated_at', now()->toISOString());
+        }
+
+        if ($hasVariations) {
+            $metadata['custom_variations'] = $this->customVariationsPayload($data['custom_variations'] ?? []);
+        }
+
+        return $metadata;
+    }
+
+    private function customVariationsPayload(array $variations): array
+    {
+        return collect($variations)
+            ->map(function (array $variation): array {
+                return array_filter([
+                    'field' => $variation['field'] ?? null,
+                    'mode' => $variation['mode'] ?? 'restricted',
+                    'min' => $this->numericOrNull($variation['min'] ?? null),
+                    'max' => $this->numericOrNull($variation['max'] ?? null),
+                    'note' => $variation['note'] ?? null,
+                ], fn (mixed $value): bool => $value !== null && $value !== '');
+            })
+            ->filter(fn (array $variation): bool => in_array($variation['field'] ?? null, self::RANGE_FIELDS, true))
+            ->values()
+            ->all();
+    }
+
+    private function numericOrNull(mixed $value): ?float
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        return round((float) $value, 2);
     }
 
     private function applyTableFilters($query, Request $request)

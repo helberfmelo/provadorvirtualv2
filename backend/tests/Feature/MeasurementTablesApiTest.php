@@ -33,6 +33,16 @@ class MeasurementTablesApiTest extends TestCase
                 'size_system' => 'br_numeric',
                 'range_mode' => 'min_max',
                 'source' => 'manual',
+                'virtual_try_on_enabled' => false,
+                'custom_variations' => [
+                    [
+                        'field' => 'waist',
+                        'mode' => 'restricted',
+                        'min' => 1,
+                        'max' => 3,
+                        'note' => 'Margem de conforto para alfaiataria',
+                    ],
+                ],
                 'rows' => [
                     [
                         'size_label' => 'P',
@@ -65,6 +75,9 @@ class MeasurementTablesApiTest extends TestCase
             ->assertJsonPath('data.measurement_target', 'mixed')
             ->assertJsonPath('data.size_system', 'br_numeric')
             ->assertJsonPath('data.range_mode', 'min_max')
+            ->assertJsonPath('data.activation.virtual_try_on_enabled', false)
+            ->assertJsonPath('data.custom_variations.0.field', 'waist')
+            ->assertJsonPath('data.custom_variations.0.mode', 'restricted')
             ->assertJsonCount(2, 'data.rows')
             ->assertJsonPath('data.rows.0.measurements.length.min', 98)
             ->assertJsonPath('data.rows.0.composite_measurements.fit_balance.formula', 'waist+hip')

@@ -56,6 +56,7 @@ APIs protegidas já implementadas:
 - `GET /api/v1/measurement-tables/template`: baixa modelo CSV ou XLSX para tabelas de corpo, peça ou mistas.
 - `POST /api/v1/measurement-tables/import/preview`: valida CSV/XLSX antes de gravar e retorna erros com linha, coluna, campo e sugestão.
 - `POST /api/v1/measurement-tables/import`: cria ou atualiza tabelas por nome no escopo da empresa ativa, substitui linhas somente após prévia sem falhas e audita `measurement_table.imported`.
+- `measurement_tables.metadata`: guarda `activation.virtual_try_on_enabled`, `custom_variations` e futuras configurações avançadas do editor sem alterar o contrato antigo das linhas.
 - `GET /api/v1/measurement-templates`: retorna templates inteligentes normalizados a partir de `backend/database/data/default_measurement_tables_data.json`, herdado do v1, com base brasileira por gênero, tipo de produto, altura, peso, idade e formato corporal.
 - `GET|PATCH /api/v1/widget-install`
 - `POST /api/v1/public/bigshop/activate`
@@ -93,7 +94,7 @@ APIs públicas adicionais:
 - `POST /api/v1/webhooks/pagarme`
 - `POST /api/v1/webhooks/mercado-pago`
 
-O config-check e a recomendação pública do widget respeitam `products.status`, `products.metadata.activation.virtual_try_on_enabled`, `products.metadata.activation.measurement_table_enabled` e o vínculo de tabela. Quando bloqueado, retornam `configured=false` com `reason` explícito, como `virtual_try_on_disabled`, `measurement_table_disabled`, `product_inactive` ou `measurement_table_missing`.
+O config-check e a recomendação pública do widget respeitam `products.status`, `products.metadata.activation.virtual_try_on_enabled`, `products.metadata.activation.measurement_table_enabled`, `measurement_tables.metadata.activation.virtual_try_on_enabled` e o vínculo de tabela. Quando bloqueado por produto, retornam `configured=false` com `reason` explícito, como `virtual_try_on_disabled`, `measurement_table_disabled`, `product_inactive` ou `measurement_table_missing`. Quando a tabela vinculada desativa apenas o provador, `config-check` retorna `configured=true`, `virtual_try_on_enabled=false` e a tabela normalizada; o widget mostra somente `Tabela de Medidas` e `POST /public/recommendations` retorna `table_virtual_try_on_disabled`.
 
 ## Autenticacao e multiempresa
 

@@ -124,6 +124,14 @@ export type MeasurementRow = {
   metadata?: Record<string, unknown>
 }
 
+export type MeasurementCustomVariation = {
+  field: 'bust' | 'waist' | 'hip' | 'height' | 'weight' | 'length' | 'shoulder' | 'composite'
+  mode: 'restricted' | 'wide'
+  min?: number | null
+  max?: number | null
+  note?: string | null
+}
+
 export type MeasurementTable = {
   id: number
   name: string
@@ -136,6 +144,12 @@ export type MeasurementTable = {
   status: string
   source: string
   notes: string | null
+  activation?: {
+    virtual_try_on_enabled: boolean
+    virtual_try_on_updated_at?: string | null
+  }
+  custom_variations?: MeasurementCustomVariation[]
+  metadata?: Record<string, unknown>
   rows_count?: number
   products_count?: number
   rows?: MeasurementRow[]

@@ -332,28 +332,41 @@
 
     var group = document.createElement('div');
     group.className = 'pv-trigger-group pv-trigger-style-' + buttonStyle() + (buttonIconAnimationEnabled() ? ' pv-trigger-icon-animated' : '');
+    var virtualTryOnEnabled = !state.config || state.config.virtual_try_on_enabled !== false;
+    var measurementTableEnabled = !state.config || state.config.measurement_table_enabled !== false;
 
-    var discoverButton = document.createElement('button');
-    discoverButton.className = 'pv-trigger pv-trigger-primary';
-    discoverButton.type = 'button';
-    discoverButton.innerHTML = '<span class="pv-trigger-icon" aria-hidden="true">' + buttonIconSvg('button_primary_icon', 'hanger') + '</span><span>Descubra seu tamanho</span>';
-    discoverButton.addEventListener('click', function (event) {
-      if (Date.now() < suppressDrawerOpenUntil) {
-        event.preventDefault();
-        return;
-      }
+    if (virtualTryOnEnabled) {
+      var discoverButton = document.createElement('button');
+      discoverButton.className = 'pv-trigger pv-trigger-primary';
+      discoverButton.type = 'button';
+      discoverButton.innerHTML = '<span class="pv-trigger-icon" aria-hidden="true">' + buttonIconSvg('button_primary_icon', 'hanger') + '</span><span>Descubra seu tamanho</span>';
+      discoverButton.addEventListener('click', function (event) {
+        if (Date.now() < suppressDrawerOpenUntil) {
+          event.preventDefault();
+          return;
+        }
 
-      openRecommendationDrawer();
-    });
+        openRecommendationDrawer();
+      });
 
-    var tableButton = document.createElement('button');
-    tableButton.className = 'pv-trigger pv-trigger-secondary';
-    tableButton.type = 'button';
-    tableButton.innerHTML = '<span class="pv-trigger-icon" aria-hidden="true">' + buttonIconSvg('button_secondary_icon', 'ruler') + '</span><span>Tabela de Medidas</span>';
-    tableButton.addEventListener('click', openTableModal);
+      group.appendChild(discoverButton);
+    }
 
-    group.appendChild(discoverButton);
-    group.appendChild(tableButton);
+    if (measurementTableEnabled) {
+      var tableButton = document.createElement('button');
+      tableButton.className = 'pv-trigger pv-trigger-secondary';
+      tableButton.type = 'button';
+      tableButton.innerHTML = '<span class="pv-trigger-icon" aria-hidden="true">' + buttonIconSvg('button_secondary_icon', 'ruler') + '</span><span>Tabela de Medidas</span>';
+      tableButton.addEventListener('click', openTableModal);
+
+      group.appendChild(tableButton);
+    }
+
+    if (!group.childNodes.length) {
+      root.innerHTML = config.debug ? '<div class="pv-warning">Provador Virtual indispon&iacute;vel para este produto.</div>' : '';
+      return;
+    }
+
     root.appendChild(group);
   }
 

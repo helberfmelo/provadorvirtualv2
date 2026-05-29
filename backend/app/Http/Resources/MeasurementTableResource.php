@@ -23,6 +23,12 @@ class MeasurementTableResource extends JsonResource
             'status' => $this->status,
             'source' => $this->source,
             'notes' => $this->notes,
+            'metadata' => $this->metadata ?? [],
+            'activation' => [
+                'virtual_try_on_enabled' => $this->booleanFlag(data_get($this->metadata ?? [], 'activation.virtual_try_on_enabled', true)),
+                'virtual_try_on_updated_at' => data_get($this->metadata ?? [], 'activation.virtual_try_on_updated_at'),
+            ],
+            'custom_variations' => data_get($this->metadata ?? [], 'custom_variations', []),
             'rows_count' => $this->whenCounted('rows'),
             'products_count' => $this->whenCounted('products'),
             'rows' => MeasurementTableRowResource::collection($this->whenLoaded('rows')),
@@ -34,5 +40,14 @@ class MeasurementTableResource extends JsonResource
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];
+    }
+
+    private function booleanFlag(mixed $value): bool
+    {
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
     }
 }

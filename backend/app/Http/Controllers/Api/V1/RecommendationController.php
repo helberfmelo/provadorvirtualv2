@@ -8,6 +8,7 @@ use App\Http\Requests\RecommendationConfigCheckRequest;
 use App\Http\Requests\StoreRecommendationFeedbackRequest;
 use App\Http\Requests\StoreRecommendationRequest;
 use App\Http\Requests\StoreRecommendationSignalRequest;
+use App\Models\MeasurementTable;
 use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Models\Product;
@@ -26,7 +27,7 @@ class RecommendationController extends Controller
     public function configCheck(RecommendationConfigCheckRequest $request)
     {
         $product = $this->resolveProduct($request->validated());
-        $configurationIssue = $this->configurationIssue($product);
+        $configurationIssue = $this->configurationIssue($product, false);
 
         if ($configurationIssue) {
             return response()->json([
@@ -37,12 +38,13 @@ class RecommendationController extends Controller
         }
 
         $product->load(['measurementTable.rows', 'variants']);
+        $virtualTryOnEnabled = $this->measurementTableVirtualTryOnEnabled($product->measurementTable);
 
         return response()->json([
             'configured' => true,
             'product_id' => $product->id,
             'measurement_table_id' => $product->measurement_table_id,
-            'virtual_try_on_enabled' => true,
+            'virtual_try_on_enabled' => $virtualTryOnEnabled,
             'measurement_table_enabled' => true,
             'available_sizes' => $product->measurementTable->rows->pluck('size_label')->values(),
             'measurement_table' => [
@@ -52,6 +54,7 @@ class RecommendationController extends Controller
                 'measurement_target' => $product->measurementTable->measurement_target ?: 'body',
                 'size_system' => $product->measurementTable->size_system ?: 'br_alpha',
                 'range_mode' => $product->measurementTable->range_mode ?: 'min_max',
+                'custom_variations' => data_get($product->measurementTable->metadata ?? [], 'custom_variations', []),
                 'rows' => $product->measurementTable->rows->map(fn ($row): array => [
                     'size_label' => $row->size_label,
                     'bust' => [$row->bust_min, $row->bust_max],
@@ -239,7 +242,7 @@ class RecommendationController extends Controller
         return $query->first();
     }
 
-    private function configurationIssue(?Product $product): ?array
+    private function configurationIssue(?Product $product, bool $requireVirtualTryOn = true): ?array
     {
         if (! $product) {
             return [
@@ -269,14 +272,34 @@ class RecommendationController extends Controller
             ];
         }
 
-        if (! $product->measurementTable()->exists()) {
+        $product->loadMissing('measurementTable');
+
+        if (! $product->measurementTable) {
             return [
                 'reason' => 'measurement_table_missing',
                 'message' => 'Produto sem tabela de medidas configurada.',
             ];
         }
 
+        if ($requireVirtualTryOn && ! $this->measurementTableVirtualTryOnEnabled($product->measurementTable)) {
+            return [
+                'reason' => 'table_virtual_try_on_disabled',
+                'message' => 'Provador Virtual desativado para a tabela vinculada a este produto.',
+            ];
+        }
+
         return null;
+    }
+
+    private function measurementTableVirtualTryOnEnabled(?MeasurementTable $table): bool
+    {
+        $value = data_get($table?->metadata ?? [], 'activation.virtual_try_on_enabled', true);
+
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
     }
 
     private function productFlagEnabled(Product $product, string $flag): bool
