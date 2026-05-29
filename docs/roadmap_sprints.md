@@ -2034,3 +2034,32 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 121 no commit `dbbe6b8`, publicado com sucesso no run `26615382578`. Validações locais passaram com `php -l`, `IntegrationsApiTest` com 8 testes e 91 assertions, PHPUnit completo com 94 testes e 891 assertions, build frontend, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 122 - Empresa ativa e plataforma da loja
+
+Objetivo: deixar claro onde a plataforma da loja é informada e corrigir a perda da empresa ativa quando o admin do SaaS acessa o portal da empresa e atualiza a página.
+
+Entregas:
+
+- store de autenticação passa a persistir a empresa ativa em `pv_active_company_id`;
+- `/me` é carregado antes de renderizar as telas internas do portal/SaaS, evitando montagem de `/app/integracoes` sem contexto de empresa;
+- seletor de empresa do portal fica desabilitado enquanto o contexto carrega e mostra placeholder controlado quando ainda não há empresa ativa;
+- `/app/integracoes` passa a exibir um bloco `Plataforma da loja`, explicando que a plataforma vem do cadastro da empresa no SaaS, do checkout ou do primeiro acesso do painel;
+- contratos BigShop ficam travados como BigShop no portal da empresa;
+- empresas não BigShop podem trocar a plataforma operacional diretamente em `/app/integracoes`, sem poder ativar BigShop por conta própria;
+- novo endpoint protegido `PATCH /api/v1/merchant/company-platform`;
+- testes de API cobrem atualização de plataforma não BigShop, bloqueio de contrato BigShop e bloqueio de autoativação BigShop.
+
+Validação:
+
+- `npm --prefix frontend run build`;
+- `php -l` nos arquivos PHP alterados;
+- `vendor/bin/pint --dirty`;
+- varredura de credenciais;
+- `git diff --check`;
+- GitHub Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Observação: `php artisan test --filter=MerchantCompanyProfileApiTest` não rodou neste ambiente local porque o PHP disponível está sem driver SQLite (`could not find driver` para `sqlite :memory:`). O workflow remoto validou backend e deploy com sucesso.
+
+Status: implementado na Sprint 122 no commit `de6a1ef`, publicado com sucesso no run `26616086732`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.

@@ -1,6 +1,6 @@
 # Usuários e Permissões
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-29
 
 ## Objetivo
 
@@ -26,6 +26,7 @@ Implementado:
 - middleware `portal.permission` protege as rotas dos módulos do portal da empresa e do SaaS;
 - usuários com mais de uma empresa recebem uma lista de empresas no login e escolhem o contexto;
 - painel permite trocar a empresa ativa pelo seletor do topo sem logout;
+- frontend persiste a última empresa ativa em `pv_active_company_id` e carrega `/me` antes de renderizar telas internas, mantendo o seletor correto após refresh;
 - token Sanctum carrega `merchant:{id}` e `company:{id}`;
 - queries de produtos, tabelas, widget, integrações, importacoes, analytics, go-live e auditoria respeitam a empresa ativa;
 - `audit_logs` registra `merchant_company_id`, `module` e `action` para eventos novos e negacoes de permissão.

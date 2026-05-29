@@ -1,6 +1,6 @@
 # Guias de Integração por Plataforma
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-29
 
 ## Objetivo
 
@@ -20,6 +20,39 @@ Implementado:
 - bloqueio mantido: contrato BigShop vê e valida apenas BigShop.
 
 Publicado e validado em produção no run `26339199751`.
+
+## Onde a plataforma é informada
+
+A plataforma da loja é gravada em `merchant_companies.platform`.
+
+Locais de entrada:
+
+- checkout público `/checkout`, no momento da contratação;
+- SaaS admin `/saas/empresas/:id/editar`, para cadastro e correção operacional;
+- portal da empresa `/app`, no bloco `Dados da empresa` do primeiro acesso quando o perfil ainda está incompleto;
+- portal da empresa `/app/integracoes`, no bloco `Plataforma da loja`, para troca operacional entre plataformas não BigShop.
+
+Regras:
+
+- contrato BigShop fica travado como BigShop no portal da empresa;
+- empresa não BigShop não pode se autoativar como BigShop pelo portal;
+- alteração para BigShop deve ser feita pelo cadastro SaaS, pois impacta contrato, preço, caminho de instalação e escopo de integração.
+
+Endpoint operacional:
+
+```http
+PATCH /api/v1/merchant/company-platform
+```
+
+Payload:
+
+```json
+{
+  "platform": "shopify"
+}
+```
+
+Permissão exigida: `integrations.edit`.
 
 ## Checklist padrão
 

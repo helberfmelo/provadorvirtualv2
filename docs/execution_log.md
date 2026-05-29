@@ -1267,3 +1267,17 @@
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`, PHPUnit completo, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`.
 - Commit `dbbe6b8` enviado para `main`; o run `26615382578` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-29 - Sprint 122 Empresa ativa e plataforma da loja
+
+- Respondida a dúvida operacional: a plataforma da loja nasce no checkout público, pode ser definida/alterada no SaaS em `/saas/empresas/:id/editar` e, no portal, aparece no primeiro acesso em `Dados da empresa`.
+- Para deixar isso evidente no fluxo de integração, `/app/integracoes` ganhou o bloco `Plataforma da loja`, com explicação de origem e seletor operacional.
+- Empresas não BigShop podem trocar a plataforma entre Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e Personalizada diretamente em `/app/integracoes`.
+- BigShop continua protegido: contrato BigShop fica travado como BigShop no portal, e empresa não BigShop não consegue se autoativar como BigShop sem passar pelo cadastro SaaS.
+- Criado `PATCH /api/v1/merchant/company-platform` com permissão `integrations.edit`.
+- O store de autenticação agora guarda `pv_active_company_id`, reaplica a empresa selecionada após refresh e evita que o portal monte telas antes de carregar `/me`.
+- O `RouterView` interno exibe carregamento de contexto enquanto a empresa ativa está sendo recuperada, evitando o fallback genérico `Plataforma` em `/app/integracoes`.
+- Validações locais passaram com `npm --prefix frontend run build`, `php -l`, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`.
+- `php artisan test --filter=MerchantCompanyProfileApiTest` ficou bloqueado localmente porque o PHP deste ambiente não tem driver SQLite (`could not find driver`); o GitHub Actions executou validação backend/deploy com sucesso.
+- Commit `de6a1ef` enviado para `main`; o run `26616086732` finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
