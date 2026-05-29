@@ -226,6 +226,8 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('products', ProductController::class)
             ->only(['index', 'show'])
             ->middleware('portal.permission:merchant,products,view');
+        Route::patch('/products/bulk-measurement-table', [ProductController::class, 'bulkLinkMeasurementTable'])
+            ->middleware('portal.permission:merchant,products,edit');
         Route::apiResource('products', ProductController::class)
             ->only(['store', 'update', 'destroy'])
             ->middleware('portal.permission:merchant,products,edit');

@@ -1190,3 +1190,14 @@
 - Commit `8277337` enviado para `main`; o run `26609097848` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - `scripts/validate-production.ps1` passou a cobrir `/app/analytics` e `/app/assistente`, além das rotas já monitoradas.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/analytics`, `/app/assistente`, `/app/widget`, páginas públicas, SaaS, portal, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 116 Vínculo em lote de tabelas nos produtos
+
+- Iniciada a melhoria de operação da listagem de produtos.
+- Hoje o vínculo principal entre produto e tabela é `products.measurement_table_id -> measurement_tables.id`.
+- O vínculo já podia ser feito no formulário de produto, por importação CSV/XML quando a origem traz `measurement_table`, e por sync BigShop quando o payload traz tabela/medidas estruturadas.
+- Criado `PATCH /api/v1/products/bulk-measurement-table` para vincular a mesma tabela a vários produtos selecionados, respeitando merchant/empresa ativa.
+- `/app/produtos` ganhou barra compacta e sticky acima da tabela com busca, filtros, seletor de tabela, botão `Vincular`, seleção de todos os itens filtrados, limpar seleção e contador.
+- A listagem ganhou coluna de checkbox para seleção em massa, mantendo a associação da tabela visível sem abrir o produto.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter ProductsApiTest`, PHPUnit completo com 93 testes e 863 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
+- Commit, push, Actions/deploy e validação de produção pendentes.

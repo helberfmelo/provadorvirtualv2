@@ -1873,3 +1873,32 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 115 no commit `8277337`, publicado com sucesso no run `26609097848`. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter RecommendationApiTest`, `--filter AnalyticsApiTest`, `--filter AiMeasurementAssistantTest`, PHPUnit completo com 92 testes e 850 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/analytics`, `/app/assistente`, `/app/widget`, páginas públicas, SaaS, portal, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 116 - Vínculo em lote de tabelas nos produtos
+
+Objetivo: deixar a listagem de produtos mais parecida com a operação limpa observada na Sizebay, permitindo filtrar, selecionar vários produtos e vincular uma tabela sem abrir item por item.
+
+Entregas:
+
+- criar endpoint protegido `PATCH /api/v1/products/bulk-measurement-table`;
+- validar escopo do merchant/empresa ativa antes de atualizar produtos e tabela;
+- manter o vínculo canônico em `products.measurement_table_id`;
+- carregar tabelas de medidas na listagem de produtos;
+- adicionar barra compacta e sticky acima do cabeçalho da tabela com busca, filtros, select de tabela, botão `Vincular`, `Todos`, `Limpar` e contador de seleção;
+- adicionar coluna de checkbox na listagem;
+- habilitar select de vínculo apenas quando houver produto selecionado;
+- atualizar docs explicando as formas de vínculo atuais: formulário do produto, importação/sync e vínculo em lote.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter ProductsApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado localmente. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter ProductsApiTest`, PHPUnit completo com 93 testes e 863 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Commit, push, Actions/deploy e validação de produção pendentes.

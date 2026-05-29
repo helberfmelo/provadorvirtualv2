@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Api\V1\Concerns\ResolvesMerchant;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\BulkLinkProductMeasurementTableRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
@@ -114,6 +115,39 @@ class ProductController extends Controller
         $product->update($data);
 
         return new ProductResource($product->refresh()->load(['company', 'measurementTable', 'variants']));
+    }
+
+    public function bulkLinkMeasurementTable(BulkLinkProductMeasurementTableRequest $request)
+    {
+        $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
+        $data = $request->validated();
+        $measurementTable = $this->resolveMeasurementTable($merchant->id, $company, (int) $data['measurement_table_id']);
+        $productIds = collect($data['product_ids'])->map(fn (mixed $id): int => (int) $id)->values();
+        $products = Product::query()
+            ->where('merchant_id', $merchant->id)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->whereIn('id', $productIds)
+            ->get();
+
+        Product::query()
+            ->whereKey($products->pluck('id'))
+            ->update(['measurement_table_id' => $measurementTable?->id]);
+
+        $updatedProducts = Product::query()
+            ->whereKey($products->pluck('id'))
+            ->with(['company', 'measurementTable'])
+            ->withCount('variants')
+            ->orderByDesc('id')
+            ->get();
+
+        return ProductResource::collection($updatedProducts)->additional([
+            'summary' => [
+                'requested' => $productIds->count(),
+                'updated' => $updatedProducts->count(),
+                'measurement_table_id' => $measurementTable?->id,
+            ],
+        ]);
     }
 
     public function destroy(Request $request, Product $product)

@@ -234,6 +234,7 @@ Atualizado em: 2026-05-28
 - Sprint 114 enviada ao GitHub no commit `a6e1ff1`; o run `26608432348` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/widget`, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 115 usa sinais de pedido, devolução, troca e feedback para gerar insights por tabela de medidas, alimentar o Assistente de IA com contexto de aprendizado e mostrar sugestões limpas em `/app/analytics`.
 - Sprint 115 enviada ao GitHub no commit `8277337`; o run `26609097848` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/analytics`, `/app/assistente`, `/app/widget`, widget, APIs, CORS, login demo e go-live readiness.
+- Sprint 116 adiciona vínculo em lote de tabela de medidas na listagem `/app/produtos`, com barra sticky compacta de busca/filtros, seleção por checkbox, seletor de tabela e ação `Vincular`.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -254,13 +255,13 @@ Atualizado em: 2026-05-28
 - Painel SaaS protegido por papel/permissão: `/saas`, `/saas/empresas`, `/saas/usuarios`, `/saas/checkout`, `/saas/pedidos` e `/saas/emails`, com entrada administrativa em `/saas/login`.
 - CRUDs do SaaS seguem padrão list-first: listagem ocupa a tela e novo/editar abre rota própria.
 - Login do portal da empresa: `/login`, aceitando e-mail ou CPF, campo de código/CNPJ para empresa e seletor quando o usuário tem multiplas empresas.
-- CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar.
+- CRUDs principais do portal da empresa também seguem padrão list-first: produtos, tabelas e usuários possuem listagem em tela própria e rotas separadas para novo/editar. Produtos permitem vínculo individual de tabela no formulário e vínculo em lote na listagem.
 - Modelagens: `/app/modelagens` cadastra caimentos por código, intensidade, elasticidade, gênero, tipo, status e uso em produtos/tabelas; a API protegida é `/api/v1/fit-profiles`.
 - Tabelas de medidas: `/app/tabelas-de-medidas` e formulários suportam base corpo/peça/mista, sistema BR letras/BR numérico/internacional/custom, ranges e medida composta por linha, mantendo o formato antigo para recomendação.
 - Diretriz obrigatória de telas: `docs/portal_ui_guidelines.md`.
 - Checkout público: `/checkout` e `/checkout/sucesso`, com aceite legal marcado por padrão, links para termos/privacidade, modal amigável de falha por meio de pagamento e conclusão específica para Pix, boleto e cartão. A conclusão pública mostra pedido, status do pagamento em português e forma de pagamento, sem expor a operadora.
 - Site público raiz: landing comercial do Provador Virtual, com planos mensal/anual por plataforma, tags de economia anual nos cards, CTA para loja teste/checkout e cards de benefícios otimizados para mobile. A cópia pública usa `provador` em vez de `widget` para evitar jargão técnico. Quando há sessão autenticada, o cabeçalho mostra retorno para `Voltar ao SaaS` ou `Voltar ao portal`, conforme o papel carregado por `/me`.
-- APIs protegidas: produtos, variações, tabelas, templates, widget-install e integrações, com middleware de permissão por módulo e escopo da empresa ativa. `PATCH /api/v1/integrations/{platform}` também salva `import_rules` para a tela de regras visuais.
+- APIs protegidas: produtos, variações, tabelas, templates, widget-install e integrações, com middleware de permissão por módulo e escopo da empresa ativa. `PATCH /api/v1/products/bulk-measurement-table` vincula uma tabela a produtos selecionados. `PATCH /api/v1/integrations/{platform}` também salva `import_rules` para a tela de regras visuais.
 - Importacoes protegidas: preview, commit e histórico em `/api/v1/imports`.
 - Assistente protegido: status e sugestoes em `/api/v1/ai/*`; sugestões de tabela recebem contexto agregado de aprendizado quando existe histórico compatível de tipo, gênero e modelagem.
 - Analytics/auditoria protegidos: `/api/v1/analytics/*`, `/api/v1/audit-logs` e `/api/v1/saas/*`. `/api/v1/analytics/recommendations` inclui KPIs de compra/devolução/troca e insights por tabela de medidas para revisão do lojista.
