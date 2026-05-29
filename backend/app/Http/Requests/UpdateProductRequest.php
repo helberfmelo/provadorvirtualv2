@@ -24,8 +24,12 @@ class UpdateProductRequest extends FormRequest
             'category' => ['sometimes', 'nullable', 'string', 'max:120'],
             'gender' => ['sometimes', 'nullable', 'string', 'max:40'],
             'fit_profile' => ['sometimes', 'nullable', 'string', 'max:80'],
+            'brand' => ['sometimes', 'nullable', 'string', 'max:120'],
+            'age_group' => ['sometimes', 'nullable', 'string', 'max:80'],
             'status' => ['sometimes', 'nullable', 'in:active,draft,inactive'],
             'image_url' => ['sometimes', 'nullable', 'string', 'max:500'],
+            'virtual_try_on_enabled' => ['sometimes', 'nullable', 'boolean'],
+            'measurement_table_enabled' => ['sometimes', 'nullable', 'boolean'],
         ];
     }
 }

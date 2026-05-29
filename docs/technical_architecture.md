@@ -49,7 +49,7 @@ APIs protegidas já implementadas:
 - `GET /api/v1/merchant/overview`: agrega resumo do painel, cobertura do catálogo, pendências operacionais, próximas ações e evolução de cobertura por empresa ativa.
 - `GET /api/v1/billing/subscription`
 - `PATCH /api/v1/billing/subscription/auto-renewal`
-- `GET|POST|PATCH|DELETE /api/v1/products`: a listagem é paginada no backend e aceita filtros por busca, status, tabela, categoria, marca, gênero, faixa etária, modelagem, origem, erro de sincronização e prontidão; a resposta inclui contadores por aba e opções de filtros.
+- `GET|POST|PATCH|DELETE /api/v1/products`: a listagem é paginada no backend e aceita filtros por busca, status, tabela, categoria, marca, gênero, faixa etária, modelagem, origem, erro de sincronização e prontidão; a resposta inclui contadores por aba e opções de filtros. O detalhe expõe ativação individual, origem por campo, snapshot importado, overrides manuais, diagnóstico e histórico; updates preservam dados importados em `metadata`, registram ajustes manuais e geram auditoria para ativação/override.
 - `POST|PATCH|DELETE /api/v1/products/{product}/variants`
 - `GET|POST|PATCH|DELETE /api/v1/measurement-tables`
 - `GET /api/v1/measurement-templates`: retorna templates inteligentes normalizados a partir de `backend/database/data/default_measurement_tables_data.json`, herdado do v1, com base brasileira por gênero, tipo de produto, altura, peso, idade e formato corporal.
@@ -88,6 +88,8 @@ APIs públicas adicionais:
 - `GET /api/v1/public/checkout/{reference}`
 - `POST /api/v1/webhooks/pagarme`
 - `POST /api/v1/webhooks/mercado-pago`
+
+O config-check e a recomendação pública do widget respeitam `products.status`, `products.metadata.activation.virtual_try_on_enabled`, `products.metadata.activation.measurement_table_enabled` e o vínculo de tabela. Quando bloqueado, retornam `configured=false` com `reason` explícito, como `virtual_try_on_disabled`, `measurement_table_disabled`, `product_inactive` ou `measurement_table_missing`.
 
 ## Autenticacao e multiempresa
 

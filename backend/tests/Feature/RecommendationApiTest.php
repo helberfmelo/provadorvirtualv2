@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
+use App\Models\Product;
 use App\Models\RecommendationFeedback;
 use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
@@ -108,6 +109,60 @@ class RecommendationApiTest extends TestCase
         ])
             ->assertUnprocessable()
             ->assertJsonPath('configured', false);
+    }
+
+    public function test_product_activation_flags_control_public_widget_api(): void
+    {
+        $this->seed();
+
+        Product::query()->whereKey(1)->update([
+            'metadata' => [
+                'activation' => [
+                    'virtual_try_on_enabled' => false,
+                    'measurement_table_enabled' => true,
+                ],
+            ],
+        ]);
+
+        $this->postJson('/api/v1/public/recommendations/config-check', [
+            'merchant_id' => 1,
+            'store_id' => 1,
+            'product_id' => 1,
+            'platform' => 'custom',
+        ])
+            ->assertOk()
+            ->assertJsonPath('configured', false)
+            ->assertJsonPath('reason', 'virtual_try_on_disabled');
+
+        $this->postJson('/api/v1/public/recommendations', [
+            'merchant_id' => 1,
+            'store_id' => 1,
+            'product_id' => 1,
+            'platform' => 'custom',
+            'measurements' => ['bust' => 90],
+        ])
+            ->assertUnprocessable()
+            ->assertJsonPath('configured', false)
+            ->assertJsonPath('reason', 'virtual_try_on_disabled');
+
+        Product::query()->whereKey(1)->update([
+            'metadata' => [
+                'activation' => [
+                    'virtual_try_on_enabled' => true,
+                    'measurement_table_enabled' => false,
+                ],
+            ],
+        ]);
+
+        $this->postJson('/api/v1/public/recommendations/config-check', [
+            'merchant_id' => 1,
+            'store_id' => 1,
+            'product_id' => 1,
+            'platform' => 'custom',
+        ])
+            ->assertOk()
+            ->assertJsonPath('configured', false)
+            ->assertJsonPath('reason', 'measurement_table_disabled');
     }
 
     public function test_bigshop_widget_resolves_company_by_external_store_id(): void

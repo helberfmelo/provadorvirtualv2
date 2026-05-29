@@ -32,6 +32,7 @@ export type Product = {
   id: number
   measurement_table_id: number | null
   external_product_id?: string | null
+  description?: string | null
   name: string
   sku: string | null
   category: string | null
@@ -42,13 +43,57 @@ export type Product = {
   data_source?: string
   source_label?: string
   status: string
+  image_url?: string | null
+  activation?: {
+    virtual_try_on_enabled: boolean
+    measurement_table_enabled: boolean
+    updated_at?: string | null
+    virtual_try_on_updated_at?: string | null
+    measurement_table_updated_at?: string | null
+  }
   has_sync_error?: boolean
   readiness_status?: 'ready' | 'pending'
   readiness_issues?: string[]
+  diagnostics?: Array<{
+    severity: 'ok' | 'info' | 'warning' | 'danger'
+    code: string
+    title: string
+    cause: string
+    action: string
+  }>
   size_labels?: string[]
   variants_count?: number
   variants?: ProductVariant[]
   measurement_table?: MeasurementTableOption | null
+  origin_fields?: Array<{
+    field: string
+    label: string
+    value: string | number | boolean | null
+    imported_value?: string | number | boolean | null
+    source: string
+    source_label: string
+    manual_override?: {
+      value?: string | number | boolean | null
+      imported_value?: string | number | boolean | null
+      source?: string
+      updated_at?: string | null
+    }
+  }>
+  imported_snapshot?: Record<string, string | number | boolean | null>
+  manual_overrides?: Record<string, {
+    value?: string | number | boolean | null
+    imported_value?: string | number | boolean | null
+    source?: string
+    updated_at?: string | null
+  }>
+  history?: Array<{
+    event: string
+    category?: string
+    severity?: string
+    source?: string
+    details?: Record<string, unknown>
+    created_at?: string | null
+  }>
 }
 
 export type MeasurementRow = {

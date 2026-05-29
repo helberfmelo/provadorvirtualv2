@@ -24,8 +24,12 @@ class StoreProductRequest extends FormRequest
             'category' => ['nullable', 'string', 'max:120'],
             'gender' => ['nullable', 'string', 'max:40'],
             'fit_profile' => ['nullable', 'string', 'max:80'],
+            'brand' => ['nullable', 'string', 'max:120'],
+            'age_group' => ['nullable', 'string', 'max:80'],
             'status' => ['nullable', 'in:active,draft,inactive'],
             'image_url' => ['nullable', 'string', 'max:500'],
+            'virtual_try_on_enabled' => ['nullable', 'boolean'],
+            'measurement_table_enabled' => ['nullable', 'boolean'],
         ];
     }
 }

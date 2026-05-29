@@ -2242,7 +2242,7 @@ Critérios de aceite:
 - alterações manuais não sobrescrevem silenciosamente dados importados;
 - ativação por produto reflete no widget/API pública.
 
-Status: planejada.
+Status: implementado na Sprint 131 em validação remota. O benchmark read-only da Sizebay confirmou um formulário único com integração, imagem, dados principais, ativação do Virtual Fitting Room, tamanhos da loja e dados do Size & Fit Advisor. O Provador Virtual evoluiu esse padrão com detalhe em abas, origem por campo, snapshot importado, ajustes manuais preservados, ativação individual de Provador Virtual/Tabela de Medidas com auditoria, diagnóstico acionável e API pública respeitando os bloqueios por produto. Validações locais passaram com build frontend, testes `ProductsApiTest|RecommendationApiTest`, Pint, PHP lint e inspeção visual desktop/mobile em `5175`.
 
 ### Sprint 132 - Vínculo de tabelas melhor que Sizebay
 

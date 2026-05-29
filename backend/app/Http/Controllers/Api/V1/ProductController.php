@@ -10,6 +10,7 @@ use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\MeasurementTable;
 use App\Models\Product;
+use App\Services\Audit\AuditLogger;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -18,6 +19,41 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
     use ResolvesMerchant;
+
+    private const PRODUCT_COLUMNS = [
+        'merchant_company_id',
+        'measurement_table_id',
+        'external_product_id',
+        'sku',
+        'name',
+        'slug',
+        'description',
+        'category',
+        'gender',
+        'fit_profile',
+        'status',
+        'image_url',
+    ];
+
+    private const PRODUCT_ORIGIN_FIELDS = [
+        'external_product_id',
+        'sku',
+        'name',
+        'slug',
+        'description',
+        'category',
+        'gender',
+        'fit_profile',
+        'measurement_table_id',
+        'image_url',
+        'brand',
+        'age_group',
+    ];
+
+    private const PRODUCT_METADATA_FIELDS = [
+        'brand',
+        'age_group',
+    ];
 
     public function index(Request $request)
     {
@@ -81,6 +117,7 @@ class ProductController extends Controller
             'fit_profile' => $data['fit_profile'] ?? null,
             'status' => $data['status'] ?? 'active',
             'image_url' => $data['image_url'] ?? null,
+            'metadata' => $this->metadataForStore($data),
         ]);
 
         return (new ProductResource($product->load(['company', 'measurementTable', 'variants'])))
@@ -98,6 +135,7 @@ class ProductController extends Controller
             'company',
             'measurementTable.rows',
             'variants' => fn ($query) => $query->orderBy('id'),
+            'auditLogs' => fn ($query) => $query->latest()->limit(12),
         ]));
     }
 
@@ -124,9 +162,22 @@ class ProductController extends Controller
             $data['slug'] = $this->slugFor($data['name']);
         }
 
-        $product->update($data);
+        $metadataResult = $this->metadataForUpdate($product, $data);
+        $product->update([
+            ...$this->columnData($data),
+            'metadata' => $metadataResult['metadata'],
+        ]);
 
-        return new ProductResource($product->refresh()->load(['company', 'measurementTable', 'variants']));
+        $this->logProductUpdateAudits($request, $merchant, $product, $metadataResult);
+
+        $product->refresh()->load([
+            'company',
+            'measurementTable',
+            'variants',
+            'auditLogs' => fn ($query) => $query->latest()->limit(12),
+        ]);
+
+        return new ProductResource($product);
     }
 
     public function bulkLinkMeasurementTable(BulkLinkProductMeasurementTableRequest $request)
@@ -260,7 +311,9 @@ class ProductController extends Controller
                 ->where('fit_profile', '!=', '')
                 ->whereNotNull('category')
                 ->where('category', '!=', '')
-                ->where(fn (Builder $subQuery) => $this->whereWithoutSyncError($subQuery)),
+                ->where(fn (Builder $subQuery) => $this->whereWithoutSyncError($subQuery))
+                ->where(fn (Builder $subQuery) => $this->whereMetadataFlagEnabled($subQuery, 'virtual_try_on_enabled'))
+                ->where(fn (Builder $subQuery) => $this->whereMetadataFlagEnabled($subQuery, 'measurement_table_enabled')),
             'pending' => $query->where(function (Builder $subQuery): void {
                 $subQuery->where('status', '!=', 'active')
                     ->orWhereNull('measurement_table_id')
@@ -268,7 +321,9 @@ class ProductController extends Controller
                     ->orWhere('fit_profile', '')
                     ->orWhereNull('category')
                     ->orWhere('category', '')
-                    ->orWhere(fn (Builder $syncQuery) => $this->whereHasSyncError($syncQuery));
+                    ->orWhere(fn (Builder $syncQuery) => $this->whereHasSyncError($syncQuery))
+                    ->orWhere(fn (Builder $activationQuery) => $this->whereMetadataFlagDisabled($activationQuery, 'virtual_try_on_enabled'))
+                    ->orWhere(fn (Builder $activationQuery) => $this->whereMetadataFlagDisabled($activationQuery, 'measurement_table_enabled'));
             }),
             'without_measurement_table' => $query->whereNull('measurement_table_id'),
             'without_modeling' => $query->where(fn (Builder $subQuery) => $subQuery->whereNull('fit_profile')->orWhere('fit_profile', '')),
@@ -401,8 +456,235 @@ class ProductController extends Controller
         });
     }
 
+    private function whereMetadataFlagEnabled(Builder $query, string $key): void
+    {
+        $path = "metadata->activation->{$key}";
+
+        $query->where(function (Builder $subQuery) use ($path): void {
+            $subQuery->whereNull($path)
+                ->orWhere($path, true)
+                ->orWhere($path, 1)
+                ->orWhere($path, '1')
+                ->orWhere($path, 'true');
+        });
+    }
+
+    private function whereMetadataFlagDisabled(Builder $query, string $key): void
+    {
+        $path = "metadata->activation->{$key}";
+
+        $query->where(function (Builder $subQuery) use ($path): void {
+            $subQuery->where($path, false)
+                ->orWhere($path, 0)
+                ->orWhere($path, '0')
+                ->orWhere($path, 'false');
+        });
+    }
+
     private function stringFilter(Request $request, string $key): string
     {
         return trim($request->string($key)->toString());
+    }
+
+    private function columnData(array $data): array
+    {
+        return array_intersect_key($data, array_flip(self::PRODUCT_COLUMNS));
+    }
+
+    private function metadataForStore(array $data): array
+    {
+        $metadata = [
+            'source' => 'manual',
+            'field_sources' => [],
+            'activation' => [
+                'virtual_try_on_enabled' => (bool) ($data['virtual_try_on_enabled'] ?? true),
+                'measurement_table_enabled' => (bool) ($data['measurement_table_enabled'] ?? true),
+                'updated_at' => now()->toISOString(),
+            ],
+        ];
+
+        foreach (self::PRODUCT_METADATA_FIELDS as $field) {
+            if (array_key_exists($field, $data) && filled($data[$field])) {
+                $metadata[$field] = $data[$field];
+            }
+        }
+
+        foreach (self::PRODUCT_ORIGIN_FIELDS as $field) {
+            if (array_key_exists($field, $data) && filled($data[$field])) {
+                $metadata['field_sources'][$field] = 'manual';
+            }
+        }
+
+        return $metadata;
+    }
+
+    private function metadataForUpdate(Product $product, array $data): array
+    {
+        $metadata = $product->metadata ?? [];
+        $metadata['field_sources'] = is_array($metadata['field_sources'] ?? null) ? $metadata['field_sources'] : [];
+        $metadata['manual_overrides'] = is_array($metadata['manual_overrides'] ?? null) ? $metadata['manual_overrides'] : [];
+        $metadata['activation'] = is_array($metadata['activation'] ?? null) ? $metadata['activation'] : [];
+        $manualOverrideFields = [];
+        $activationChanges = [];
+        $tracksImportedData = $this->sourceForProduct($product) !== 'manual' || filled($metadata['imported_snapshot'] ?? null);
+
+        if ($tracksImportedData && blank($metadata['imported_snapshot'] ?? null)) {
+            $metadata['imported_snapshot'] = $this->snapshotFromProduct($product, $metadata);
+        }
+
+        foreach (self::PRODUCT_ORIGIN_FIELDS as $field) {
+            if (! array_key_exists($field, $data)) {
+                continue;
+            }
+
+            $oldValue = $this->productFieldValue($product, $metadata, $field);
+            $newValue = $data[$field];
+
+            if (! $this->sameFieldValue($oldValue, $newValue)) {
+                $metadata['field_sources'][$field] = 'manual';
+
+                if ($tracksImportedData) {
+                    $metadata['manual_overrides'][$field] = [
+                        'value' => $newValue,
+                        'imported_value' => data_get($metadata, "imported_snapshot.{$field}", $oldValue),
+                        'source' => 'manual',
+                        'updated_at' => now()->toISOString(),
+                    ];
+                    $manualOverrideFields[] = $field;
+                }
+            }
+        }
+
+        foreach (self::PRODUCT_METADATA_FIELDS as $field) {
+            if (! array_key_exists($field, $data)) {
+                continue;
+            }
+
+            if (filled($data[$field])) {
+                $metadata[$field] = $data[$field];
+            } else {
+                unset($metadata[$field]);
+            }
+        }
+
+        $previousActivation = $this->activationFromMetadata($metadata);
+
+        foreach (['virtual_try_on_enabled', 'measurement_table_enabled'] as $flag) {
+            if (! array_key_exists($flag, $data)) {
+                continue;
+            }
+
+            $enabled = $this->booleanFlag($data[$flag]);
+            $metadata['activation'][$flag] = $enabled;
+            $metadata['activation']["{$flag}_updated_at"] = now()->toISOString();
+
+            if ($previousActivation[$flag] !== $enabled) {
+                $activationChanges[$flag] = [
+                    'from' => $previousActivation[$flag],
+                    'to' => $enabled,
+                ];
+            }
+        }
+
+        if ($activationChanges !== []) {
+            $metadata['activation']['updated_at'] = now()->toISOString();
+        }
+
+        if ($manualOverrideFields !== []) {
+            $metadata = $this->appendProductHistory($metadata, 'manual_overrides.updated', [
+                'fields' => array_values(array_unique($manualOverrideFields)),
+            ]);
+        }
+
+        if ($activationChanges !== []) {
+            $metadata = $this->appendProductHistory($metadata, 'activation.updated', [
+                'changes' => $activationChanges,
+            ]);
+        }
+
+        return [
+            'metadata' => $metadata,
+            'manual_override_fields' => array_values(array_unique($manualOverrideFields)),
+            'activation_changes' => $activationChanges,
+        ];
+    }
+
+    private function snapshotFromProduct(Product $product, array $metadata): array
+    {
+        return collect(self::PRODUCT_ORIGIN_FIELDS)
+            ->mapWithKeys(fn (string $field): array => [$field => $this->productFieldValue($product, $metadata, $field)])
+            ->filter(fn (mixed $value): bool => filled($value))
+            ->all();
+    }
+
+    private function productFieldValue(Product $product, array $metadata, string $field): mixed
+    {
+        if (in_array($field, self::PRODUCT_METADATA_FIELDS, true)) {
+            return data_get($metadata, $field);
+        }
+
+        return $product->{$field};
+    }
+
+    private function sameFieldValue(mixed $oldValue, mixed $newValue): bool
+    {
+        return trim((string) $oldValue) === trim((string) $newValue);
+    }
+
+    private function activationFromMetadata(array $metadata): array
+    {
+        return [
+            'virtual_try_on_enabled' => $this->booleanFlag(data_get($metadata, 'activation.virtual_try_on_enabled', true)),
+            'measurement_table_enabled' => $this->booleanFlag(data_get($metadata, 'activation.measurement_table_enabled', true)),
+        ];
+    }
+
+    private function booleanFlag(mixed $value): bool
+    {
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
+    }
+
+    private function appendProductHistory(array $metadata, string $event, array $details): array
+    {
+        $history = is_array($metadata['history'] ?? null) ? $metadata['history'] : [];
+        array_unshift($history, [
+            'event' => $event,
+            'source' => 'manual',
+            'details' => $details,
+            'created_at' => now()->toISOString(),
+        ]);
+
+        $metadata['history'] = array_slice($history, 0, 25);
+
+        return $metadata;
+    }
+
+    private function logProductUpdateAudits(Request $request, $merchant, Product $product, array $metadataResult): void
+    {
+        $logger = app(AuditLogger::class);
+
+        if ($metadataResult['activation_changes'] !== []) {
+            $logger->log($request, $merchant, 'product.activation_updated', 'products', 'info', [
+                'module' => 'products',
+                'action' => 'update_activation',
+                'merchant_company_id' => $product->merchant_company_id,
+                'product_id' => $product->id,
+                'changes' => $metadataResult['activation_changes'],
+            ], $product);
+        }
+
+        if ($metadataResult['manual_override_fields'] !== []) {
+            $logger->log($request, $merchant, 'product.manual_override_updated', 'products', 'info', [
+                'module' => 'products',
+                'action' => 'manual_override',
+                'merchant_company_id' => $product->merchant_company_id,
+                'product_id' => $product->id,
+                'fields' => $metadataResult['manual_override_fields'],
+            ], $product);
+        }
     }
 }

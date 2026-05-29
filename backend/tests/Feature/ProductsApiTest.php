@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditLog;
 use App\Models\MeasurementTable;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
@@ -218,6 +219,86 @@ class ProductsApiTest extends TestCase
             ->assertJsonPath('meta.total', 1)
             ->assertJsonPath('data.0.name', 'S130 Calca erro sync Zak')
             ->assertJsonPath('data.0.has_sync_error', true);
+    }
+
+    public function test_product_detail_tracks_origin_activation_and_manual_overrides(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $merchant = Merchant::query()->where('slug', 'provador-virtual-demo')->firstOrFail();
+        $company = MerchantCompany::query()->where('merchant_id', $merchant->id)->firstOrFail();
+        $table = MeasurementTable::query()->where('merchant_id', $merchant->id)->firstOrFail();
+
+        $product = $this->createOperationalProduct($merchant, $company, $table, [
+            'name' => 'S131 Camisa importada',
+            'slug' => 's131-camisa-importada',
+            'sku' => 'S131-BIGSHOP',
+            'external_product_id' => 'BS-S131',
+            'category' => 'Camisas',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'metadata' => [
+                'source' => 'bigshop',
+                'brand' => 'Zak',
+                'age_group' => 'adult',
+                'field_sources' => [
+                    'name' => 'bigshop',
+                    'brand' => 'bigshop',
+                    'measurement_table_id' => 'rule',
+                ],
+                'imported_snapshot' => [
+                    'name' => 'S131 Camisa importada',
+                    'brand' => 'Zak',
+                    'measurement_table_id' => $table->id,
+                ],
+                'activation' => [
+                    'virtual_try_on_enabled' => true,
+                    'measurement_table_enabled' => true,
+                ],
+            ],
+        ], ['P', 'M']);
+
+        $this->withHeaders($headers)
+            ->getJson("/api/v1/products/{$product->id}")
+            ->assertOk()
+            ->assertJsonPath('data.source_label', 'BigShop')
+            ->assertJsonPath('data.activation.virtual_try_on_enabled', true)
+            ->assertJsonPath('data.origin_fields.2.field', 'name')
+            ->assertJsonPath('data.origin_fields.2.source_label', 'BigShop')
+            ->assertJsonPath('data.origin_fields.10.source_label', 'Regra');
+
+        $response = $this->withHeaders($headers)
+            ->patchJson("/api/v1/products/{$product->id}", [
+                'name' => 'S131 Camisa ajustada no painel',
+                'brand' => 'Zak Ajustada',
+                'virtual_try_on_enabled' => false,
+                'measurement_table_enabled' => false,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.name', 'S131 Camisa ajustada no painel')
+            ->assertJsonPath('data.brand', 'Zak Ajustada')
+            ->assertJsonPath('data.activation.virtual_try_on_enabled', false)
+            ->assertJsonPath('data.activation.measurement_table_enabled', false)
+            ->assertJsonPath('data.manual_overrides.name.imported_value', 'S131 Camisa importada')
+            ->assertJsonPath('data.manual_overrides.name.value', 'S131 Camisa ajustada no painel')
+            ->assertJsonPath('data.manual_overrides.brand.imported_value', 'Zak')
+            ->assertJsonPath('data.origin_fields.2.source_label', 'Manual');
+
+        $diagnosticCodes = collect($response->json('data.diagnostics'))->pluck('code')->all();
+        $this->assertContains('virtual_try_on_disabled', $diagnosticCodes);
+        $this->assertContains('measurement_table_disabled', $diagnosticCodes);
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'product.activation_updated',
+            'auditable_type' => Product::class,
+            'auditable_id' => $product->id,
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'product.manual_override_updated',
+            'auditable_type' => Product::class,
+            'auditable_id' => $product->id,
+        ]);
+        $this->assertSame(2, AuditLog::query()->where('auditable_id', $product->id)->count());
     }
 
     private function loginToken(): string

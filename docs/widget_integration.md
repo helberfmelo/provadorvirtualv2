@@ -105,6 +105,8 @@ Regra Sprint 78: qualquer clique/toque no tamanho recomendado, seja no banner de
 
 Status Sprint 104/105: a etapa inicial do fluxo foi enxugada para evitar repetição sobre altura e peso. O estado padrão mostra apenas o aviso para preencher altura/peso antes dos campos, com blocos mais compactos. Tooltips de medidas devem exibir acentuação correta e não entidades HTML escapadas.
 
+Status Sprint 131: o widget/API pública respeita a ativação individual do produto. `config-check` e `recommendations` retornam `configured=false` com motivo explícito quando o produto estiver inativo, sem tabela, com Provador Virtual desligado ou com Tabela de Medidas bloqueada no detalhe do produto.
+
 ## Evolucao inteligente prevista
 
 Benchmark Sizebay/Zak em `docs/sizebay_benchmark.md` confirmou que o widget deve evoluir para:
@@ -128,7 +130,7 @@ Endpoints usados pelo widget:
 - `POST /api/v1/public/recommendations/{id}/signal`
 - `POST /api/v1/public/shopper-profiles/forget`
 
-`config-check` retorna também a tabela de medidas normalizada para o modal público, quando o produto estiver configurado.
+`config-check` retorna também a tabela de medidas normalizada para o modal público, quando o produto estiver configurado. Quando bloqueado por produto, retorna `reason` como `virtual_try_on_disabled`, `measurement_table_disabled`, `product_inactive` ou `measurement_table_missing`.
 
 `recommendations` retorna `shopper_profile` com `id`, token inicial, qualidade do perfil e mensagem para o consumidor. O token nunca fica em log ou HTML do lojista; fica somente no navegador do comprador.
 

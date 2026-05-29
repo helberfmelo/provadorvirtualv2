@@ -26,11 +26,13 @@ class RecommendationController extends Controller
     public function configCheck(RecommendationConfigCheckRequest $request)
     {
         $product = $this->resolveProduct($request->validated());
+        $configurationIssue = $this->configurationIssue($product);
 
-        if (! $product || ! $product->measurementTable()->exists()) {
+        if ($configurationIssue) {
             return response()->json([
                 'configured' => false,
-                'reason' => 'measurement_table_missing',
+                'reason' => $configurationIssue['reason'],
+                'message' => $configurationIssue['message'],
             ]);
         }
 
@@ -40,6 +42,8 @@ class RecommendationController extends Controller
             'configured' => true,
             'product_id' => $product->id,
             'measurement_table_id' => $product->measurement_table_id,
+            'virtual_try_on_enabled' => true,
+            'measurement_table_enabled' => true,
             'available_sizes' => $product->measurementTable->rows->pluck('size_label')->values(),
             'measurement_table' => [
                 'id' => $product->measurementTable->id,
@@ -77,11 +81,13 @@ class RecommendationController extends Controller
     ) {
         $data = $request->validated();
         $product = $this->resolveProduct($data);
+        $configurationIssue = $this->configurationIssue($product);
 
-        if (! $product || ! $product->measurementTable()->exists()) {
+        if ($configurationIssue) {
             return response()->json([
                 'configured' => false,
-                'message' => 'Produto sem tabela de medidas configurada.',
+                'reason' => $configurationIssue['reason'],
+                'message' => $configurationIssue['message'],
             ], 422);
         }
 
@@ -231,6 +237,57 @@ class RecommendationController extends Controller
         }
 
         return $query->first();
+    }
+
+    private function configurationIssue(?Product $product): ?array
+    {
+        if (! $product) {
+            return [
+                'reason' => 'measurement_table_missing',
+                'message' => 'Produto sem tabela de medidas configurada.',
+            ];
+        }
+
+        if ($product->status !== 'active') {
+            return [
+                'reason' => 'product_inactive',
+                'message' => 'Produto inativo no Provador Virtual.',
+            ];
+        }
+
+        if (! $this->productFlagEnabled($product, 'virtual_try_on_enabled')) {
+            return [
+                'reason' => 'virtual_try_on_disabled',
+                'message' => 'Provador Virtual desativado para este produto.',
+            ];
+        }
+
+        if (! $this->productFlagEnabled($product, 'measurement_table_enabled')) {
+            return [
+                'reason' => 'measurement_table_disabled',
+                'message' => 'Tabela de medidas desativada para este produto.',
+            ];
+        }
+
+        if (! $product->measurementTable()->exists()) {
+            return [
+                'reason' => 'measurement_table_missing',
+                'message' => 'Produto sem tabela de medidas configurada.',
+            ];
+        }
+
+        return null;
+    }
+
+    private function productFlagEnabled(Product $product, string $flag): bool
+    {
+        $value = data_get($product->metadata ?? [], "activation.{$flag}", true);
+
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
     }
 
     private function resolveMerchantContext(array $data): array

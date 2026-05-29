@@ -1354,3 +1354,16 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
 - Commit `84ea4be` enviado para `main`; o run `26629170275` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 131 Detalhe do produto, origem dos dados e ativação por produto
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy, API pública e sessão Sizebay.
+- Acessado o MySizebay da Zak em modo somente leitura em `/products/form/new` e no detalhe de produto existente, sem alterar dados, sem salvar, sem publicar e sem acionar suporte.
+- O benchmark Sizebay confirmou formulário longo com `Integration information`, Product ID, imagem, campos principais, toggle `Enable Virtual Fitting Room`, tamanhos da loja, tabela do Size & Fit Advisor, seleção de tamanhos e botões Cancel/Save.
+- O Provador Virtual evoluiu esse padrão para uma tela de detalhe com abas Resumo, Origem, Tabela, Tamanhos, Mídia, Diagnóstico e Histórico, mantendo primeira leitura limpa e ações separadas.
+- `ProductResource` passou a expor ativação individual, origem por campo, snapshot importado, overrides manuais, diagnóstico acionável e histórico por metadados/auditoria.
+- `PATCH /api/v1/products/{id}` agora preserva dados importados em `metadata.imported_snapshot`, registra `metadata.manual_overrides` para ajustes manuais e audita mudanças de ativação/override sem gravar segredos.
+- O produto ganhou ativação individual para Provador Virtual e Tabela de Medidas em `metadata.activation`; a prontidão e os filtros passam a tratar produtos desativados individualmente como pendentes.
+- A API pública de recomendação/config-check passa a respeitar `virtual_try_on_enabled`, `measurement_table_enabled` e status do produto, retornando motivo explícito quando o widget deve ficar oculto.
+- Validação visual local rodou em `http://127.0.0.1:5175/app/produtos/5/editar`, com backend local em `8001`, cobrindo desktop e mobile, abas de origem/tabela/diagnóstico/histórico e sem overflow horizontal.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter 'ProductsApiTest|RecommendationApiTest'`, `php vendor\bin\pint --dirty` e `npm --prefix frontend run build`.

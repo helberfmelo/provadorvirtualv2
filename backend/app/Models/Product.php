@@ -38,4 +38,9 @@ class Product extends Model
     {
         return $this->belongsTo(MeasurementTable::class);
     }
+
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'auditable')->latest();
+    }
 }
