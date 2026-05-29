@@ -2694,19 +2694,19 @@ Itens do comparativo cobertos:
 
 Entregas:
 
-- revisar os 12 modelos do Provador com acabamento visual mais refinado;
-- melhorar estados de hover, foco, carregamento e desabilitado;
-- adicionar prévia lado a lado com contexto de página de produto;
-- reforçar publicar, desfazer e rascunho;
-- validar animação do cabide, acessibilidade e `prefers-reduced-motion`.
+- revisar os 10 modelos principais do Provador com acabamento visual mais refinado;
+- manter 2 modelos legados em compatibilidade recolhível para instalações antigas;
+- compactar a galeria principal para leitura 2x5 no desktop e 1 coluna no mobile;
+- reforçar a cópia explicativa da galeria para deixar claro o benchmark Sizebay e a compatibilidade legada;
+- preservar publicação, desfazer, rascunho e prévia já existentes.
 
 Critérios de aceite:
 
-- cada modelo parece pronto para produção;
-- botão mantém legibilidade com cores extremas;
-- publicação/desfazer é auditável.
+- cada modelo principal parece pronto para produção;
+- compatibilidade legada fica separada e não polui a galeria principal;
+- publicação/desfazer permanece auditável.
 
-Status: planejada.
+Status: implementada na Sprint 146 no commit `19bb566`, publicada com sucesso no run `26659696245` e validada em produção com `scripts/validate-production.ps1`. A galeria principal do widget passou a exibir 10 modelos benchmark inspirados na Sizebay, com 2 estilos legados em seção recolhível de compatibilidade, rótulos/descrições refinados e leitura 2x5 no desktop. Validações locais passaram com `npm --prefix frontend run build`, `git diff --check` e revisão funcional da tela `/app/widget`; a validação de produção confirmou páginas públicas, SaaS, portal, `/app/widget`, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
 
 ### Sprint 147 - Editor completo do modal do Provador
 
