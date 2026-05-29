@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use App\Models\Product;
 use App\Support\PlatformCatalog;
+use App\Support\WidgetPlacementCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -27,7 +28,7 @@ class WidgetInstallResource extends JsonResource
             'public_key' => $this->public_key,
             'platform' => $this->platform,
             'allowed_domains' => $this->allowed_domains ?? [],
-            'theme' => $this->theme ?? [],
+            'theme' => $liveState['theme'],
             'is_active' => $this->is_active,
             'draft' => [
                 ...$draftState,
@@ -62,7 +63,7 @@ class WidgetInstallResource extends JsonResource
         return [
             'platform' => $this->platform ?: 'custom',
             'allowed_domains' => $this->allowed_domains ?? [],
-            'theme' => $this->theme ?? [],
+            'theme' => $this->themeWithDefaults($this->theme ?? []),
             'is_active' => (bool) $this->is_active,
         ];
     }
@@ -72,7 +73,7 @@ class WidgetInstallResource extends JsonResource
         return [
             'platform' => $this->draft_platform ?: $liveState['platform'],
             'allowed_domains' => $this->draft_allowed_domains ?? $liveState['allowed_domains'],
-            'theme' => $this->draft_theme ?? $liveState['theme'],
+            'theme' => $this->themeWithDefaults($this->draft_theme ?? $liveState['theme']),
             'is_active' => $this->draft_is_active ?? $liveState['is_active'],
         ];
     }
@@ -112,6 +113,7 @@ class WidgetInstallResource extends JsonResource
                     'steps' => $this->platformSteps($key, $entry['guide']['steps'] ?? []),
                     'data_support' => $entry['guide']['data_support'] ?? [],
                     'placement_label' => $this->placementLabel($key),
+                    'placement_suggestions' => WidgetPlacementCatalog::suggestions($key),
                     'snippet' => $this->snippetForPlatform($key, $scriptUrl, $cssUrl, $product),
                     'reload_snippet' => $this->reloadSnippetForPlatform($key),
                 ],
@@ -123,7 +125,7 @@ class WidgetInstallResource extends JsonResource
 
     private function snippetForPlatform(string $platform, string $scriptUrl, string $cssUrl, ?Product $product): string
     {
-        $theme = htmlspecialchars(json_encode($this->theme ?? [], JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8');
+        $theme = htmlspecialchars(json_encode($this->themeWithDefaults($this->theme ?? []), JSON_UNESCAPED_SLASHES), ENT_QUOTES, 'UTF-8');
         $sampleProductId = $product?->external_product_id ?? $product?->id ?? 'ID_DO_PRODUTO';
         $sampleSku = $product?->sku ?? 'SKU_DO_PRODUTO';
 
@@ -425,5 +427,14 @@ window.ProvadorVirtual?.reload({
 })
 JS,
         };
+    }
+
+    private function themeWithDefaults(array $theme): array
+    {
+        $theme['placement'] = WidgetPlacementCatalog::normalize(
+            is_array($theme['placement'] ?? null) ? $theme['placement'] : null
+        );
+
+        return $theme;
     }
 }

@@ -191,6 +191,56 @@ Regras:
 - não salva HTML da loja, apenas resumo dos checks e diagnóstico sanitizado;
 - falha remota gera `status=failed` e erro operacional em `integration_events`.
 
+## Posicionamento do botão
+
+O local visual dos botões do provador é configurado no tema do widget em `theme.placement`:
+
+```json
+{
+  "placement": {
+    "mode": "inside",
+    "selector": "#provador-virtual-container",
+    "container_id": "provador-virtual-container",
+    "validation": {
+      "status": "passed"
+    }
+  }
+}
+```
+
+Modos:
+
+- `inside`: cria/move o container dentro do seletor;
+- `after`: posiciona o container depois do seletor;
+- `before`: posiciona o container antes do seletor.
+
+Rota de prévia:
+
+```http
+POST /api/v1/widget-install/placement-preview
+```
+
+Payload:
+
+```json
+{
+  "platform": "shopify",
+  "url": "https://loja.com.br/produto-exemplo",
+  "mode": "after",
+  "selector": ".product-form__buttons",
+  "container_id": "provador-virtual-container"
+}
+```
+
+Regras:
+
+- aceita somente URLs públicas `http` ou `https`;
+- bloqueia `localhost`, IPs privados/reservados e hosts `.local`;
+- valida seletores CSS simples como `#id`, `.classe`, `tag`, `[data-atributo]`, combinações por espaço e atributos básicos;
+- não salva HTML da loja, somente checks sanitizados;
+- publicação do widget bloqueia seletor inválido ou última validação marcada como `failed`;
+- o JS público usa `data-pv-root` para não duplicar botões quando a loja recarrega o widget ou troca variação.
+
 ## Teste de webhook
 
 Rota protegida:

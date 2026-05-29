@@ -2583,7 +2583,7 @@ Critérios de aceite:
 - seletor inválido bloqueia publicação com mensagem clara;
 - widget não duplica botões.
 
-Status: planejada.
+Status: implementada localmente, aguardando commit/deploy. O configurador em `/app/widget` cobre modo dentro/depois/antes do seletor, sugestões por plataforma, endpoint protegido `POST /api/v1/widget-install/placement-preview`, salvamento em `theme.placement`, bloqueio de publicação para seletor inválido ou última validação falhada, CORS local para a prévia e script público com posicionamento por âncora sem duplicar raízes do widget. Validações locais passaram com `php -l`, testes focados de widget/integrações/recomendação/BigShop, PHPUnit completo (`124 tests`, `1345 assertions`), Pint, build frontend, `git diff --check`, varredura de segredos e validação visual headless desktop/mobile em `5177` com backend em `8002`.
 
 ### Sprint 143 - Histórico de sincronização e contadores por execução
 

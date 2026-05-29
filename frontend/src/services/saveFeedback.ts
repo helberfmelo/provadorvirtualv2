@@ -41,6 +41,7 @@ const ignoredFragments = [
   '/probe',
   '/sync',
   '/validate-install',
+  '/placement-preview',
   '/recommendations',
 ]
 

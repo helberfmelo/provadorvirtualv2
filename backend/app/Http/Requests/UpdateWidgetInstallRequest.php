@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Support\PlatformCatalog;
 use App\Support\WidgetButtonIconCatalog;
 use App\Support\WidgetButtonStyleCatalog;
+use App\Support\WidgetPlacementCatalog;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -41,6 +42,15 @@ class UpdateWidgetInstallRequest extends FormRequest
             'theme.button_icon_animation' => ['nullable', 'boolean'],
             'theme.confetti_enabled' => ['nullable', 'boolean'],
             'theme.presentation_mode' => ['nullable', 'string', Rule::in(['drawer', 'modal'])],
+            'theme.placement' => ['nullable', 'array'],
+            'theme.placement.mode' => ['nullable', 'string', Rule::in(WidgetPlacementCatalog::modes())],
+            'theme.placement.selector' => ['nullable', 'string', 'max:180'],
+            'theme.placement.container_id' => ['nullable', 'string', 'max:80', 'regex:/^[A-Za-z][A-Za-z0-9_-]*$/'],
+            'theme.placement.validation' => ['nullable', 'array'],
+            'theme.placement.validation.status' => ['nullable', 'string', Rule::in(['untested', 'passed', 'warning', 'failed'])],
+            'theme.placement.validation.url' => ['nullable', 'string', 'max:255'],
+            'theme.placement.validation.checked_at' => ['nullable', 'string', 'max:40'],
+            'theme.placement.validation.message' => ['nullable', 'string', 'max:180'],
             'is_active' => ['sometimes', 'boolean'],
         ];
     }

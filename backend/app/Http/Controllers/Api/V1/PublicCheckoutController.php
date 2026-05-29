@@ -13,6 +13,7 @@ use App\Services\CheckoutPaymentManager;
 use App\Services\TransactionalEmailService;
 use App\Support\CheckoutPlanCatalog;
 use App\Support\PlatformCatalog;
+use App\Support\WidgetPlacementCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
@@ -266,6 +267,7 @@ class PublicCheckoutController extends Controller
                 'button_icon_animation' => true,
                 'confetti_enabled' => true,
                 'presentation_mode' => 'drawer',
+                'placement' => WidgetPlacementCatalog::default(),
             ],
             'is_active' => true,
         ]);

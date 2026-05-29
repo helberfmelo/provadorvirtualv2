@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\MerchantCompany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class WidgetInstallApiTest extends TestCase
@@ -35,14 +36,18 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.theme.button_primary_icon', 'hanger')
             ->assertJsonPath('data.theme.button_secondary_icon', 'ruler')
             ->assertJsonPath('data.theme.button_icon_animation', true)
+            ->assertJsonPath('data.theme.placement.mode', 'inside')
+            ->assertJsonPath('data.theme.placement.selector', '#provador-virtual-container')
             ->assertJsonPath('data.draft.has_unpublished_changes', false)
             ->assertJsonPath('data.platform_guide.key', 'custom')
             ->assertJsonPath('data.platform_guide.guide.placement_label', 'Página de produto')
+            ->assertJsonPath('data.platform_guide.guide.placement_suggestions.0.selector', '#provador-virtual-container')
             ->assertJsonPath('data.platform_guides.0.key', 'bigshop');
 
         $this->assertStringContainsString('provador-virtual.js', $response->json('data.snippet'));
         $this->assertStringContainsString('data-merchant-id', $response->json('data.snippet'));
         $this->assertStringContainsString('data-platform="custom"', $response->json('data.snippet'));
+        $this->assertStringContainsString('placement', $response->json('data.snippet'));
 
         $this->withHeaders($headers)
             ->patchJson('/api/v1/widget-install', [
@@ -186,6 +191,92 @@ class WidgetInstallApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('data.platform', 'bigshop');
+    }
+
+    public function test_merchant_can_preview_and_publish_widget_placement(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+
+        Http::fake([
+            'https://loja.test/produto-midi' => Http::response(
+                '<html><body><form class="product-form"><div id="provador-virtual-container"></div><button type="submit">Comprar</button></form><script src="https://cdn.test/provador-virtual.js"></script></body></html>',
+                200
+            ),
+        ]);
+
+        $preview = $this->withHeaders($headers)
+            ->postJson('/api/v1/widget-install/placement-preview', [
+                'platform' => 'shopify',
+                'url' => 'https://loja.test/produto-midi',
+                'mode' => 'after',
+                'selector' => '.product-form',
+                'container_id' => 'provador-virtual-container',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'passed')
+            ->assertJsonPath('data.placement.mode', 'after')
+            ->assertJsonPath('data.diagnostics.anchor.matches', 1)
+            ->assertJsonPath('data.diagnostics.container.matches', 1)
+            ->assertJsonPath('data.diagnostics.container.before_script', true);
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'mode' => 'publish',
+                'platform' => 'shopify',
+                'theme' => [
+                    'placement' => [
+                        'mode' => 'after',
+                        'selector' => '.product-form',
+                        'container_id' => 'provador-virtual-container',
+                        'validation' => [
+                            'status' => $preview->json('data.status'),
+                            'url' => $preview->json('data.url'),
+                            'checked_at' => $preview->json('data.checked_at'),
+                        ],
+                    ],
+                ],
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'shopify')
+            ->assertJsonPath('data.theme.placement.mode', 'after')
+            ->assertJsonPath('data.theme.placement.selector', '.product-form')
+            ->assertJsonPath('data.theme.placement.validation.status', 'passed');
+    }
+
+    public function test_invalid_or_failed_widget_placement_blocks_publish(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'mode' => 'publish',
+                'theme' => [
+                    'placement' => [
+                        'mode' => 'inside',
+                        'selector' => 'div[',
+                    ],
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('theme.placement.selector');
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/widget-install', [
+                'mode' => 'publish',
+                'theme' => [
+                    'placement' => [
+                        'mode' => 'inside',
+                        'selector' => '#provador-virtual-container',
+                        'validation' => [
+                            'status' => 'failed',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('theme.placement.selector');
     }
 
     private function loginToken(): string

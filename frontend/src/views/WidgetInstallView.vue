@@ -3,6 +3,54 @@ import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
 import { useAuthStore } from '../stores/auth'
 
+type PlacementMode = 'inside' | 'after' | 'before'
+
+type PlacementSuggestion = {
+  selector: string
+  mode: PlacementMode
+  label: string
+}
+
+type PlacementValidation = {
+  status: 'untested' | 'passed' | 'warning' | 'failed'
+  url?: string | null
+  checked_at?: string | null
+  message?: string | null
+}
+
+type WidgetPlacement = {
+  mode: PlacementMode
+  selector: string
+  container_id: string
+  validation?: PlacementValidation
+}
+
+type PlacementPreview = {
+  status: 'passed' | 'warning' | 'failed'
+  url: string
+  http_status: number | null
+  platform: string
+  placement: {
+    mode: PlacementMode
+    selector: string
+    container_id: string
+    label: string
+  }
+  checks: Array<{
+    key: string
+    label: string
+    status: 'passed' | 'warning' | 'failed'
+    action: string | null
+  }>
+  diagnostics: {
+    anchor: { selector: string; matches: number }
+    container: { selector: string; matches: number; before_script: boolean | null }
+    script: { found: boolean }
+    duplicates: { container: boolean }
+  }
+  checked_at: string
+}
+
 type PlatformGuide = {
   key: string
   name: string
@@ -13,6 +61,7 @@ type PlatformGuide = {
     steps: string[]
     data_support: Record<string, string>
     placement_label: string
+    placement_suggestions: PlacementSuggestion[]
     snippet: string
     reload_snippet: string
   }
@@ -43,6 +92,7 @@ type WidgetInstall = {
     button_icon_animation?: boolean | string
     confetti_enabled?: boolean | string
     presentation_mode?: 'drawer' | 'modal' | string
+    placement?: WidgetPlacement
   }
   draft?: {
     platform: string
@@ -73,6 +123,32 @@ type WidgetInstall = {
   } | null
 }
 
+type WidgetForm = {
+  platform: string
+  allowed_domains: string
+  is_active: boolean
+  theme: {
+    primary: string
+    secondary: string
+    accent: string
+    background: string
+    text: string
+    font_family: string
+    font_size: string
+    font_weight: string
+    button_radius: string
+    button_style: string
+    button_background: string
+    button_text: string
+    button_primary_icon: string
+    button_secondary_icon: string
+    button_icon_animation: boolean
+    confetti_enabled: boolean
+    presentation_mode: 'drawer' | 'modal'
+    placement: WidgetPlacement
+  }
+}
+
 const auth = useAuthStore()
 const install = ref<WidgetInstall | null>(null)
 const loading = ref(false)
@@ -81,9 +157,12 @@ const copied = ref(false)
 const previewDevice = ref<'desktop' | 'mobile'>('desktop')
 const previewModalOpen = ref(false)
 const savedFormSnapshot = ref('')
+const placementTesting = ref(false)
+const placementPreview = ref<PlacementPreview | null>(null)
+const placementPreviewUrl = ref('')
 let confettiPreviewTimeout: number | null = null
 
-const form = reactive({
+const form = reactive<WidgetForm>({
   platform: 'custom',
   allowed_domains: '',
   is_active: true,
@@ -105,6 +184,14 @@ const form = reactive({
     button_icon_animation: true,
     confetti_enabled: true,
     presentation_mode: 'drawer',
+    placement: {
+      mode: 'inside' as PlacementMode,
+      selector: '#provador-virtual-container',
+      container_id: 'provador-virtual-container',
+      validation: {
+        status: 'untested' as const,
+      },
+    },
   },
 })
 
@@ -150,9 +237,15 @@ const platformOptions = computed(() => {
   }))
 })
 
-const presentationModeOptions = [
+const presentationModeOptions: Array<{ value: 'drawer' | 'modal'; label: string; icon: string }> = [
   { value: 'drawer', label: 'Drawer lateral', icon: 'fa-table-columns' },
   { value: 'modal', label: 'Modal central', icon: 'fa-window-maximize' },
+]
+
+const placementModeOptions: Array<{ value: PlacementMode; label: string; icon: string }> = [
+  { value: 'inside', label: 'Dentro', icon: 'fa-arrows-to-dot' },
+  { value: 'after', label: 'Depois', icon: 'fa-arrow-down' },
+  { value: 'before', label: 'Antes', icon: 'fa-arrow-up' },
 ]
 
 const buttonStyleOptions = [
@@ -360,6 +453,36 @@ const currentDataSupport = computed(() => {
     .map(([field, description]) => ({ field, description }))
 })
 
+const placementSuggestions = computed(() => {
+  return currentPlatformGuide.value?.guide.placement_suggestions?.length
+    ? currentPlatformGuide.value.guide.placement_suggestions
+    : [
+        { selector: '#provador-virtual-container', mode: 'inside' as PlacementMode, label: 'Container padrão' },
+        { selector: '.product-form', mode: 'after' as PlacementMode, label: 'Depois do formulário' },
+        { selector: 'button[type="submit"]', mode: 'before' as PlacementMode, label: 'Antes do comprar' },
+      ]
+})
+
+const placementValidation = computed<PlacementValidation>(() => form.theme.placement.validation || { status: 'untested' })
+
+const placementStatusLabel = computed(() => {
+  const status = placementValidation.value.status
+
+  if (status === 'passed') {
+    return 'Validado'
+  }
+
+  if (status === 'warning') {
+    return 'Com aviso'
+  }
+
+  if (status === 'failed') {
+    return 'Falhou'
+  }
+
+  return 'Não testado'
+})
+
 const platformInstallMode = computed(() => {
   if (currentPlatformGuide.value?.install_mode === 'one_click') {
     return 'Instalação assistida'
@@ -448,7 +571,28 @@ function fillForm(data: WidgetInstall) {
     || theme.confetti_enabled === true
     || theme.confetti_enabled === 'true'
     || theme.confetti_enabled === '1'
+  form.theme.placement = normalizePlacement(theme.placement)
+  placementPreview.value = null
+  placementPreviewUrl.value = form.theme.placement.validation?.url || data.company?.domain || ''
   savedFormSnapshot.value = JSON.stringify(formState())
+}
+
+function normalizePlacement(value: WidgetPlacement | undefined): WidgetPlacement {
+  const mode = value?.mode && placementModeOptions.some((option) => option.value === value.mode)
+    ? value.mode
+    : 'inside'
+
+  return {
+    mode,
+    selector: value?.selector || '#provador-virtual-container',
+    container_id: value?.container_id || 'provador-virtual-container',
+    validation: {
+      status: value?.validation?.status || 'untested',
+      url: value?.validation?.url || null,
+      checked_at: value?.validation?.checked_at || null,
+      message: value?.validation?.message || null,
+    },
+  }
 }
 
 function selectedMeasureIcon(value: string | undefined, fallback: string) {
@@ -487,7 +631,13 @@ function formState() {
     platform: form.platform,
     allowed_domains: domains.value,
     is_active: form.is_active,
-    theme: { ...form.theme },
+    theme: {
+      ...form.theme,
+      placement: {
+        ...form.theme.placement,
+        validation: { ...form.theme.placement.validation },
+      },
+    },
   }
 }
 
@@ -531,6 +681,55 @@ async function discardDraft() {
     fillForm(data.data)
   } finally {
     saving.value = false
+  }
+}
+
+function markPlacementUntested() {
+  placementPreview.value = null
+  form.theme.placement.validation = { status: 'untested' }
+}
+
+function setPlacementMode(mode: PlacementMode) {
+  form.theme.placement.mode = mode
+  markPlacementUntested()
+}
+
+function applyPlacementSuggestion(suggestion: PlacementSuggestion) {
+  form.theme.placement.selector = suggestion.selector
+  form.theme.placement.mode = suggestion.mode
+  markPlacementUntested()
+}
+
+function placementCheckClass(status: PlacementPreview['checks'][number]['status']) {
+  return {
+    ok: status === 'passed',
+    warning: status === 'warning',
+    danger: status === 'failed',
+  }
+}
+
+async function testPlacementSelector() {
+  placementTesting.value = true
+
+  try {
+    const { data } = await api.post('/widget-install/placement-preview', {
+      platform: form.platform,
+      url: placementPreviewUrl.value,
+      mode: form.theme.placement.mode,
+      selector: form.theme.placement.selector,
+      container_id: form.theme.placement.container_id,
+    })
+
+    placementPreview.value = data.data
+    const firstIssue = placementPreview.value?.checks.find((check) => check.status !== 'passed')
+    form.theme.placement.validation = {
+      status: placementPreview.value?.status || 'untested',
+      url: placementPreview.value?.url || placementPreviewUrl.value,
+      checked_at: placementPreview.value?.checked_at || null,
+      message: firstIssue?.action || null,
+    }
+  } finally {
+    placementTesting.value = false
   }
 }
 
@@ -663,6 +862,101 @@ function removeConfettiPreview() {
               <span>{{ currentPlatformGuide.summary }}</span>
             </div>
             <em>{{ currentPlatformGuide.guide.placement_label }}</em>
+          </div>
+
+          <div class="widget-placement-config">
+            <div class="subsection-heading compact-heading">
+              <h2>Posição na PDP</h2>
+              <span :class="['status-pill', placementValidation.status]">{{ placementStatusLabel }}</span>
+            </div>
+
+            <fieldset class="mode-selector widget-placement-mode">
+              <legend>Âncora do botão</legend>
+              <div class="segmented-control">
+                <button
+                  v-for="mode in placementModeOptions"
+                  :key="mode.value"
+                  type="button"
+                  :class="{ active: form.theme.placement.mode === mode.value }"
+                  @click="setPlacementMode(mode.value)"
+                >
+                  <i :class="['fa-solid', mode.icon]" aria-hidden="true"></i>
+                  {{ mode.label }}
+                </button>
+              </div>
+            </fieldset>
+
+            <div class="widget-placement-fields">
+              <label>
+                Seletor CSS
+                <input
+                  v-model="form.theme.placement.selector"
+                  placeholder="#provador-virtual-container"
+                  @input="markPlacementUntested"
+                />
+              </label>
+              <label>
+                URL da PDP
+                <input
+                  v-model="placementPreviewUrl"
+                  placeholder="https://loja.com.br/produto"
+                />
+              </label>
+              <button class="btn btn-secondary" type="button" :disabled="placementTesting || !form.theme.placement.selector" @click="testPlacementSelector">
+                <i class="fa-solid fa-magnifying-glass-location" aria-hidden="true"></i>
+                {{ placementTesting ? 'Testando...' : 'Testar seletor' }}
+              </button>
+            </div>
+
+            <div class="widget-placement-suggestions">
+              <button
+                v-for="suggestion in placementSuggestions"
+                :key="`${suggestion.mode}-${suggestion.selector}`"
+                type="button"
+                class="selector-chip"
+                @click="applyPlacementSuggestion(suggestion)"
+              >
+                <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                <span>{{ suggestion.label }}</span>
+                <code>{{ suggestion.selector }}</code>
+              </button>
+            </div>
+
+            <div class="widget-placement-preview">
+              <div class="placement-product-preview" :class="`placement-${form.theme.placement.mode}`">
+                <div class="placement-anchor">
+                  <span>Seletor</span>
+                  <strong>{{ form.theme.placement.selector }}</strong>
+                </div>
+                <div :class="['preview-widget-buttons', `preview-button-style-${form.theme.button_style}`]">
+                  <button type="button">
+                    <span :class="buttonIconClass('primary')" v-html="buttonIconHtml('primary')"></span>
+                    <span class="button-label">Descubra seu tamanho</span>
+                  </button>
+                  <button type="button">
+                    <span :class="buttonIconClass('secondary')" v-html="buttonIconHtml('secondary')"></span>
+                    <span class="button-label">Tabela de Medidas</span>
+                  </button>
+                </div>
+              </div>
+
+              <div v-if="placementPreview" class="placement-checks">
+                <span
+                  v-for="check in placementPreview.checks"
+                  :key="check.key"
+                  :class="placementCheckClass(check.status)"
+                >
+                  <i
+                    :class="[
+                      'fa-solid',
+                      check.status === 'passed' ? 'fa-circle-check' : check.status === 'warning' ? 'fa-triangle-exclamation' : 'fa-circle-xmark',
+                    ]"
+                    aria-hidden="true"
+                  ></i>
+                  {{ check.label }}
+                </span>
+              </div>
+            </div>
           </div>
         </section>
 

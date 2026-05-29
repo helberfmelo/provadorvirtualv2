@@ -106,6 +106,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,measurement_tables,edit');
         Route::get('/widget-install', [WidgetInstallController::class, 'show'])
             ->middleware('portal.permission:merchant,widget,view');
+        Route::post('/widget-install/placement-preview', [WidgetInstallController::class, 'placementPreview'])
+            ->middleware('portal.permission:merchant,widget,edit');
         Route::patch('/widget-install', [WidgetInstallController::class, 'update'])
             ->middleware('portal.permission:merchant,widget,edit');
         Route::get('/integrations', [IntegrationController::class, 'index'])

@@ -42,19 +42,16 @@
 
   function boot() {
     var container = resolveContainer(config.containerId);
-    if (!container) {
+    if (!mountRoot(container)) {
       return;
     }
-
-    root = document.createElement('div');
-    root.className = 'pv-widget-root';
-    container.appendChild(root);
 
     configCheck()
       .then(function (result) {
         state.configured = Boolean(result.configured);
         state.config = result;
         config.theme = Object.assign({}, config.theme, result.theme || {});
+        mountRoot(resolveContainer(config.containerId));
         emitConfigEvent(result);
 
         if (state.configured) {
@@ -188,7 +185,23 @@
   }
 
   function resolveContainer(containerId) {
-    var container = document.getElementById(containerId);
+    var placement = placementConfig(containerId);
+    var container = document.getElementById(placement.containerId);
+    var target = resolvePlacementTarget(placement, container);
+
+    if (container && target && container.contains(target)) {
+      return container;
+    }
+
+    if (target && target !== container) {
+      if (!container) {
+        container = document.createElement('div');
+        container.id = placement.containerId;
+      }
+
+      placeContainer(container, target, placement.mode);
+      return container;
+    }
 
     if (container) {
       return container;
@@ -198,6 +211,76 @@
     fallback.id = containerId;
     script.parentNode.insertBefore(fallback, script);
     return fallback;
+  }
+
+  function mountRoot(container) {
+    if (!container) {
+      return false;
+    }
+
+    container.querySelectorAll('.pv-widget-root[data-pv-root="true"]').forEach(function (node) {
+      if (node !== root && node.parentNode) {
+        node.parentNode.removeChild(node);
+      }
+    });
+
+    if (!root) {
+      root = document.createElement('div');
+      root.className = 'pv-widget-root';
+      root.setAttribute('data-pv-root', 'true');
+    }
+
+    if (root.parentNode !== container) {
+      container.appendChild(root);
+    }
+
+    return true;
+  }
+
+  function placementConfig(containerId) {
+    var theme = config.theme || {};
+    var placement = theme.placement && typeof theme.placement === 'object' ? theme.placement : {};
+    var mode = String(placement.mode || 'inside').toLowerCase();
+
+    if (['inside', 'after', 'before'].indexOf(mode) < 0) {
+      mode = 'inside';
+    }
+
+    return {
+      mode: mode,
+      selector: placement.selector ? String(placement.selector).trim() : '#' + containerId,
+      containerId: placement.container_id ? String(placement.container_id).trim() : containerId,
+    };
+  }
+
+  function resolvePlacementTarget(placement, container) {
+    if (!placement.selector) {
+      return container;
+    }
+
+    try {
+      var target = document.querySelector(placement.selector);
+
+      return target || container;
+    } catch (error) {
+      return container;
+    }
+  }
+
+  function placeContainer(container, target, mode) {
+    if (mode === 'before' && target.parentNode) {
+      target.parentNode.insertBefore(container, target);
+      return;
+    }
+
+    if (mode === 'after' && target.parentNode) {
+      target.parentNode.insertBefore(container, target.nextSibling);
+      return;
+    }
+
+    if (target !== container) {
+      target.appendChild(container);
+    }
   }
 
   function loadCss(url) {

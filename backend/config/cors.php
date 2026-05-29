@@ -30,7 +30,7 @@ return [
         'api/v1/taxonomy*',
         'api/v1/fit-profiles*',
         'api/v1/measurement-*',
-        'api/v1/widget-install',
+        'api/v1/widget-install*',
         'api/v1/integrations*',
         'api/v1/imports*',
         'api/v1/ai*',

@@ -8,6 +8,10 @@ param(
 $ErrorActionPreference = "Stop"
 
 $BaseUrl = $BaseUrl.TrimEnd("/")
+$FrontendBase = $BaseUrl
+if ($FrontendBase.EndsWith("/provadorvirtual_v2")) {
+    $FrontendBase = $FrontendBase.Substring(0, $FrontendBase.Length - "/provadorvirtual_v2".Length)
+}
 if ([string]::IsNullOrWhiteSpace($ApiBase)) {
     if ($BaseUrl.EndsWith("/provadorvirtual_v2")) {
         $ApiBase = "$BaseUrl/public/api/v1"
@@ -121,6 +125,8 @@ $widgetJs = Invoke-WebRequest -UseBasicParsing -Uri "$WidgetBase/provador-virtua
 Assert-True ($widgetJs.StatusCode -eq 200) "widget JS nao retornou 200"
 Assert-True ($widgetJs.Content.Contains("pv_shopper_profile_v2")) "widget JS sem perfil v2"
 Assert-True ($widgetJs.Content.Contains("role=`"dialog`"")) "widget JS sem dialog acessivel"
+Assert-True ($widgetJs.Content.Contains("placementConfig")) "widget JS sem posicionamento por seletor"
+Assert-True ($widgetJs.Content.Contains("data-pv-root")) "widget JS sem controle de duplicidade"
 Assert-True ($widgetJs.RawContentLength -lt 95000) "widget JS acima do limite de performance"
 "WIDGET js OK"
 
@@ -238,6 +244,24 @@ $headers = @{
     Accept = "application/json"
     Authorization = "Bearer $($login.token)"
 }
+
+$widgetInstall = Invoke-RestMethod -Uri "$ApiBase/widget-install" -Headers $headers
+Assert-True ($widgetInstall.data.theme.placement.selector -eq "#provador-virtual-container") "widget sem placement padrao"
+Assert-True (@($widgetInstall.data.platform_guide.guide.placement_suggestions).Count -gt 0) "widget sem sugestoes de seletor"
+"API widget install OK"
+
+$placementBody = @{
+    platform = $widgetInstall.data.platform
+    url = "$FrontendBase/produto-teste"
+    mode = "inside"
+    selector = "#app"
+    container_id = "provador-virtual-container"
+} | ConvertTo-Json -Depth 3
+
+$placementPreview = Invoke-RestMethod -Method Post -Uri "$ApiBase/widget-install/placement-preview" -Headers $headers -ContentType "application/json" -Body $placementBody
+Assert-True ($placementPreview.data.status -ne "failed") "preview de posicionamento falhou"
+Assert-True ($placementPreview.data.diagnostics.anchor.matches -gt 0) "preview nao encontrou seletor #app"
+"API widget placement preview $($placementPreview.data.status)"
 
 $readiness = Invoke-RestMethod -Uri "$ApiBase/go-live/readiness" -Headers $headers
 Assert-True ($readiness.summary.status -ne "blocked") "readiness bloqueado"

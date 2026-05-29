@@ -36,6 +36,10 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('button_primary_icon', $scriptContents);
         $this->assertStringContainsString('button_secondary_icon', $scriptContents);
         $this->assertStringContainsString('button_icon_animation', $scriptContents);
+        $this->assertStringContainsString('placementConfig', $scriptContents);
+        $this->assertStringContainsString('resolvePlacementTarget', $scriptContents);
+        $this->assertStringContainsString('placeContainer', $scriptContents);
+        $this->assertStringContainsString('data-pv-root', $scriptContents);
         $this->assertStringContainsString('buttonStyle', $scriptContents);
         $this->assertStringContainsString('buttonIconSvg', $scriptContents);
         $this->assertStringContainsString('buttonIconAnimationEnabled', $scriptContents);

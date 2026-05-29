@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Models\WidgetInstall;
 use App\Services\TransactionalEmailService;
 use App\Support\PlatformCatalog;
+use App\Support\WidgetPlacementCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -510,6 +511,7 @@ class SaasAdminController extends Controller
             'button_icon_animation' => true,
             'confetti_enabled' => true,
             'presentation_mode' => 'drawer',
+            'placement' => WidgetPlacementCatalog::default(),
         ];
     }
 }
