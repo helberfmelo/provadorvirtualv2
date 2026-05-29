@@ -4537,6 +4537,107 @@ textarea {
   font-weight: 800;
 }
 
+.integrations-stack {
+  display: grid;
+  gap: 18px;
+  width: min(100%, 1040px);
+  margin-top: 22px;
+}
+
+.integrations-form,
+.integration-section {
+  min-width: 0;
+}
+
+.integration-section {
+  display: grid;
+  gap: 14px;
+}
+
+.integration-section .subsection-heading {
+  align-items: center;
+}
+
+.integration-section .subsection-heading h2 {
+  font-size: 1.08rem;
+}
+
+.integration-platform-summary {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.integration-platform-summary span,
+.integration-platform-summary strong,
+.integration-platform-summary small {
+  display: block;
+  min-width: 0;
+}
+
+.integration-platform-summary strong {
+  color: #0f172a;
+}
+
+.integration-platform-summary small {
+  margin-top: 3px;
+  color: #4b5563;
+  line-height: 1.45;
+}
+
+.integration-platform-summary em {
+  justify-self: end;
+  padding: 6px 9px;
+  border-radius: 999px;
+  color: #92400e;
+  background: #fffbeb;
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.integration-platform-picker {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.integration-connection-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.integration-validation-grid {
+  grid-template-columns: minmax(260px, 1fr) minmax(180px, 0.42fr);
+  align-items: end;
+}
+
+.integration-validation-grid .btn {
+  width: 100%;
+}
+
+.integration-guide-columns {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.integration-guide-columns h3 {
+  margin: 0 0 8px;
+  color: #0f172a;
+  font-size: 0.96rem;
+}
+
+.integration-section .guide-snippet {
+  max-height: 320px;
+}
+
 .onboarding-grid {
   margin-top: 18px;
 }
@@ -5392,6 +5493,11 @@ td small {
   .checkout-card-grid,
   .company-profile-grid,
   .inline-form,
+  .integration-platform-summary,
+  .integration-platform-picker,
+  .integration-connection-grid,
+  .integration-validation-grid,
+  .integration-guide-columns,
   .integration-actions,
   .import-rule-editor-grid,
   .alias-row,
@@ -5437,6 +5543,10 @@ td small {
     grid-column: 1 / -1;
     justify-self: start;
     white-space: normal;
+  }
+
+  .integration-platform-summary em {
+    justify-self: start;
   }
 
   .button-style-option {

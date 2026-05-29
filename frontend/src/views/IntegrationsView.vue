@@ -533,104 +533,145 @@ function canRunBigShopApiAction() {
 
     <div v-if="loading" class="empty-state">Carregando integrações...</div>
 
-    <div v-else class="integrations-grid">
-      <aside class="platform-list">
-        <button
-          v-for="platform in platforms"
-          :key="platform.key"
-          class="platform-card"
-          :class="{ active: selected?.key === platform.key }"
-          type="button"
-          @click="selectPlatform(platform)"
-        >
-          <span class="platform-icon">
-            <i class="fa-solid" :class="platform.icon" aria-hidden="true"></i>
-          </span>
-          <span>
-            <strong>{{ platform.name }}</strong>
-            <small>{{ statusLabel(platform.status) }}</small>
-          </span>
-          <em v-if="platform.priority">Prioridade</em>
-        </button>
-      </aside>
+    <div v-else class="integrations-stack">
+      <form class="admin-form integrations-form" @submit.prevent="savePlatform">
+        <section class="panel-main integration-section integration-platform-section">
+          <div class="subsection-heading">
+            <h2>Plataforma</h2>
+            <span>{{ selected?.install_mode === 'one_click' ? 'Um clique' : 'Manual' }}</span>
+          </div>
 
-      <form class="panel-main admin-form" @submit.prevent="savePlatform">
-        <div class="subsection-heading">
-          <h2>{{ selected?.name }}</h2>
-          <span>{{ selected?.install_mode === 'one_click' ? 'Um clique' : 'Manual' }}</span>
-        </div>
-        <p class="guide-summary">{{ selected?.summary }}</p>
+          <div class="integration-platform-summary">
+            <span class="platform-icon">
+              <i class="fa-solid" :class="selected?.icon" aria-hidden="true"></i>
+            </span>
+            <span>
+              <strong>{{ selected?.name }}</strong>
+              <small>{{ selected?.summary }}</small>
+            </span>
+            <em>{{ statusLabel(selected?.status || form.status) }}</em>
+          </div>
 
-        <div class="form-grid">
-          <label>
-            <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.external_store_id" :data-tooltip="fieldHelp.external_store_id">i</span>
-              Loja
-            </span>
-            <input v-model="form.external_store_id" maxlength="120" />
-          </label>
-          <label>
-            <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.api_base_url" :data-tooltip="fieldHelp.api_base_url">i</span>
-              URL da API
-            </span>
-            <input v-model="form.api_base_url" type="url" maxlength="255" />
-          </label>
-          <label>
-            <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.feed_url" :data-tooltip="fieldHelp.feed_url">i</span>
-              URL do XML/feed
-            </span>
-            <input v-model="form.feed_url" type="text" inputmode="url" maxlength="255" :placeholder="feedPlaceholder" />
-          </label>
-          <label>
-            <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.status" :data-tooltip="fieldHelp.status">i</span>
-              Status
-            </span>
-            <select v-model="form.status">
-              <option value="draft">Rascunho</option>
-              <option value="configured">Configurada</option>
-              <option value="connected">Conectada</option>
-              <option value="disabled">Pausada</option>
-            </select>
-          </label>
-          <label>
-            <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.access_token" :data-tooltip="fieldHelp.access_token">i</span>
+          <div v-if="platforms.length > 1 && !isBigShopContract" class="integration-platform-picker" role="list">
+            <button
+              v-for="platform in platforms"
+              :key="platform.key"
+              class="platform-card"
+              :class="{ active: selected?.key === platform.key }"
+              type="button"
+              role="listitem"
+              @click="selectPlatform(platform)"
+            >
+              <span class="platform-icon">
+                <i class="fa-solid" :class="platform.icon" aria-hidden="true"></i>
+              </span>
+              <span>
+                <strong>{{ platform.name }}</strong>
+                <small>{{ statusLabel(platform.status) }}</small>
+              </span>
+              <em v-if="platform.priority">Prioridade</em>
+            </button>
+          </div>
+        </section>
+
+        <section class="panel-main integration-section">
+          <div class="subsection-heading">
+            <h2>Conexão</h2>
+            <span>Credenciais e catálogo</span>
+          </div>
+
+          <div class="form-grid integration-connection-grid">
+            <label>
+              <span class="field-label">
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.external_store_id" :data-tooltip="fieldHelp.external_store_id">i</span>
+                Loja
+              </span>
+              <input v-model="form.external_store_id" maxlength="120" />
+            </label>
+            <label>
+              <span class="field-label">
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.api_base_url" :data-tooltip="fieldHelp.api_base_url">i</span>
+                URL da API
+              </span>
+              <input v-model="form.api_base_url" type="url" maxlength="255" />
+            </label>
+            <label>
+              <span class="field-label">
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.feed_url" :data-tooltip="fieldHelp.feed_url">i</span>
+                URL do XML/feed
+              </span>
+              <input v-model="form.feed_url" type="text" inputmode="url" maxlength="255" :placeholder="feedPlaceholder" />
+            </label>
+            <label>
+              <span class="field-label">
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.status" :data-tooltip="fieldHelp.status">i</span>
+                Status
+              </span>
+              <select v-model="form.status">
+                <option value="draft">Rascunho</option>
+                <option value="configured">Configurada</option>
+                <option value="connected">Conectada</option>
+                <option value="disabled">Pausada</option>
+              </select>
+            </label>
+            <label>
+              <span class="field-label">
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.access_token" :data-tooltip="fieldHelp.access_token">i</span>
+                Token
+              </span>
+              <input v-model="form.access_token" autocomplete="off" />
+            </label>
+            <label>
+              <span class="field-label">
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.webhook_secret" :data-tooltip="fieldHelp.webhook_secret">i</span>
+                Webhook secret
+              </span>
+              <input v-model="form.webhook_secret" autocomplete="off" />
+            </label>
+          </div>
+
+          <div class="connection-flags">
+            <span :class="{ on: selected?.connection?.has_access_token }">
+              <i class="fa-solid fa-key" aria-hidden="true"></i>
               Token
             </span>
-            <input v-model="form.access_token" autocomplete="off" />
-          </label>
-          <label>
-            <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.webhook_secret" :data-tooltip="fieldHelp.webhook_secret">i</span>
-              Webhook secret
+            <span :class="{ on: selected?.connection?.has_webhook_secret }">
+              <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+              Webhook
             </span>
-            <input v-model="form.webhook_secret" autocomplete="off" />
-          </label>
-        </div>
+            <span :class="{ on: selected?.status === 'connected' }">
+              <i class="fa-solid fa-link" aria-hidden="true"></i>
+              Conexão
+            </span>
+          </div>
+        </section>
 
-        <div class="connection-flags">
-          <span :class="{ on: selected?.connection?.has_access_token }">
-            <i class="fa-solid fa-key" aria-hidden="true"></i>
-            Token
-          </span>
-          <span :class="{ on: selected?.connection?.has_webhook_secret }">
-            <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
-            Webhook
-          </span>
-          <span :class="{ on: selected?.status === 'connected' }">
-            <i class="fa-solid fa-link" aria-hidden="true"></i>
-            Conexão
-          </span>
-        </div>
-
-        <div class="guide-panel">
+        <section class="panel-main integration-section">
           <div class="subsection-heading">
-            <h2>Checklist</h2>
+            <h2>Validação da instalação</h2>
             <span>{{ validation?.status ? statusLabel(validation.status) : 'Pendente' }}</span>
           </div>
+
+          <div class="form-grid integration-validation-grid">
+            <label>
+              <span class="field-label">
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_url" :data-tooltip="fieldHelp.validation_url">i</span>
+                URL para validar
+              </span>
+              <input v-model="form.validation_url" type="url" placeholder="https://loja.com.br/produto" />
+            </label>
+            <label class="inline-action-label">
+              <span class="field-label">
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_action" :data-tooltip="fieldHelp.validation_action">i</span>
+                Validação
+              </span>
+              <button class="btn btn-secondary" type="button" :disabled="validating" @click="validateInstall">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                {{ validating ? 'Validando...' : 'Validar instalação' }}
+              </button>
+            </label>
+          </div>
+
           <div class="check-list install-checklist">
             <span
               v-for="item in selected?.guide.checklist"
@@ -649,54 +690,37 @@ function canRunBigShopApiAction() {
               {{ check.action }}
             </p>
           </div>
-        </div>
+        </section>
 
-        <div class="form-grid">
-          <label>
-            <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_url" :data-tooltip="fieldHelp.validation_url">i</span>
-              URL para validar
-            </span>
-            <input v-model="form.validation_url" type="url" placeholder="https://loja.com.br/produto" />
-          </label>
-          <label class="inline-action-label">
-            <span class="field-label">
-              <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.validation_action" :data-tooltip="fieldHelp.validation_action">i</span>
-              Validação
-            </span>
-            <button class="btn btn-secondary" type="button" :disabled="validating" @click="validateInstall">
-              <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-              {{ validating ? 'Validando...' : 'Validar instalação' }}
-            </button>
-          </label>
-        </div>
-
-        <div class="guide-panel">
+        <section class="panel-main integration-section">
           <div class="subsection-heading">
-            <h2>Passo a passo</h2>
-            <span>{{ selected?.name }}</span>
-          </div>
-          <ol class="guide-steps">
-            <li v-for="step in selected?.guide.steps" :key="step">{{ step }}</li>
-          </ol>
-        </div>
-
-        <div class="guide-panel">
-          <div class="subsection-heading">
-            <h2>Onde instalar o widget</h2>
+            <h2>Instalação no produto</h2>
             <span>Página de produto</span>
           </div>
-          <ul class="placement-steps">
-            <li v-for="step in installationPlacementSteps" :key="step">{{ step }}</li>
-          </ul>
+
+          <div class="integration-guide-columns">
+            <div>
+              <h3>Passo a passo</h3>
+              <ol class="guide-steps">
+                <li v-for="step in selected?.guide.steps" :key="step">{{ step }}</li>
+              </ol>
+            </div>
+            <div>
+              <h3>Onde instalar o widget</h3>
+              <ul class="placement-steps">
+                <li v-for="step in installationPlacementSteps" :key="step">{{ step }}</li>
+              </ul>
+            </div>
+          </div>
+
           <pre class="guide-snippet compact-snippet"><code>window.ProvadorVirtual?.reload({
   productId: 'ID_DO_PRODUTO',
   variantId: 'ID_DA_GRADE',
   sku: 'SKU_DA_GRADE'
 })</code></pre>
-        </div>
+        </section>
 
-        <div class="guide-panel">
+        <section class="panel-main integration-section">
           <div class="subsection-heading">
             <h2>Dados suportados</h2>
             <span>Matriz</span>
@@ -707,9 +731,9 @@ function canRunBigShopApiAction() {
               <strong>{{ value }}</strong>
             </span>
           </div>
-        </div>
+        </section>
 
-        <div class="guide-panel">
+        <section class="panel-main integration-section">
           <div class="subsection-heading">
             <h2>Snippet</h2>
             <button class="icon-link" type="button" :title="copied ? 'Copiado' : 'Copiar snippet'" @click="copyGuideSnippet">
@@ -717,70 +741,82 @@ function canRunBigShopApiAction() {
             </button>
           </div>
           <pre class="guide-snippet"><code>{{ selected?.guide.snippet }}</code></pre>
-        </div>
+        </section>
 
-        <div class="integration-actions">
-          <div class="integration-action-card">
-            <strong>Configuração</strong>
-            <button class="btn btn-primary" type="submit" :disabled="saving">
-              <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
-              Salvar integração
-            </button>
+        <section class="panel-main integration-section">
+          <div class="subsection-heading">
+            <h2>Ações</h2>
+            <span>Salvar e sincronizar</span>
           </div>
-          <div class="integration-action-card">
-            <strong>Catálogo XML/feed</strong>
-            <button
-              class="btn btn-secondary"
-              type="button"
-              :disabled="running"
-              @click="syncXmlFeed"
-            >
-              <i class="fa-solid fa-file-code" aria-hidden="true"></i>
-              Sincronizar XML/feed
-            </button>
-          </div>
-          <div v-if="selected?.key === 'bigshop'" class="integration-action-card integration-action-card-wide">
-            <strong>API BigShop</strong>
-            <div class="action-row compact">
-              <button
-                class="btn btn-secondary"
-                type="button"
-                :disabled="running"
-                @click="probeBigShop"
-              >
-                <i class="fa-solid fa-signal" aria-hidden="true"></i>
-                Testar conexão
-              </button>
-              <button
-                class="btn btn-secondary"
-                type="button"
-                :disabled="running"
-                @click="dryRunBigShop"
-              >
-                <i class="fa-solid fa-list-check" aria-hidden="true"></i>
-                Prévia segura
-              </button>
-              <button
-                class="btn btn-secondary"
-                type="button"
-                :disabled="running"
-                @click="syncBigShop"
-              >
-                <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
-                Sincronizar API
+          <div class="integration-actions">
+            <div class="integration-action-card">
+              <strong>Configuração</strong>
+              <button class="btn btn-primary" type="submit" :disabled="saving">
+                <i class="fa-solid fa-floppy-disk" aria-hidden="true"></i>
+                Salvar integração
               </button>
             </div>
+            <div class="integration-action-card">
+              <strong>Catálogo XML/feed</strong>
+              <button
+                class="btn btn-secondary"
+                type="button"
+                :disabled="running"
+                @click="syncXmlFeed"
+              >
+                <i class="fa-solid fa-file-code" aria-hidden="true"></i>
+                Sincronizar XML/feed
+              </button>
+            </div>
+            <div v-if="selected?.key === 'bigshop'" class="integration-action-card integration-action-card-wide">
+              <strong>API BigShop</strong>
+              <div class="action-row compact">
+                <button
+                  class="btn btn-secondary"
+                  type="button"
+                  :disabled="running"
+                  @click="probeBigShop"
+                >
+                  <i class="fa-solid fa-signal" aria-hidden="true"></i>
+                  Testar conexão
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  type="button"
+                  :disabled="running"
+                  @click="dryRunBigShop"
+                >
+                  <i class="fa-solid fa-list-check" aria-hidden="true"></i>
+                  Prévia segura
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  type="button"
+                  :disabled="running"
+                  @click="syncBigShop"
+                >
+                  <i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>
+                  Sincronizar API
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div v-if="integrationReport" class="integration-report">
-          <span v-for="(value, key) in integrationReport" :key="key">
-            <strong>{{ value }}</strong>
-            <small>{{ key }}</small>
-          </span>
-        </div>
+        <section v-if="integrationReport" class="panel-main integration-section">
+          <div class="subsection-heading">
+            <h2>Resultado da sincronização</h2>
+            <span>Última ação</span>
+          </div>
+          <div class="integration-report">
+            <span v-for="(value, key) in integrationReport" :key="key">
+              <strong>{{ value }}</strong>
+              <small>{{ key }}</small>
+            </span>
+          </div>
+        </section>
 
-        <div v-if="bigShopDryRun" class="guide-panel bigshop-dry-run-panel">
+        <section v-if="bigShopDryRun" class="panel-main integration-section bigshop-dry-run-panel">
           <div class="subsection-heading">
             <h2>Prévia BigShop</h2>
             <span>{{ dryRunStatusLabel(bigShopDryRun.status) }}</span>
@@ -857,9 +893,9 @@ function canRunBigShopApiAction() {
               <em :class="issue.severity">{{ issue.severity === 'error' ? 'Erro' : 'Alerta' }}</em>
             </article>
           </div>
-        </div>
+        </section>
 
-        <div v-if="selected?.key === 'bigshop'" class="guide-panel">
+        <section v-if="selected?.key === 'bigshop'" class="panel-main integration-section">
           <div class="subsection-heading">
             <h2>Ativações um clique</h2>
             <span>{{ bigShopActivations.length }} recentes</span>
@@ -876,7 +912,7 @@ function canRunBigShopApiAction() {
               <small>{{ activation.contract_version || 'contrato atual' }}</small>
             </article>
           </div>
-        </div>
+        </section>
       </form>
     </div>
   </section>
