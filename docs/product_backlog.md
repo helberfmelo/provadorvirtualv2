@@ -61,6 +61,7 @@ Atualizado em: 2026-05-25
 - `DONE` Validação de domínio/snippet instalado por URL pública.
 - `DONE` Matriz de dados suportados por plataforma.
 - `DONE` Tabelas `import_jobs` e `integration_events`.
+- `TODO` Criar migração assistida para clientes vindos da Sizebay, com Zak como piloto, importando tabelas, produtos, vínculos, marcas, categorias, modelagens, regras e dados agregados autorizados por prévia revisável.
 - `TODO` Webhooks quando houver contrato.
 
 ## IA
@@ -156,5 +157,6 @@ Atualizado em: 2026-05-25
 - `DONE` Estudar documentação pública Sizebay.
 - `DONE` Capturar fluxo Zak com Sizebay em camisa e calca.
 - `DONE` Identificar tenant Zak Sizebay `1235` e contrato técnico observado.
+- `TODO` Validar pacote de migração Sizebay com a Zak usando apenas dados autorizados/read-only, sem credenciais ou sessões versionadas.
 - `TODO` Capturar outras lojas com Sizebay de forma controlada.
 - `DONE` Documentar matriz de plataformas: Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart, Custom e BigShop.

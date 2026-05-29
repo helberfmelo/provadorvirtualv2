@@ -1482,3 +1482,12 @@
 - Corrigida a migration no commit `66d3391`, com nomes curtos de índices e guards para o caso de deploy parcialmente interrompido já ter criado tabelas antes de registrar a migration.
 - O run `26644028670` finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/taxonomia`, redirect legado `/provadorvirtual_v2/app/taxonomia` e `API taxonomy intelligence`. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Planejamento da Sprint 160 Migração Sizebay
+
+- Relida a documentação obrigatória e os documentos de Sizebay, Zak, importações, LGPD/aprendizado e backlog antes do ajuste de roadmap; `docs/credentials.local.md` foi conferido somente em modo mascarado.
+- Não houve novo acesso ao portal Sizebay, uso de credenciais, alteração remota, publicação, contato com suporte ou gravação de dados sensíveis.
+- Acrescentada ao roadmap a Sprint 160, planejada para migração assistida de clientes vindos da Sizebay, com a Zak como piloto real.
+- A sprint prevê importar, sempre via prévia e revisão, tabelas de medidas, produtos, variantes, vínculos produto-tabela, marcas, categorias, modelagens, regras de importação e dados agregados autorizados de relatórios/devoluções.
+- Registrados bloqueios de segurança: não importar segredos, cookies, sessões, dados pessoais de consumidores, mensagens de suporte ou qualquer dado sem autorização/base legal.
+- Atualizado o backlog para refletir a migração Sizebay/Zak como item futuro de integrações e benchmark.

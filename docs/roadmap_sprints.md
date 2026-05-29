@@ -3101,3 +3101,61 @@ Critérios de aceite:
 - build, testes, smoke e validação de produção passam.
 
 Status: planejada.
+
+### Sprint 160 - Migração Sizebay e importação assistida de clientes
+
+Contexto:
+
+- clientes que saem da Sizebay precisam trazer o máximo possível de configuração operacional para o Provador Virtual;
+- a Zak é o piloto real para validar o fluxo, usando os dados já conhecidos da BigShop/loja `124` e os materiais que o cliente autorizar fornecer;
+- qualquer acesso ao portal Sizebay continua somente leitura, sem salvar, publicar, alterar dados, contatar suporte ou registrar credenciais.
+
+Benchmark Sizebay antes de codar:
+
+- revisar Measurement Guide/Table Measurements, Products, Brands, Categories, Modelings, Settings/Data Sources, Settings/Sync, Importation Rules e Reports;
+- confirmar quais exportações o cliente consegue baixar do portal Sizebay e quais dados precisam vir de arquivos fornecidos pelo cliente;
+- comparar os dados exportados com o feed/API BigShop da Zak para medir cobertura, conflitos e campos ausentes antes de qualquer importação final.
+
+Itens do comparativo cobertos:
+
+- migração assistida de clientes Sizebay;
+- tabelas de medidas;
+- vínculos produto-tabela;
+- modelagens, marcas e categorias;
+- regras de importação;
+- relatórios e histórico agregado;
+- dados de aprendizado com minimização LGPD.
+
+Entregas:
+
+- criar fluxo de migração Sizebay com upload de pacote CSV/XLSX/JSON/ZIP e prévia antes de gravar;
+- aceitar como fontes arquivos exportados pelo cliente, capturas estruturadas autorizadas e dados próprios da loja, como feed/API BigShop da Zak;
+- criar parsers e mapeamentos para tabelas de medidas, linhas por tamanho, medidas corporais, medidas da peça, sistema de tamanho, unidade, ranges, observações e status;
+- importar ou reconciliar produtos, variantes, SKUs, links públicos, imagens, grade/tamanho, categoria, marca, gênero, faixa etária, modelagem e vínculo com tabela;
+- importar marcas, categorias, modelagens e regras de importação como sugestões revisáveis, aproveitando a taxonomia inteligente da Sprint 138;
+- gerar dry-run com criados, atualizados, ignorados, conflitos, baixa confiança, campos ausentes e produtos afetados;
+- criar fila de revisão para conflitos de tabela, categoria, marca, modelagem, sistema de tamanho e associação produto-tabela;
+- permitir aplicar lote somente após confirmação, com `batch_id`, auditoria e rollback/desfazer do lote;
+- registrar aprendizados aprovados para melhorar próximas importações, sem expor dados sensíveis;
+- para relatórios da Sizebay, importar apenas agregados permitidos pelo cliente, como uso por produto/categoria/dispositivo/período e devoluções normalizadas, evitando PII e mantendo pedido como hash quando necessário;
+- bloquear a importação de segredos, tokens, cookies, sessões, dados pessoais de consumidores, mensagens de suporte e qualquer dado sem base legal/autorização.
+
+Critérios de aceite:
+
+- nenhuma informação importada é aplicada sem prévia e confirmação;
+- mapeamento crítico de baixa confiança nunca vincula tabela ou altera categoria/marca/modelagem sem revisão humana;
+- cada sugestão mostra motivo, origem, confiança e impacto em produtos afetados;
+- a Zak gera dry-run comparando Sizebay/exportações autorizadas com BigShop/feed e mostra cobertura de produtos, tabelas, tamanhos e conflitos;
+- lote aplicado pode ser auditado e desfeito;
+- segredos Sizebay, cookies e sessões não aparecem em arquivos versionados, logs, banco em claro ou documentação;
+- dados agregados de relatório/devolução respeitam minimização LGPD e não expõem consumidor identificável;
+- mapeamentos aprovados melhoram importações futuras e aparecem na fila de aprendizado/taxonomia.
+
+Validações:
+
+- testes PHP para parsers, dry-run, aplicação, rollback, auditoria e bloqueios de baixa confiança;
+- testes de integração com os serviços existentes de produtos, tabelas, marcas, categorias, modelagens, importações, analytics e taxonomia;
+- build frontend e validação visual local na porta `5177`, com backend em `8002`;
+- `git diff --check`, Pint, varredura de segredos e validação de produção quando a sprint for implementada.
+
+Status: planejada.
