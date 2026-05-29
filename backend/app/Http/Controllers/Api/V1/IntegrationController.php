@@ -373,7 +373,7 @@ class IntegrationController extends Controller
             ->whereIn('event_type', ['dry_run_import', 'sync_products', 'xml_feed_sync'])
             ->orderByDesc('occurred_at')
             ->orderByDesc('id')
-            ->limit(30)
+            ->limit(60)
             ->get();
 
         $jobs = ImportJob::query()
@@ -394,6 +394,19 @@ class IntegrationController extends Controller
                 'with_errors' => $items->where('counters.errors', '>', 0)->count(),
                 'warnings' => $items->where('counters.warnings', '>', 0)->count(),
                 'last_status' => $items->first()['status'] ?? null,
+                'totals' => $this->syncTotals($items),
+                'by_origin' => $items->groupBy('origin.method')->map->count()->all(),
+                'by_status' => $items->groupBy('status')->map->count()->all(),
+                'timeline' => $items->take(16)->map(fn (array $item): array => [
+                    'id' => $item['id'],
+                    'status' => $item['status'],
+                    'title' => $item['title'],
+                    'origin' => $item['origin'],
+                    'occurred_at' => $item['occurred_at'],
+                    'total' => $item['counters']['total'],
+                    'errors' => $item['counters']['errors'],
+                    'warnings' => $item['counters']['warnings'],
+                ])->values()->all(),
             ],
         ]);
     }
@@ -503,34 +516,20 @@ class IntegrationController extends Controller
         $summary = $event->summary ?? [];
         $payload = $event->payload ?? [];
         $issues = $this->syncIssues($event, $job);
+        $counters = $this->syncCounters($summary, $issues, $job);
 
         return [
             'id' => $event->id,
+            'execution_key' => $this->syncExecutionKey($event),
             'platform' => $event->platform,
             'event_type' => $event->event_type,
             'title' => $this->syncEventTitle($event->event_type),
+            'origin' => $this->syncOrigin($event),
             'status' => $event->status,
             'occurred_at' => $event->occurred_at?->toISOString(),
+            'duration_seconds' => $this->syncDurationSeconds($summary, $job),
             'error' => $event->error,
-            'counters' => [
-                'products' => (int) (data_get($summary, 'products_read')
-                    ?? data_get($summary, 'products_synced')
-                    ?? data_get($summary, 'summary.products')
-                    ?? data_get($summary, 'total_rows')
-                    ?? 0),
-                'variants' => (int) (data_get($summary, 'variants_detected')
-                    ?? data_get($summary, 'variants_synced')
-                    ?? data_get($summary, 'summary.variants')
-                    ?? 0),
-                'tables' => (int) (data_get($summary, 'measurement_tables_synced')
-                    ?? data_get($summary, 'summary.measurement_tables')
-                    ?? 0),
-                'errors' => (int) (data_get($summary, 'errors_count')
-                    ?? data_get($summary, 'failed_rows')
-                    ?? $issues->where('severity', 'error')->count()),
-                'warnings' => (int) (data_get($summary, 'warnings_count')
-                    ?? $issues->where('severity', 'warning')->count()),
-            ],
+            'counters' => $counters,
             'summary' => [
                 'products_valid' => data_get($summary, 'products_valid'),
                 'products_with_grids' => data_get($summary, 'products_with_grids'),
@@ -544,9 +543,154 @@ class IntegrationController extends Controller
                 'import_status' => data_get($summary, 'import_status'),
                 'feed_host' => data_get($summary, 'feed_host'),
                 'http_status' => data_get($summary, 'http_status'),
+                'trigger' => data_get($summary, 'trigger'),
+                'source' => data_get($summary, 'source'),
             ],
             'sample_products' => collect(data_get($payload, 'sample_products', []))->take(8)->values()->all(),
             'issues' => $issues->take(80)->values()->all(),
+        ];
+    }
+
+    private function syncCounters(array $summary, $issues, ?ImportJob $job): array
+    {
+        $products = $this->counterValue($summary, [
+            'products_read',
+            'products_synced',
+            'summary.products',
+            'total_rows',
+        ], (int) ($job?->total_rows ?? 0));
+        $errors = $this->counterValue($summary, ['errors_count', 'failed_rows'], (int) $issues->where('severity', 'error')->count());
+        $warnings = $this->counterValue($summary, ['warnings_count'], (int) $issues->where('severity', 'warning')->count());
+        $inserted = $this->counterValue($summary, [
+            'inserted',
+            'created',
+            'products_created',
+            'imported_rows',
+            'summary.created',
+        ], (int) ($job?->imported_rows ?? 0));
+        $updated = $this->counterValue($summary, [
+            'updated',
+            'products_updated',
+            'summary.updated',
+        ]);
+        $ignored = $this->counterValue($summary, [
+            'ignored',
+            'skipped',
+            'products_without_grids',
+            'products_without_measurement_table',
+            'summary.ignored',
+        ]);
+        $unknown = $this->counterValue($summary, [
+            'unknown',
+            'unknown_rows',
+            'grids_without_product',
+            'summary.unknown',
+        ]);
+        $unchanged = $this->counterValue($summary, [
+            'unchanged',
+            'without_changes',
+            'summary.unchanged',
+        ]);
+        $total = $this->counterValue($summary, ['total', 'total_rows'], $products + $unknown + $ignored);
+
+        return [
+            'total' => $total,
+            'inserted' => $inserted,
+            'updated' => $updated,
+            'ignored' => $ignored,
+            'unknown' => $unknown,
+            'unchanged' => $unchanged,
+            'products' => $products,
+            'variants' => $this->counterValue($summary, [
+                'variants_detected',
+                'variants_synced',
+                'summary.variants',
+            ]),
+            'tables' => $this->counterValue($summary, [
+                'measurement_tables_synced',
+                'summary.measurement_tables',
+            ]),
+            'errors' => $errors,
+            'warnings' => $warnings,
+        ];
+    }
+
+    private function counterValue(array $summary, array $keys, int $default = 0): int
+    {
+        foreach ($keys as $key) {
+            $value = data_get($summary, $key);
+
+            if ($value !== null && $value !== '') {
+                return max(0, (int) $value);
+            }
+        }
+
+        return max(0, $default);
+    }
+
+    private function syncTotals($items): array
+    {
+        $keys = ['total', 'inserted', 'updated', 'ignored', 'unknown', 'unchanged', 'products', 'variants', 'tables', 'errors', 'warnings'];
+
+        return collect($keys)
+            ->mapWithKeys(fn (string $key): array => [$key => (int) $items->sum("counters.{$key}")])
+            ->all();
+    }
+
+    private function syncExecutionKey(IntegrationEvent $event): string
+    {
+        return implode('-', array_filter([
+            $event->platform,
+            $event->event_type,
+            $event->occurred_at?->format('YmdHis') ?: $event->id,
+            $event->id,
+        ]));
+    }
+
+    private function syncDurationSeconds(array $summary, ?ImportJob $job): ?int
+    {
+        if ($job?->started_at && $job?->finished_at) {
+            return max(0, $job->started_at->diffInSeconds($job->finished_at));
+        }
+
+        $duration = data_get($summary, 'duration_seconds');
+
+        return $duration === null ? null : max(0, (int) $duration);
+    }
+
+    private function syncOrigin(IntegrationEvent $event): array
+    {
+        $summary = $event->summary ?? [];
+        $trigger = (string) (data_get($summary, 'trigger') ?: data_get($summary, 'origin') ?: '');
+
+        if (in_array($trigger, ['manual', 'scheduled', 'webhook'], true)) {
+            $method = $trigger;
+        } elseif ($event->event_type === 'xml_feed_sync') {
+            $method = 'xml_feed';
+        } elseif ($event->event_type === 'sync_products') {
+            $method = 'api';
+        } else {
+            $method = 'manual';
+        }
+
+        $source = match ($event->event_type) {
+            'sync_products', 'dry_run_import' => $event->platform === 'bigshop' ? 'BigShop' : 'API',
+            'xml_feed_sync' => 'XML/feed',
+            default => $event->platform ?: 'manual',
+        };
+
+        $methodLabel = [
+            'manual' => 'Manual',
+            'scheduled' => 'Agendada',
+            'webhook' => 'Webhook',
+            'xml_feed' => 'XML/feed',
+            'api' => 'API',
+        ][$method] ?? ucfirst($method);
+
+        return [
+            'method' => $method,
+            'source' => $source,
+            'label' => $methodLabel.' / '.$source,
         ];
     }
 
@@ -554,18 +698,10 @@ class IntegrationController extends Controller
     {
         $issues = collect(data_get($event->payload ?? [], 'issues', []))
             ->filter(fn (mixed $issue): bool => is_array($issue))
-            ->map(fn (array $issue): array => [
-                'severity' => in_array($issue['severity'] ?? null, ['error', 'warning'], true) ? $issue['severity'] : 'warning',
-                'code' => (string) ($issue['code'] ?? $event->event_type),
-                'product_id' => $issue['product_id'] ?? null,
-                'product_name' => $issue['product_name'] ?? null,
-                'grid_id' => $issue['grid_id'] ?? null,
-                'line' => $issue['line'] ?? null,
-                'message' => (string) ($issue['message'] ?? 'Pendência de sincronização.'),
-            ]);
+            ->map(fn (array $issue): array => $this->syncIssueItem($issue, $event->event_type));
 
         if ($job?->errors) {
-            $issues = $issues->merge(collect($job->errors)->map(fn (array $row): array => [
+            $issues = $issues->merge(collect($job->errors)->map(fn (array $row): array => $this->syncIssueItem([
                 'severity' => 'error',
                 'code' => 'import_row_failed',
                 'product_id' => data_get($row, 'data.sku') ?: data_get($row, 'data.external_product_id'),
@@ -573,11 +709,11 @@ class IntegrationController extends Controller
                 'grid_id' => data_get($row, 'data.variant_sku'),
                 'line' => data_get($row, 'line'),
                 'message' => collect(data_get($row, 'errors', []))->filter()->join(' | ') ?: 'Linha não importada.',
-            ]));
+            ], 'import_row_failed')));
         }
 
         if ($event->error) {
-            $issues->push([
+            $issues->push($this->syncIssueItem([
                 'severity' => 'error',
                 'code' => 'sync_error',
                 'product_id' => null,
@@ -585,10 +721,33 @@ class IntegrationController extends Controller
                 'grid_id' => null,
                 'line' => null,
                 'message' => $event->error,
-            ]);
+            ], 'sync_error'));
         }
 
         return $issues;
+    }
+
+    private function syncIssueItem(array $issue, string $fallbackCode): array
+    {
+        $productId = $issue['product_id'] ?? null;
+        $code = (string) ($issue['code'] ?? $fallbackCode);
+
+        return [
+            'severity' => in_array($issue['severity'] ?? null, ['error', 'warning'], true) ? $issue['severity'] : 'warning',
+            'code' => $code,
+            'product_id' => $productId,
+            'product_name' => $issue['product_name'] ?? null,
+            'grid_id' => $issue['grid_id'] ?? null,
+            'line' => $issue['line'] ?? null,
+            'message' => (string) ($issue['message'] ?? 'Pendência de sincronização.'),
+            'action_url' => filled($productId) ? '/app/produtos?busca='.rawurlencode((string) $productId) : '/app/regras-de-importacao',
+            'action_label' => filled($productId) ? 'Abrir produto' : 'Revisar regra',
+            'rule_url' => '/app/regras-de-importacao',
+            'related' => [
+                'product' => filled($productId),
+                'rule' => str_contains($code, 'rule') || str_contains($code, 'mapping') || ! filled($productId),
+            ],
+        ];
     }
 
     private function syncEventTitle(string $type): string

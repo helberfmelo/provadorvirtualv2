@@ -299,6 +299,22 @@ Assert-True ($checkKeys -contains "sku_found") "checklist sem SKU"
 Assert-True ($checkKeys -contains "buttons_rendered") "checklist sem botoes renderizados"
 "API integrations OK"
 
+$syncHistory = Invoke-RestMethod -Uri "$ApiBase/integrations/sync-history" -Headers $headers
+Assert-True ($null -ne $syncHistory.data) "sync history sem data"
+Assert-True ($null -ne $syncHistory.meta) "sync history sem meta"
+$syncMetaKeys = @($syncHistory.meta.PSObject.Properties.Name)
+Assert-True ($syncMetaKeys -contains "totals") "sync history sem totais"
+Assert-True ($syncMetaKeys -contains "timeline") "sync history sem timeline"
+Assert-True ($syncMetaKeys -contains "by_origin") "sync history sem origem"
+Assert-True ($syncMetaKeys -contains "by_status") "sync history sem status"
+if (@($syncHistory.data).Count -gt 0) {
+    $firstSync = @($syncHistory.data)[0]
+    Assert-True ($null -ne $firstSync.execution_key) "sync history sem chave de execucao"
+    Assert-True ($null -ne $firstSync.origin) "sync history sem origem por execucao"
+    Assert-True ($null -ne $firstSync.counters.total) "sync history sem contador total"
+}
+"API sync history OK"
+
 $integrationChangeCurrent = Invoke-RestMethod -Uri "$ApiBase/merchant/integration-change-requests/current" -Headers $headers
 Assert-True ($integrationChangeCurrent.PSObject.Properties.Name -contains "data") "integration change current sem data"
 "API integration change current OK"

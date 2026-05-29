@@ -7509,9 +7509,136 @@ textarea {
 
 .sync-filters {
   display: grid;
-  grid-template-columns: repeat(2, minmax(180px, 240px));
+  grid-template-columns: repeat(3, minmax(160px, 240px));
   gap: 12px;
   align-items: end;
+}
+
+.sync-timeline {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 12px;
+}
+
+.sync-timeline button {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  gap: 4px 8px;
+  align-items: center;
+  min-width: 150px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+  color: #0f172a;
+  text-align: left;
+}
+
+.sync-timeline button.active {
+  border-color: #ff4d5e;
+  background: #fff5f6;
+}
+
+.sync-timeline i {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #d97706;
+}
+
+.sync-timeline i.ok {
+  background: #059669;
+}
+
+.sync-timeline i.failed,
+.sync-timeline i.error {
+  background: #dc2626;
+}
+
+.sync-timeline strong,
+.sync-timeline small,
+.sync-timeline em {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sync-timeline strong {
+  font-size: 0.88rem;
+}
+
+.sync-timeline small {
+  grid-column: 2;
+  color: #6b7280;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.sync-timeline em {
+  grid-column: 2;
+  color: #0f172a;
+  font-size: 0.78rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.sync-compare-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.sync-compare-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sync-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sync-compare-grid span {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.sync-compare-grid small {
+  color: #6b7280;
+  font-weight: 800;
+}
+
+.sync-compare-grid strong {
+  color: #0f172a;
+  font-size: 1.16rem;
+}
+
+.sync-compare-grid em {
+  width: fit-content;
+  padding: 3px 7px;
+  border-radius: 8px;
+  color: #6b7280;
+  background: #f3f4f6;
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 900;
+}
+
+.sync-compare-grid em.positive {
+  color: #047857;
+  background: #ecfdf5;
+}
+
+.sync-compare-grid em.negative {
+  color: #991b1b;
+  background: #fef2f2;
 }
 
 .sync-grid {
@@ -7525,6 +7652,18 @@ textarea {
 .sync-list-row small {
   color: #6b7280;
   font-weight: 700;
+}
+
+.sync-origin-pill {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 4px 7px;
+  border-radius: 8px;
+  color: #075985;
+  background: #e0f2fe;
+  font-size: 0.76rem;
+  font-weight: 900;
 }
 
 .sync-row-title {
@@ -7558,6 +7697,20 @@ textarea {
 .sync-detail-panel {
   display: grid;
   gap: 16px;
+}
+
+.sync-detail-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.sync-counter-grid span {
+  min-width: 104px;
 }
 
 .sync-key-values {
@@ -7594,6 +7747,25 @@ textarea {
 
 .sync-detail-panel td small {
   color: #6b7280;
+}
+
+.sync-issue-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.sync-issue-actions a {
+  width: fit-content;
+  padding: 5px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  color: #0f172a;
+  background: #fff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-decoration: none;
 }
 
 .assistant-status,
@@ -8086,6 +8258,8 @@ td small {
   .measurement-system-grid,
   .custom-variation-list article,
   .sync-filters,
+  .sync-compare-controls,
+  .sync-compare-grid,
   .sync-key-values,
   .install-grid,
   .widget-install-summary,

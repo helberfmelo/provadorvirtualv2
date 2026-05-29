@@ -450,10 +450,19 @@ XML, 200),
             'direction' => 'outbound',
             'status' => 'warning',
             'summary' => [
+                'trigger' => 'manual',
+                'source' => 'bigshop',
+                'duration_seconds' => 18,
+                'total' => 5,
                 'products_read' => 2,
                 'products_valid' => 2,
+                'products_created' => 1,
+                'products_updated' => 1,
+                'products_without_grids' => 1,
+                'unchanged' => 1,
                 'grids_read' => 4,
                 'grids_joined' => 3,
+                'grids_without_product' => 1,
                 'errors_count' => 1,
                 'warnings_count' => 2,
             ],
@@ -483,14 +492,35 @@ XML, 200),
         $this->withHeaders($headers)
             ->getJson('/api/v1/integrations/sync-history')
             ->assertOk()
+            ->assertJsonStructure(['data' => [['execution_key']]])
             ->assertJsonPath('meta.total', 1)
             ->assertJsonPath('meta.with_errors', 1)
+            ->assertJsonPath('meta.totals.total', 5)
+            ->assertJsonPath('meta.totals.inserted', 1)
+            ->assertJsonPath('meta.totals.updated', 1)
+            ->assertJsonPath('meta.totals.ignored', 1)
+            ->assertJsonPath('meta.totals.unknown', 1)
+            ->assertJsonPath('meta.totals.unchanged', 1)
+            ->assertJsonPath('meta.by_origin.manual', 1)
+            ->assertJsonPath('meta.by_status.warning', 1)
+            ->assertJsonPath('meta.timeline.0.total', 5)
             ->assertJsonPath('data.0.title', 'Prévia BigShop')
+            ->assertJsonPath('data.0.origin.method', 'manual')
+            ->assertJsonPath('data.0.origin.source', 'BigShop')
+            ->assertJsonPath('data.0.duration_seconds', 18)
+            ->assertJsonPath('data.0.counters.total', 5)
+            ->assertJsonPath('data.0.counters.inserted', 1)
+            ->assertJsonPath('data.0.counters.updated', 1)
+            ->assertJsonPath('data.0.counters.ignored', 1)
+            ->assertJsonPath('data.0.counters.unknown', 1)
+            ->assertJsonPath('data.0.counters.unchanged', 1)
             ->assertJsonPath('data.0.counters.products', 2)
             ->assertJsonPath('data.0.counters.errors', 1)
             ->assertJsonPath('data.0.sample_products.0.external_product_id', 'BS-10')
             ->assertJsonPath('data.0.issues.0.product_id', 'BS-999')
-            ->assertJsonPath('data.0.issues.0.grid_id', 'G999');
+            ->assertJsonPath('data.0.issues.0.grid_id', 'G999')
+            ->assertJsonPath('data.0.issues.0.action_label', 'Abrir produto')
+            ->assertJsonPath('data.0.issues.0.action_url', '/app/produtos?busca=BS-999');
     }
 
     public function test_bigshop_contract_can_only_access_bigshop_integration(): void

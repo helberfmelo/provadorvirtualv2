@@ -2613,7 +2613,7 @@ Critérios de aceite:
 - erros levam para produto ou regra relacionada;
 - histórico continua performático com muitos eventos.
 
-Status: planejada.
+Status: implementada localmente em 2026-05-29, aguardando commit, deploy e validação de produção. `GET /api/v1/integrations/sync-history` passa a retornar `execution_key`, origem, duração, contadores padronizados, totais, agrupamentos por origem/status e timeline compacta. `/app/sincronizacao` passa a exibir totais/inseridos/atualizados/ignorados/desconhecidos/sem alteração, filtro por origem, timeline, comparação entre execuções e ações para abrir produto ou revisar regra nos erros. Validações locais passaram com `php -l`, `IntegrationsApiTest`, suíte focada de integrações/importações/BigShop/analytics/SaaS/recomendação, PHPUnit completo (`124 tests`, `1368 assertions`), Pint, build frontend, `git diff --check`, sintaxe do script de produção, varredura de segredos e validação visual headless desktop/mobile em `5177` com backend em `8002`.
 
 ### Sprint 144 - Erros por produto com ações de correção
 
