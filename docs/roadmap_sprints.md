@@ -2119,7 +2119,7 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: em validação.
+Status: implementado na Sprint 127 no commit `a66236cb`, publicado com sucesso no run `26623161467`. Validação local documental passou com varredura de segredos e `git diff --check`; o GitHub Actions finalizou com deploy e smoke público com sucesso. A validação local pós-deploy com `scripts/validate-production.ps1` foi tentada, mas esta máquina não conseguiu abrir conexão TCP 443 para `provadorvirtual.online`/`108.179.241.241`, então o bloqueio ficou registrado como conectividade local.
 
 ### Sprint 128 - Navegação limpa e ajuda contextual
 
