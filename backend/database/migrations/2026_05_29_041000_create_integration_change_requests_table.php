@@ -17,9 +17,9 @@ return new class extends Migration
             $table->string('to_platform', 80);
             $table->string('status', 40)->default('pending')->index();
             $table->string('terms_version', 40);
-            $table->timestamp('terms_accepted_at')->nullable();
-            $table->timestamp('requested_at');
-            $table->timestamp('resolved_at')->nullable();
+            $table->dateTime('terms_accepted_at')->nullable();
+            $table->dateTime('requested_at');
+            $table->dateTime('resolved_at')->nullable();
             $table->string('payment_link')->nullable();
             $table->text('admin_notes')->nullable();
             $table->json('metadata')->nullable();
