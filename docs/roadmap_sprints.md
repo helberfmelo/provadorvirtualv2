@@ -2427,7 +2427,7 @@ Critérios de aceite:
 - categorias sem mapeamento aparecem como pendência operacional;
 - taxonomia alimenta regras, modelagens, IA e relatórios.
 
-Status: planejada.
+Status: implementado na Sprint 137 no commit `8c4d505`, publicado com sucesso no run `26640876246`. O benchmark read-only da Sizebay em `/categories` e `/sizebay-categories` mostrou a separação entre categorias locais, tipo de categoria, subcategorias e traduções da taxonomia global; o Provador Virtual evoluiu esse padrão com tela dedicada `/app/categorias`, descoberta automática das categorias vindas dos produtos, árvore inicial de taxonomia, sugestões revisáveis, edição de tipo/gênero/faixa etária/tradução, importação/exportação/mescla e aplicação em produtos preservando a categoria original. Validações locais passaram com PHPUnit completo (`117 tests`, `1201 assertions`), testes focados de categorias/produtos/recomendação/importações/integrações, Pint, PHP lint, build frontend, varredura de segredos, `git diff --check` e inspeção visual desktop/mobile em `5177`; o GitHub Actions finalizou com deploy e smoke público com sucesso, e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK` incluindo `/app/categorias`, redirect legado e `GET /api/v1/categories`.
 
 ### Sprint 138 - Taxonomia inteligente e base de aprendizado
 

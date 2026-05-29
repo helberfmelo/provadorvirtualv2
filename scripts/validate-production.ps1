@@ -92,6 +92,7 @@ Assert-Page "/app/produtos/novo"
 Assert-Page "/app/tabelas-de-medidas"
 Assert-Page "/app/tabelas-de-medidas/nova"
 Assert-Page "/app/modelagens"
+Assert-Page "/app/categorias"
 Assert-Page "/app/marcas"
 Assert-Page "/app/regras-de-importacao"
 Assert-Page "/app/integracoes"
@@ -103,6 +104,7 @@ if (-not $BaseUrl.EndsWith("/provadorvirtual_v2")) {
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/" "/"
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/login" "/login"
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/produtos/novo" "/app/produtos/novo"
+    Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/categorias" "/app/categorias"
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/marcas" "/app/marcas"
 }
 
@@ -243,5 +245,11 @@ $brands = Invoke-RestMethod -Uri "$ApiBase/brands" -Headers $headers
 Assert-True ($null -ne $brands.summary) "brands summary ausente"
 Assert-True ($null -ne $brands.data) "brands data ausente"
 "API brands OK"
+
+$categories = Invoke-RestMethod -Uri "$ApiBase/categories" -Headers $headers
+Assert-True ($null -ne $categories.summary) "categories summary ausente"
+Assert-True ($null -ne $categories.data) "categories data ausente"
+Assert-True ($null -ne $categories.taxonomy_categories) "categories taxonomy ausente"
+"API categories OK"
 
 "PRODUCTION VALIDATION OK"

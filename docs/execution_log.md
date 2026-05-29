@@ -1448,3 +1448,20 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
 - Commit `e5c3cc2` enviado para `main`; o run `26638565143` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente após incluir `/app/marcas` e `API brands`. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 137 Categorias locais e taxonomia normalizada
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy, API pública, integrações e sessão Sizebay.
+- Acessado o MySizebay da Zak em modo somente leitura em `/categories` e `/sizebay-categories`, sem alterar dados, sem importar/exportar, sem criar categoria, sem salvar e sem acionar suporte.
+- O benchmark Sizebay confirmou uma gestão separada entre categorias locais (`Name`, `Type`, ações de export/import/create) e taxonomia Sizebay (`Sizebay Category`, `Subcategories`, `Translations`, abas All/Shoes/Clothes), embora as tabelas tenham permanecido em loading nesta sessão.
+- Criadas as entidades `merchant_categories` e `taxonomy_categories`, com árvore inicial de taxonomia por tipo de peça, subcategorias, gênero, faixa etária, traduções e API `/api/v1/categories` para descobrir, revisar, importar/exportar, mesclar e aplicar categorias normalizadas.
+- A normalização preserva `products.category` e grava `metadata.category_original`, `metadata.normalized_category`, `metadata.rules_context.category` e `metadata.ai_context.category`, permitindo filtros, regras, IA, modelagens e relatórios usarem a taxonomia sem perder o nome recebido da loja.
+- Importações CSV/XML e sincronização BigShop passam a registrar a categoria local e reaplicar automaticamente a taxonomia quando o mapeamento já foi revisado.
+- `/app/categorias` ganhou painel de saúde da taxonomia, lista de pendências, sugestões revisáveis com confiança, edição de tipo/gênero/faixa etária/tradução, mescla de variações, importação com prévia e exportação/modelo CSV.
+- `/app/produtos` ganhou filtro por categoria normalizada e exibição conjunta da categoria original com a normalizada; analytics e config-check/recomendação pública passam a expor contexto de categoria normalizada.
+- O script `scripts/validate-production.ps1` passou a validar `/app/categorias`, redirect legado para `/app/categorias` e `GET /api/v1/categories`.
+- Validação visual local rodou em `http://127.0.0.1:5177/app/categorias`, com backend local em `8002`, cobrindo desktop e viewport mobile; a captura full-page mobile também mostrou apenas o menu off-canvas fora do viewport, sem afetar a tela visível.
+- Validações locais passaram com `php -l`, `php vendor\bin\pint --dirty --test`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter 'CategoryManagementApiTest|ProductsApiTest|RecommendationApiTest|ImportsApiTest|IntegrationsApiTest'`, PHPUnit completo (`117 tests`, `1201 assertions`) e `npm --prefix frontend run build` (com o aviso conhecido de bundle acima de 500 kB).
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram; os achados foram falsos positivos esperados em testes/demo e nomes técnicos de token.
+- Commit `8c4d505` enviado para `main`; o run `26640876246` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente após incluir `/app/categorias` e `API categories`. Resultado final: `PRODUCTION VALIDATION OK`.
