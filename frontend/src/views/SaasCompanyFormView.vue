@@ -340,6 +340,8 @@ async function updateChangeRequest(request: IntegrationChangeRequest) {
             <option value="loja_integrada">Loja Integrada</option>
             <option value="magento">Magento</option>
             <option value="opencart">OpenCart</option>
+            <option value="xml_feed">XML/feed</option>
+            <option value="api">API</option>
             <option value="custom">Personalizada</option>
           </select>
         </label>

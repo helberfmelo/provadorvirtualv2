@@ -120,7 +120,14 @@ async function toggleCompany(company: CompanyRow) {
                 <strong>{{ company.merchant.name }}</strong>
                 <small>{{ company.merchant.slug }}</small>
               </td>
-              <td>{{ company.platform }}</td>
+              <td>
+                <strong>{{ company.integration_state?.platform_label || company.platform }}</strong>
+                <small>
+                  {{ company.integration_state?.technical_label || 'Sem conexão' }}
+                  ·
+                  {{ company.integration_state?.commercial_label || company.merchant.billing_status }}
+                </small>
+              </td>
               <td>{{ [company.city, company.state].filter(Boolean).join('/') || '-' }}</td>
               <td>
                 <span class="status-pill" :class="{ ok: company.status === 'active', warning: company.status !== 'active' }">

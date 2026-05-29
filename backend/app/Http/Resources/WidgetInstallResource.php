@@ -197,6 +197,20 @@ class WidgetInstallResource extends JsonResource
                 'sku' => '{{ sku|default(model) }}',
                 'platform' => 'opencart',
             ]),
+            'xml_feed' => $this->scriptSnippet($scriptUrl, $cssUrl, $theme, [
+                'store_id' => $this->company?->domain ?: 'DOMINIO_OU_STORE_ID',
+                'product_id' => 'FEED_PRODUCT_ID',
+                'variant_id' => 'FEED_VARIANT_ID',
+                'sku' => 'SKU_DA_VARIANTE',
+                'platform' => 'xml_feed',
+            ]),
+            'api' => $this->scriptSnippet($scriptUrl, $cssUrl, $theme, [
+                'store_id' => $this->company?->external_store_id ?: 'API_STORE_ID',
+                'product_id' => 'API_PRODUCT_ID',
+                'variant_id' => 'API_VARIANT_ID',
+                'sku' => 'SKU_DA_VARIANTE',
+                'platform' => 'api',
+            ]),
             default => $this->scriptSnippet($scriptUrl, $cssUrl, $theme, [
                 'store_id' => $this->merchant_company_id ?: 'STORE_ID',
                 'product_id' => $sampleProductId,
@@ -296,6 +310,18 @@ class WidgetInstallResource extends JsonResource
                 'Use product_id e model/sku; se o SKU não estiver no template, exponha-o no controller.',
                 'Atualize option_value_id ou SKU no evento de opção selecionada e chame reload.',
             ],
+            'xml_feed' => [
+                'Mantenha o feed público sincronizado com os mesmos IDs usados na página de produto.',
+                'Cole o container perto da seleção de tamanho e use FEED_PRODUCT_ID, FEED_VARIANT_ID e SKU_DA_VARIANTE no snippet.',
+                'Quando o comprador trocar a variação, atualize os IDs para bater com o item do XML/feed.',
+                'Sincronize o catálogo no portal antes de validar o widget na loja.',
+            ],
+            'api' => [
+                'Use no snippet os mesmos IDs retornados pela API autorizada do cliente.',
+                'Cole o container na PDP e atualize produto, variação e SKU quando a seleção mudar.',
+                'Antes de publicar, valide que o conector API importou os produtos e que cada produto tem tabela revisada.',
+                'Webhooks de pedido/devolução exigem segredo salvo e nunca devem aparecer no HTML.',
+            ],
             default => $fallbackSteps,
         };
     }
@@ -311,6 +337,8 @@ class WidgetInstallResource extends JsonResource
             'loja_integrada' => 'Editor HTML/JS do tema',
             'magento' => 'catalog_product_view',
             'opencart' => 'product.twig',
+            'xml_feed' => 'PDP usando IDs do feed',
+            'api' => 'PDP usando IDs da API',
             'bigshop' => 'produto.vue / PDP BigShop',
             default => 'Página de produto',
         };

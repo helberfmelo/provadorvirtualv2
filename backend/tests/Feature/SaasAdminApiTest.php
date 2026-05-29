@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\PlatformConnection;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -51,6 +52,9 @@ class SaasAdminApiTest extends TestCase
             ])
             ->assertCreated()
             ->assertJsonPath('data.access_code', $expectedAccessCode)
+            ->assertJsonPath('data.integration_state.platform_label', 'Personalizada')
+            ->assertJsonPath('data.integration_state.technical_status', 'missing')
+            ->assertJsonPath('data.integration_state.commercial_status', 'trialing')
             ->json('data');
 
         $this->postJson('/api/v1/public/company-access', [
@@ -78,7 +82,29 @@ class SaasAdminApiTest extends TestCase
             ->assertCreated()
             ->assertJsonPath('data.platform', 'bigshop')
             ->assertJsonPath('data.bigshop_discount_active', true)
+            ->assertJsonPath('data.integration_state.platform_label', 'BigShop')
+            ->assertJsonPath('data.integration_state.commercial_status', 'bigshop_benefit')
             ->json('data');
+
+        PlatformConnection::query()->create([
+            'merchant_id' => $company['merchant']['id'],
+            'merchant_company_id' => $company['id'],
+            'platform' => 'bigshop',
+            'external_store_id' => '124',
+            'api_base_url' => 'https://api.bigshop.test',
+            'feed_url' => 'https://loja.bigshop.test/feed.xml',
+            'access_token_encrypted' => 'encrypted-token',
+            'webhook_secret_encrypted' => 'encrypted-secret',
+            'status' => 'configured',
+        ]);
+
+        $this->withHeaders($headers)
+            ->getJson('/api/v1/saas/companies')
+            ->assertOk()
+            ->assertJsonPath('data.0.integration_state.technical_status', 'configured')
+            ->assertJsonPath('data.0.integration_state.has_api_credentials', true)
+            ->assertJsonPath('data.0.integration_state.has_feed_url', true)
+            ->assertJsonPath('data.0.integration_state.has_webhook_secret', true);
 
         $this->withHeaders($headers)
             ->patchJson('/api/v1/saas/companies/'.$company['id'], [

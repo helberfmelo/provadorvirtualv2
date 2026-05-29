@@ -1491,3 +1491,15 @@
 - A sprint prevê importar, sempre via prévia e revisão, tabelas de medidas, produtos, variantes, vínculos produto-tabela, marcas, categorias, modelagens, regras de importação e dados agregados autorizados de relatórios/devoluções.
 - Registrados bloqueios de segurança: não importar segredos, cookies, sessões, dados pessoais de consumidores, mensagens de suporte ou qualquer dado sem autorização/base legal.
 - Atualizado o backlog para refletir a migração Sizebay/Zak como item futuro de integrações e benchmark.
+
+## 2026-05-29 - Sprint 139 Integrações por plataforma melhores que Sizebay
+
+- Relida a documentação obrigatória antes da sprint, incluindo `docs/credentials.local.md` somente em modo mascarado. Não houve novo acesso ao portal Sizebay nem uso de credenciais.
+- `PlatformCatalog` ganhou plataformas dedicadas `xml_feed` e `api`, com guia, snippet, matriz de dados e metadados de campos por plataforma.
+- `/app/integracoes` passou a renderizar somente os campos relevantes da plataforma escolhida: XML/feed usa identificador, feed e status; API usa identificador, URL base, token, webhook e status; ações de XML aparecem apenas quando a plataforma suporta feed.
+- O widget install ganhou snippets e passos próprios para XML/feed e API.
+- O SaaS admin passou a receber `integration_state` por empresa, com plataforma, status técnico, status comercial, contagem de conexões, flags de feed/API/webhook e último erro, sem expor credenciais em claro.
+- CORS local passou a permitir `5178` para cobrir fallback quando `5177` já estiver ocupado durante validações locais.
+- `scripts/validate-production.ps1` passou a validar `GET /api/v1/integrations`, garantindo presença de `xml_feed`, `api` e metadados críticos dos campos.
+- Validações locais passaram com `php -l`, suíte focada `IntegrationsApiTest|SaasAdminApiTest|MerchantCompanyProfileApiTest|WidgetInstallApiTest|PublicCheckoutFlowTest|IntegrationChangeRequestApiTest` (`40 tests`, `342 assertions`), PHPUnit completo (`121 tests`, `1268 assertions`), `php vendor/bin/pint --dirty --test` e `npm --prefix frontend run build`.
+- Validação visual local rodou em `http://127.0.0.1:5178/app/integracoes` com backend em `8002` porque `5177` já estava ocupado; Chrome headless/CDP confirmou campos de XML/feed e API no desktop/mobile sem erros de console. As capturas ficaram em `.tmp/sprint139-integracoes-*.png` e não devem ser versionadas.

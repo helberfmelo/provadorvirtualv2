@@ -21,16 +21,26 @@ class IntegrationsApiTest extends TestCase
         $this->seed();
         $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
 
-        $this->withHeaders($headers)
+        $catalogResponse = $this->withHeaders($headers)
             ->getJson('/api/v1/integrations')
             ->assertOk()
             ->assertJsonPath('data.0.key', 'bigshop')
             ->assertJsonPath('data.0.priority', true)
             ->assertJsonPath('data.0.status', 'draft')
             ->assertJsonPath('data.0.guide.checklist.0.key', 'domain_configured')
+            ->assertJsonPath('data.0.setup.fields.external_store_id.label', 'Store ID BigShop')
             ->assertJsonFragment(['key' => 'loja_integrada'])
             ->assertJsonFragment(['key' => 'magento'])
-            ->assertJsonFragment(['key' => 'opencart']);
+            ->assertJsonFragment(['key' => 'opencart'])
+            ->assertJsonFragment(['key' => 'xml_feed'])
+            ->assertJsonFragment(['key' => 'api']);
+
+        $platformCatalog = collect($catalogResponse->json('data'))->keyBy('key');
+
+        $this->assertSame('URL do XML/feed', $platformCatalog->get('xml_feed')['setup']['fields']['feed_url']['label']);
+        $this->assertTrue($platformCatalog->get('xml_feed')['setup']['fields']['feed_url']['required']);
+        $this->assertSame('URL base da API', $platformCatalog->get('api')['setup']['fields']['api_base_url']['label']);
+        $this->assertTrue($platformCatalog->get('api')['setup']['fields']['access_token']['secret']);
 
         $this->withHeaders($headers)
             ->patchJson('/api/v1/integrations/bigshop', [
@@ -171,6 +181,61 @@ XML, 200),
             ->assertJsonPath('data.status', 'completed');
 
         $this->assertSame($tableId, $product->refresh()->measurement_table_id);
+    }
+
+    public function test_xml_feed_platform_has_own_connection_and_sync_flow(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $feedUrl = 'https://store.example/xml-platform-feed.xml';
+
+        Http::fake([
+            $feedUrl => Http::response(<<<'XML'
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+  <channel>
+    <item>
+      <g:id>XML-VAR-1</g:id>
+      <g:item_group_id>XML-GROUP-1</g:item_group_id>
+      <title>Camisa Feed Verde</title>
+      <g:product_type>Topwear</g:product_type>
+      <link>https://store.example/camisa-feed-verde</link>
+      <g:brand>Feed Brand</g:brand>
+      <g:gender>unisex</g:gender>
+      <g:size>G</g:size>
+      <g:availability>in stock</g:availability>
+    </item>
+  </channel>
+</rss>
+XML, 200),
+        ]);
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/integrations/xml_feed', [
+                'external_store_id' => 'store.example',
+                'feed_url' => $feedUrl,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.platform', 'xml_feed')
+            ->assertJsonPath('data.status', 'configured');
+
+        $this->withHeaders($headers)
+            ->postJson('/api/v1/integrations/xml_feed/sync-xml')
+            ->assertOk()
+            ->assertJsonPath('data.status', 'completed')
+            ->assertJsonPath('data.imported_rows', 1);
+
+        $this->assertDatabaseHas('platform_connections', [
+            'platform' => 'xml_feed',
+            'external_store_id' => 'store.example',
+            'feed_url' => $feedUrl,
+            'status' => 'connected',
+        ]);
+        $this->assertDatabaseHas('integration_events', [
+            'platform' => 'xml_feed',
+            'event_type' => 'xml_feed_sync',
+            'status' => 'success',
+        ]);
     }
 
     public function test_merchant_can_configure_visual_import_rules(): void

@@ -250,6 +250,54 @@ HTML
                 ],
                 snippet: self::snippet('opencart', '{{ product_id }}', 'OPTION_VALUE_ID', '{{ sku }}')
             ),
+            'xml_feed' => self::entry(
+                key: 'xml_feed',
+                name: 'XML/feed',
+                icon: 'fa-file-code',
+                installMode: 'manual',
+                priority: false,
+                summary: 'Importação por catálogo Google XML, RSS ou feed público quando a plataforma não tem API pronta.',
+                steps: [
+                    'Confirme que o feed público traz produto, variação, SKU, tamanho, cor, categoria, marca, gênero e imagem quando disponíveis.',
+                    'Informe a URL do XML/feed e salve a integração antes da primeira sincronização.',
+                    'Rode a sincronização, revise produtos sem tamanho e vincule tabelas de medidas antes de publicar o provador.',
+                    'Instale o snippet na página de produto usando produto, variação e SKU compatíveis com o feed.',
+                ],
+                dataSupport: [
+                    'product_id' => 'g:item_group_id ou g:id',
+                    'variant_id' => 'g:id',
+                    'sku' => 'g:mpn ou g:id',
+                    'size_change' => 'JS da loja',
+                    'xml_feed' => 'Fonte principal',
+                    'feed_api' => 'Não exige API',
+                    'orders_returns' => 'CSV/API futura',
+                ],
+                snippet: self::snippet('xml_feed', 'FEED_PRODUCT_ID', 'FEED_VARIANT_ID', 'SKU_DA_VARIANTE')
+            ),
+            'api' => self::entry(
+                key: 'api',
+                name: 'API',
+                icon: 'fa-code-branch',
+                installMode: 'manual',
+                priority: false,
+                summary: 'Integração por API própria do lojista ou conector customizado, com credenciais salvas de forma criptografada.',
+                steps: [
+                    'Informe a base da API, identificador da loja e token de leitura fornecido pelo cliente.',
+                    'Mapeie produto, variação, SKU, tamanho, categoria, marca, gênero e imagem para o contrato canônico do Provador.',
+                    'Instale o widget na página de produto usando os mesmos identificadores retornados pela API.',
+                    'Configure webhooks assinados somente quando a loja puder enviar eventos de pedido/devolução com segurança.',
+                ],
+                dataSupport: [
+                    'product_id' => 'Endpoint de produtos',
+                    'variant_id' => 'Endpoint de variações',
+                    'sku' => 'Campo SKU da API',
+                    'size_change' => 'JS da loja',
+                    'xml_feed' => 'Opcional fora desta opção',
+                    'feed_api' => 'Fonte principal',
+                    'orders_returns' => 'Webhook/API futura',
+                ],
+                snippet: self::snippet('api', 'API_PRODUCT_ID', 'API_VARIANT_ID', 'SKU_DA_VARIANTE')
+            ),
             'custom' => self::entry(
                 key: 'custom',
                 name: 'Personalizada',
@@ -318,7 +366,7 @@ HTML
 
     private static function setup(string $key): array
     {
-        return match ($key) {
+        $setup = match ($key) {
             'bigshop' => [
                 'connection_fields' => ['Store ID BigShop', 'Token x-api', 'URL da API V3', 'URL XML/feed'],
                 'catalog_flow' => 'Ler produtos pela API V3, cruzar product_grids por produto e complementar com Google XML/feed quando existir.',
@@ -373,6 +421,18 @@ HTML
                 'product_page' => 'Instalação no product.twig e recarga quando opção/tamanho mudar.',
                 'tracking' => 'Eventos por script ou conector customizado.',
             ],
+            'xml_feed' => [
+                'connection_fields' => ['Identificador da loja', 'URL XML/feed', 'Status'],
+                'catalog_flow' => 'Catálogo por Google XML/RSS/feed público, com prévia e erros por linha antes de virar recomendação.',
+                'product_page' => 'Snippet universal na PDP usando os mesmos IDs do feed para produto, variação e SKU.',
+                'tracking' => 'Pedidos e devoluções entram depois por CSV/API, sem depender do feed de catálogo.',
+            ],
+            'api' => [
+                'connection_fields' => ['Identificador da loja', 'URL base da API', 'Token de leitura', 'Webhook secret opcional'],
+                'catalog_flow' => 'Catálogo por API autorizada do cliente ou conector customizado, mapeado para o contrato canônico.',
+                'product_page' => 'Snippet universal na PDP usando os mesmos IDs retornados pela API.',
+                'tracking' => 'Webhooks ou API de pedidos/devoluções quando houver contrato assinado e segredo rotacionável.',
+            ],
             default => [
                 'connection_fields' => ['Domínio público', 'Produto', 'Variação', 'SKU'],
                 'catalog_flow' => 'Catálogo por XML, CSV ou API conforme disponibilidade da loja.',
@@ -380,6 +440,111 @@ HTML
                 'tracking' => 'Eventos de carrinho, pedido e devolução por script/API conforme contrato.',
             ],
         };
+
+        return array_merge($setup, [
+            'fields' => self::fields($key),
+        ]);
+    }
+
+    private static function fields(string $key): array
+    {
+        $fields = [
+            'external_store_id' => self::field(
+                'Loja',
+                'Identificador da loja nesta plataforma.',
+                'loja-ou-dominio'
+            ),
+            'api_base_url' => self::field(
+                'URL da API',
+                'Base da API quando houver leitura autenticada de catálogo.',
+                'https://api.loja.com.br'
+            ),
+            'feed_url' => self::field(
+                'URL do XML/feed',
+                'Catálogo público em Google XML, RSS ou formato compatível.',
+                'https://loja.com.br/feed.xml'
+            ),
+            'access_token' => self::field(
+                'Token',
+                'Token/chave de leitura. Fica criptografado e não volta em claro.',
+                '',
+                secret: true
+            ),
+            'webhook_secret' => self::field(
+                'Webhook secret',
+                'Segredo para validar webhooks assinados quando a plataforma enviar eventos.',
+                '',
+                secret: true
+            ),
+        ];
+
+        return match ($key) {
+            'bigshop' => [
+                'external_store_id' => self::field('Store ID BigShop', 'ID da loja BigShop usado também pelo widget público.', '124', required: true),
+                'api_base_url' => self::field('URL da API V3', 'Base da API BigShop para leitura de products e product_grids.', 'https://api.bigshop.com.br'),
+                'access_token' => self::field('Token x-api', 'Token BigShop de leitura. O valor é write-only e criptografado.', '', secret: true),
+                'feed_url' => self::field('URL XML/feed', 'Feed Google Merchant da loja para enriquecer link, imagem, categoria e grade.', 'https://www.loja.com.br/feed.xml'),
+                'webhook_secret' => self::field('Webhook secret', 'Segredo para eventos BigShop futuros de pedido/devolução.', '', secret: true),
+            ],
+            'shopify' => [
+                'external_store_id' => self::field('Domínio permanente', 'Use o domínio permanente ou identificador da loja Shopify.', 'loja.myshopify.com'),
+                'api_base_url' => self::field('Admin API', 'Base da Admin API ou endpoint do app Shopify.', 'https://loja.myshopify.com/admin/api'),
+                'access_token' => self::field('Access token', 'Token do app Shopify com escopos de leitura aprovados.', '', secret: true),
+                'feed_url' => self::field('Feed opcional', 'Feed Google Merchant quando a loja preferir sincronização por XML.', 'https://loja.com/products.xml'),
+                'webhook_secret' => self::field('Webhook secret', 'Segredo do app para eventos de pedidos/devoluções.', '', secret: true),
+            ],
+            'woocommerce' => [
+                'external_store_id' => self::field('Domínio WordPress', 'Domínio da instalação WooCommerce.', 'loja.com.br'),
+                'api_base_url' => self::field('REST API', 'Base da REST API WooCommerce.', 'https://loja.com.br/wp-json/wc/v3'),
+                'access_token' => self::field('Consumer key/secret', 'Credencial de leitura da REST API. Salvar sem expor em claro.', '', secret: true),
+                'feed_url' => self::field('Feed opcional', 'XML de plugin Google Merchant quando a API não estiver disponível.', 'https://loja.com.br/feed.xml'),
+                'webhook_secret' => self::field('Webhook secret', 'Segredo de webhooks WooCommerce quando configurados.', '', secret: true),
+            ],
+            'nuvemshop', 'vtex', 'tray', 'magento' => [
+                'external_store_id' => $fields['external_store_id'],
+                'api_base_url' => $fields['api_base_url'],
+                'access_token' => $fields['access_token'],
+                'feed_url' => $fields['feed_url'],
+                'webhook_secret' => $fields['webhook_secret'],
+            ],
+            'loja_integrada' => [
+                'external_store_id' => self::field('Domínio ou ID', 'Identificador público da loja ou domínio usado no snippet.', 'loja.com.br'),
+                'feed_url' => self::field('Feed/exportação', 'URL de feed ou exportação de catálogo quando disponível.', 'https://loja.com.br/feed.xml'),
+            ],
+            'opencart' => [
+                'external_store_id' => self::field('Domínio OpenCart', 'Domínio da loja ou store id configurado no OpenCart.', 'loja.com.br'),
+                'api_base_url' => self::field('API/módulo', 'Base de API ou módulo quando existir integração de catálogo.', 'https://loja.com.br/index.php?route=api'),
+                'access_token' => $fields['access_token'],
+                'feed_url' => $fields['feed_url'],
+            ],
+            'xml_feed' => [
+                'external_store_id' => self::field('Identificador da loja', 'Domínio, tenant ou código interno usado para localizar o feed.', 'loja.com.br'),
+                'feed_url' => self::field('URL do XML/feed', 'URL pública do catálogo que será sincronizado.', 'https://loja.com.br/feed.xml', required: true),
+            ],
+            'api' => [
+                'external_store_id' => self::field('Identificador da loja', 'Store id, tenant ou domínio usado no conector customizado.', 'STORE_ID'),
+                'api_base_url' => self::field('URL base da API', 'Endpoint base autorizado pelo cliente para leitura de catálogo.', 'https://api.loja.com.br', required: true),
+                'access_token' => self::field('Token de leitura', 'Token, chave ou bearer do conector. Fica criptografado.', '', secret: true),
+                'webhook_secret' => self::field('Webhook secret', 'Segredo para eventos assinados, quando houver webhook.', '', secret: true),
+            ],
+            default => $fields,
+        };
+    }
+
+    private static function field(
+        string $label,
+        string $help,
+        string $placeholder = '',
+        bool $secret = false,
+        bool $required = false
+    ): array {
+        return [
+            'label' => $label,
+            'help' => $help,
+            'placeholder' => $placeholder,
+            'secret' => $secret,
+            'required' => $required,
+        ];
     }
 
     private static function checklist(): array

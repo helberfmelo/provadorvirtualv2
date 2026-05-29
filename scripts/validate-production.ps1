@@ -254,6 +254,18 @@ Assert-True ($null -ne $categories.data) "categories data ausente"
 Assert-True ($null -ne $categories.taxonomy_categories) "categories taxonomy ausente"
 "API categories OK"
 
+$integrations = Invoke-RestMethod -Uri "$ApiBase/integrations" -Headers $headers
+$integrationKeys = @($integrations.data | ForEach-Object { $_.key })
+Assert-True ($integrationKeys -contains "xml_feed") "integrations sem plataforma xml_feed"
+Assert-True ($integrationKeys -contains "api") "integrations sem plataforma api"
+$xmlFeedIntegration = @($integrations.data | Where-Object { $_.key -eq "xml_feed" })[0]
+$apiIntegration = @($integrations.data | Where-Object { $_.key -eq "api" })[0]
+Assert-True ($xmlFeedIntegration.setup.fields.feed_url.required -eq $true) "xml_feed sem feed_url obrigatorio"
+Assert-True ($null -eq $xmlFeedIntegration.setup.fields.access_token) "xml_feed expôs token indevido"
+Assert-True ($apiIntegration.setup.fields.api_base_url.required -eq $true) "api sem api_base_url obrigatoria"
+Assert-True ($apiIntegration.setup.fields.access_token.secret -eq $true) "api sem token secreto"
+"API integrations OK"
+
 $taxonomy = Invoke-RestMethod -Uri "$ApiBase/taxonomy/intelligence" -Headers $headers
 Assert-True ($null -ne $taxonomy.summary) "taxonomy summary ausente"
 Assert-True ($null -ne $taxonomy.active_version) "taxonomy active version ausente"

@@ -14,6 +14,21 @@ export type MerchantRow = {
   last_recommendation_at: string | null
 }
 
+export type CompanyIntegrationState = {
+  platform: string
+  platform_label: string
+  technical_status: string
+  technical_label: string
+  commercial_status: string
+  commercial_label: string
+  connections_count: number
+  has_feed_url: boolean
+  has_api_credentials: boolean
+  has_webhook_secret: boolean
+  last_sync_at: string | null
+  last_error: string | null
+}
+
 export type CompanyRow = {
   id: number
   access_code: string
@@ -32,6 +47,7 @@ export type CompanyRow = {
   bigshop_discount_active: boolean
   external_store_id: string | null
   status: string
+  integration_state: CompanyIntegrationState | null
   merchant: {
     id: number
     name: string

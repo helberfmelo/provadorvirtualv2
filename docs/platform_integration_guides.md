@@ -6,20 +6,21 @@ Atualizado em: 2026-05-29
 
 Permitir que o lojista escolha sua plataforma e tenha um passo a passo padrão para instalar o Provador Virtual com poucos cliques, mantendo BigShop como caminho preferencial de um clique.
 
-## Status Sprint 34
+## Status Sprint 139
 
 Implementado:
 
 - catálogo ampliado em `PlatformCatalog`;
 - guias, snippets, checklist e matriz de dados retornados em `GET /api/v1/integrations`;
-- plataformas: BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e Personalizada;
-- painel `/app/integracoes` com guia visual por plataforma;
+- plataformas: BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart, XML/feed, API e Personalizada;
+- painel `/app/integracoes` com guia visual por plataforma, campos dinâmicos por tipo de conexão e ações coerentes com a fonte de dados;
 - endpoint `POST /api/v1/integrations/{platform}/validate-install`;
 - registro de validação em `integration_events` com `event_type=install_validation`;
 - auditoria `integration.install_validated`;
-- bloqueio comercial BigShop agora depende de `merchant_companies.bigshop_discount_active`: loja BigShop com benefício vê BigShop e solicita troca; loja sem benefício pode trocar a plataforma operacional no portal.
+- bloqueio comercial BigShop agora depende de `merchant_companies.bigshop_discount_active`: loja BigShop com benefício vê BigShop e solicita troca; loja sem benefício pode trocar a plataforma operacional no portal;
+- SaaS admin recebe `integration_state` por empresa, com status técnico, status comercial, contagem de conexões e flags de API/feed/webhook sem expor token ou segredo.
 
-Publicado e validado em produção no run `26339199751`.
+Sprint 139 validada localmente; publicação e validação de produção ficam registradas no log da sprint.
 
 ## Onde a plataforma é informada
 
@@ -34,7 +35,7 @@ Locais de entrada:
 
 Regras:
 
-- empresa que usa Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou personalizada pode trocar diretamente no portal para qualquer plataforma, inclusive BigShop, sem ativar desconto;
+- empresa que usa Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart, XML/feed, API ou personalizada pode trocar diretamente no portal para qualquer plataforma, inclusive BigShop, sem ativar desconto;
 - empresa BigShop com `bigshop_discount_active=true` mantém o benefício comercial protegido: para sair da BigShop, precisa solicitar a troca no portal, aceitar os termos e aguardar revisão/pagamento pelo SaaS;
 - o SaaS pode ajustar a plataforma e marcar/desmarcar o benefício BigShop no cadastro da empresa, preservando a diferença entre plataforma operacional e condição comercial.
 
@@ -162,7 +163,7 @@ Campos avaliados por plataforma:
 - feed/API de produto;
 - pedidos/devolucoes.
 
-BigShop já possui probe/sync base. As demais plataformas estão em modo guia/snippet/manual, com API/plugin/webhook como evolucao futura.
+BigShop já possui probe/sync base. XML/feed possui fluxo próprio para salvar feed e sincronizar catálogo; API possui contrato de conexão para base autorizada, token criptografado e webhook opcional. As demais plataformas seguem em modo guia/snippet/manual, com API/plugin/webhook como evolução futura.
 
 ## Snippet universal
 

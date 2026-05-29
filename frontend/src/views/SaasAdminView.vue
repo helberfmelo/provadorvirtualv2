@@ -161,7 +161,14 @@ async function loadOverview() {
                 <small>{{ company.document || company.domain || 'sem documento' }}</small>
               </td>
               <td>{{ company.merchant.name }}</td>
-              <td>{{ company.platform }}</td>
+              <td>
+                <strong>{{ company.integration_state?.platform_label || company.platform }}</strong>
+                <small>
+                  {{ company.integration_state?.technical_label || 'Sem conexão' }}
+                  ·
+                  {{ company.integration_state?.commercial_label || company.merchant.billing_status }}
+                </small>
+              </td>
               <td>
                 <span class="status-pill" :class="{ ok: company.status === 'active', warning: company.status !== 'active' }">
                   {{ company.status === 'active' ? 'Ativa' : company.status }}

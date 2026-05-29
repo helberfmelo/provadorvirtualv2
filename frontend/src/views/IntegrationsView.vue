@@ -25,11 +25,22 @@ type PlatformGuide = {
   data_support: Record<string, string>
 }
 
+type ConnectionFieldKey = 'external_store_id' | 'api_base_url' | 'feed_url' | 'access_token' | 'webhook_secret'
+
+type PlatformField = {
+  label: string
+  help: string
+  placeholder?: string
+  secret?: boolean
+  required?: boolean
+}
+
 type PlatformSetup = {
   connection_fields: string[]
   catalog_flow: string
   product_page: string
   tracking: string
+  fields?: Partial<Record<ConnectionFieldKey, PlatformField>>
 }
 
 type Platform = {
@@ -134,6 +145,8 @@ const platformOptions = [
   { value: 'loja_integrada', label: 'Loja Integrada' },
   { value: 'magento', label: 'Magento' },
   { value: 'opencart', label: 'OpenCart' },
+  { value: 'xml_feed', label: 'XML/feed' },
+  { value: 'api', label: 'API' },
   { value: 'custom', label: 'Personalizada' },
 ]
 const platforms = ref<Platform[]>([])
@@ -244,9 +257,7 @@ const guideSteps = computed(() => {
 })
 const dataSupportEntries = computed<[string, string][]>(() => Object.entries(selected.value?.guide?.data_support || {}))
 const guideSnippet = computed(() => selected.value?.guide?.snippet || '')
-const feedPlaceholder = computed(() => selected.value?.key === 'bigshop'
-  ? 'https://domínio-da-loja.com.br/feed.xml'
-  : 'https://loja.com.br/feed.xml')
+const showXmlFeedAction = computed(() => showConnectionField('feed_url'))
 const installationPlacementSteps = computed(() => {
   const platformName = selected.value?.name || 'plataforma'
   const steps = [
@@ -288,7 +299,7 @@ const companyPlatformHelp = computed(() => {
 
   return 'O lojista informa aqui quando precisa trocar a plataforma operacional. O SaaS também pode alterar em Empresas > editar.'
 })
-const fieldHelp = {
+const fieldHelp: Record<string, string> = {
   external_store_id: 'Informe o identificador da loja na plataforma. Na BigShop, use o store_id da loja.',
   api_base_url: 'Informe a URL base da API quando a plataforma tiver API autenticada. Na BigShop, use a API V3.',
   feed_url: 'Informe a URL pública do catálogo XML/Google Merchant. Na BigShop, normalmente é o domínio da loja seguido de /feed.xml.',
@@ -297,6 +308,34 @@ const fieldHelp = {
   webhook_secret: 'Informe o segredo usado para validar webhooks assinados, quando a plataforma enviar eventos ao Provador Virtual.',
   validation_url: 'Informe uma página pública de produto para confirmar se o container, script e identificadores do widget foram instalados.',
   validation_action: 'Rode a validação da página informada e veja o checklist técnico de instalação.',
+}
+
+const defaultConnectionFields: Record<ConnectionFieldKey, PlatformField> = {
+  external_store_id: {
+    label: 'Loja',
+    help: fieldHelp.external_store_id,
+    placeholder: 'loja-ou-dominio',
+  },
+  api_base_url: {
+    label: 'URL da API',
+    help: fieldHelp.api_base_url,
+    placeholder: 'https://api.loja.com.br',
+  },
+  feed_url: {
+    label: 'URL do XML/feed',
+    help: fieldHelp.feed_url,
+    placeholder: 'https://loja.com.br/feed.xml',
+  },
+  access_token: {
+    label: 'Token',
+    help: fieldHelp.access_token,
+    secret: true,
+  },
+  webhook_secret: {
+    label: 'Webhook secret',
+    help: fieldHelp.webhook_secret,
+    secret: true,
+  },
 }
 
 onMounted(() => {
@@ -675,6 +714,32 @@ function platformLabel(platform: string) {
   return platformOptions.find((option) => option.value === platform)?.label || 'Personalizada'
 }
 
+function connectionField(key: ConnectionFieldKey): PlatformField {
+  return selected.value?.setup?.fields?.[key] || defaultConnectionFields[key]
+}
+
+function showConnectionField(key: ConnectionFieldKey) {
+  return Boolean((selected.value?.setup?.fields || defaultConnectionFields)[key])
+}
+
+function connectionFieldHelp(key: ConnectionFieldKey) {
+  return connectionField(key).help || fieldHelp[key]
+}
+
+function dataSupportLabel(key: string) {
+  const labels: Record<string, string> = {
+    product_id: 'Produto',
+    variant_id: 'Variação',
+    sku: 'SKU',
+    size_change: 'Troca de tamanho',
+    xml_feed: 'XML/feed',
+    feed_api: 'API/feed',
+    orders_returns: 'Pedidos/devoluções',
+  }
+
+  return labels[key] || key
+}
+
 function preferredPlatformKey() {
   const platform = auth.activeCompany?.platform || companyPlatformForm.platform
 
@@ -876,26 +941,26 @@ function canRunBigShopApiAction() {
           </div>
 
           <div class="form-grid integration-connection-grid">
-            <label>
+            <label v-if="showConnectionField('external_store_id')">
               <span class="field-label">
-                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.external_store_id" :data-tooltip="fieldHelp.external_store_id">i</span>
-                Loja
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="connectionFieldHelp('external_store_id')" :data-tooltip="connectionFieldHelp('external_store_id')">i</span>
+                {{ connectionField('external_store_id').label }}
               </span>
-              <input v-model="form.external_store_id" maxlength="120" />
+              <input v-model="form.external_store_id" maxlength="120" :placeholder="connectionField('external_store_id').placeholder" :required="connectionField('external_store_id').required" />
             </label>
-            <label>
+            <label v-if="showConnectionField('api_base_url')">
               <span class="field-label">
-                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.api_base_url" :data-tooltip="fieldHelp.api_base_url">i</span>
-                URL da API
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="connectionFieldHelp('api_base_url')" :data-tooltip="connectionFieldHelp('api_base_url')">i</span>
+                {{ connectionField('api_base_url').label }}
               </span>
-              <input v-model="form.api_base_url" type="url" maxlength="255" />
+              <input v-model="form.api_base_url" type="url" maxlength="255" :placeholder="connectionField('api_base_url').placeholder" :required="connectionField('api_base_url').required" />
             </label>
-            <label>
+            <label v-if="showConnectionField('feed_url')">
               <span class="field-label">
-                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.feed_url" :data-tooltip="fieldHelp.feed_url">i</span>
-                URL do XML/feed
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="connectionFieldHelp('feed_url')" :data-tooltip="connectionFieldHelp('feed_url')">i</span>
+                {{ connectionField('feed_url').label }}
               </span>
-              <input v-model="form.feed_url" type="text" inputmode="url" maxlength="255" :placeholder="feedPlaceholder" />
+              <input v-model="form.feed_url" type="text" inputmode="url" maxlength="255" :placeholder="connectionField('feed_url').placeholder" :required="connectionField('feed_url').required" />
             </label>
             <label>
               <span class="field-label">
@@ -909,30 +974,34 @@ function canRunBigShopApiAction() {
                 <option value="disabled">Pausada</option>
               </select>
             </label>
-            <label>
+            <label v-if="showConnectionField('access_token')">
               <span class="field-label">
-                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.access_token" :data-tooltip="fieldHelp.access_token">i</span>
-                Token
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="connectionFieldHelp('access_token')" :data-tooltip="connectionFieldHelp('access_token')">i</span>
+                {{ connectionField('access_token').label }}
               </span>
-              <input v-model="form.access_token" autocomplete="off" />
+              <input v-model="form.access_token" :type="connectionField('access_token').secret ? 'password' : 'text'" autocomplete="off" :placeholder="connectionField('access_token').placeholder" :required="connectionField('access_token').required" />
             </label>
-            <label>
+            <label v-if="showConnectionField('webhook_secret')">
               <span class="field-label">
-                <span class="info-tooltip" tabindex="0" role="button" :aria-label="fieldHelp.webhook_secret" :data-tooltip="fieldHelp.webhook_secret">i</span>
-                Webhook secret
+                <span class="info-tooltip" tabindex="0" role="button" :aria-label="connectionFieldHelp('webhook_secret')" :data-tooltip="connectionFieldHelp('webhook_secret')">i</span>
+                {{ connectionField('webhook_secret').label }}
               </span>
-              <input v-model="form.webhook_secret" autocomplete="off" />
+              <input v-model="form.webhook_secret" :type="connectionField('webhook_secret').secret ? 'password' : 'text'" autocomplete="off" :placeholder="connectionField('webhook_secret').placeholder" :required="connectionField('webhook_secret').required" />
             </label>
           </div>
 
           <div class="connection-flags">
-            <span :class="{ on: selected?.connection?.has_access_token }">
+            <span v-if="showConnectionField('access_token')" :class="{ on: selected?.connection?.has_access_token }">
               <i class="fa-solid fa-key" aria-hidden="true"></i>
               Token
             </span>
-            <span :class="{ on: selected?.connection?.has_webhook_secret }">
+            <span v-if="showConnectionField('webhook_secret')" :class="{ on: selected?.connection?.has_webhook_secret }">
               <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
               Webhook
+            </span>
+            <span v-if="showConnectionField('feed_url')" :class="{ on: Boolean(selected?.connection?.feed_url) }">
+              <i class="fa-solid fa-file-code" aria-hidden="true"></i>
+              XML/feed
             </span>
             <span :class="{ on: selected?.status === 'connected' }">
               <i class="fa-solid fa-link" aria-hidden="true"></i>
@@ -1038,7 +1107,7 @@ function canRunBigShopApiAction() {
           </div>
           <div class="data-support-grid">
             <span v-for="[key, value] in dataSupportEntries" :key="key">
-              <small>{{ key }}</small>
+              <small>{{ dataSupportLabel(key) }}</small>
               <strong>{{ value }}</strong>
             </span>
           </div>
@@ -1067,7 +1136,7 @@ function canRunBigShopApiAction() {
                 Salvar integração
               </button>
             </div>
-            <div class="integration-action-card">
+            <div v-if="showXmlFeedAction" class="integration-action-card">
               <strong>Catálogo XML/feed</strong>
               <button
                 class="btn btn-secondary"

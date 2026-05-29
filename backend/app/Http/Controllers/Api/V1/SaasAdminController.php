@@ -377,6 +377,7 @@ class SaasAdminController extends Controller
             'bigshop_discount_active' => (bool) $company->bigshop_discount_active,
             'external_store_id' => $company->external_store_id,
             'status' => $company->status,
+            'integration_state' => $this->companyIntegrationState($company),
             'merchant' => [
                 'id' => $company->merchant?->id,
                 'name' => $company->merchant?->name,
@@ -385,6 +386,94 @@ class SaasAdminController extends Controller
             ],
             'created_at' => $company->created_at?->toISOString(),
         ];
+    }
+
+    private function companyIntegrationState(MerchantCompany $company): array
+    {
+        $platform = $company->platform ?: 'custom';
+        $entry = PlatformCatalog::find($platform) ?: PlatformCatalog::find('custom');
+        $connections = PlatformConnection::query()
+            ->where('merchant_id', $company->merchant_id)
+            ->where(function ($query) use ($company): void {
+                $query->where('merchant_company_id', $company->id)
+                    ->orWhereNull('merchant_company_id');
+            })
+            ->orderByRaw('merchant_company_id is null')
+            ->latest('id')
+            ->get();
+        $primary = $connections->firstWhere('platform', $platform) ?: $connections->first();
+        $technicalStatus = $this->technicalStatusFor($primary);
+        $commercialStatus = $this->commercialStatusFor($company);
+
+        return [
+            'platform' => $platform,
+            'platform_label' => $entry['name'] ?? $platform,
+            'technical_status' => $technicalStatus,
+            'technical_label' => $this->technicalStatusLabel($technicalStatus),
+            'commercial_status' => $commercialStatus,
+            'commercial_label' => $this->commercialStatusLabel($commercialStatus),
+            'connections_count' => $connections->count(),
+            'has_feed_url' => $connections->contains(fn (PlatformConnection $connection): bool => filled($connection->feed_url)),
+            'has_api_credentials' => $connections->contains(fn (PlatformConnection $connection): bool => filled($connection->api_base_url) && filled($connection->access_token_encrypted)),
+            'has_webhook_secret' => $connections->contains(fn (PlatformConnection $connection): bool => filled($connection->webhook_secret_encrypted)),
+            'last_sync_at' => $connections
+                ->pluck('last_sync_at')
+                ->filter()
+                ->sortDesc()
+                ->first()?->toISOString(),
+            'last_error' => $primary?->last_error,
+        ];
+    }
+
+    private function technicalStatusFor(?PlatformConnection $connection): string
+    {
+        if (! $connection) {
+            return 'missing';
+        }
+
+        if (in_array($connection->status, ['connected', 'disabled', 'error'], true)) {
+            return $connection->status;
+        }
+
+        $hasStore = filled($connection->external_store_id);
+        $hasFeed = filled($connection->feed_url);
+        $hasApi = filled($connection->api_base_url) && filled($connection->access_token_encrypted);
+
+        return ($hasStore || $hasFeed || $hasApi) ? 'configured' : ($connection->status ?: 'draft');
+    }
+
+    private function technicalStatusLabel(string $status): string
+    {
+        return [
+            'missing' => 'Sem conexão',
+            'draft' => 'Pendente',
+            'configured' => 'Configurada',
+            'connected' => 'Conectada',
+            'disabled' => 'Pausada',
+            'error' => 'Erro técnico',
+        ][$status] ?? $status;
+    }
+
+    private function commercialStatusFor(MerchantCompany $company): string
+    {
+        if ($company->platform === 'bigshop' && $company->bigshop_discount_active) {
+            return 'bigshop_benefit';
+        }
+
+        return $company->merchant?->billing_status ?: $company->status;
+    }
+
+    private function commercialStatusLabel(string $status): string
+    {
+        return [
+            'bigshop_benefit' => 'Benefício BigShop',
+            'trialing' => 'Trial',
+            'active' => 'Comercial ativo',
+            'pending_payment' => 'Pagamento pendente',
+            'past_due' => 'Em atraso',
+            'canceled' => 'Cancelado',
+            'inactive' => 'Empresa inativa',
+        ][$status] ?? $status;
     }
 
     private function uniqueMerchantSlug(string $name): string

@@ -15,6 +15,8 @@ const platformOptions = [
   { value: 'loja_integrada', label: 'Loja Integrada' },
   { value: 'magento', label: 'Magento' },
   { value: 'opencart', label: 'OpenCart' },
+  { value: 'xml_feed', label: 'XML/feed' },
+  { value: 'api', label: 'API' },
   { value: 'custom', label: 'Personalizada' },
 ]
 type BillingSubscription = {

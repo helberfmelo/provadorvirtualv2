@@ -2490,7 +2490,7 @@ Critérios de aceite:
 - cada plataforma tem passo a passo próprio;
 - admin SaaS consegue ver o estado técnico e comercial da integração.
 
-Status: planejada.
+Status: implementada localmente na Sprint 139, aguardando commit, deploy e validação de produção. `/app/integracoes` agora usa metadados por plataforma para mostrar somente campos relevantes, inclui plataformas dedicadas `xml_feed` e `api`, separa conexão, catálogo, instalação, dados suportados, snippet e ações, e o SaaS passa a expor `integration_state` com estado técnico/comercial sem revelar segredos. Validações locais passaram com `php -l`, suíte focada de integrações/SaaS/perfil/widget/checkout/troca de integração, PHPUnit completo (`121 tests`, `1268 assertions`), Pint, build frontend e validação visual headless em `/app/integracoes` com XML/feed e API.
 
 ### Sprint 140 - BigShop com governança comercial superior
 

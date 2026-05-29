@@ -126,6 +126,8 @@ const platformOptions = computed(() => {
         { key: 'loja_integrada', name: 'Loja Integrada', icon: 'fa-shop', summary: 'HTML/JS do tema.' },
         { key: 'magento', name: 'Magento', icon: 'fa-cubes', summary: 'Bloco catalog_product_view.' },
         { key: 'opencart', name: 'OpenCart', icon: 'fa-box-open', summary: 'Template product.twig.' },
+        { key: 'xml_feed', name: 'XML/feed', icon: 'fa-file-code', summary: 'Catálogo por XML ou feed público.' },
+        { key: 'api', name: 'API', icon: 'fa-code-branch', summary: 'Conector por API autorizada.' },
         { key: 'custom', name: 'Personalizada', icon: 'fa-code', summary: 'Snippet universal.' },
       ]
 
