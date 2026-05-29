@@ -2007,3 +2007,30 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 120 no commit `c1ebf36`, publicado com sucesso no run `26611893093`. Validações locais passaram com build frontend, `IntegrationsApiTest` com 7 testes e 84 assertions, varredura de credenciais e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 121 - Status e instruções adaptativas de integrações
+
+Objetivo: corrigir a integração Zak/BigShop aparecendo como `Rascunho` mesmo com dados mínimos salvos e fazer a seção `Plataforma` adaptar instruções por plataforma, seguindo o padrão de separação observado na Sizebay entre serviço na PDP, catálogo por XML/API e tracking.
+
+Entregas:
+
+- API passa a devolver status efetivo da integração quando a conexão antiga ainda estiver gravada como `draft`, mas possuir dados mínimos;
+- `PATCH /api/v1/integrations/{platform}` não permite que uma conexão com store/feed/token volte a parecer rascunho por envio acidental de status `draft`;
+- migração normaliza conexões antigas `draft` com dados suficientes para `configured`, incluindo a Zak/BigShop;
+- seção `Plataforma` passa a mostrar conexão exigida, fluxo de catálogo, instalação na página de produto e tracking/aprendizado conforme BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart ou custom;
+- label visual de `draft` muda para `Pendente`, evitando leitura de rascunho em integração operacional;
+- frontend exibe próximo passo contextual por status e plataforma.
+
+Validação:
+
+- `php -l` nos arquivos PHP alterados;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit`;
+- `npm --prefix frontend run build`;
+- `vendor/bin/pint --dirty`;
+- varredura de credenciais;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado na Sprint 121 no commit `dbbe6b8`, publicado com sucesso no run `26615382578`. Validações locais passaram com `php -l`, `IntegrationsApiTest` com 8 testes e 91 assertions, PHPUnit completo com 94 testes e 891 assertions, build frontend, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.

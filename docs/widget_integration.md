@@ -283,4 +283,6 @@ Regra comercial Sprint 32: empresas que contrataram como BigShop recebem o desco
 
 Status Sprint 34: o catálogo de integrações passou a incluir `loja_integrada`, `magento` e `opencart`, além das plataformas anteriores. `GET /api/v1/integrations` retorna guia, snippet, checklist e matriz de dados por plataforma. `POST /api/v1/integrations/{platform}/validate-install` valida domínio público, container, script, plataforma e identificadores do produto sem salvar o HTML da loja.
 
+Status Sprint 121: `GET /api/v1/integrations` passa a retornar também `setup` por plataforma, separando campos de conexão, fluxo de catálogo, ponto de instalação na página de produto e tracking/aprendizado. O status exposto pela API é efetivo: conexões antigas gravadas como `draft`, mas com dados mínimos de configuração, aparecem como `configured`; a interface exibe esse estado como `Configurada` e reserva `Pendente` para integrações sem dados suficientes.
+
 Credenciais de plataforma devem ser salvas apenas por endpoints protegidos e persistidas criptografadas. A API retorna somente flags como `has_access_token` e `has_webhook_secret`.

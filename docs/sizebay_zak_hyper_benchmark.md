@@ -593,6 +593,8 @@ Status Sprint 112: as tabelas flexiveis foram implementadas e publicadas no comm
 
 Status Sprint 113: o cadastro de modelagens foi implementado e publicado em `/app/modelagens` e `/api/v1/fit-profiles`; commit `85f7cec`, run `26607795341`, com validação de produção OK.
 
+Status Sprint 121: a seção `Plataforma` de `/app/integracoes` foi ajustada para seguir a separação observada na Sizebay: conexão exigida, catálogo por XML/API, implementação na PDP e tracking/aprendizado. Também foi corrigido o status efetivo da Zak/BigShop: conexão com Store ID e token ou feed não deve aparecer como `Rascunho`/`Pendente`, e sim como `Configurada` até ser testada/sincronizada como `Conectada`.
+
 ### P2 - Melhorar widget/personalizacao
 
 - A galeria de botoes foi ampliada na Sprint 108 para 10 modelos inspirados na galeria publica correta, com variacoes e animacoes proprias.

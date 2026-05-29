@@ -244,6 +244,8 @@ Atualizado em: 2026-05-29
 - Sprint 119 enviada ao GitHub no commit `c366754`; o run `26611218335` finalizou com sucesso e a validação de produção confirmou `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 120 refina `/app/integracoes` para evitar blocos vazios: a seção Plataforma tem fallback de nome/resumo/ícone, passos padrão aparecem quando o guia vem incompleto e Dados suportados/Snippet só aparecem com conteúdo real.
 - Sprint 120 enviada ao GitHub no commit `c1ebf36`; o run `26611893093` finalizou com sucesso e a validação de produção confirmou `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget, APIs, CORS, login demo e go-live readiness.
+- Sprint 121 corrige o status efetivo das integrações: conexões antigas `draft` com dados mínimos passam a aparecer como `Configurada`, a migração normaliza esses registros e a seção Plataforma mostra requisitos adaptados por BigShop, Shopify, WooCommerce, Nuvemshop, VTEX, Tray, Loja Integrada, Magento, OpenCart e custom.
+- Sprint 121 enviada ao GitHub no commit `dbbe6b8`; o run `26615382578` finalizou com sucesso e a validação de produção confirmou `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.
@@ -277,7 +279,7 @@ Atualizado em: 2026-05-29
 - Go-live protegido: `/api/v1/go-live/readiness` e `/app/go-live`.
 - Pacote comercial protegido: `/app/go-live` mostra links de venda, onboarding, automações e pendências reais.
 - Observabilidade pública: `/api/v1/ops/status`.
-- BigShop protegido: probe, dry-run e sync em `/api/v1/integrations/bigshop/*`. A tela `/app/integracoes` usa fluxo em uma coluna única com seções empilhadas para plataforma, conexão, validação, instalação, dados suportados, snippet, ações, prévia BigShop e ativações; se os metadados da plataforma vierem incompletos, a UI usa fallbacks e oculta seções sem conteúdo.
+- BigShop protegido: probe, dry-run e sync em `/api/v1/integrations/bigshop/*`. A tela `/app/integracoes` usa fluxo em uma coluna única com seções empilhadas para plataforma, conexão, validação, instalação, dados suportados, snippet, ações, prévia BigShop e ativações; se os metadados da plataforma vierem incompletos, a UI usa fallbacks e oculta seções sem conteúdo. A API calcula status efetivo para não mostrar como pendente uma conexão BigShop com Store ID e token/feed já cadastrados.
 - Sincronização protegida: `GET /api/v1/integrations/sync-history` consolida eventos `dry_run_import`, `sync_products` e `xml_feed_sync` para `/app/sincronizacao`.
 - Monitor BigShop protegido: `GET /api/v1/integrations/bigshop/activations`.
 - Validação de instalação protegida: `POST /api/v1/integrations/{platform}/validate-install`.

@@ -1254,3 +1254,16 @@
 - Validações locais passaram com `npm --prefix frontend run build`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --configuration phpunit.xml --filter IntegrationsApiTest`, varredura de credenciais e `git diff --check`.
 - Commit `c1ebf36` enviado para `main`; o run `26611893093` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-29 - Sprint 121 Status e instruções adaptativas de integrações
+
+- Investigado o `Rascunho` exibido na integração Zak: o card lia o status da conexão `platform_connections.status`; conexões antigas podiam continuar com `draft` mesmo tendo Store ID, feed e token salvos.
+- A API de integrações agora calcula status efetivo: BigShop com Store ID e token ou feed aparece como `configured`; conexões `connected`, `disabled` e `error` continuam respeitadas.
+- O salvamento de integração passa a transformar `draft` acidental em `configured` quando há dados mínimos, evitando regressão visual após editar credenciais.
+- Criada migração para normalizar conexões antigas `draft` com dados mínimos para `configured`, cobrindo a Zak/BigShop sem expor token.
+- Revisitada a documentação pública Sizebay de implementação por API, XML feed, Shopify e plataformas de order tracking. O aprendizado aplicado foi separar claramente serviço na PDP, catálogo por XML/API e tracking por plataforma.
+- A seção `Plataforma` em `/app/integracoes` agora mostra, por plataforma, os campos de conexão esperados, o fluxo de catálogo, o ponto correto de instalação na página de produto e o caminho de tracking/aprendizado.
+- `draft` passa a ser exibido como `Pendente` no portal para não sugerir rascunho quando o assunto é integração operacional.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`, PHPUnit completo, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`.
+- Commit `dbbe6b8` enviado para `main`; o run `26615382578` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
