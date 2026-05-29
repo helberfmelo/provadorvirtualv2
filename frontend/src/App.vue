@@ -12,12 +12,26 @@ type NavLink = {
   variant?: 'platform'
 }
 
+type NavSection = {
+  label: string
+  links: NavLink[]
+}
+
+type ContextHelp = {
+  topic: string
+  title: string
+  text: string
+  nextTo?: string
+  nextLabel?: string
+}
+
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const navOpen = ref(false)
 const cookieNoticeVisible = ref(false)
 const brandLogoUrl = `${import.meta.env.BASE_URL}images/brand/logo_provador_virtual.png`
+const supportUrl = 'https://wa.me/5531993157573?text=Oi,%20preciso%20de%20ajuda%20no%20Provador%20Virtual.'
 
 const canSeeSaas = computed(() => ['admin', 'support'].includes(auth.user?.role || ''))
 const isCompanyRoute = computed(() => route.path === '/app' || route.path.startsWith('/app/'))
@@ -49,6 +63,7 @@ const brandAriaLabel = computed(() => {
 })
 const workNavTitle = computed(() => isSaasRoute.value ? 'Operação SaaS' : 'Operação da loja')
 const activeCompanyName = computed(() => auth.activeCompany?.name || 'Sem empresa ativa')
+const isSaasViewingCompanyPortal = computed(() => isCompanyRoute.value && canSeeSaas.value)
 const publicPlatformLink = computed<NavLink | null>(() => {
   if (!auth.isAuthenticated || !auth.user) {
     return null
@@ -80,35 +95,203 @@ const publicLinks = computed<NavLink[]>(() => [
   { to: '/login', label: 'Entrar', icon: 'fa-right-to-bracket', show: !auth.isAuthenticated },
 ])
 
-const companyLinks = computed<NavLink[]>(() => [
-  { to: '/app', label: 'Painel', icon: 'fa-gauge-high', show: true },
-  { to: '/app/produtos', label: 'Produtos', icon: 'fa-shirt', show: auth.canView('products') },
-  { to: '/app/tabelas-de-medidas', label: 'Tabelas', icon: 'fa-ruler-combined', show: auth.canView('measurement_tables') },
-  { to: '/app/modelagens', label: 'Modelagens', icon: 'fa-sliders', show: auth.canView('measurement_tables') },
-  { to: '/app/assistente', label: 'Assistente IA', icon: 'fa-wand-magic-sparkles', show: auth.canView('ai_assistant') },
-  { to: '/app/importacoes', label: 'Importações', icon: 'fa-file-arrow-up', show: auth.canView('imports') },
-  { to: '/app/regras-de-importacao', label: 'Regras', icon: 'fa-filter', show: auth.canView('integrations') },
-  { to: '/app/widget', label: 'Provador', icon: 'fa-code', show: auth.canView('widget') },
-  { to: '/app/integracoes', label: 'Integrações', icon: 'fa-plug', show: auth.canView('integrations') },
-  { to: '/app/sincronizacao', label: 'Sincronização', icon: 'fa-rotate', show: auth.canView('integrations') },
-  { to: '/app/analytics', label: 'Analytics', icon: 'fa-chart-line', show: auth.canView('analytics') },
-  { to: '/app/go-live', label: 'Go-live', icon: 'fa-rocket', show: auth.canView('go_live') },
-  { to: '/app/usuarios', label: 'Usuários', icon: 'fa-users-gear', show: auth.canView('users') },
+const companyNavSections = computed<NavSection[]>(() => [
+  {
+    label: 'Operação',
+    links: [
+      { to: '/app', label: 'Painel', icon: 'fa-gauge-high', show: true },
+      { to: '/app/importacoes', label: 'Importações', icon: 'fa-file-arrow-up', show: auth.canView('imports') },
+      { to: '/app/sincronizacao', label: 'Sincronização', icon: 'fa-rotate', show: auth.canView('integrations') },
+    ],
+  },
+  {
+    label: 'Catálogo',
+    links: [
+      { to: '/app/produtos', label: 'Produtos', icon: 'fa-shirt', show: auth.canView('products') },
+      { to: '/app/tabelas-de-medidas', label: 'Tabelas', icon: 'fa-ruler-combined', show: auth.canView('measurement_tables') },
+      { to: '/app/modelagens', label: 'Modelagens', icon: 'fa-sliders', show: auth.canView('measurement_tables') },
+      { to: '/app/regras-de-importacao', label: 'Regras', icon: 'fa-filter', show: auth.canView('integrations') },
+    ],
+  },
+  {
+    label: 'Provador',
+    links: [
+      { to: '/app/widget', label: 'Instalação', icon: 'fa-code', show: auth.canView('widget') },
+      { to: '/app/integracoes', label: 'Integrações', icon: 'fa-plug', show: auth.canView('integrations') },
+      { to: '/app/go-live', label: 'Publicação', icon: 'fa-rocket', show: auth.canView('go_live') },
+    ],
+  },
+  {
+    label: 'Resultados',
+    links: [
+      { to: '/app/analytics', label: 'Relatórios', icon: 'fa-chart-line', show: auth.canView('analytics') },
+      { to: '/app/assistente', label: 'Assistente IA', icon: 'fa-wand-magic-sparkles', show: auth.canView('ai_assistant') },
+    ],
+  },
+  {
+    label: 'Conta',
+    links: [
+      { to: '/app/usuarios', label: 'Usuários', icon: 'fa-users-gear', show: auth.canView('users') },
+    ],
+  },
 ])
 
-const saasLinks = computed<NavLink[]>(() => [
-  { to: '/saas', label: 'Visão geral', icon: 'fa-gauge-high', show: auth.canSaasView('saas_dashboard') },
-  { to: '/saas/empresas', label: 'Empresas', icon: 'fa-building', show: auth.canSaasView('saas_companies') },
-  { to: '/saas/usuarios', label: 'Usuários SaaS', icon: 'fa-user-shield', show: auth.canSaasView('saas_users') },
-  { to: '/saas/usuarios-empresas', label: 'Usuários das empresas', icon: 'fa-users-gear', show: auth.canSaasView('saas_company_users') },
-  { to: '/saas/checkout', label: 'Checkout', icon: 'fa-credit-card', show: auth.canSaasView('saas_checkout') },
-  { to: '/saas/pedidos', label: 'Pedidos', icon: 'fa-receipt', show: auth.canSaasView('saas_checkout') },
-  { to: '/saas/emails', label: 'E-mails', icon: 'fa-envelope-open-text', show: auth.canSaasView('saas_emails') },
+const saasNavSections = computed<NavSection[]>(() => [
+  {
+    label: 'SaaS',
+    links: [
+      { to: '/saas', label: 'Visão geral', icon: 'fa-gauge-high', show: auth.canSaasView('saas_dashboard') },
+      { to: '/saas/empresas', label: 'Empresas', icon: 'fa-building', show: auth.canSaasView('saas_companies') },
+      { to: '/saas/usuarios', label: 'Usuários SaaS', icon: 'fa-user-shield', show: auth.canSaasView('saas_users') },
+      { to: '/saas/usuarios-empresas', label: 'Usuários das empresas', icon: 'fa-users-gear', show: auth.canSaasView('saas_company_users') },
+    ],
+  },
+  {
+    label: 'Operação',
+    links: [
+      { to: '/saas/checkout', label: 'Checkout', icon: 'fa-credit-card', show: auth.canSaasView('saas_checkout') },
+      { to: '/saas/pedidos', label: 'Pedidos', icon: 'fa-receipt', show: auth.canSaasView('saas_checkout') },
+      { to: '/saas/emails', label: 'E-mails', icon: 'fa-envelope-open-text', show: auth.canSaasView('saas_emails') },
+    ],
+  },
 ])
 
-const visibleWorkLinks = computed(() => (
-  isSaasRoute.value ? saasLinks.value : companyLinks.value
-).filter((link) => link.show))
+const visibleWorkSections = computed(() => (
+  isSaasRoute.value ? saasNavSections.value : companyNavSections.value
+).map((section) => ({
+  ...section,
+  links: section.links.filter((link) => link.show),
+})).filter((section) => section.links.length > 0))
+
+const companyHelpItems: Array<ContextHelp & { prefix: string, exact?: boolean }> = [
+  {
+    prefix: '/app',
+    exact: true,
+    topic: 'painel',
+    title: 'Painel da loja',
+    text: 'Veja o estado geral e avance para os cadastros que liberam o provador.',
+    nextTo: '/app/produtos',
+    nextLabel: 'Ir para produtos',
+  },
+  {
+    prefix: '/app/produtos',
+    topic: 'produtos',
+    title: 'Produtos',
+    text: 'Revise tabela, modelagem, categoria e status antes de publicar o provador.',
+    nextTo: '/app/tabelas-de-medidas',
+    nextLabel: 'Revisar tabelas',
+  },
+  {
+    prefix: '/app/tabelas-de-medidas',
+    topic: 'tabelas',
+    title: 'Tabelas de medidas',
+    text: 'Mantenha medidas revisadas e vinculadas aos produtos que receberão recomendação.',
+    nextTo: '/app/produtos',
+    nextLabel: 'Vincular produtos',
+  },
+  {
+    prefix: '/app/modelagens',
+    topic: 'modelagens',
+    title: 'Modelagens',
+    text: 'Use caimentos consistentes para importar, filtrar e recomendar com mais precisão.',
+    nextTo: '/app/regras-de-importacao',
+    nextLabel: 'Ajustar regras',
+  },
+  {
+    prefix: '/app/importacoes',
+    topic: 'importacoes',
+    title: 'Importações',
+    text: 'Faça prévia, valide erros e só depois grave dados no catálogo.',
+    nextTo: '/app/sincronizacao',
+    nextLabel: 'Ver sincronizações',
+  },
+  {
+    prefix: '/app/regras-de-importacao',
+    topic: 'regras',
+    title: 'Regras de importação',
+    text: 'Normalize categoria, marca, gênero e modelagem antes de novas importações.',
+    nextTo: '/app/importacoes',
+    nextLabel: 'Testar importação',
+  },
+  {
+    prefix: '/app/widget',
+    topic: 'provador',
+    title: 'Instalação do provador',
+    text: 'Publique somente depois de conferir domínios, botões e prévia desktop/mobile.',
+    nextTo: '/app/integracoes',
+    nextLabel: 'Conferir integração',
+  },
+  {
+    prefix: '/app/integracoes',
+    topic: 'integracoes',
+    title: 'Integrações',
+    text: 'Separe plataforma, catálogo, instalação na página de produto e rastreamento.',
+    nextTo: '/app/sincronizacao',
+    nextLabel: 'Ver histórico',
+  },
+  {
+    prefix: '/app/sincronizacao',
+    topic: 'sincronizacao',
+    title: 'Sincronização',
+    text: 'Use contadores e erros por produto para corrigir a origem antes de importar de novo.',
+    nextTo: '/app/regras-de-importacao',
+    nextLabel: 'Corrigir regras',
+  },
+  {
+    prefix: '/app/analytics',
+    topic: 'relatorios',
+    title: 'Relatórios',
+    text: 'Acompanhe recomendações, feedbacks e sinais comerciais para priorizar revisão.',
+    nextTo: '/app/go-live',
+    nextLabel: 'Ver publicação',
+  },
+  {
+    prefix: '/app/assistente',
+    topic: 'assistente',
+    title: 'Assistente IA',
+    text: 'Gere rascunhos e sugestões, mas revise tudo antes de salvar como tabela.',
+    nextTo: '/app/tabelas-de-medidas/nova',
+    nextLabel: 'Criar tabela',
+  },
+  {
+    prefix: '/app/go-live',
+    topic: 'publicacao',
+    title: 'Publicação',
+    text: 'Confira bloqueios, avisos e links diretos antes de liberar a loja para clientes.',
+    nextTo: '/app/widget',
+    nextLabel: 'Abrir provador',
+  },
+  {
+    prefix: '/app/usuarios',
+    topic: 'usuarios',
+    title: 'Usuários',
+    text: 'Mantenha acessos por função e evite liberar edição para quem só acompanha operação.',
+    nextTo: '/app',
+    nextLabel: 'Voltar ao painel',
+  },
+]
+
+const contextHelp = computed<ContextHelp | null>(() => {
+  if (!isCompanyRoute.value || route.path === '/app/ajuda') {
+    return null
+  }
+
+  const item = companyHelpItems.find((help) => (
+    help.exact ? route.path === help.prefix : route.path === help.prefix || route.path.startsWith(`${help.prefix}/`)
+  ))
+
+  if (!item) {
+    return null
+  }
+
+  return {
+    topic: item.topic,
+    title: item.title,
+    text: item.text,
+    nextTo: item.nextTo,
+    nextLabel: item.nextLabel,
+  }
+})
 
 onMounted(() => {
   auth.ensureLoaded().catch(() => undefined)
@@ -245,6 +428,14 @@ function handleBrandClick(event: MouseEvent) {
           <strong>{{ isSaasRoute ? 'Provador Virtual' : activeCompanyName }}</strong>
         </div>
 
+        <div v-if="isSaasViewingCompanyPortal" class="admin-context-note">
+          <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
+          <span>
+            <strong>Acesso SaaS</strong>
+            <small>Você está no portal da empresa. Use o atalho SaaS para voltar à administração.</small>
+          </span>
+        </div>
+
         <label v-if="isCompanyRoute && auth.isAuthenticated && auth.companyOptions.length > 1" class="company-switcher">
           <span>Empresa</span>
           <select :value="auth.activeCompany?.id || ''" :disabled="auth.loadingMe" @change="switchCompany">
@@ -255,16 +446,19 @@ function handleBrandClick(event: MouseEvent) {
           </select>
         </label>
 
-        <nav class="work-nav" aria-label="Navegacao do portal">
-          <RouterLink
-            v-for="link in visibleWorkLinks"
-            :key="link.to"
-            :to="link.to"
-            @click="navOpen = false"
-          >
-            <i class="fa-solid" :class="link.icon" aria-hidden="true"></i>
-            <span>{{ link.label }}</span>
-          </RouterLink>
+        <nav class="work-nav" aria-label="Navegação do portal">
+          <section v-for="section in visibleWorkSections" :key="section.label" class="work-nav-section">
+            <h2 class="work-nav-section-title">{{ section.label }}</h2>
+            <RouterLink
+              v-for="link in section.links"
+              :key="link.to"
+              :to="link.to"
+              @click="navOpen = false"
+            >
+              <i class="fa-solid" :class="link.icon" aria-hidden="true"></i>
+              <span>{{ link.label }}</span>
+            </RouterLink>
+          </section>
         </nav>
 
         <div class="work-sidebar-mobile-actions">
@@ -298,6 +492,26 @@ function handleBrandClick(event: MouseEvent) {
       </aside>
 
       <main class="work-main">
+        <section v-if="contextHelp" class="context-help-bar" aria-label="Ajuda contextual">
+          <div class="context-help-copy">
+            <strong>
+              <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
+              {{ contextHelp.title }}
+            </strong>
+            <span>{{ contextHelp.text }}</span>
+          </div>
+          <div class="context-help-actions">
+            <RouterLink :to="{ path: '/app/ajuda', query: { topico: contextHelp.topic } }">
+              Manual
+            </RouterLink>
+            <RouterLink v-if="contextHelp.nextTo" :to="contextHelp.nextTo">
+              {{ contextHelp.nextLabel || 'Próximo passo' }}
+            </RouterLink>
+            <a :href="supportUrl" target="_blank" rel="noopener noreferrer">
+              Suporte
+            </a>
+          </div>
+        </section>
         <div v-if="!workContextReady" class="empty-state work-context-loading">
           Carregando contexto da empresa...
         </div>

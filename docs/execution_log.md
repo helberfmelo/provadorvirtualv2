@@ -1310,3 +1310,15 @@
 - Validação local documental passou com varredura de segredos e `git diff --check`.
 - Commit `a66236cb` enviado para `main`; o run `26623161467` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` foi tentada após o deploy, mas a máquina local não conseguiu abrir conexão TCP 443 para `provadorvirtual.online`/`108.179.241.241`; o bloqueio foi registrado como conectividade local, não como erro de aplicação.
+
+## 2026-05-29 - Sprint 128 Navegação limpa e ajuda contextual
+
+- Relida a documentação obrigatória antes da sprint e mantido o comparativo Sizebay local fora do Git.
+- Acessado o MySizebay da Zak em modo somente leitura, sem salvar, publicar, acionar suporte ou alterar dados. O benchmark da dashboard mostrou menu lateral curto, tenant visível, cabeçalho limpo, card principal de cobertura de produtos e suporte acessível.
+- O portal da empresa foi reorganizado em grupos de navegação por jornada: Operação, Catálogo, Provador, Resultados e Conta.
+- A sidebar autenticada ganhou contraste operacional, estados ativos mais claros, rótulos em PT-BR voltados ao lojista e nota de contexto quando admin/support SaaS está no portal da empresa.
+- Criada ajuda contextual discreta por tela crítica, com link para manual, próximo passo operacional e suporte.
+- Criada a tela `/app/ajuda` com manual rápido por tópico, usando textos curtos e CTA direto para a ação relacionada.
+- A navegação SaaS também foi agrupada para preservar consistência entre portais sem misturar contextos.
+- Validação visual local em `http://127.0.0.1:5174` cobriu desktop, mobile e menu mobile com dados de preview injetados apenas no navegador.
+- `npm --prefix frontend run build` passou. Testes backend não foram executados porque não houve alteração backend; o PHP local segue sem driver SQLite para testes que dependem do banco.

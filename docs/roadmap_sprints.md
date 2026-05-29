@@ -2151,7 +2151,7 @@ Critérios de aceite:
 - cada tela crítica tem ajuda contextual, mas sem blocos longos de texto;
 - layout responsivo sem sobreposição.
 
-Status: planejada.
+Status: implementado na Sprint 128. O portal da empresa passou a ter navegação agrupada por Operação, Catálogo, Provador, Resultados e Conta, com sidebar escura, estado ativo mais claro, rótulos em linguagem de lojista, ajuda contextual por tela e manual rápido em `/app/ajuda`. O benchmark read-only da Sizebay confirmou o valor de menu curto, tenant visível, tela limpa e suporte acessível; o Provador Virtual aplicou esses aprendizados com próximos passos e manual sem blocos longos.
 
 ### Sprint 129 - Painel de cobertura e prontidão operacional
 

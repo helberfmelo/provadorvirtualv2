@@ -8,6 +8,7 @@ import DashboardView from '../views/DashboardView.vue'
 import HomeView from '../views/HomeView.vue'
 import FitProfilesView from '../views/FitProfilesView.vue'
 import GoLiveView from '../views/GoLiveView.vue'
+import HelpView from '../views/HelpView.vue'
 import ImportRulesView from '../views/ImportRulesView.vue'
 import ImportsView from '../views/ImportsView.vue'
 import IntegrationsView from '../views/IntegrationsView.vue'
@@ -64,6 +65,7 @@ const router = createRouter({
     { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/analytics', component: AnalyticsView },
     { path: '/app/go-live', component: GoLiveView },
+    { path: '/app/ajuda', component: HelpView },
     { path: '/app/importacoes', component: ImportsView },
     { path: '/app/regras-de-importacao', component: ImportRulesView },
     { path: '/app/widget', component: WidgetInstallView },
