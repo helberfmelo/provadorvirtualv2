@@ -2089,3 +2089,24 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 123 nos commits `9e16705`, `c5b90e6` e `49c94e4`, publicado com sucesso no run `26617845717`. Validações locais passaram com PHPUnit completo (102 testes, 927 assertions), build frontend, `php -l`, `vendor/bin/pint --dirty`, varredura de credenciais e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 124 - Comparativo Sizebay e Provador Virtual
+
+Objetivo: acessar novamente o portal MySizebay da Zak em modo somente leitura e criar um documento comparativo tela por tela, item por item, entre a experiencia da Sizebay e o estado atual do Provador Virtual.
+
+Entregas:
+
+- recapturar as telas principais do portal Sizebay do cliente Zak sem alterar dados;
+- consolidar a captura atual com o benchmark autenticado anterior de Settings, Sync, Importation Rules, Buttons Customization, VFR Customization, Reports, Orders, Returns e Billing;
+- criar `docs/sizebay_vs_provador_virtual_comparison.md` em formato de tabela com as colunas solicitadas: item comparado, Sizebay, Provador Virtual e quem esta melhor/impacto;
+- comparar dashboard, produtos, tabelas, modelagens, marcas, categorias, taxonomias, integracoes, sync, regras, widget, analytics, pedidos, devolucoes, IA, go-live, suporte, billing, SaaS Admin e governanca BigShop;
+- atualizar `docs/README.md` para incluir o comparativo como leitura obrigatoria.
+
+Validação:
+
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` apos deploy.
+
+Status: em validacao.

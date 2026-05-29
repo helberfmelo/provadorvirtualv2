@@ -1298,3 +1298,13 @@
 - O segundo push passou na validação backend, mas o deploy remoto falhou em MySQL strict mode por `timestamp not null` sem default em `requested_at`; ajustado para `dateTime` em `49c94e4`.
 - Commit final `49c94e4` enviado para `main`; o run `26617845717` do GitHub Actions finalizou com sucesso, incluindo validação backend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, SaaS, portal da empresa, páginas públicas, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-29 - Sprint 124 Comparativo Sizebay e Provador Virtual
+
+- Acessado novamente o portal MySizebay da Zak em modo somente leitura, sem alterar configuracoes, sem acionar suporte e sem registrar credenciais ou tokens.
+- Recapturadas as telas principais do portal do cliente: Dashboard, Products, Product form, Measurement Guide, Measurement Table, Modelings, Brands, Categories, Sizebay Brands e Sizebay Categories.
+- Reaproveitada a captura autenticada anterior ja documentada para Settings, Sync, Importation Rules, Buttons Customization, VFR Customization, Reports, Orders, Returns e Billing.
+- Criado `docs/sizebay_vs_provador_virtual_comparison.md` com tabela comparativa em quatro colunas: item comparado, Sizebay, Provador Virtual e quem esta melhor/impacto.
+- A comparacao cobre navegacao, dashboard, produtos, tabelas, modelagens, marcas, categorias, taxonomias, integracoes, sync, regras, widget, analytics, pedidos, devolucoes, IA, go-live, suporte, billing, SaaS Admin e governanca BigShop.
+- `docs/README.md` passou a listar o novo comparativo como documento obrigatorio de leitura.
+- Validação local documental passou com varredura de segredos e `git diff --check`.
