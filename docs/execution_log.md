@@ -1370,3 +1370,15 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
 - Commit `1c0fc58` enviado para `main`; o run `26630698467` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 132 Vínculo de tabelas melhor que Sizebay
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy e a sessão Sizebay.
+- Acessado o MySizebay da Zak em modo somente leitura em `/products` e `/table-measurements`, sem alterar dados, sem salvar, sem publicar e sem acionar suporte.
+- O benchmark Sizebay confirmou coluna `Chart` diretamente na lista de produtos, `--` para produtos sem tabela, seleção por checkbox e lista de tabelas com nome, metadados e tamanhos.
+- O Provador Virtual manteve a coluna clara de tabela e evoluiu a ação em massa com prévia antes de aplicar, resumo de sem tabela/conflitos/já vinculados/recomendados, recomendação por categoria, marca, gênero, modelagem e tamanhos, confirmação explícita para substituir vínculos e desfazer do último lote.
+- `PATCH /api/v1/products/bulk-measurement-table` agora aceita `action=preview|apply|undo`, retorna prévia com conflitos/recomendações, bloqueia substituição sem `confirm_conflicts`, grava `batch_id` em `metadata.bulk_measurement_table`, registra histórico por produto e audita vínculo/desfazer em massa.
+- `/app/produtos` ganhou fila operacional de produtos sem tabela, botão de prévia para vínculo em lote, painel de conflitos/recomendações e ação de desfazer o último lote aplicado.
+- Validação visual local rodou em `http://127.0.0.1:5175/app/produtos`, com backend local em `8001`, cobrindo desktop e mobile do painel de prévia, sem sobreposição incoerente.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter ProductsApiTest`, `php vendor\bin\pint --dirty` e `npm --prefix frontend run build` (com o aviso conhecido de bundle acima de 500 kB).
+- Varredura de segredos, `git diff --check`, commit, push, GitHub Actions e validação de produção ainda serão registrados ao finalizar a sprint.

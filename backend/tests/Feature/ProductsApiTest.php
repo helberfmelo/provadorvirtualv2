@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\AuditLog;
 use App\Models\MeasurementTable;
+use App\Models\MeasurementTableRow;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\Product;
@@ -123,6 +124,154 @@ class ProductsApiTest extends TestCase
         $this->assertDatabaseHas('products', [
             'id' => $secondProductId,
             'measurement_table_id' => $tableId,
+        ]);
+    }
+
+    public function test_merchant_can_preview_confirm_and_undo_bulk_measurement_table_links(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+        $merchant = Merchant::query()->where('slug', 'provador-virtual-demo')->firstOrFail();
+        $company = MerchantCompany::query()->where('merchant_id', $merchant->id)->firstOrFail();
+
+        $targetTable = MeasurementTable::query()->create([
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $company->id,
+            'name' => 'S132 Camisas Zak Regular',
+            'product_type' => 'Camisas',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'status' => 'active',
+            'source' => 'manual',
+        ]);
+        $oldTable = MeasurementTable::query()->create([
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $company->id,
+            'name' => 'S132 Calcas Arquivo',
+            'product_type' => 'Calcas',
+            'gender' => 'female',
+            'fit_profile' => 'slim',
+            'status' => 'active',
+            'source' => 'manual',
+        ]);
+
+        foreach (['P', 'M', 'G'] as $index => $size) {
+            MeasurementTableRow::query()->create([
+                'measurement_table_id' => $targetTable->id,
+                'size_label' => $size,
+                'sort_order' => $index + 1,
+            ]);
+        }
+
+        MeasurementTableRow::query()->create([
+            'measurement_table_id' => $oldTable->id,
+            'size_label' => '38',
+            'sort_order' => 1,
+        ]);
+
+        $withoutTable = $this->createOperationalProduct($merchant, $company, null, [
+            'name' => 'S132 Camisa sem tabela',
+            'slug' => 's132-camisa-sem-tabela',
+            'sku' => 'S132-NOTABLE',
+            'category' => 'Camisas',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'metadata' => ['brand' => 'Zak'],
+        ], ['P', 'M']);
+        $conflicting = $this->createOperationalProduct($merchant, $company, $oldTable, [
+            'name' => 'S132 Camisa com tabela antiga',
+            'slug' => 's132-camisa-com-tabela-antiga',
+            'sku' => 'S132-CONFLICT',
+            'category' => 'Camisas',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'metadata' => ['brand' => 'Zak'],
+        ], ['M']);
+        $sameTable = $this->createOperationalProduct($merchant, $company, $targetTable, [
+            'name' => 'S132 Camisa ja correta',
+            'slug' => 's132-camisa-ja-correta',
+            'sku' => 'S132-SAME',
+            'category' => 'Camisas',
+            'gender' => 'male',
+            'fit_profile' => 'regular',
+            'metadata' => ['brand' => 'Zak'],
+        ], ['G']);
+        $productIds = [$withoutTable->id, $conflicting->id, $sameTable->id];
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/products/bulk-measurement-table', [
+                'action' => 'preview',
+                'product_ids' => $productIds,
+                'measurement_table_id' => $targetTable->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('summary.requested', 3)
+            ->assertJsonPath('summary.without_table', 1)
+            ->assertJsonPath('summary.conflicts', 1)
+            ->assertJsonPath('summary.same_table', 1)
+            ->assertJsonPath('summary.recommended_target_matches', 3)
+            ->assertJsonPath('preview.0.target_table_id', $targetTable->id);
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/products/bulk-measurement-table', [
+                'action' => 'apply',
+                'product_ids' => $productIds,
+                'measurement_table_id' => $targetTable->id,
+            ])
+            ->assertStatus(409)
+            ->assertJsonPath('summary.conflicts', 1);
+
+        $batchId = $this->withHeaders($headers)
+            ->patchJson('/api/v1/products/bulk-measurement-table', [
+                'action' => 'apply',
+                'product_ids' => $productIds,
+                'measurement_table_id' => $targetTable->id,
+                'confirm_conflicts' => true,
+            ])
+            ->assertOk()
+            ->assertJsonPath('summary.requested', 3)
+            ->assertJsonPath('summary.updated', 2)
+            ->assertJsonPath('summary.skipped_same_table', 1)
+            ->assertJsonPath('summary.conflicts', 1)
+            ->json('summary.batch_id');
+
+        $this->assertDatabaseHas('products', [
+            'id' => $withoutTable->id,
+            'measurement_table_id' => $targetTable->id,
+        ]);
+        $this->assertDatabaseHas('products', [
+            'id' => $conflicting->id,
+            'measurement_table_id' => $targetTable->id,
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'product.bulk_measurement_table_linked',
+        ]);
+
+        $this->withHeaders($headers)
+            ->patchJson('/api/v1/products/bulk-measurement-table', [
+                'action' => 'undo',
+                'product_ids' => $productIds,
+                'batch_id' => $batchId,
+            ])
+            ->assertOk()
+            ->assertJsonPath('summary.requested', 3)
+            ->assertJsonPath('summary.updated', 2)
+            ->assertJsonPath('summary.skipped', 1);
+
+        $this->assertDatabaseHas('products', [
+            'id' => $withoutTable->id,
+            'measurement_table_id' => null,
+        ]);
+        $this->assertDatabaseHas('products', [
+            'id' => $conflicting->id,
+            'measurement_table_id' => $oldTable->id,
+        ]);
+        $this->assertDatabaseHas('products', [
+            'id' => $sameTable->id,
+            'measurement_table_id' => $targetTable->id,
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'product.bulk_measurement_table_undone',
         ]);
     }
 

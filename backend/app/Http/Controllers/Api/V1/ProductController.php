@@ -14,6 +14,7 @@ use App\Services\Audit\AuditLogger;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class ProductController extends Controller
@@ -185,32 +186,292 @@ class ProductController extends Controller
         $merchant = $this->currentMerchant($request);
         $company = $this->currentCompany($request, $merchant);
         $data = $request->validated();
-        $measurementTable = $this->resolveMeasurementTable($merchant->id, $company, (int) $data['measurement_table_id']);
+        $action = $data['action'] ?? 'apply';
+        $measurementTable = $action === 'undo'
+            ? null
+            : $this->resolveMeasurementTable($merchant->id, $company, (int) $data['measurement_table_id']);
         $productIds = collect($data['product_ids'])->map(fn (mixed $id): int => (int) $id)->values();
         $products = Product::query()
             ->where('merchant_id', $merchant->id)
             ->tap(fn ($query) => $this->scopeCompany($query, $company))
             ->whereIn('id', $productIds)
+            ->with([
+                'company',
+                'measurementTable',
+                'variants' => fn ($query) => $query->select(['id', 'product_id', 'size_label', 'is_active'])->orderBy('id'),
+            ])
             ->get();
+        $candidateTables = $this->candidateMeasurementTables($merchant->id, $company);
+        $preview = $measurementTable
+            ? $this->bulkMeasurementTablePreview($products, $measurementTable, $candidateTables)
+            : null;
 
-        Product::query()
-            ->whereKey($products->pluck('id'))
-            ->update(['measurement_table_id' => $measurementTable?->id]);
+        if ($action === 'preview') {
+            return response()->json($preview);
+        }
 
-        $updatedProducts = Product::query()
-            ->whereKey($products->pluck('id'))
-            ->with(['company', 'measurementTable'])
-            ->withCount('variants')
-            ->orderByDesc('id')
-            ->get();
+        if ($action === 'undo') {
+            return $this->undoBulkMeasurementTable($request, $merchant, $company, $products, $data['batch_id'] ?? null);
+        }
+
+        if (($preview['summary']['conflicts'] ?? 0) > 0 && ! $request->boolean('confirm_conflicts')) {
+            return response()->json([
+                ...$preview,
+                'message' => 'Confirme a substituição de produtos que já possuem tabela vinculada.',
+            ], 409);
+        }
+
+        $batchId = (string) Str::uuid();
+        $updatedIds = [];
+
+        DB::transaction(function () use ($products, $measurementTable, $batchId, &$updatedIds): void {
+            foreach ($products as $product) {
+                if ((int) $product->measurement_table_id === (int) $measurementTable?->id) {
+                    continue;
+                }
+
+                $metadata = $product->metadata ?? [];
+                $metadata['bulk_measurement_table']['last_action'] = [
+                    'batch_id' => $batchId,
+                    'previous_measurement_table_id' => $product->measurement_table_id,
+                    'measurement_table_id' => $measurementTable?->id,
+                    'created_at' => now()->toISOString(),
+                ];
+                $metadata = $this->appendProductHistory($metadata, 'measurement_table.bulk_linked', [
+                    'batch_id' => $batchId,
+                    'from' => $product->measurement_table_id,
+                    'to' => $measurementTable?->id,
+                ]);
+
+                $product->update([
+                    'measurement_table_id' => $measurementTable?->id,
+                    'metadata' => $metadata,
+                ]);
+                $updatedIds[] = $product->id;
+            }
+        });
+
+        app(AuditLogger::class)->log($request, $merchant, 'product.bulk_measurement_table_linked', 'products', 'info', [
+            'module' => 'products',
+            'action' => 'bulk_measurement_table_link',
+            'merchant_company_id' => $company?->id,
+            'batch_id' => $batchId,
+            'product_ids' => $products->pluck('id')->values()->all(),
+            'updated_product_ids' => $updatedIds,
+            'measurement_table_id' => $measurementTable?->id,
+            'conflicts' => $preview['summary']['conflicts'] ?? 0,
+        ]);
+
+        $updatedProducts = $this->productsForBulkResponse($products->pluck('id'));
 
         return ProductResource::collection($updatedProducts)->additional([
             'summary' => [
                 'requested' => $productIds->count(),
-                'updated' => $updatedProducts->count(),
+                'updated' => count($updatedIds),
+                'skipped_same_table' => $products->count() - count($updatedIds),
                 'measurement_table_id' => $measurementTable?->id,
+                'batch_id' => $batchId,
+                'conflicts' => $preview['summary']['conflicts'] ?? 0,
+            ],
+            'preview' => $preview['preview'] ?? [],
+        ]);
+    }
+
+    private function undoBulkMeasurementTable(Request $request, $merchant, $company, Collection $products, ?string $batchId)
+    {
+        $updatedIds = [];
+        $skippedIds = [];
+
+        DB::transaction(function () use ($products, $batchId, &$updatedIds, &$skippedIds): void {
+            foreach ($products as $product) {
+                $metadata = $product->metadata ?? [];
+                $lastAction = data_get($metadata, 'bulk_measurement_table.last_action');
+
+                if (! is_array($lastAction) || ($batchId && data_get($lastAction, 'batch_id') !== $batchId)) {
+                    $skippedIds[] = $product->id;
+
+                    continue;
+                }
+
+                $previousTableId = data_get($lastAction, 'previous_measurement_table_id');
+                $metadata['bulk_measurement_table']['last_undo'] = [
+                    'batch_id' => data_get($lastAction, 'batch_id'),
+                    'restored_measurement_table_id' => $previousTableId,
+                    'undone_measurement_table_id' => $product->measurement_table_id,
+                    'created_at' => now()->toISOString(),
+                ];
+                unset($metadata['bulk_measurement_table']['last_action']);
+                $metadata = $this->appendProductHistory($metadata, 'measurement_table.bulk_unlinked', [
+                    'batch_id' => data_get($lastAction, 'batch_id'),
+                    'from' => $product->measurement_table_id,
+                    'to' => $previousTableId,
+                ]);
+
+                $product->update([
+                    'measurement_table_id' => $previousTableId ? (int) $previousTableId : null,
+                    'metadata' => $metadata,
+                ]);
+                $updatedIds[] = $product->id;
+            }
+        });
+
+        app(AuditLogger::class)->log($request, $merchant, 'product.bulk_measurement_table_undone', 'products', 'info', [
+            'module' => 'products',
+            'action' => 'bulk_measurement_table_undo',
+            'merchant_company_id' => $company?->id,
+            'batch_id' => $batchId,
+            'product_ids' => $products->pluck('id')->values()->all(),
+            'updated_product_ids' => $updatedIds,
+            'skipped_product_ids' => $skippedIds,
+        ]);
+
+        return ProductResource::collection($this->productsForBulkResponse($products->pluck('id')))->additional([
+            'summary' => [
+                'requested' => $products->count(),
+                'updated' => count($updatedIds),
+                'skipped' => count($skippedIds),
+                'batch_id' => $batchId,
             ],
         ]);
+    }
+
+    private function productsForBulkResponse(Collection $productIds): Collection
+    {
+        return Product::query()
+            ->whereKey($productIds->values()->all())
+            ->with(['company', 'measurementTable'])
+            ->withCount('variants')
+            ->orderByDesc('id')
+            ->get();
+    }
+
+    private function candidateMeasurementTables(int $merchantId, $company): Collection
+    {
+        return MeasurementTable::query()
+            ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompany($query, $company))
+            ->where('status', 'active')
+            ->with('rows')
+            ->get();
+    }
+
+    private function bulkMeasurementTablePreview(Collection $products, MeasurementTable $targetTable, Collection $candidateTables): array
+    {
+        $items = $products->map(function (Product $product) use ($targetTable, $candidateTables): array {
+            $currentTable = $product->measurementTable;
+            $recommendation = $this->recommendMeasurementTable($product, $candidateTables);
+            $sameTable = (int) $product->measurement_table_id === (int) $targetTable->id;
+            $conflict = $product->measurement_table_id && ! $sameTable;
+
+            return [
+                'product_id' => $product->id,
+                'name' => $product->name,
+                'sku' => $product->sku ?: $product->external_product_id,
+                'category' => $product->category,
+                'brand' => data_get($product->metadata ?? [], 'brand'),
+                'fit_profile' => $product->fit_profile,
+                'sizes' => $product->variants->pluck('size_label')->filter()->unique()->values()->all(),
+                'current_table_id' => $currentTable?->id,
+                'current_table_name' => $currentTable?->name,
+                'target_table_id' => $targetTable->id,
+                'target_table_name' => $targetTable->name,
+                'conflict' => (bool) $conflict,
+                'same_table' => $sameTable,
+                'without_table' => blank($product->measurement_table_id),
+                'recommendation' => $recommendation,
+                'target_matches_recommendation' => $recommendation && (int) $recommendation['table_id'] === (int) $targetTable->id,
+            ];
+        })->values();
+
+        return [
+            'summary' => [
+                'requested' => $products->count(),
+                'target_table' => [
+                    'id' => $targetTable->id,
+                    'name' => $targetTable->name,
+                    'product_type' => $targetTable->product_type,
+                ],
+                'without_table' => $items->where('without_table', true)->count(),
+                'same_table' => $items->where('same_table', true)->count(),
+                'conflicts' => $items->where('conflict', true)->count(),
+                'recommended_target_matches' => $items->where('target_matches_recommendation', true)->count(),
+            ],
+            'preview' => $items->all(),
+        ];
+    }
+
+    private function recommendMeasurementTable(Product $product, Collection $candidateTables): ?array
+    {
+        $productCategory = $this->normalizedText($product->category);
+        $productBrand = $this->normalizedText(data_get($product->metadata ?? [], 'brand'));
+        $productFit = $this->normalizedText($product->fit_profile);
+        $productGender = $this->normalizedText($product->gender);
+        $productSizes = $product->variants
+            ->pluck('size_label')
+            ->map(fn ($size) => $this->normalizedText($size))
+            ->filter()
+            ->unique()
+            ->values();
+
+        return $candidateTables
+            ->map(function (MeasurementTable $table) use ($productCategory, $productBrand, $productFit, $productGender, $productSizes): array {
+                $score = 0;
+                $reasons = [];
+                $tableType = $this->normalizedText($table->product_type);
+                $tableName = $this->normalizedText($table->name);
+                $tableGender = $this->normalizedText($table->gender);
+                $tableFit = $this->normalizedText($table->fit_profile);
+                $tableSizes = $table->rows
+                    ->pluck('size_label')
+                    ->map(fn ($size) => $this->normalizedText($size))
+                    ->filter()
+                    ->unique()
+                    ->values();
+
+                if ($productCategory && (($tableType && ($productCategory === $tableType || str_contains($tableType, $productCategory) || str_contains($productCategory, $tableType))) || str_contains($tableName, $productCategory))) {
+                    $score += 4;
+                    $reasons[] = 'categoria';
+                }
+
+                if ($productGender && $tableGender && $productGender === $tableGender) {
+                    $score += 2;
+                    $reasons[] = 'genero';
+                }
+
+                if ($productFit && $tableFit && $productFit === $tableFit) {
+                    $score += 2;
+                    $reasons[] = 'modelagem';
+                }
+
+                if ($productBrand && str_contains($tableName, $productBrand)) {
+                    $score += 2;
+                    $reasons[] = 'marca';
+                }
+
+                $sizeMatches = $productSizes->intersect($tableSizes)->count();
+                if ($sizeMatches > 0) {
+                    $score += min(3, $sizeMatches);
+                    $reasons[] = "{$sizeMatches} tamanho(s)";
+                }
+
+                return [
+                    'table_id' => $table->id,
+                    'table_name' => $table->name,
+                    'score' => $score,
+                    'reasons' => $reasons,
+                ];
+            })
+            ->filter(fn (array $recommendation): bool => $recommendation['score'] > 0)
+            ->sortByDesc('score')
+            ->values()
+            ->first();
+    }
+
+    private function normalizedText(mixed $value): string
+    {
+        $normalized = Str::ascii(Str::lower((string) $value));
+
+        return trim(preg_replace('/[^a-z0-9]+/', ' ', $normalized) ?: '');
     }
 
     public function destroy(Request $request, Product $product)

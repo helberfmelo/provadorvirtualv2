@@ -29,8 +29,51 @@ const filters = reactive({
 })
 
 const bulkMeasurementTableId = ref<number | ''>('')
+const bulkPreview = ref<BulkPreview | null>(null)
+const confirmBulkConflicts = ref(false)
+const lastBulkAction = ref<{ batch_id: string; product_ids: number[]; label: string } | null>(null)
 
 type ProductTabKey = 'all' | 'ready' | 'pending' | 'without_measurement_table' | 'sync_error' | 'inactive'
+
+type BulkPreviewItem = {
+  product_id: number
+  name: string
+  sku: string | null
+  category: string | null
+  brand: string | null
+  fit_profile: string | null
+  sizes: string[]
+  current_table_id: number | null
+  current_table_name: string | null
+  target_table_id: number
+  target_table_name: string
+  conflict: boolean
+  same_table: boolean
+  without_table: boolean
+  target_matches_recommendation: boolean
+  recommendation?: {
+    table_id: number
+    table_name: string
+    score: number
+    reasons: string[]
+  } | null
+}
+
+type BulkPreview = {
+  summary: {
+    requested: number
+    target_table: {
+      id: number
+      name: string
+      product_type: string
+    }
+    without_table: number
+    same_table: number
+    conflicts: number
+    recommended_target_matches: number
+  }
+  preview: BulkPreviewItem[]
+}
 
 type ProductFilterOptions = {
   categories: string[]
@@ -143,6 +186,13 @@ const activeFilterCount = computed(() => Object.entries(filters)
   .length)
 const canPreviousPage = computed(() => pagination.current_page > 1)
 const canNextPage = computed(() => pagination.current_page < pagination.last_page)
+const selectedTargetTable = computed(() => measurementTables.value.find((table) => table.id === Number(bulkMeasurementTableId.value)) || null)
+const hasBulkPreview = computed(() => Boolean(bulkPreview.value))
+const bulkPreviewHasConflicts = computed(() => (bulkPreview.value?.summary.conflicts || 0) > 0)
+const canConfirmBulkPreview = computed(() => Boolean(bulkPreview.value) && (!bulkPreviewHasConflicts.value || confirmBulkConflicts.value))
+const withoutTableCount = computed(() => summary.tabs.without_measurement_table || 0)
+const bulkPreviewRows = computed(() => bulkPreview.value?.preview || [])
+const bulkTargetLabel = computed(() => bulkPreview.value?.summary.target_table.name || selectedTargetTable.value?.name || 'tabela selecionada')
 
 let filterTimer: ReturnType<typeof window.setTimeout> | null = null
 
@@ -162,6 +212,11 @@ watch(filters, () => {
   }
 
   scheduleLoadProducts()
+}, { deep: true })
+
+watch([selectedProductIds, bulkMeasurementTableId], () => {
+  bulkPreview.value = null
+  confirmBulkConflicts.value = false
 }, { deep: true })
 
 function applyRouteFilters() {
@@ -315,7 +370,7 @@ function clearSelection() {
   selectedProductIds.value = []
 }
 
-async function linkSelectedProducts() {
+async function previewSelectedProducts() {
   error.value = ''
 
   if (!hasSelection.value) {
@@ -331,22 +386,94 @@ async function linkSelectedProducts() {
 
   try {
     const { data } = await api.patch('/products/bulk-measurement-table', {
+      action: 'preview',
       product_ids: selectedProductIds.value,
       measurement_table_id: bulkMeasurementTableId.value,
+    })
+    bulkPreview.value = data
+    confirmBulkConflicts.value = !data.summary?.conflicts
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Não foi possível montar a prévia do vínculo.'
+  } finally {
+    linking.value = false
+  }
+}
+
+async function confirmSelectedProductsLink() {
+  if (!bulkPreview.value || !bulkMeasurementTableId.value) {
+    return
+  }
+
+  error.value = ''
+  linking.value = true
+  const productIds = [...selectedProductIds.value]
+
+  try {
+    const { data } = await api.patch('/products/bulk-measurement-table', {
+      action: 'apply',
+      product_ids: productIds,
+      measurement_table_id: bulkMeasurementTableId.value,
+      confirm_conflicts: confirmBulkConflicts.value,
     })
     showFeedback({
       status: 'success',
       title: 'Tabela vinculada',
       message: `${data.summary?.updated || selectedCount.value} produto(s) atualizados com a tabela selecionada.`,
     })
+    if (data.summary?.batch_id) {
+      lastBulkAction.value = {
+        batch_id: data.summary.batch_id,
+        product_ids: productIds,
+        label: selectedTargetTable.value?.name || 'tabela selecionada',
+      }
+    }
     bulkMeasurementTableId.value = ''
+    bulkPreview.value = null
+    confirmBulkConflicts.value = false
     clearSelection()
     await loadProducts(pagination.current_page)
   } catch (requestError: any) {
+    if (requestError.response?.status === 409 && requestError.response?.data?.preview) {
+      bulkPreview.value = requestError.response.data
+      confirmBulkConflicts.value = false
+    }
     error.value = requestError.response?.data?.message || 'Não foi possível vincular a tabela aos produtos selecionados.'
   } finally {
     linking.value = false
   }
+}
+
+async function undoLastBulkLink() {
+  if (!lastBulkAction.value) {
+    return
+  }
+
+  error.value = ''
+  linking.value = true
+
+  try {
+    const { data } = await api.patch('/products/bulk-measurement-table', {
+      action: 'undo',
+      product_ids: lastBulkAction.value.product_ids,
+      batch_id: lastBulkAction.value.batch_id,
+    })
+    showFeedback({
+      status: 'success',
+      title: 'Vínculo desfeito',
+      message: `${data.summary?.updated || 0} produto(s) voltaram para a tabela anterior.`,
+    })
+    lastBulkAction.value = null
+    await loadProducts(pagination.current_page)
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Não foi possível desfazer o vínculo em massa.'
+  } finally {
+    linking.value = false
+  }
+}
+
+function dismissBulkPreview() {
+  bulkPreview.value = null
+  confirmBulkConflicts.value = false
 }
 
 async function removeProduct(product: Product) {
@@ -454,6 +581,64 @@ function compactSizes(product: Product) {
   const visible = sizes.slice(0, 6).join(', ')
   return sizes.length > 6 ? `${visible} +${sizes.length - 6}` : visible
 }
+
+function compactPreviewSizes(item: BulkPreviewItem) {
+  if (!item.sizes.length) {
+    return '-'
+  }
+
+  const visible = item.sizes.slice(0, 5).join(', ')
+  return item.sizes.length > 5 ? `${visible} +${item.sizes.length - 5}` : visible
+}
+
+function previewRecommendationText(item: BulkPreviewItem) {
+  if (!item.recommendation) {
+    return 'Sem recomendação'
+  }
+
+  const reasons = item.recommendation.reasons.length
+    ? ` por ${item.recommendation.reasons.map(recommendationReasonLabel).join(', ')}`
+    : ''
+  return `${item.recommendation.table_name}${reasons}`
+}
+
+function recommendationReasonLabel(reason: string) {
+  return {
+    genero: 'gênero',
+  }[reason] || reason
+}
+
+function previewTone(item: BulkPreviewItem) {
+  if (item.same_table) {
+    return 'neutral'
+  }
+
+  if (item.conflict) {
+    return item.target_matches_recommendation ? 'warning' : 'danger'
+  }
+
+  if (item.target_matches_recommendation) {
+    return 'ok'
+  }
+
+  return 'warning'
+}
+
+function previewStatusText(item: BulkPreviewItem) {
+  if (item.same_table) {
+    return 'Já usa esta tabela'
+  }
+
+  if (item.conflict) {
+    return item.target_matches_recommendation ? 'Substituir com recomendação' : 'Conflito'
+  }
+
+  if (item.target_matches_recommendation) {
+    return 'Recomendado'
+  }
+
+  return 'Novo vínculo'
+}
 </script>
 
 <template>
@@ -495,6 +680,19 @@ function compactSizes(product: Product) {
           <i class="fa-solid" :class="tab.icon" aria-hidden="true"></i>
           <span>{{ tab.label }}</span>
           <strong>{{ tab.count }}</strong>
+        </button>
+      </div>
+
+      <div v-if="withoutTableCount" class="measurement-queue-panel">
+        <div>
+          <i class="fa-solid fa-ruler-combined" aria-hidden="true"></i>
+          <span>
+            <strong>{{ withoutTableCount }} produto(s) sem tabela</strong>
+            <small>Fila operacional para revisar e vincular em lote.</small>
+          </span>
+        </div>
+        <button class="btn btn-secondary btn-compact" type="button" @click="setTab('without_measurement_table')">
+          Ver fila
         </button>
       </div>
 
@@ -574,9 +772,20 @@ function compactSizes(product: Product) {
             {{ table.name }}
           </option>
         </select>
-        <button class="btn btn-primary btn-compact" type="button" :disabled="!hasSelection || linking" @click="linkSelectedProducts">
-          <i class="fa-solid fa-link" aria-hidden="true"></i>
-          Vincular
+        <button class="btn btn-primary btn-compact" type="button" :disabled="!hasSelection || !bulkMeasurementTableId || linking" @click="previewSelectedProducts">
+          <i class="fa-solid fa-eye" aria-hidden="true"></i>
+          Prévia
+        </button>
+        <button
+          v-if="lastBulkAction"
+          class="btn btn-secondary btn-compact"
+          type="button"
+          :disabled="linking"
+          :title="`Desfazer ${lastBulkAction.label}`"
+          @click="undoLastBulkLink"
+        >
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+          Desfazer
         </button>
         <button class="btn btn-secondary btn-compact" type="button" :disabled="!products.length || allVisibleSelected" @click="selectAllVisible">
           Todos
@@ -590,6 +799,84 @@ function compactSizes(product: Product) {
         Filtro ativo: <strong>{{ activeShortcutLabel || `${activeFilterCount} filtro(s)` }}</strong>
         <button type="button" @click="clearAllFilters">Limpar</button>
       </p>
+
+      <section v-if="hasBulkPreview" class="bulk-preview-panel" aria-live="polite">
+        <div class="bulk-preview-header">
+          <div>
+            <span class="eyebrow">Vínculo em massa</span>
+            <h3>Prévia para {{ bulkTargetLabel }}</h3>
+            <p>{{ bulkPreview?.summary.requested }} produto(s) selecionados antes de aplicar a mudança.</p>
+          </div>
+          <button type="button" class="icon-link" title="Fechar prévia" @click="dismissBulkPreview">
+            <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+          </button>
+        </div>
+
+        <div class="bulk-preview-summary">
+          <article>
+            <span>Sem tabela</span>
+            <strong>{{ bulkPreview?.summary.without_table || 0 }}</strong>
+          </article>
+          <article>
+            <span>Conflitos</span>
+            <strong>{{ bulkPreview?.summary.conflicts || 0 }}</strong>
+          </article>
+          <article>
+            <span>Já vinculados</span>
+            <strong>{{ bulkPreview?.summary.same_table || 0 }}</strong>
+          </article>
+          <article>
+            <span>Recomendados</span>
+            <strong>{{ bulkPreview?.summary.recommended_target_matches || 0 }}</strong>
+          </article>
+        </div>
+
+        <div class="table-wrap bulk-preview-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Tamanhos</th>
+                <th>Tabela atual</th>
+                <th>Recomendação</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in bulkPreviewRows" :key="item.product_id">
+                <td>
+                  <strong>{{ item.name }}</strong>
+                  <small>{{ item.sku || item.category || 'sem SKU' }}</small>
+                </td>
+                <td>{{ compactPreviewSizes(item) }}</td>
+                <td>{{ item.current_table_name || 'Sem tabela' }}</td>
+                <td>{{ previewRecommendationText(item) }}</td>
+                <td>
+                  <span class="status-pill" :class="previewTone(item)">
+                    {{ previewStatusText(item) }}
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <label v-if="bulkPreviewHasConflicts" class="bulk-preview-confirm">
+          <input v-model="confirmBulkConflicts" type="checkbox" />
+          <span>Confirmo substituir a tabela atual dos produtos em conflito.</span>
+        </label>
+
+        <div class="bulk-preview-actions">
+          <button class="btn btn-secondary btn-compact" type="button" @click="dismissBulkPreview">
+            Cancelar
+          </button>
+          <button class="btn btn-primary btn-compact" type="button" :disabled="!canConfirmBulkPreview || linking" @click="confirmSelectedProductsLink">
+            <i class="fa-solid fa-link" aria-hidden="true"></i>
+            Confirmar vínculo
+          </button>
+        </div>
+      </section>
+
       <div class="table-wrap products-table-wrap">
         <table>
           <thead>

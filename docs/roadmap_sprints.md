@@ -2272,7 +2272,7 @@ Critérios de aceite:
 - vínculo aparece imediatamente na linha do produto;
 - há confirmação quando a ação substituir vínculo existente.
 
-Status: planejada.
+Status: implementada localmente na Sprint 132. O benchmark read-only da Sizebay confirmou coluna `Chart`, seleção por checkbox e clareza de produtos sem tabela; o Provador Virtual evoluiu esse padrão com fila operacional de sem tabela, prévia em massa com conflitos e recomendações, confirmação explícita para substituir vínculos, desfazer por `batch_id`, histórico por produto e auditoria. Validações locais passaram com build frontend, `ProductsApiTest`, Pint, PHP lint e inspeção visual desktop/mobile em `5175`; commit, push, GitHub Actions e validação de produção serão registrados ao concluir a sprint.
 
 ### Sprint 133 - Tabelas com importar, exportar e observações
 
