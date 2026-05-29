@@ -31,15 +31,21 @@ export type FitProfile = {
 export type Product = {
   id: number
   measurement_table_id: number | null
+  external_product_id?: string | null
   name: string
   sku: string | null
   category: string | null
   gender: string | null
   fit_profile: string | null
+  brand?: string | null
+  age_group?: string | null
+  data_source?: string
+  source_label?: string
   status: string
   has_sync_error?: boolean
   readiness_status?: 'ready' | 'pending'
   readiness_issues?: string[]
+  size_labels?: string[]
   variants_count?: number
   variants?: ProductVariant[]
   measurement_table?: MeasurementTableOption | null

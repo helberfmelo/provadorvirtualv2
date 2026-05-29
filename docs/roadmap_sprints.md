@@ -2212,7 +2212,7 @@ Critérios de aceite:
 - seleção em massa continua funcionando;
 - backend pagina e filtra sem carregar catálogo inteiro no cliente.
 
-Status: planejada.
+Status: implementado na Sprint 130. A listagem de Produtos passou a usar paginação e filtros no backend, com abas acionáveis para todos, prontos, pendentes, sem tabela, com erro e desativados; a tabela ganhou colunas de categoria, marca, gênero, faixa etária, modelagem, tamanhos, tabela, prontidão, origem e status. O benchmark read-only da Sizebay confirmou a utilidade de abas com contadores, busca, limpar filtros, seleção por checkbox e colunas Product, Category, Chart, Sizes, Brand, Age group e Modeling; o Provador Virtual evoluiu esse padrão com filtros superiores mais completos e prontidão operacional explícita. Validações locais passaram com API paginada, filtros server-side, seleção em massa preservada, build frontend, testes `ProductsApiTest|MerchantOverviewApiTest` e inspeção visual desktop/mobile em `5175`.
 
 ### Sprint 131 - Detalhe do produto, origem dos dados e ativação por produto
 

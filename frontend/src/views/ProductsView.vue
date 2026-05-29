@@ -12,51 +12,108 @@ const route = useRoute()
 const loading = ref(false)
 const linking = ref(false)
 const error = ref('')
+const bootstrapped = ref(false)
 
 const filters = reactive({
   search: '',
   status: '',
   table: '',
   readiness: '',
+  category: '',
+  brand: '',
+  gender: '',
+  age_group: '',
+  modeling: '',
+  source: '',
+  error: '',
 })
 
 const bulkMeasurementTableId = ref<number | ''>('')
 
-const filteredProducts = computed(() => {
-  const search = filters.search.trim().toLowerCase()
+type ProductTabKey = 'all' | 'ready' | 'pending' | 'without_measurement_table' | 'sync_error' | 'inactive'
 
-  return products.value.filter((product) => {
-    const matchesSearch = !search || [
-      product.name,
-      product.sku,
-      product.category,
-      product.fit_profile,
-      product.measurement_table?.name,
-    ].some((value) => String(value || '').toLowerCase().includes(search))
-    const matchesStatus = !filters.status || product.status === filters.status
-    const matchesTable = !filters.table
-      || (filters.table === 'with_table' && Boolean(product.measurement_table_id))
-      || (filters.table === 'without_table' && !product.measurement_table_id)
-      || String(product.measurement_table_id || '') === filters.table
-    const matchesReadiness = !filters.readiness
-      || (filters.readiness === 'ready' && product.readiness_status === 'ready')
-      || (filters.readiness === 'pending' && product.readiness_status !== 'ready')
-      || (filters.readiness === 'without_measurement_table' && !product.measurement_table_id)
-      || (filters.readiness === 'without_modeling' && !product.fit_profile)
-      || (filters.readiness === 'without_category' && !product.category)
-      || (filters.readiness === 'sync_error' && Boolean(product.has_sync_error))
+type ProductFilterOptions = {
+  categories: string[]
+  brands: string[]
+  genders: string[]
+  age_groups: string[]
+  modelings: string[]
+  sources: string[]
+  statuses: string[]
+}
 
-    return matchesSearch && matchesStatus && matchesTable && matchesReadiness
-  })
+const emptyTabs = () => ({
+  all: 0,
+  ready: 0,
+  pending: 0,
+  without_measurement_table: 0,
+  sync_error: 0,
+  inactive: 0,
+})
+
+const emptyFilterOptions = (): ProductFilterOptions => ({
+  categories: [],
+  brands: [],
+  genders: [],
+  age_groups: [],
+  modelings: [],
+  sources: [],
+  statuses: [],
+})
+
+const summary = reactive({
+  total: 0,
+  filtered: 0,
+  with_measurement_table: 0,
+  tabs: emptyTabs(),
+})
+
+const filterOptions = ref<ProductFilterOptions>(emptyFilterOptions())
+
+const pagination = reactive({
+  current_page: 1,
+  last_page: 1,
+  per_page: 25,
+  total: 0,
+  from: null as number | null,
+  to: null as number | null,
 })
 
 const selectedCount = computed(() => selectedProductIds.value.length)
 const hasSelection = computed(() => selectedCount.value > 0)
-const visibleProductIds = computed(() => filteredProducts.value.map((product) => product.id))
+const visibleProductIds = computed(() => products.value.map((product) => product.id))
 const allVisibleSelected = computed(() => (
   visibleProductIds.value.length > 0
   && visibleProductIds.value.every((id) => selectedProductIds.value.includes(id))
 ))
+const activeTab = computed<ProductTabKey>(() => {
+  if (filters.readiness === 'ready') return 'ready'
+  if (filters.readiness === 'pending') return 'pending'
+  if (filters.readiness === 'without_measurement_table') return 'without_measurement_table'
+  if (filters.readiness === 'sync_error' || filters.error === 'sync_error') return 'sync_error'
+  if (filters.status === 'inactive') return 'inactive'
+
+  return 'all'
+})
+const tabItems = computed(() => [
+  { key: 'all' as ProductTabKey, label: 'Todos', count: summary.tabs.all, icon: 'fa-table-list' },
+  { key: 'ready' as ProductTabKey, label: 'Prontos', count: summary.tabs.ready, icon: 'fa-circle-check' },
+  { key: 'pending' as ProductTabKey, label: 'Pendentes', count: summary.tabs.pending, icon: 'fa-triangle-exclamation' },
+  { key: 'without_measurement_table' as ProductTabKey, label: 'Sem tabela', count: summary.tabs.without_measurement_table, icon: 'fa-ruler-combined' },
+  { key: 'sync_error' as ProductTabKey, label: 'Com erro', count: summary.tabs.sync_error, icon: 'fa-circle-exclamation' },
+  { key: 'inactive' as ProductTabKey, label: 'Desativados', count: summary.tabs.inactive, icon: 'fa-pause' },
+])
+const pageRangeLabel = computed(() => {
+  if (loading.value) {
+    return 'carregando'
+  }
+
+  if (!pagination.total) {
+    return '0 produtos'
+  }
+
+  return `${pagination.from || 1}-${pagination.to || products.value.length} de ${pagination.total} produtos`
+})
 const activeShortcutLabel = computed(() => {
   const labels: Record<string, string> = {
     ready: 'Prontos para publicar',
@@ -67,16 +124,44 @@ const activeShortcutLabel = computed(() => {
     sync_error: 'Com erro de sincronização',
   }
 
-  return filters.readiness ? labels[filters.readiness] || '' : ''
-})
+  if (filters.readiness) {
+    return labels[filters.readiness] || ''
+  }
 
-onMounted(() => {
+  if (filters.status === 'inactive') {
+    return 'Produtos desativados'
+  }
+
+  if (filters.error === 'sync_error') {
+    return 'Com erro de sincronização'
+  }
+
+  return ''
+})
+const activeFilterCount = computed(() => Object.entries(filters)
+  .filter(([key, value]) => key !== 'readiness' && key !== 'status' ? Boolean(String(value).trim()) : Boolean(String(value).trim()))
+  .length)
+const canPreviousPage = computed(() => pagination.current_page > 1)
+const canNextPage = computed(() => pagination.current_page < pagination.last_page)
+
+let filterTimer: ReturnType<typeof window.setTimeout> | null = null
+
+onMounted(async () => {
   applyRouteFilters()
-  loadData()
+  await loadData()
+  bootstrapped.value = true
 })
 
 watch(() => route.query, () => {
   applyRouteFilters()
+}, { deep: true })
+
+watch(filters, () => {
+  if (!bootstrapped.value) {
+    return
+  }
+
+  scheduleLoadProducts()
 }, { deep: true })
 
 function applyRouteFilters() {
@@ -96,10 +181,47 @@ function applyRouteFilters() {
   }[shortcut] || ''
 }
 
-function clearOperationalFilter() {
+function clearAllFilters() {
+  filters.search = ''
+  filters.status = ''
+  filters.table = ''
+  filters.readiness = ''
+  filters.category = ''
+  filters.brand = ''
+  filters.gender = ''
+  filters.age_group = ''
+  filters.modeling = ''
+  filters.source = ''
+  filters.error = ''
+}
+
+function setTab(tab: ProductTabKey) {
   filters.readiness = ''
   filters.status = ''
   filters.table = ''
+  filters.error = ''
+
+  if (tab === 'ready') {
+    filters.readiness = 'ready'
+  } else if (tab === 'pending') {
+    filters.readiness = 'pending'
+  } else if (tab === 'without_measurement_table') {
+    filters.readiness = 'without_measurement_table'
+  } else if (tab === 'sync_error') {
+    filters.readiness = 'sync_error'
+  } else if (tab === 'inactive') {
+    filters.status = 'inactive'
+  }
+}
+
+function scheduleLoadProducts() {
+  if (filterTimer) {
+    window.clearTimeout(filterTimer)
+  }
+
+  filterTimer = window.setTimeout(() => {
+    loadProducts(1)
+  }, 250)
 }
 
 async function loadData() {
@@ -108,12 +230,11 @@ async function loadData() {
 
   try {
     const [productsResponse, tablesResponse] = await Promise.all([
-      api.get('/products'),
+      api.get('/products', { params: productQueryParams(1) }),
       api.get('/measurement-tables'),
     ])
-    products.value = productsResponse.data.data
+    applyProductsResponse(productsResponse.data)
     measurementTables.value = tablesResponse.data.data
-    selectedProductIds.value = selectedProductIds.value.filter((id) => products.value.some((product) => product.id === id))
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível carregar os produtos.'
   } finally {
@@ -121,19 +242,60 @@ async function loadData() {
   }
 }
 
-async function loadProducts() {
+async function loadProducts(page = pagination.current_page) {
   loading.value = true
   error.value = ''
 
   try {
-    const { data } = await api.get('/products')
-    products.value = data.data
-    selectedProductIds.value = selectedProductIds.value.filter((id) => products.value.some((product) => product.id === id))
+    const { data } = await api.get('/products', { params: productQueryParams(page) })
+    applyProductsResponse(data)
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível carregar os produtos.'
   } finally {
     loading.value = false
   }
+}
+
+function productQueryParams(page: number) {
+  const params: Record<string, string | number> = {
+    page,
+    per_page: pagination.per_page,
+  }
+
+  Object.entries(filters).forEach(([key, value]) => {
+    const normalized = String(value || '').trim()
+    if (!normalized) {
+      return
+    }
+
+    if (key === 'error' && normalized === 'sync_error') {
+      params.sync_error = 1
+      return
+    }
+
+    params[key] = normalized
+  })
+
+  return params
+}
+
+function applyProductsResponse(data: any) {
+  products.value = data.data || []
+  const responseSummary = data.summary || {}
+  summary.total = Number(responseSummary.total || 0)
+  summary.filtered = Number(responseSummary.filtered || 0)
+  summary.with_measurement_table = Number(responseSummary.with_measurement_table || 0)
+  summary.tabs = { ...emptyTabs(), ...(responseSummary.tabs || {}) }
+  filterOptions.value = { ...emptyFilterOptions(), ...(responseSummary.filters || {}) }
+
+  const meta = data.meta || {}
+  pagination.current_page = Number(meta.current_page || 1)
+  pagination.last_page = Number(meta.last_page || 1)
+  pagination.per_page = Number(meta.per_page || pagination.per_page)
+  pagination.total = Number(meta.total || products.value.length)
+  pagination.from = meta.from ?? (products.value.length ? 1 : null)
+  pagination.to = meta.to ?? products.value.length
+  selectedProductIds.value = selectedProductIds.value.filter((id) => products.value.some((product) => product.id === id))
 }
 
 function toggleProduct(productId: number) {
@@ -179,7 +341,7 @@ async function linkSelectedProducts() {
     })
     bulkMeasurementTableId.value = ''
     clearSelection()
-    await loadProducts()
+    await loadProducts(pagination.current_page)
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível vincular a tabela aos produtos selecionados.'
   } finally {
@@ -195,7 +357,102 @@ async function removeProduct(product: Product) {
     message: 'O produto foi removido da empresa.',
   })
   selectedProductIds.value = selectedProductIds.value.filter((id) => id !== product.id)
-  await loadProducts()
+  await loadProducts(pagination.current_page)
+}
+
+function goToPage(page: number) {
+  if (page < 1 || page > pagination.last_page || page === pagination.current_page) {
+    return
+  }
+
+  loadProducts(page)
+}
+
+function genderLabel(value: string | null | undefined) {
+  return {
+    female: 'Feminino',
+    male: 'Masculino',
+    unisex: 'Unissex',
+    kids: 'Infantil',
+  }[String(value || '')] || value || '-'
+}
+
+function ageGroupLabel(value: string | null | undefined) {
+  return {
+    adult: 'Adulto',
+    kids: 'Infantil',
+    baby: 'Bebê',
+    teen: 'Teen',
+  }[String(value || '')] || value || '-'
+}
+
+function statusLabel(value: string) {
+  return {
+    active: 'Ativo',
+    draft: 'Rascunho',
+    inactive: 'Inativo',
+  }[value] || value
+}
+
+function sourceLabel(value: string) {
+  return {
+    manual: 'Manual',
+    import: 'Importação',
+    bigshop: 'BigShop',
+    api: 'API',
+    ai: 'IA',
+  }[value] || value
+}
+
+function productReadinessText(product: Product) {
+  if (product.readiness_status === 'ready') {
+    return 'Pronto'
+  }
+
+  if (product.has_sync_error) {
+    return 'Erro sync'
+  }
+
+  if (!product.measurement_table_id) {
+    return 'Sem tabela'
+  }
+
+  if (!product.fit_profile) {
+    return 'Sem modelagem'
+  }
+
+  if (!product.category) {
+    return 'Sem categoria'
+  }
+
+  if (product.status === 'inactive') {
+    return 'Inativo'
+  }
+
+  return 'Pendente'
+}
+
+function readinessTone(product: Product) {
+  if (product.readiness_status === 'ready') {
+    return 'ok'
+  }
+
+  if (product.has_sync_error) {
+    return 'danger'
+  }
+
+  return 'warning'
+}
+
+function compactSizes(product: Product) {
+  const sizes = product.size_labels || []
+
+  if (!sizes.length) {
+    return product.variants_count ? `${product.variants_count} variações` : '-'
+  }
+
+  const visible = sizes.slice(0, 6).join(', ')
+  return sizes.length > 6 ? `${visible} +${sizes.length - 6}` : visible
 }
 </script>
 
@@ -224,10 +481,25 @@ async function removeProduct(product: Product) {
     <section class="panel-main subsection">
       <div class="subsection-heading">
         <h2>Produtos cadastrados</h2>
-        <span>{{ loading ? 'carregando' : `${filteredProducts.length}/${products.length} produtos` }}</span>
+        <span>{{ pageRangeLabel }}</span>
       </div>
+
+      <div class="product-status-tabs" role="tablist" aria-label="Status operacional dos produtos">
+        <button
+          v-for="tab in tabItems"
+          :key="tab.key"
+          type="button"
+          :class="{ active: activeTab === tab.key }"
+          @click="setTab(tab.key)"
+        >
+          <i class="fa-solid" :class="tab.icon" aria-hidden="true"></i>
+          <span>{{ tab.label }}</span>
+          <strong>{{ tab.count }}</strong>
+        </button>
+      </div>
+
       <div class="product-list-toolbar">
-        <input v-model="filters.search" type="search" placeholder="Buscar produto, SKU ou tabela" />
+        <input v-model="filters.search" type="search" placeholder="Buscar produto, SKU, tabela ou marca" />
         <select v-model="filters.status" aria-label="Filtrar status">
           <option value="">Status</option>
           <option value="active">Ativos</option>
@@ -251,6 +523,50 @@ async function removeProduct(product: Product) {
           <option value="without_category">Sem categoria</option>
           <option value="sync_error">Erro de sync</option>
         </select>
+        <select v-model="filters.category" aria-label="Filtrar categoria">
+          <option value="">Categoria</option>
+          <option v-for="category in filterOptions.categories" :key="category" :value="category">
+            {{ category }}
+          </option>
+        </select>
+        <select v-model="filters.brand" aria-label="Filtrar marca">
+          <option value="">Marca</option>
+          <option v-for="brand in filterOptions.brands" :key="brand" :value="brand">
+            {{ brand }}
+          </option>
+        </select>
+        <select v-model="filters.gender" aria-label="Filtrar gênero">
+          <option value="">Gênero</option>
+          <option v-for="gender in filterOptions.genders" :key="gender" :value="gender">
+            {{ genderLabel(gender) }}
+          </option>
+        </select>
+        <select v-model="filters.age_group" aria-label="Filtrar faixa etária">
+          <option value="">Faixa etária</option>
+          <option v-for="ageGroup in filterOptions.age_groups" :key="ageGroup" :value="ageGroup">
+            {{ ageGroupLabel(ageGroup) }}
+          </option>
+        </select>
+        <select v-model="filters.modeling" aria-label="Filtrar modelagem">
+          <option value="">Modelagem</option>
+          <option v-for="modeling in filterOptions.modelings" :key="modeling" :value="modeling">
+            {{ modeling }}
+          </option>
+        </select>
+        <select v-model="filters.source" aria-label="Filtrar origem do dado">
+          <option value="">Origem</option>
+          <option v-for="source in filterOptions.sources" :key="source" :value="source">
+            {{ sourceLabel(source) }}
+          </option>
+        </select>
+        <select v-model="filters.error" aria-label="Filtrar erro">
+          <option value="">Erro</option>
+          <option value="sync_error">Erro de sync</option>
+        </select>
+        <button class="btn btn-secondary btn-compact" type="button" :disabled="!activeFilterCount" @click="clearAllFilters">
+          <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
+          Filtros
+        </button>
         <span class="toolbar-divider"></span>
         <select v-model.number="bulkMeasurementTableId" :disabled="!hasSelection" aria-label="Tabela para vincular">
           <option value="">Vincular tabela</option>
@@ -262,7 +578,7 @@ async function removeProduct(product: Product) {
           <i class="fa-solid fa-link" aria-hidden="true"></i>
           Vincular
         </button>
-        <button class="btn btn-secondary btn-compact" type="button" :disabled="!filteredProducts.length || allVisibleSelected" @click="selectAllVisible">
+        <button class="btn btn-secondary btn-compact" type="button" :disabled="!products.length || allVisibleSelected" @click="selectAllVisible">
           Todos
         </button>
         <button class="btn btn-secondary btn-compact" type="button" :disabled="!hasSelection" @click="clearSelection">
@@ -270,9 +586,9 @@ async function removeProduct(product: Product) {
         </button>
         <strong>{{ selectedCount }} sel.</strong>
       </div>
-      <p v-if="activeShortcutLabel" class="filter-hint">
-        Filtro aplicado pelo painel: <strong>{{ activeShortcutLabel }}</strong>
-        <button type="button" @click="clearOperationalFilter">Limpar</button>
+      <p v-if="activeShortcutLabel || activeFilterCount" class="filter-hint">
+        Filtro ativo: <strong>{{ activeShortcutLabel || `${activeFilterCount} filtro(s)` }}</strong>
+        <button type="button" @click="clearAllFilters">Limpar</button>
       </p>
       <div class="table-wrap products-table-wrap">
         <table>
@@ -281,18 +597,22 @@ async function removeProduct(product: Product) {
               <th class="selection-column"></th>
               <th>Produto</th>
               <th>Categoria</th>
+              <th>Marca</th>
+              <th>Gênero</th>
+              <th>Faixa</th>
               <th>Modelagem</th>
+              <th>Tamanhos</th>
               <th>Tabela</th>
-              <th>Variações</th>
+              <th>Prontidão</th>
               <th>Status</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-if="!filteredProducts.length">
-              <td colspan="8">Nenhum produto encontrado.</td>
+            <tr v-if="!products.length">
+              <td colspan="12">Nenhum produto encontrado.</td>
             </tr>
-            <tr v-for="product in filteredProducts" :key="product.id" :class="{ 'is-selected': selectedProductIds.includes(product.id) }">
+            <tr v-for="product in products" :key="product.id" :class="{ 'is-selected': selectedProductIds.includes(product.id) }">
               <td class="selection-column">
                 <input
                   type="checkbox"
@@ -303,15 +623,26 @@ async function removeProduct(product: Product) {
               </td>
               <td>
                 <strong>{{ product.name }}</strong>
-                <small>{{ product.sku || 'sem SKU' }}</small>
+                <small>{{ product.sku || product.external_product_id || 'sem SKU' }}</small>
               </td>
               <td>{{ product.category || '-' }}</td>
+              <td>{{ product.brand || '-' }}</td>
+              <td>{{ genderLabel(product.gender) }}</td>
+              <td>{{ ageGroupLabel(product.age_group) }}</td>
               <td>{{ product.fit_profile || '-' }}</td>
-              <td>{{ product.measurement_table?.name || 'Sem tabela' }}</td>
-              <td>{{ product.variants_count ?? 0 }}</td>
               <td>
-                <span class="status-pill" :class="{ ok: product.status === 'active', warning: product.status !== 'active' }">
-                  {{ product.status === 'active' ? 'Ativo' : product.status }}
+                <span class="sizes-chip-list">{{ compactSizes(product) }}</span>
+              </td>
+              <td>{{ product.measurement_table?.name || 'Sem tabela' }}</td>
+              <td>
+                <span class="status-pill" :class="readinessTone(product)">
+                  {{ productReadinessText(product) }}
+                </span>
+                <small>{{ product.source_label || sourceLabel(product.data_source || 'manual') }}</small>
+              </td>
+              <td>
+                <span class="status-pill" :class="{ ok: product.status === 'active', warning: product.status === 'draft', neutral: product.status === 'inactive' }">
+                  {{ statusLabel(product.status) }}
                 </span>
               </td>
               <td class="row-actions">
@@ -325,6 +656,24 @@ async function removeProduct(product: Product) {
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <div class="pagination-bar">
+        <span>{{ pageRangeLabel }}</span>
+        <div>
+          <button class="btn btn-secondary btn-compact" type="button" :disabled="!canPreviousPage || loading" @click="goToPage(pagination.current_page - 1)">
+            <i class="fa-solid fa-chevron-left" aria-hidden="true"></i>
+          </button>
+          <strong>Página {{ pagination.current_page }} de {{ pagination.last_page }}</strong>
+          <button class="btn btn-secondary btn-compact" type="button" :disabled="!canNextPage || loading" @click="goToPage(pagination.current_page + 1)">
+            <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+          </button>
+          <select v-model.number="pagination.per_page" aria-label="Produtos por página" @change="loadProducts(1)">
+            <option :value="25">25 por página</option>
+            <option :value="50">50 por página</option>
+            <option :value="100">100 por página</option>
+          </select>
+        </div>
       </div>
     </section>
   </section>

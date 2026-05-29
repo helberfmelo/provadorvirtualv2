@@ -1340,3 +1340,14 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
 - Commit `d1a71ad` enviado para `main`; o run `26627213077` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, rotas SaaS, rotas do app, assets do widget, APIs, CORS, autenticação e readiness de go-live. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 130 Produtos com status, colunas e filtros superiores
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy e a sessão Sizebay.
+- Acessado o MySizebay da Zak em modo somente leitura na tela Products, sem alterar dados, sem salvar e sem acionar suporte. O benchmark confirmou abas All/Pending/Active/Inactive com contadores, busca, limpeza de filtros, seleção por checkbox e colunas Product, Category, Chart, Sizes, Brand, Age group e Modeling.
+- `GET /api/v1/products` passou a paginar no backend, aplicar filtros server-side e retornar resumo com contadores por aba e opções de filtros operacionais.
+- A API de produtos agora filtra por busca, status, tabela, categoria, marca, gênero, faixa etária, modelagem, origem do dado, erro de sincronização e prontidão.
+- `ProductResource` passou a expor marca, faixa etária, origem, rótulo de origem e tamanhos consolidados por produto, sem exigir que o frontend calcule prontidão carregando o catálogo inteiro.
+- `/app/produtos` ganhou abas com contadores para Todos, Prontos, Pendentes, Sem tabela, Com erro e Desativados; filtros superiores compactos; colunas ampliadas; paginação; e preservou a seleção em massa para vínculo de tabela.
+- Validação visual local rodou em `http://127.0.0.1:5175/app/produtos`, com backend local em `8001`, cobrindo desktop `1366x900` e mobile `390x844`, sem sobreposição incoerente.
+- Validações locais passaram com `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter 'ProductsApiTest|MerchantOverviewApiTest'`, `php vendor\bin\pint --dirty` e `npm --prefix frontend run build`.

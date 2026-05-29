@@ -49,7 +49,7 @@ APIs protegidas já implementadas:
 - `GET /api/v1/merchant/overview`: agrega resumo do painel, cobertura do catálogo, pendências operacionais, próximas ações e evolução de cobertura por empresa ativa.
 - `GET /api/v1/billing/subscription`
 - `PATCH /api/v1/billing/subscription/auto-renewal`
-- `GET|POST|PATCH|DELETE /api/v1/products`
+- `GET|POST|PATCH|DELETE /api/v1/products`: a listagem é paginada no backend e aceita filtros por busca, status, tabela, categoria, marca, gênero, faixa etária, modelagem, origem, erro de sincronização e prontidão; a resposta inclui contadores por aba e opções de filtros.
 - `POST|PATCH|DELETE /api/v1/products/{product}/variants`
 - `GET|POST|PATCH|DELETE /api/v1/measurement-tables`
 - `GET /api/v1/measurement-templates`: retorna templates inteligentes normalizados a partir de `backend/database/data/default_measurement_tables_data.json`, herdado do v1, com base brasileira por gênero, tipo de produto, altura, peso, idade e formato corporal.
