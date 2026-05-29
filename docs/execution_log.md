@@ -1367,3 +1367,6 @@
 - A API pública de recomendação/config-check passa a respeitar `virtual_try_on_enabled`, `measurement_table_enabled` e status do produto, retornando motivo explícito quando o widget deve ficar oculto.
 - Validação visual local rodou em `http://127.0.0.1:5175/app/produtos/5/editar`, com backend local em `8001`, cobrindo desktop e mobile, abas de origem/tabela/diagnóstico/histórico e sem overflow horizontal.
 - Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter 'ProductsApiTest|RecommendationApiTest'`, `php vendor\bin\pint --dirty` e `npm --prefix frontend run build`.
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
+- Commit `1c0fc58` enviado para `main`; o run `26630698467` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
