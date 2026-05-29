@@ -267,6 +267,9 @@ class AuthTest extends TestCase
             ->assertJsonPath('active_company.id', $company->id)
             ->json('token');
 
+        // Force the next test request to authenticate with the freshly issued tenant-scoped token.
+        $this->app['auth']->forgetGuards();
+
         $this->withHeader('Authorization', 'Bearer '.$companyToken)
             ->getJson('/api/v1/integrations')
             ->assertOk()
