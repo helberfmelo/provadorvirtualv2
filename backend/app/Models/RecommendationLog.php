@@ -43,4 +43,15 @@ class RecommendationLog extends Model
     {
         return $this->hasMany(RecommendationLearningEvent::class);
     }
+
+    public function widgetUsageEvents()
+    {
+        return $this->hasMany(WidgetUsageEvent::class);
+    }
+
+    public function recommendationUsageEvent()
+    {
+        return $this->hasOne(WidgetUsageEvent::class)
+            ->where('event_name', 'recommendation_generated');
+    }
 }

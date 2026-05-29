@@ -155,6 +155,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,ai_assistant,edit');
         Route::get('/analytics/recommendations', [AnalyticsController::class, 'recommendations'])
             ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/analytics/recommendations/export', [AnalyticsController::class, 'recommendationsExport'])
+            ->middleware('portal.permission:merchant,analytics,view');
         Route::get('/analytics/widget-usage', [AnalyticsController::class, 'widgetUsage'])
             ->middleware('portal.permission:merchant,analytics,view');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])

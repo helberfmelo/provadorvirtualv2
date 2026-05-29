@@ -145,7 +145,16 @@ class AnalyticsApiTest extends TestCase
             ->assertJsonPath('data.summary.measurement_table_insights_review', 1)
             ->assertJsonPath('data.sizes.0.size', 'M')
             ->assertJsonPath('data.learning_statuses.0.status', 'accepted')
-            ->assertJsonPath('data.measurement_table_insights.0.suggested_action', 'review_size_too_small');
+            ->assertJsonPath('data.measurement_table_insights.0.suggested_action', 'review_size_too_small')
+            ->assertJsonPath('data.product_ranking.0.product_id', $product->id)
+            ->assertJsonPath('data.product_ranking.0.button_impressions', 1)
+            ->assertJsonPath('data.product_ranking.0.recommendations_generated', 1)
+            ->assertJsonPath('data.product_ranking.0.returns_exchanges', 1)
+            ->assertJsonPath('data.recommendation_report.data.0.recommendation_id', $recommendationId)
+            ->assertJsonPath('data.recommendation_report.data.0.recommended_size', 'M')
+            ->assertJsonPath('data.recommendation_report.data.0.device_type', 'mobile')
+            ->assertJsonPath('data.recommendation_report.meta.total', 1)
+            ->assertJsonFragment(['id' => $product->id, 'name' => 'Vestido Midi Aurora']);
 
         $this->withHeaders($headers)
             ->getJson('/api/v1/analytics/widget-usage?period=30d&device_type=mobile')
@@ -163,6 +172,20 @@ class AnalyticsApiTest extends TestCase
             ->assertJsonPath('data.device_distribution.0.device_type', 'mobile')
             ->assertJsonPath('data.funnel.0.key', 'button_impression')
             ->assertJsonPath('data.filter_options.platforms.0', 'custom');
+
+        $rankingExport = $this->withHeaders($headers)
+            ->get('/api/v1/analytics/recommendations/export?report=ranking&device_type=mobile');
+
+        $rankingExport->assertOk();
+        $this->assertStringContainsString('text/csv', (string) $rankingExport->headers->get('content-type'));
+        $this->assertStringContainsString('Vestido Midi Aurora', $rankingExport->getContent());
+
+        $recommendationExport = $this->withHeaders($headers)
+            ->get('/api/v1/analytics/recommendations/export?report=recommendations&device_type=mobile');
+
+        $recommendationExport->assertOk();
+        $this->assertStringContainsString('provador-virtual-recomendacoes.csv', (string) $recommendationExport->headers->get('content-disposition'));
+        $this->assertStringContainsString((string) $recommendationId, $recommendationExport->getContent());
 
         $this->withHeaders($headers)
             ->getJson('/api/v1/audit-logs')

@@ -256,6 +256,17 @@ Assert-True ($null -ne $widgetUsageAnalytics.data.summary) "widget usage analyti
 Assert-True ($null -ne $widgetUsageAnalytics.data.filter_options) "widget usage analytics sem filtros"
 "API widget usage analytics OK"
 
+$recommendationAnalytics = Invoke-RestMethod -Uri "$ApiBase/analytics/recommendations?period=30d&per_page=5" -Headers $headers
+Assert-True ($null -ne $recommendationAnalytics.data) "recommendation analytics sem data"
+Assert-True ($null -ne $recommendationAnalytics.data.product_ranking) "recommendation analytics sem ranking"
+Assert-True ($null -ne $recommendationAnalytics.data.recommendation_report.meta) "recommendation analytics sem paginacao"
+"API recommendation analytics OK"
+
+$recommendationExport = Invoke-WebRequest -UseBasicParsing -Uri "$ApiBase/analytics/recommendations/export?report=recommendations&period=30d" -Headers $headers
+Assert-True ($recommendationExport.StatusCode -eq 200) "export de recomendacoes nao retornou 200"
+Assert-True ($recommendationExport.Headers["Content-Type"] -like "text/csv*") "export de recomendacoes sem CSV"
+"API recommendation export OK"
+
 $placementBody = @{
     platform = $widgetInstall.data.platform
     url = "$FrontendBase/produto-teste"

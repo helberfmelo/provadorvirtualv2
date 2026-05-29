@@ -25,4 +25,9 @@ class RecommendationSession extends Model
     {
         return $this->belongsTo(ShopperProfile::class);
     }
+
+    public function logs()
+    {
+        return $this->hasMany(RecommendationLog::class);
+    }
 }

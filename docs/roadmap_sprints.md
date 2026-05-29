@@ -2796,7 +2796,7 @@ Critérios de aceite:
 - relatório ajuda priorizar correções;
 - dados não expõem informação pessoal desnecessária.
 
-Status: planejada.
+Status: implementada localmente, aguardando publicação. O portal `/app/analytics` agora combina `GET /api/v1/analytics/widget-usage` com `GET /api/v1/analytics/recommendations` para entregar ranking de produtos por impressões, aberturas, consultas, recomendações, aplicação de tamanho, erros, devoluções/trocas e taxa de uso, além do relatório paginado de recomendações emitidas com produto, SKU, tabela usada, confiança, origem, dispositivo e sinais comerciais. Também foi criado `GET /api/v1/analytics/recommendations/export` para exportação CSV do ranking e das recomendações, com drill-down por produto/tabela e destaque para produtos sem tabela de medidas. Validações locais passaram com `php -l`, `C:\php\php.exe artisan test --filter=AnalyticsApiTest`, `C:\php\php.exe artisan test`, `C:\php\php.exe vendor\bin\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `5177` com backend local em `8002`.
 
 ### Sprint 150 - Pedidos no portal da empresa
 

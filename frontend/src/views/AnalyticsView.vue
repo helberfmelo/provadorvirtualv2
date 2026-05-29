@@ -3,6 +3,19 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
 
 type RecommendationAnalyticsPayload = {
+  filters: {
+    period: string
+    date_from: string
+    date_to: string
+    product_id: number | null
+    measurement_table_id: number | null
+    platform: string | null
+    device_type: string | null
+    brand: string | null
+    category: string | null
+    page: number
+    per_page: number
+  }
   summary: {
     recommendations_total: number
     recommendations_today: number
@@ -68,6 +81,67 @@ type RecommendationAnalyticsPayload = {
       return_rate: number | null
     }
   }[]
+  product_ranking: {
+    product_id: number
+    name: string | null
+    sku: string | null
+    brand: string
+    category: string
+    measurement_table_id: number | null
+    measurement_table_name: string | null
+    button_impressions: number
+    virtual_try_on_opens: number
+    measurement_table_opens: number
+    recommendations_generated: number
+    size_selections: number
+    returns_exchanges: number
+    blocked_outliers: number
+    needs_more_data: number
+    usage_rate: number | null
+    selection_rate: number | null
+    return_rate: number | null
+    errors_total: number
+    attention_flags: string[]
+  }[]
+  recommendation_report: {
+    data: {
+      recommendation_id: number
+      created_at: string | null
+      product_id: number | null
+      product_name: string | null
+      product_sku: string | null
+      measurement_table_id: number | null
+      measurement_table_name: string | null
+      recommended_size: string | null
+      confidence: number
+      status: string
+      platform: string | null
+      device_type: string | null
+      origin: string
+      feedback_helpful: boolean | null
+      feedback_rating: number | null
+      purchases: number
+      returns: number
+      exchanges: number
+      outlier_score: number
+      brand: string
+      category: string
+    }[]
+    meta: {
+      current_page: number
+      last_page: number
+      per_page: number
+      total: number
+    }
+  }
+  filter_options: {
+    products: { id: number; name: string; sku: string | null }[]
+    measurement_tables: { id: number; name: string }[]
+    brands: string[]
+    categories: string[]
+    platforms: string[]
+    device_types: string[]
+  }
   outliers: {
     id: number
     event_type: string
@@ -141,6 +215,7 @@ const widgetUsage = ref<WidgetUsagePayload | null>(null)
 const auditLogs = ref<AuditLog[]>([])
 const loading = ref(false)
 const error = ref('')
+const recommendationPage = ref(1)
 
 const widgetFilters = reactive({
   period: '30d',
@@ -177,7 +252,7 @@ async function loadAnalytics() {
 
   try {
     const [recommendationResponse, widgetUsageResponse, auditResponse] = await Promise.all([
-      api.get('/analytics/recommendations'),
+      api.get('/analytics/recommendations', { params: recommendationParams() }),
       api.get('/analytics/widget-usage', { params: widgetUsageParams() }),
       api.get('/audit-logs'),
     ])
@@ -187,6 +262,7 @@ async function loadAnalytics() {
     auditLogs.value = auditResponse.data.data
 
     syncFiltersFromResponse()
+    recommendationPage.value = recommendationAnalytics.value?.recommendation_report.meta.current_page || 1
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível carregar analytics.'
   } finally {
@@ -254,6 +330,19 @@ function widgetUsageParams() {
   return params
 }
 
+function recommendationParams() {
+  return {
+    ...widgetUsageParams(),
+    page: String(recommendationPage.value),
+    per_page: '10',
+  }
+}
+
+function applyFilters() {
+  recommendationPage.value = 1
+  loadAnalytics()
+}
+
 function resetWidgetFilters() {
   widgetFilters.period = '30d'
   widgetFilters.date_from = ''
@@ -264,6 +353,7 @@ function resetWidgetFilters() {
   widgetFilters.device_type = ''
   widgetFilters.brand = ''
   widgetFilters.category = ''
+  recommendationPage.value = 1
 
   loadAnalytics()
 }
@@ -312,6 +402,68 @@ function deviceLabel(deviceType: string) {
 function usageDaySummary(day: WidgetUsagePayload['daily'][number]) {
   return `${day.virtual_try_on_opens} aberturas · ${day.recommendations_generated} recomendações · ${day.size_selections} tamanhos`
 }
+
+function attentionLabel(flag: string) {
+  const labels: Record<string, string> = {
+    sem_tabela: 'Sem tabela',
+    devolucao_ou_troca: 'Com devolução/troca',
+    outlier_bloqueado: 'Com outlier',
+    baixa_confianca: 'Baixa confiança',
+  }
+
+  return labels[flag] || eventLabel(flag)
+}
+
+function formatDateTime(value: string | null) {
+  if (! value) {
+    return '-'
+  }
+
+  return value.slice(0, 16).replace('T', ' ')
+}
+
+function applyRecommendationDrilldown(productId?: number | null, tableId?: number | null) {
+  widgetFilters.product_id = productId ? String(productId) : ''
+  widgetFilters.measurement_table_id = tableId ? String(tableId) : ''
+  recommendationPage.value = 1
+  loadAnalytics()
+}
+
+function changeRecommendationPage(page: number) {
+  if (! recommendationAnalytics?.value) {
+    return
+  }
+
+  if (page < 1 || page > recommendationAnalytics.value.recommendation_report.meta.last_page) {
+    return
+  }
+
+  recommendationPage.value = page
+  loadAnalytics()
+}
+
+async function downloadRecommendationExport(report: 'ranking' | 'recommendations') {
+  const response = await api.get('/analytics/recommendations/export', {
+    params: {
+      ...recommendationParams(),
+      report,
+    },
+    responseType: 'blob',
+  })
+
+  const filename = report === 'ranking'
+    ? 'provador-virtual-ranking-produtos.csv'
+    : 'provador-virtual-recomendacoes.csv'
+
+  const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv;charset=utf-8' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.setAttribute('download', filename)
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  window.URL.revokeObjectURL(url)
+}
 </script>
 
 <template>
@@ -319,7 +471,7 @@ function usageDaySummary(day: WidgetUsagePayload['daily'][number]) {
     <div class="page-heading">
       <div>
         <span class="eyebrow">Analytics</span>
-        <h1>Uso do widget e qualidade</h1>
+        <h1>Relatórios do provador e qualidade</h1>
       </div>
       <button class="btn btn-secondary" type="button" :disabled="loading" @click="loadAnalytics">
         <i class="fa-solid fa-rotate" aria-hidden="true"></i>
@@ -332,11 +484,11 @@ function usageDaySummary(day: WidgetUsagePayload['daily'][number]) {
     <template v-if="widgetUsage && recommendationAnalytics">
       <section class="panel-main admin-form analytics-filter-panel">
         <div class="subsection-heading">
-          <h2>Uso do widget</h2>
+          <h2>Filtros dos relatórios</h2>
           <span>{{ widgetUsage.filters.date_from }} até {{ widgetUsage.filters.date_to }}</span>
         </div>
 
-        <form class="analytics-filter-grid" @submit.prevent="loadAnalytics">
+        <form class="analytics-filter-grid" @submit.prevent="applyFilters">
           <label>
             <span>Período</span>
             <select v-model="widgetFilters.period">
@@ -443,7 +595,17 @@ function usageDaySummary(day: WidgetUsagePayload['daily'][number]) {
         </form>
       </section>
 
-      <div class="metric-grid">
+      <section class="panel-main analytics-section-panel">
+        <div class="subsection-heading">
+          <h2>Uso do widget</h2>
+          <span>{{ percent(widgetUsage.summary.usage_rate) }} taxa de uso no período</span>
+        </div>
+        <p class="page-heading-help analytics-section-help">
+          Acompanhe abertura do provador, consulta de tabela e aplicação do tamanho antes de chegar nas recomendações.
+        </p>
+      </section>
+
+      <div class="metric-grid analytics-metric-grid">
         <article class="metric-card">
           <i class="fa-solid fa-eye" aria-hidden="true"></i>
           <strong>{{ widgetUsage.summary.button_impressions }}</strong>
@@ -654,31 +816,65 @@ function usageDaySummary(day: WidgetUsagePayload['daily'][number]) {
       <div class="analytics-grid">
         <section class="panel-main">
           <div class="subsection-heading">
-            <h2>Produtos</h2>
-            <span>{{ recommendationAnalytics.products.length }} com recomendação</span>
+            <h2>Ranking de produtos</h2>
+            <div class="action-row">
+              <span>{{ recommendationAnalytics.product_ranking.length }} no período</span>
+              <button class="btn btn-secondary" type="button" @click="downloadRecommendationExport('ranking')">
+                <i class="fa-solid fa-file-export" aria-hidden="true"></i>
+                Exportar CSV
+              </button>
+            </div>
           </div>
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Produto</th>
+                  <th>Uso</th>
                   <th>Recomendações</th>
-                  <th>Confiança</th>
-                  <th>Outlier</th>
+                  <th>Erros</th>
+                  <th>Ação</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-if="!recommendationAnalytics.products.length">
+                <tr v-if="!recommendationAnalytics.product_ranking.length">
                   <td colspan="4">Sem dados.</td>
                 </tr>
-                <tr v-for="product in recommendationAnalytics.products" :key="product.product_id">
+                <tr v-for="product in recommendationAnalytics.product_ranking" :key="product.product_id">
                   <td>
                     <strong>{{ product.name || product.product_id }}</strong>
-                    <small>{{ product.normalized_category || product.normalized_brand || product.brand || '-' }}</small>
+                    <small>
+                      {{ product.category || '-' }} · {{ product.brand || '-' }} ·
+                      {{ product.measurement_table_name || 'Sem tabela' }}
+                    </small>
                   </td>
-                  <td>{{ product.recommendations }}</td>
-                  <td>{{ product.average_confidence }}</td>
-                  <td>{{ product.average_outlier_score }}</td>
+                  <td>
+                    <strong>{{ product.button_impressions }}</strong>
+                    <small>{{ percent(product.usage_rate) }} taxa de uso</small>
+                  </td>
+                  <td>
+                    <strong>{{ product.recommendations_generated }}</strong>
+                    <small>{{ percent(product.selection_rate) }} aplicação</small>
+                  </td>
+                  <td>
+                    <strong>{{ product.errors_total }}</strong>
+                    <small>
+                      {{ product.returns_exchanges }} devoluções/trocas ·
+                      {{ product.blocked_outliers }} outliers
+                    </small>
+                    <small v-if="product.attention_flags.length">
+                      {{ product.attention_flags.map(attentionLabel).join(' · ') }}
+                    </small>
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-secondary analytics-inline-button"
+                      type="button"
+                      @click="applyRecommendationDrilldown(product.product_id, product.measurement_table_id)"
+                    >
+                      Drill-down
+                    </button>
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -708,6 +904,99 @@ function usageDaySummary(day: WidgetUsagePayload['daily'][number]) {
           </div>
         </section>
       </div>
+
+      <section class="panel-main">
+        <div class="subsection-heading">
+          <h2>Recomendações emitidas</h2>
+          <div class="action-row">
+            <span>{{ recommendationAnalytics.recommendation_report.meta.total }} no período</span>
+            <button class="btn btn-secondary" type="button" @click="downloadRecommendationExport('recommendations')">
+              <i class="fa-solid fa-file-export" aria-hidden="true"></i>
+              Exportar CSV
+            </button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Produto</th>
+                <th>Tabela</th>
+                <th>Recomendação</th>
+                <th>Origem</th>
+                <th>Sinais</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-if="!recommendationAnalytics.recommendation_report.data.length">
+                <td colspan="6">Sem recomendações no período filtrado.</td>
+              </tr>
+              <tr
+                v-for="row in recommendationAnalytics.recommendation_report.data"
+                :key="row.recommendation_id"
+              >
+                <td>
+                  <strong>#{{ row.recommendation_id }}</strong>
+                  <small>{{ formatDateTime(row.created_at) }}</small>
+                </td>
+                <td>
+                  <strong>{{ row.product_name || row.product_id || '-' }}</strong>
+                  <small>{{ row.product_sku || row.category || '-' }}</small>
+                </td>
+                <td>
+                  <strong>{{ row.measurement_table_name || 'Sem tabela' }}</strong>
+                  <small>{{ row.brand }}</small>
+                </td>
+                <td>
+                  <strong>{{ row.recommended_size || '-' }}</strong>
+                  <small>{{ row.confidence }} de confiança · {{ eventLabel(row.status) }}</small>
+                </td>
+                <td>
+                  <strong>{{ row.origin }}</strong>
+                  <small>{{ deviceLabel(row.device_type || 'desktop') }} · {{ row.platform || 'widget' }}</small>
+                </td>
+                <td>
+                  <strong>{{ row.purchases }} compras</strong>
+                  <small>{{ row.returns + row.exchanges }} devoluções/trocas</small>
+                  <small>
+                    Feedback:
+                    {{ row.feedback_helpful === null ? 'sem retorno' : (row.feedback_helpful ? 'ajudou' : 'não ajudou') }}
+                  </small>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div
+          v-if="recommendationAnalytics.recommendation_report.meta.last_page > 1"
+          class="analytics-pagination"
+        >
+          <button
+            class="btn btn-secondary"
+            type="button"
+            :disabled="recommendationAnalytics.recommendation_report.meta.current_page <= 1"
+            @click="changeRecommendationPage(recommendationAnalytics.recommendation_report.meta.current_page - 1)"
+          >
+            Anterior
+          </button>
+          <span>
+            Página {{ recommendationAnalytics.recommendation_report.meta.current_page }}
+            de {{ recommendationAnalytics.recommendation_report.meta.last_page }}
+          </span>
+          <button
+            class="btn btn-secondary"
+            type="button"
+            :disabled="
+              recommendationAnalytics.recommendation_report.meta.current_page
+                >= recommendationAnalytics.recommendation_report.meta.last_page
+            "
+            @click="changeRecommendationPage(recommendationAnalytics.recommendation_report.meta.current_page + 1)"
+          >
+            Próxima
+          </button>
+        </div>
+      </section>
 
       <div class="analytics-grid">
         <section class="panel-main">

@@ -28,4 +28,9 @@ class ShopperProfile extends Model
     {
         return $this->hasMany(RecommendationLearningEvent::class);
     }
+
+    public function recommendationSessions()
+    {
+        return $this->hasMany(RecommendationSession::class);
+    }
 }
