@@ -1337,3 +1337,6 @@
 - `/app/produtos` entende filtros vindos do painel por query string, como `?filtro=sem_tabela`, `?filtro=sem_modelagem`, `?filtro=sem_categoria`, `?filtro=erro_sync`, `?filtro=pendentes` e `?filtro=prontos`.
 - Validação visual local em `http://127.0.0.1:5174` cobriu dashboard desktop/mobile e lista de produtos filtrada com dados de preview injetados apenas no navegador.
 - Validações locais passaram com `npm --prefix frontend run build`, `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter 'MerchantOverviewApiTest|ProductsApiTest'`, `php vendor/bin/pint --dirty`.
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
+- Commit `d1a71ad` enviado para `main`; o run `26627213077` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, rotas SaaS, rotas do app, assets do widget, APIs, CORS, autenticação e readiness de go-live. Resultado final: `PRODUCTION VALIDATION OK`.
