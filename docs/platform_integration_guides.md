@@ -24,7 +24,7 @@ Publicado no run `26647308642` e validado em produção com `scripts/validate-pr
 
 ## Status Sprint 140
 
-Implementado localmente para publicação:
+Implementado e publicado no commit `e5cd59e`/run `26649251806`:
 
 - `/app/integracoes` mostra governança do benefício BigShop, solicitação atual, resumo financeiro estimado, termos e próximos passos antes de qualquer troca;
 - `GET /api/v1/merchant/integration-change-requests/current` permite ao lojista acompanhar status e link de pagamento sem receber observações internas do SaaS;
@@ -34,7 +34,7 @@ Implementado localmente para publicação:
 
 ## Status Sprint 141
 
-Implementado localmente para publicação:
+Implementado e publicado no commit `1b9be20`/run `26650581437`:
 
 - `GET /api/v1/integrations` expõe exemplos de API por plataforma, guia de webhook assinado, guia GTM opcional/fallback e estado diagnóstico recente por plataforma;
 - `POST /api/v1/integrations/{platform}/validate-install` retorna diagnóstico granular de container, script, plataforma, produto, variação, SKU, botões renderizados e indício de GTM;
