@@ -253,77 +253,82 @@ const buttonStyleOptions = [
     value: 'gallery_1_text_icons',
     label: '#1 Texto com ícones',
     icon: 'fa-ruler-combined',
-    description: 'Links horizontais limpos com prefixos curtos e hover discreto.',
+    description: 'Links horizontais limpos com ícones antes do texto.',
   },
   {
     value: 'gallery_2_side_icons',
-    label: '#2 Ícone lateral',
+    label: '#2 Cartão com ícone lateral',
     icon: 'fa-table-list',
-    description: 'Botões empilhados com bloco lateral para o ícone.',
+    description: 'Cartões verticais com faixa lateral e texto em destaque.',
   },
   {
     value: 'gallery_3_dark_outline',
     icon: 'fa-square',
     label: '#3 Bloco escuro',
-    description: 'Botões preenchidos que invertem no hover.',
+    description: 'Blocos sólidos com contraste alto e hover invertido.',
   },
   {
     value: 'gallery_4_underlined_icons',
-    label: '#4 Sublinhado',
+    label: '#4 Sublinhado com ícones',
     icon: 'fa-underline',
-    description: 'Links sublinhados com ícones antes do texto.',
+    description: 'Links sublinhados com ícone de apoio antes do texto.',
   },
   {
     value: 'gallery_5_pills',
-    label: '#5 Pílulas',
+    label: '#5 Pílulas animadas',
     icon: 'fa-capsules',
-    description: 'Botões empilhados em pílula com animação no ícone.',
+    description: 'Pílulas verticais com ícone em movimento.',
   },
   {
     value: 'gallery_6_split_line',
     label: '#6 Linha central',
     icon: 'fa-minus',
-    description: 'Links verticais compactos com divisor animado.',
+    description: 'Links compactos separados por uma linha central.',
   },
   {
     value: 'gallery_7_editorial_links',
-    label: '#7 Editorial',
+    label: '#7 Editorial sublinhado',
     icon: 'fa-link',
-    description: 'Links sublinhados leves para lojas mais minimalistas.',
+    description: 'Texto editorial, leve e sublinhado.',
   },
   {
     value: 'gallery_8_dotted_stack',
-    label: '#8 Pontilhado',
+    label: '#8 Contorno pontilhado',
     icon: 'fa-grip-lines',
-    description: 'Botões empilhados com borda pontilhada e hover preenchido.',
+    description: 'Botões verticais com borda pontilhada e hover preenchido.',
   },
   {
     value: 'gallery_9_light_block',
     label: '#9 Bloco claro',
     icon: 'fa-square-full',
-    description: 'Botões claros que ficam preenchidos ao passar o mouse.',
+    description: 'Blocos claros que ganham preenchimento no hover.',
   },
   {
     value: 'gallery_10_badge_tooltip',
     label: '#10 Selo novo',
     icon: 'fa-certificate',
-    description: 'Links com selo no provador e dica ao passar o mouse.',
-  },
-  {
-    value: 'gallery_11_icon_chips',
-    label: '#11 Chips com ícone',
-    icon: 'fa-tags',
-    description: 'Chips compactos com ícone destacado e borda leve.',
-  },
-  {
-    value: 'gallery_12_dual_cards',
-    label: '#12 Cartões duplos',
-    icon: 'fa-grip',
-    description: 'Dois cards pequenos, claros e fáceis de tocar no mobile.',
+    description: 'Links com selo novo e tooltip para o VFR.',
   },
 ]
 
-const buttonStyleValues = buttonStyleOptions.map((option) => option.value)
+const buttonStyleCompatibilityOptions = [
+  {
+    value: 'gallery_11_icon_chips',
+    label: 'Compatível: chips com ícone',
+    icon: 'fa-tags',
+    description: 'Mantido para instalações legadas e testes internos.',
+  },
+  {
+    value: 'gallery_12_dual_cards',
+    label: 'Compatível: cartões duplos',
+    icon: 'fa-grip',
+    description: 'Mantido para instalações legadas e testes internos.',
+  },
+]
+
+const allButtonStyleOptions = [...buttonStyleOptions, ...buttonStyleCompatibilityOptions]
+const buttonStyleValues = allButtonStyleOptions.map((option) => option.value)
+const compatibilityButtonStyleValues = buttonStyleCompatibilityOptions.map((option) => option.value)
 const legacyButtonStyleMap: Record<string, string> = {
   gradient: 'gallery_3_dark_outline',
   clean: 'gallery_1_text_icons',
@@ -385,9 +390,15 @@ const measureIconOptions = [
 const measureIconValues = measureIconOptions.map((option) => option.value)
 
 const selectedButtonStyle = computed(() => {
-  return buttonStyleOptions.find((option) => option.value === form.theme.button_style)
+  return allButtonStyleOptions.find((option) => option.value === form.theme.button_style)
     || buttonStyleOptions[0]
 })
+
+const selectedButtonStyleCompatibility = computed(() => {
+  return buttonStyleCompatibilityOptions.find((option) => option.value === form.theme.button_style) || null
+})
+
+const isCompatibilityButtonStyle = computed(() => compatibilityButtonStyleValues.includes(form.theme.button_style))
 
 const selectedPrimaryIcon = computed(() => selectedMeasureIcon(form.theme.button_primary_icon, 'hanger'))
 const selectedSecondaryIcon = computed(() => selectedMeasureIcon(form.theme.button_secondary_icon, 'ruler'))
@@ -1011,8 +1022,12 @@ function removeConfettiPreview() {
           <section class="widget-button-customizer" :style="previewStyle" aria-labelledby="widget-button-style-title">
             <div class="subsection-heading compact-heading">
               <h2 id="widget-button-style-title">Botões personalizados</h2>
-              <span>{{ selectedButtonStyle.label }}</span>
+              <span>{{ selectedButtonStyle.label }}<template v-if="selectedButtonStyleCompatibility"> · legado</template></span>
             </div>
+
+            <p class="widget-button-customizer-note">
+              Os 10 modelos principais seguem a galeria pública da Sizebay. Valores legados continuam disponíveis em compatibilidade.
+            </p>
 
             <div class="button-style-list" role="radiogroup" aria-label="Visual dos botões">
               <button
@@ -1042,6 +1057,35 @@ function removeConfettiPreview() {
                 </span>
               </button>
             </div>
+
+            <details class="button-style-compatibility" :open="isCompatibilityButtonStyle">
+              <summary>
+                <div>
+                  <strong>Modelos compatíveis</strong>
+                  <span>Use apenas se precisar manter um estilo salvo em versões anteriores.</span>
+                </div>
+                <i class="fa-solid fa-angles-down" aria-hidden="true"></i>
+              </summary>
+
+              <div class="button-style-list button-style-compatibility-list" role="radiogroup" aria-label="Modelos compatíveis">
+                <button
+                  v-for="option in buttonStyleCompatibilityOptions"
+                  :key="option.value"
+                  type="button"
+                  class="button-style-option button-style-option-compatibility"
+                  :class="{ active: form.theme.button_style === option.value }"
+                  role="radio"
+                  :aria-checked="form.theme.button_style === option.value"
+                  @click="form.theme.button_style = option.value"
+                >
+                  <i :class="['fa-solid', option.icon]" aria-hidden="true"></i>
+                  <span class="button-style-copy">
+                    <strong>{{ option.label }}</strong>
+                    <small>{{ option.description }}</small>
+                  </span>
+                </button>
+              </div>
+            </details>
 
             <div class="button-color-box" :style="previewStyle">
               <div class="button-color-controls">
