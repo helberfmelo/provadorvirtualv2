@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 import { api } from '../services/api'
-import type { FitProfile } from '../services/merchantTypes'
+import type { FitProfile, FitProfileDiagnosticGroup, FitProfileDiagnostics, FitProfileSuggestion } from '../services/merchantTypes'
 import { showFeedback } from '../services/saveFeedback'
 
 const profiles = ref<FitProfile[]>([])
+const diagnostics = ref<FitProfileDiagnostics | null>(null)
 const selectedId = ref<number | null>(null)
 const loading = ref(false)
+const diagnosticsLoading = ref(false)
 const saving = ref(false)
+const applyingGroupKey = ref('')
 const error = ref('')
 
 const form = reactive({
@@ -27,6 +30,17 @@ const summary = computed(() => ({
   active: profiles.value.filter((profile) => profile.status === 'active').length,
   used: profiles.value.filter((profile) => usageTotal(profile) > 0).length,
 }))
+const diagnosticSummary = computed(() => diagnostics.value?.summary || {
+  products_analyzed: 0,
+  issues: 0,
+  without_modeling: 0,
+  modeling_not_found: 0,
+  modeling_inactive: 0,
+  modeling_incompatible: 0,
+  groups: 0,
+})
+const topDiagnosticGroups = computed(() => diagnostics.value?.groups.slice(0, 6) || [])
+const selectedImpact = computed(() => selectedProfile.value?.guidance?.recommendation_impact || null)
 
 const genderLabels: Record<string, string> = {
   female: 'Feminino',
@@ -53,6 +67,7 @@ const stretchLabels: Record<string, string> = {
 
 onMounted(() => {
   loadProfiles()
+  loadDiagnostics()
 })
 
 async function loadProfiles(preferredId: number | null = selectedId.value) {
@@ -73,6 +88,19 @@ async function loadProfiles(preferredId: number | null = selectedId.value) {
     error.value = requestError.response?.data?.message || 'Não foi possível carregar as modelagens.'
   } finally {
     loading.value = false
+  }
+}
+
+async function loadDiagnostics() {
+  diagnosticsLoading.value = true
+
+  try {
+    const { data } = await api.get('/fit-profiles/diagnostics')
+    diagnostics.value = data
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Não foi possível carregar o diagnóstico de modelagens.'
+  } finally {
+    diagnosticsLoading.value = false
   }
 }
 
@@ -116,6 +144,67 @@ function statusLabel(status: string) {
   return 'Inativa'
 }
 
+function confidenceLabel(value?: string) {
+  if (value === 'high') {
+    return 'alta'
+  }
+
+  if (value === 'medium') {
+    return 'média'
+  }
+
+  return 'baixa'
+}
+
+function suggestionModeLabel(suggestion: FitProfileSuggestion) {
+  return suggestion.mode === 'existing' ? 'Aplicar existente' : 'Criar e aplicar'
+}
+
+function suggestionPayload(suggestion: FitProfileSuggestion) {
+  return suggestion.profile || {
+    name: suggestion.name,
+    code: suggestion.code,
+    product_type: suggestion.product_type || null,
+    gender: suggestion.gender || 'unisex',
+    fit_intensity: suggestion.fit_intensity || 'regular',
+    stretch_level: suggestion.stretch_level || 'medium',
+    description: 'Criada pelo diagnóstico guiado de modelagens.',
+  }
+}
+
+function groupProductLine(group: FitProfileDiagnosticGroup) {
+  return [group.category, group.brand, group.gender, group.age_group].filter(Boolean).join(' · ') || 'Grupo operacional'
+}
+
+async function applyDiagnosticGroup(group: FitProfileDiagnosticGroup) {
+  if (!group.product_ids.length) {
+    return
+  }
+
+  applyingGroupKey.value = group.key
+  error.value = ''
+
+  const suggestion = group.suggested_profile
+  const payload = suggestion.mode === 'existing' && suggestion.id
+    ? { product_ids: group.product_ids, profile_id: suggestion.id }
+    : { product_ids: group.product_ids, profile: suggestionPayload(suggestion) }
+
+  try {
+    const { data } = await api.post('/fit-profiles/diagnostics/apply', payload)
+    showFeedback({
+      status: 'success',
+      title: suggestion.mode === 'existing' ? 'Modelagem aplicada' : 'Modelagem criada',
+      message: `${data.summary?.updated || 0} produto(s) atualizados no diagnóstico.`,
+    })
+    await loadProfiles(data.profile?.id || selectedId.value)
+    await loadDiagnostics()
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Não foi possível aplicar a correção de modelagem.'
+  } finally {
+    applyingGroupKey.value = ''
+  }
+}
+
 async function saveProfile() {
   saving.value = true
   error.value = ''
@@ -142,6 +231,7 @@ async function saveProfile() {
       message: 'O cadastro de modelagem foi atualizado.',
     })
     await loadProfiles(data.data.id)
+    await loadDiagnostics()
   } catch (requestError: any) {
     error.value = requestError.response?.data?.message || 'Não foi possível salvar a modelagem.'
   } finally {
@@ -161,6 +251,7 @@ async function removeProfile() {
     message: 'A modelagem foi removida do cadastro.',
   })
   await loadProfiles(null)
+  await loadDiagnostics()
 }
 </script>
 
@@ -177,6 +268,10 @@ async function removeProfile() {
           <i class="fa-solid fa-rotate" aria-hidden="true"></i>
           Atualizar
         </button>
+        <button class="btn btn-secondary" type="button" :disabled="diagnosticsLoading" @click="loadDiagnostics">
+          <i class="fa-solid fa-stethoscope" aria-hidden="true"></i>
+          Diagnosticar
+        </button>
         <button class="btn btn-primary" type="button" @click="newProfile">
           <i class="fa-solid fa-plus" aria-hidden="true"></i>
           Nova modelagem
@@ -185,6 +280,70 @@ async function removeProfile() {
     </div>
 
     <p v-if="error" class="form-error">{{ error }}</p>
+
+    <section class="fit-diagnostic-panel">
+      <div class="subsection-heading">
+        <div>
+          <h2>Diagnóstico de modelagens</h2>
+          <span>{{ diagnosticSummary.products_analyzed }} produtos analisados · {{ diagnosticSummary.issues }} pendências</span>
+        </div>
+        <span class="status-pill" :class="{ ok: diagnosticSummary.issues === 0, warning: diagnosticSummary.issues > 0 }">
+          {{ diagnosticSummary.issues === 0 ? 'Sem pendências' : `${diagnosticSummary.groups} grupos` }}
+        </span>
+      </div>
+
+      <div class="fit-diagnostic-metrics">
+        <article>
+          <span>Sem modelagem</span>
+          <strong>{{ diagnosticSummary.without_modeling }}</strong>
+        </article>
+        <article>
+          <span>Não encontrada</span>
+          <strong>{{ diagnosticSummary.modeling_not_found }}</strong>
+        </article>
+        <article>
+          <span>Inativa</span>
+          <strong>{{ diagnosticSummary.modeling_inactive }}</strong>
+        </article>
+        <article>
+          <span>Incompatível</span>
+          <strong>{{ diagnosticSummary.modeling_incompatible }}</strong>
+        </article>
+      </div>
+
+      <div v-if="topDiagnosticGroups.length" class="fit-diagnostic-groups">
+        <article v-for="group in topDiagnosticGroups" :key="group.key" class="fit-diagnostic-group">
+          <div class="fit-diagnostic-group-main">
+            <span class="status-pill" :class="{ danger: group.severity === 'danger', warning: group.severity !== 'danger' }">
+              {{ group.title }}
+            </span>
+            <h3>{{ group.suggested_profile.name }}</h3>
+            <p>{{ group.cause }}</p>
+            <small>{{ groupProductLine(group) }} · {{ group.products_count }} produto(s)</small>
+            <div class="variation-preview-tags">
+              <span v-for="product in group.sample_products.slice(0, 4)" :key="product.id">
+                {{ product.name }}
+              </span>
+            </div>
+          </div>
+          <div class="fit-diagnostic-action">
+            <strong>{{ suggestionModeLabel(group.suggested_profile) }}</strong>
+            <span>Confiança {{ confidenceLabel(group.suggested_profile.confidence) }}</span>
+            <small>{{ group.suggested_profile.reasons?.join(' · ') }}</small>
+            <button
+              class="btn btn-primary btn-compact"
+              type="button"
+              :disabled="Boolean(applyingGroupKey)"
+              @click="applyDiagnosticGroup(group)"
+            >
+              <i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i>
+              {{ applyingGroupKey === group.key ? 'Aplicando...' : 'Aplicar grupo' }}
+            </button>
+          </div>
+        </article>
+      </div>
+      <p v-else-if="!diagnosticsLoading" class="empty-state">Nenhuma correção de modelagem pendente.</p>
+    </section>
 
     <div class="app-grid">
       <aside class="panel-list">
@@ -281,6 +440,14 @@ async function removeProfile() {
           <span><strong>{{ intensityLabels[form.fit_intensity] }}</strong> intensidade</span>
           <span><strong>{{ stretchLabels[form.stretch_level] }}</strong> elasticidade</span>
           <span><strong>{{ genderLabels[form.gender] }}</strong> gênero</span>
+        </div>
+
+        <div class="fit-impact-panel">
+          <div>
+            <strong>Impacto na recomendação</strong>
+            <span>{{ selectedImpact?.summary || 'Caimento regular: base neutra para revisar recomendações e feedback.' }}</span>
+          </div>
+          <small>{{ selectedImpact?.confidence_hint || 'Elasticidade média mantém tolerância padrão.' }}</small>
         </div>
 
         <div class="action-row compact">

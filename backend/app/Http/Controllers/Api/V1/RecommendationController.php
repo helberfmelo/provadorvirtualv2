@@ -8,6 +8,7 @@ use App\Http\Requests\RecommendationConfigCheckRequest;
 use App\Http\Requests\StoreRecommendationFeedbackRequest;
 use App\Http\Requests\StoreRecommendationRequest;
 use App\Http\Requests\StoreRecommendationSignalRequest;
+use App\Models\FitProfile;
 use App\Models\MeasurementTable;
 use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
@@ -39,6 +40,7 @@ class RecommendationController extends Controller
 
         $product->load(['measurementTable.rows', 'variants']);
         $virtualTryOnEnabled = $this->measurementTableVirtualTryOnEnabled($product->measurementTable);
+        $modelingContext = $this->modelingContext($product);
 
         return response()->json([
             'configured' => true,
@@ -68,6 +70,7 @@ class RecommendationController extends Controller
                     'composite_measurements' => $row->composite_measurements ?? [],
                 ])->values(),
             ],
+            'modeling_context' => $modelingContext,
             'theme' => WidgetInstall::query()
                 ->where('merchant_id', $product->merchant_id)
                 ->when($product->merchant_company_id, fn ($query, $companyId) => $query->where('merchant_company_id', $companyId))
@@ -96,6 +99,9 @@ class RecommendationController extends Controller
 
         $product->load(['measurementTable.rows', 'variants']);
         $result = $engine->recommend($product->measurementTable, $data['measurements']);
+        $modelingContext = $this->modelingContext($product);
+        $fitNotes = $this->fitNotesWithModeling($result->fitNotes, $modelingContext);
+        $warnings = $this->warningsWithModeling($result->warnings, $modelingContext);
         $recommendedVariant = $this->variantForRecommendation($product, $result->recommendedSize);
         $profileState = $profiles->resolve($product, $data['measurements'], $data['shopper_profile'] ?? []);
         $rawWidgetPayload = $this->rawWidgetPayload($request->input('shopper_profile.raw_widget_data'));
@@ -127,8 +133,8 @@ class RecommendationController extends Controller
             'input_measurements' => $data['measurements'],
             'raw_widget_payload' => $rawWidgetPayload,
             'score_breakdown' => $result->scoreBreakdown,
-            'fit_notes' => $result->fitNotes,
-            'warnings' => $result->warnings,
+            'fit_notes' => $fitNotes,
+            'warnings' => $warnings,
             'status' => $result->needsMoreData ? 'needs_more_data' : 'recommended',
         ]);
 
@@ -151,7 +157,12 @@ class RecommendationController extends Controller
                 'outlier_score' => (float) $learningEvent->outlier_score,
                 'weight' => (float) $learningEvent->learning_weight,
             ],
-            ...$result->toArray(),
+            ...[
+                ...$result->toArray(),
+                'fit_notes' => $fitNotes,
+                'warnings' => $warnings,
+                'modeling_context' => $modelingContext,
+            ],
         ], 201);
     }
 
@@ -300,6 +311,88 @@ class RecommendationController extends Controller
         }
 
         return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
+    }
+
+    private function modelingContext(Product $product): array
+    {
+        $code = trim((string) $product->fit_profile);
+
+        if ($code === '') {
+            return [
+                'status' => 'missing',
+                'code' => null,
+                'message' => 'Produto sem modelagem cadastrada; a recomendação usa apenas a tabela de medidas.',
+                'impact' => 'Sem contexto de caimento para revisar confiança e feedback.',
+            ];
+        }
+
+        $profile = FitProfile::query()
+            ->where('merchant_id', $product->merchant_id)
+            ->where('code', $code)
+            ->when($product->merchant_company_id, function ($query, int $companyId): void {
+                $query->where(function ($innerQuery) use ($companyId): void {
+                    $innerQuery->where('merchant_company_id', $companyId)
+                        ->orWhereNull('merchant_company_id');
+                });
+            })
+            ->orderByRaw('merchant_company_id is null')
+            ->first();
+
+        if (! $profile) {
+            return [
+                'status' => 'unknown',
+                'code' => $code,
+                'message' => 'Produto referencia uma modelagem que ainda não existe no cadastro.',
+                'impact' => 'A recomendação foi calculada, mas o caimento precisa ser corrigido no diagnóstico.',
+            ];
+        }
+
+        if ($profile->status !== 'active') {
+            return [
+                'status' => 'inactive',
+                'code' => $code,
+                'profile_id' => $profile->id,
+                'name' => $profile->name,
+                'message' => 'Modelagem cadastrada, porém inativa.',
+                'impact' => 'Ative ou substitua a modelagem antes de usar sinais de feedback para aprendizado.',
+            ];
+        }
+
+        $impact = data_get($profile->metadata ?? [], 'recommendation_impact', []);
+
+        return [
+            'status' => 'active',
+            'code' => $profile->code,
+            'profile_id' => $profile->id,
+            'name' => $profile->name,
+            'fit_intensity' => $profile->fit_intensity ?: 'regular',
+            'stretch_level' => $profile->stretch_level ?: 'medium',
+            'message' => 'Modelagem ativa usada como contexto operacional da recomendação.',
+            'impact' => $impact['summary'] ?? 'Modelagem ativa para revisar caimento, feedback e sinais comerciais.',
+            'confidence_hint' => $impact['confidence_hint'] ?? 'Sem ajuste automático sem revisão humana.',
+        ];
+    }
+
+    private function fitNotesWithModeling(array $fitNotes, array $modelingContext): array
+    {
+        if (($modelingContext['status'] ?? null) !== 'active') {
+            return $fitNotes;
+        }
+
+        $fitNotes[] = 'Modelagem '.$modelingContext['name'].': '.$modelingContext['impact'];
+
+        return array_slice($fitNotes, 0, 5);
+    }
+
+    private function warningsWithModeling(array $warnings, array $modelingContext): array
+    {
+        if (($modelingContext['status'] ?? null) === 'active') {
+            return $warnings;
+        }
+
+        $warnings[] = $modelingContext['message'] ?? 'Revise a modelagem do produto.';
+
+        return array_values(array_unique($warnings));
     }
 
     private function productFlagEnabled(Product $product, string $flag): bool

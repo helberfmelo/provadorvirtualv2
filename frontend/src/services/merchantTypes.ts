@@ -26,6 +26,91 @@ export type FitProfile = {
   status: 'active' | 'draft' | 'inactive'
   products_count: number
   measurement_tables_count: number
+  metadata?: Record<string, unknown>
+  guidance?: {
+    rules_context?: Record<string, unknown>
+    ai_context?: Record<string, unknown>
+    recommendation_impact?: {
+      summary?: string
+      confidence_hint?: string
+    }
+  }
+}
+
+export type FitProfileSuggestion = {
+  id?: number
+  mode: 'existing' | 'create'
+  name: string
+  code: string
+  product_type?: string | null
+  gender?: 'female' | 'male' | 'unisex' | 'kids' | null
+  fit_intensity?: FitProfile['fit_intensity']
+  stretch_level?: FitProfile['stretch_level']
+  status?: FitProfile['status']
+  confidence?: 'high' | 'medium' | 'low'
+  reasons?: string[]
+  profile?: {
+    name: string
+    code: string
+    description?: string | null
+    product_type?: string | null
+    gender?: 'female' | 'male' | 'unisex' | 'kids' | null
+    fit_intensity?: FitProfile['fit_intensity']
+    stretch_level?: FitProfile['stretch_level']
+  }
+}
+
+export type FitProfileDiagnosticProduct = {
+  id: number
+  name: string
+  sku?: string | null
+  category?: string | null
+  brand?: string | null
+  gender?: string | null
+  age_group?: string | null
+  fit_profile?: string | null
+  sizes?: string[]
+}
+
+export type FitProfileDiagnosticIssue = {
+  code: string
+  severity: 'warning' | 'danger'
+  title: string
+  cause: string
+  action: string
+  product: FitProfileDiagnosticProduct
+  suggested_profile: FitProfileSuggestion
+}
+
+export type FitProfileDiagnosticGroup = {
+  key: string
+  code: string
+  severity: 'warning' | 'danger'
+  title: string
+  cause: string
+  action: string
+  suggested_profile: FitProfileSuggestion
+  products_count: number
+  product_ids: number[]
+  sample_products: FitProfileDiagnosticProduct[]
+  category?: string | null
+  brand?: string | null
+  gender?: string | null
+  age_group?: string | null
+}
+
+export type FitProfileDiagnostics = {
+  summary: {
+    products_analyzed: number
+    issues: number
+    without_modeling: number
+    modeling_not_found: number
+    modeling_inactive: number
+    modeling_incompatible: number
+    groups: number
+  }
+  groups: FitProfileDiagnosticGroup[]
+  issues: FitProfileDiagnosticIssue[]
 }
 
 export type Product = {

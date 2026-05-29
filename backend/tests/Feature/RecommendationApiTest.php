@@ -211,6 +211,51 @@ class RecommendationApiTest extends TestCase
             ->assertJsonPath('reason', 'table_virtual_try_on_disabled');
     }
 
+    public function test_recommendation_records_modeling_context_and_missing_modeling_warning(): void
+    {
+        $this->seed();
+
+        Product::query()->whereKey(1)->update(['fit_profile' => null]);
+
+        $this->postJson('/api/v1/public/recommendations/config-check', [
+            'merchant_id' => 1,
+            'store_id' => 1,
+            'product_id' => 1,
+            'platform' => 'custom',
+        ])
+            ->assertOk()
+            ->assertJsonPath('configured', true)
+            ->assertJsonPath('modeling_context.status', 'missing');
+
+        $recommendation = $this->postJson('/api/v1/public/recommendations', [
+            'merchant_id' => 1,
+            'store_id' => 1,
+            'product_id' => 1,
+            'platform' => 'custom',
+            'measurements' => [
+                'bust' => 92,
+                'waist' => 74,
+                'hip' => 100,
+                'height' => 166,
+                'weight' => 62,
+            ],
+        ])
+            ->assertCreated()
+            ->assertJsonPath('configured', true)
+            ->assertJsonPath('modeling_context.status', 'missing');
+
+        $this->assertContains(
+            'Produto sem modelagem cadastrada; a recomendação usa apenas a tabela de medidas.',
+            $recommendation->json('warnings')
+        );
+
+        $log = RecommendationLog::query()->findOrFail($recommendation->json('recommendation_id'));
+        $this->assertContains(
+            'Produto sem modelagem cadastrada; a recomendação usa apenas a tabela de medidas.',
+            $log->warnings
+        );
+    }
+
     public function test_bigshop_widget_resolves_company_by_external_store_id(): void
     {
         $this->seed();

@@ -2,7 +2,15 @@
 
 $localOrigins = [
     'http://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:5175',
+    'http://127.0.0.1:5176',
+    'http://127.0.0.1:5177',
     'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'http://localhost:5176',
+    'http://localhost:5177',
 ];
 $allowedOrigins = array_values(array_filter(array_map(
     'trim',
@@ -15,6 +23,7 @@ return [
         'api/v1/me',
         'api/v1/merchant/*',
         'api/v1/products*',
+        'api/v1/fit-profiles*',
         'api/v1/measurement-*',
         'api/v1/widget-install',
         'api/v1/integrations*',

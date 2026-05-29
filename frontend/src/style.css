@@ -2534,6 +2534,123 @@ th {
   margin-top: 18px;
 }
 
+.fit-diagnostic-panel {
+  display: grid;
+  gap: 14px;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.fit-diagnostic-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.fit-diagnostic-metrics article {
+  display: grid;
+  gap: 5px;
+  min-height: 84px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.fit-diagnostic-metrics span,
+.fit-diagnostic-group small,
+.fit-diagnostic-action span,
+.fit-diagnostic-action small,
+.fit-impact-panel small {
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 800;
+  line-height: 1.4;
+}
+
+.fit-diagnostic-metrics strong {
+  color: #0f172a;
+  font-size: 1.65rem;
+  line-height: 1;
+}
+
+.fit-diagnostic-groups {
+  display: grid;
+  gap: 10px;
+}
+
+.fit-diagnostic-group {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.26fr);
+  gap: 14px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.fit-diagnostic-group-main {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fit-diagnostic-group h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 1.05rem;
+}
+
+.fit-diagnostic-group p {
+  max-width: 880px;
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+
+.fit-diagnostic-action {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  background: #fff7ed;
+}
+
+.fit-diagnostic-action strong {
+  color: #9a3412;
+}
+
+.fit-impact-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 8px;
+  background: #eff6ff;
+}
+
+.fit-impact-panel div {
+  display: grid;
+  gap: 4px;
+}
+
+.fit-impact-panel strong {
+  color: #1e3a8a;
+}
+
+.fit-impact-panel span {
+  color: #1f2937;
+  line-height: 1.5;
+}
+
 .help-grid {
   display: grid;
   grid-template-columns: minmax(260px, 0.35fr) minmax(0, 1fr);
@@ -7093,6 +7210,8 @@ td small {
   .quick-grid,
   .change-request-list article,
   .app-grid,
+  .fit-diagnostic-metrics,
+  .fit-diagnostic-group,
   .form-grid,
   .checkout-company-grid,
   .checkout-contact-grid,

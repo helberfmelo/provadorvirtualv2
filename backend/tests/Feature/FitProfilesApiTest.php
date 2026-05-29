@@ -111,6 +111,85 @@ class FitProfilesApiTest extends TestCase
             ->assertOk();
     }
 
+    public function test_merchant_can_diagnose_and_apply_modeling_fixes(): void
+    {
+        $this->seed();
+        $headers = ['Authorization' => 'Bearer '.$this->loginToken()];
+
+        $products = $this->withHeaders($headers)
+            ->getJson('/api/v1/products?per_page=10')
+            ->assertOk()
+            ->json('data');
+        $missingProductId = $products[0]['id'];
+        $unknownProductId = $products[1]['id'];
+
+        $this->withHeaders($headers)
+            ->patchJson("/api/v1/products/{$missingProductId}", [
+                'fit_profile' => null,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.fit_profile', null);
+
+        $this->withHeaders($headers)
+            ->patchJson("/api/v1/products/{$unknownProductId}", [
+                'fit_profile' => 'athletic_fit',
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.fit_profile', 'athletic_fit');
+
+        $diagnostics = $this->withHeaders($headers)
+            ->getJson('/api/v1/fit-profiles/diagnostics')
+            ->assertOk()
+            ->assertJsonPath('summary.without_modeling', 1)
+            ->assertJsonPath('summary.modeling_not_found', 1)
+            ->json();
+
+        $missingGroup = collect($diagnostics['groups'])->firstWhere('code', 'without_modeling');
+        $this->assertNotNull($missingGroup);
+        $this->assertSame('existing', $missingGroup['suggested_profile']['mode']);
+        $this->assertNotEmpty($missingGroup['suggested_profile']['id']);
+
+        $this->withHeaders($headers)
+            ->postJson('/api/v1/fit-profiles/diagnostics/apply', [
+                'product_ids' => [$missingProductId],
+                'profile_id' => $missingGroup['suggested_profile']['id'],
+            ])
+            ->assertOk()
+            ->assertJsonPath('summary.updated', 1);
+
+        $this->withHeaders($headers)
+            ->getJson("/api/v1/products/{$missingProductId}")
+            ->assertOk()
+            ->assertJsonPath('data.fit_profile', $missingGroup['suggested_profile']['code'])
+            ->assertJsonFragment(['event' => 'fit_profile.diagnostic_applied']);
+
+        $unknownGroup = collect($diagnostics['groups'])->firstWhere('code', 'modeling_not_found');
+        $this->assertNotNull($unknownGroup);
+        $this->assertSame('create', $unknownGroup['suggested_profile']['mode']);
+
+        $this->withHeaders($headers)
+            ->postJson('/api/v1/fit-profiles/diagnostics/apply', [
+                'product_ids' => [$unknownProductId],
+                'profile' => $unknownGroup['suggested_profile']['profile'],
+            ])
+            ->assertOk()
+            ->assertJsonPath('summary.created', true)
+            ->assertJsonPath('profile.code', 'athletic_fit');
+
+        $this->withHeaders($headers)
+            ->getJson("/api/v1/products/{$unknownProductId}")
+            ->assertOk()
+            ->assertJsonPath('data.fit_profile', 'athletic_fit');
+
+        $this->assertDatabaseHas('fit_profiles', [
+            'code' => 'athletic_fit',
+            'status' => 'active',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'fit_profile.diagnostic_applied',
+        ]);
+    }
+
     private function loginToken(): string
     {
         return $this->postJson('/api/v1/auth/login', [

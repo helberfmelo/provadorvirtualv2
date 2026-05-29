@@ -89,6 +89,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,integrations,edit');
         Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index'])
             ->middleware('portal.permission:merchant,measurement_tables,view');
+        Route::get('/fit-profiles/diagnostics', [FitProfileController::class, 'diagnostics'])
+            ->middleware('portal.permission:merchant,measurement_tables,view');
+        Route::post('/fit-profiles/diagnostics/apply', [FitProfileController::class, 'applyDiagnostics'])
+            ->middleware('portal.permission:merchant,measurement_tables,edit');
         Route::apiResource('fit-profiles', FitProfileController::class)
             ->only(['index', 'show'])
             ->middleware('portal.permission:merchant,measurement_tables,view');
