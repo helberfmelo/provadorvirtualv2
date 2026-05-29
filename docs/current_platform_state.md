@@ -235,6 +235,7 @@ Atualizado em: 2026-05-28
 - Sprint 115 usa sinais de pedido, devolução, troca e feedback para gerar insights por tabela de medidas, alimentar o Assistente de IA com contexto de aprendizado e mostrar sugestões limpas em `/app/analytics`.
 - Sprint 115 enviada ao GitHub no commit `8277337`; o run `26609097848` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/analytics`, `/app/assistente`, `/app/widget`, widget, APIs, CORS, login demo e go-live readiness.
 - Sprint 116 adiciona vínculo em lote de tabela de medidas na listagem `/app/produtos`, com barra sticky compacta de busca/filtros, seleção por checkbox, seletor de tabela e ação `Vincular`.
+- Sprint 116 enviada ao GitHub no commit `e802ad6`; o run `26609619782` finalizou com sucesso e a validação de produção confirmou páginas públicas, SaaS, portal, `/app/produtos`, `/app/produtos/novo`, widget, APIs, CORS, login demo e go-live readiness.
 - API limpa em produção usa redirect 307 para `/provadorvirtual_v2/public/api/...` no HostGator; `curl -L` e navegadores recebem JSON real.
 - Painel autenticado em produção usa `/provadorvirtual_v2/public/api/v1` direto para evitar perda de `Authorization` em clientes que não preservam header durante redirect.
 - A raiz `https://provadorvirtual.online/` é o endereço canônico das páginas públicas, SaaS e Portal da Empresa; rotas legadas de frontend em `/provadorvirtual_v2/` devem redirecionar para a raiz limpa.

@@ -1901,4 +1901,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` após deploy.
 
-Status: implementado localmente. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter ProductsApiTest`, PHPUnit completo com 93 testes e 863 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Commit, push, Actions/deploy e validação de produção pendentes.
+Status: implementado na Sprint 116 no commit `e802ad6`, publicado com sucesso no run `26609619782`. Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter ProductsApiTest`, PHPUnit completo com 93 testes e 863 assertions, `npm --prefix frontend run build`, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/produtos`, `/app/produtos/novo`, páginas públicas, SaaS, portal, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
