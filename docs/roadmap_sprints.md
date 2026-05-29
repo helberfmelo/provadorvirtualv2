@@ -2132,3 +2132,25 @@ Validação:
 - `scripts/validate-production.ps1` apos deploy.
 
 Status: implementado na Sprint 125 no commit `4b3ed2e`, publicado com sucesso no run `26620619329`. Validação local documental passou com varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 126 - Comparativo Sizebay em HTML
+
+Objetivo: transformar o comparativo Sizebay x Provador Virtual em um documento HTML com aparencia de planilha, colunas com larguras definidas e leitura visual mais proxima de uma tabela de Excel.
+
+Entregas:
+
+- criar `docs/sizebay_vs_provador_virtual_comparison.html`;
+- usar CSS proprio com tabela estilo planilha, bordas, cabecalho fixo, linhas de secao e destaque visual de vencedor;
+- definir larguras das quatro colunas via `colgroup`;
+- manter as colunas solicitadas: item comparado, Sizebay, Provador Virtual e quem esta melhor/por que;
+- transformar `docs/sizebay_vs_provador_virtual_comparison.md` em indice para a versao HTML;
+- atualizar `docs/README.md` para listar o HTML como documento principal.
+
+Validação:
+
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` apos deploy.
+
+Status: em validacao.

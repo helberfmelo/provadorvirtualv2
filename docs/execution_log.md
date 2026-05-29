@@ -1321,3 +1321,12 @@
 - Validação local documental passou com varredura de segredos e `git diff --check`.
 - Commit `4b3ed2e` enviado para `main`; o run `26620619329` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-29 - Sprint 126 Comparativo Sizebay em HTML
+
+- Criado `docs/sizebay_vs_provador_virtual_comparison.html` como documento visual principal do comparativo.
+- O comparativo passou a usar HTML e CSS proprio, com tabela em estilo planilha, bordas visiveis, cabecalho fixo, linhas de secao e destaque visual de vencedor.
+- As larguras das colunas foram definidas com `colgroup`: item comparado, Sizebay, Provador Virtual e avaliacao.
+- `docs/sizebay_vs_provador_virtual_comparison.md` virou apenas um indice apontando para a versao HTML, evitando duas fontes divergentes.
+- `docs/README.md` passou a listar a versao HTML como documento obrigatorio de leitura.
+- O conteudo manteve linguagem amigavel em portugues e nao registra credenciais, tokens, sessoes ou segredos.

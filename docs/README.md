@@ -20,7 +20,7 @@ Antes de desenvolver qualquer sprint, ajuste, correção ou deploy, reler nesta 
 11. `docs/v1_intelligence_migration.md`
 12. `docs/sizebay_benchmark.md`
 13. `docs/sizebay_zak_hyper_benchmark.md`
-14. `docs/sizebay_vs_provador_virtual_comparison.md`
+14. `docs/sizebay_vs_provador_virtual_comparison.html`
 15. `docs/data_learning_lgpd_outliers.md`
 16. `docs/analytics_admin.md`
 17. `docs/user_access_permissions.md`
@@ -55,7 +55,7 @@ Todo commit criado para uma sprint deve ter o título iniciado exatamente com `S
 - Documentação pública: `https://documenter.getpostman.com/view/4253101/2s93sdYrsi`
 - Documentação pública Sizebay: `https://docs.sizebay.com/`
 - Portal Sizebay do cliente Zak, estudado somente em leitura, registrado em `docs/sizebay_zak_hyper_benchmark.md`
-- Comparativo Sizebay x Provador Virtual registrado em `docs/sizebay_vs_provador_virtual_comparison.md`
+- Comparativo Sizebay x Provador Virtual registrado em `docs/sizebay_vs_provador_virtual_comparison.html`
 - Galeria pública de botões Sizebay: `https://sizebay-buttons-gallery.vercel.app/`
 - Captura tecnica pública Zak/Sizebay em `https://www.zak.com.br/`
 
