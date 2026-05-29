@@ -1924,3 +1924,36 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 117 no commit `98c24b8`, publicado com sucesso no run `26609952186`. Validação local passou com `npm --prefix frontend run build`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo login, SaaS, portal da empresa, páginas públicas, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 118 - Personalização visual dos botões com ícones
+
+Objetivo: completar a personalização visual do provador com 12 modelos de botão, catálogo de ícones de medidas e preview mais limpo em modal, alinhando a experiência com a referência da galeria pública da Sizebay.
+
+Entregas:
+
+- tela `/app/widget` passa a ter uma coluna única para Instalação e Visual;
+- card Visualizador saiu da coluna lateral e abre em modal por botão `Visualizar`;
+- cards de `Código` e `Onde instalar` ficam no final da página;
+- catálogo de botões foi ampliado de 10 para 12 opções;
+- opções de botão aparecem em grade 3x4 no desktop;
+- box abaixo da grade permite escolher cores de fundo/texto e ícones dos botões;
+- `PV` e `cm` foram substituídos por ícones configuráveis no preview e no widget público;
+- catálogo de ícones inclui cabide, régua, fita métrica, esquadro, camiseta, corpo, tabela e etiqueta;
+- checkbox `Animar ícone do cabide` aparece apenas quando o cabide é o ícone do botão `Descubra seu tamanho`;
+- animação do cabide usa movimento pendular controlado pelo tema;
+- API aceita `button_primary_icon`, `button_secondary_icon` e `button_icon_animation`;
+- widget público `/widget/v1/provador-virtual.js` e CSS renderizam os ícones escolhidos e os modelos `gallery_11_icon_chips` e `gallery_12_dual_cards`;
+- defaults, seeders, checkout, criação SaaS e ativação BigShop passam a usar cabide/régua como padrão.
+
+Validação:
+
+- `npm --prefix frontend run build`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter "WidgetInstallApiTest|WidgetAssetTest"`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit`;
+- `vendor/bin/pint --dirty`;
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado na Sprint 118 no commit `4c66327`, publicado com sucesso no run `26610700834`. Validações locais passaram com build frontend, testes focados do widget, PHPUnit completo com 93 testes e 884 assertions, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/widget`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.

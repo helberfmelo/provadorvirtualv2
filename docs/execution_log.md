@@ -1214,3 +1214,19 @@
 - Validação local passou com `npm --prefix frontend run build`.
 - Commit `98c24b8` enviado para `main`; o run `26609952186` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo login, SaaS, portal da empresa, páginas públicas, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-28 - Sprint 118 Personalização visual dos botões
+
+- A personalização de botões da tela `/app/widget` foi reorganizada em uma coluna única.
+- O Visualizador passou para modal acionado pelo botão `Visualizar`; os cards `Código` e `Onde instalar` ficam no final da página.
+- A galeria de botões passou de 10 para 12 modelos, exibidos em grade 3x4 no desktop.
+- `PV` e `cm` foram substituídos por ícones configuráveis no preview e no widget público.
+- Criado catálogo de ícones de medidas com cabide, régua, fita métrica, esquadro, camiseta, corpo, tabela e etiqueta.
+- A escolha de cores e ícones fica abaixo da grade de modelos de botão.
+- O checkbox `Animar ícone do cabide` aparece somente quando o cabide é o ícone do botão `Descubra seu tamanho`.
+- A animação do cabide usa movimento pendular e respeita `prefers-reduced-motion`.
+- API, validação e defaults passaram a aceitar `button_primary_icon`, `button_secondary_icon` e `button_icon_animation`.
+- O widget público ganhou renderização dos ícones configuráveis e os estilos `gallery_11_icon_chips` e `gallery_12_dual_cards`.
+- Validações locais passaram com `npm --prefix frontend run build`, testes focados `WidgetInstallApiTest|WidgetAssetTest`, PHPUnit completo com 93 testes e 884 assertions, `vendor/bin/pint --dirty`, varredura de segredos e `git diff --check`.
+- Commit `4c66327` enviado para `main`; o run `26610700834` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/widget`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
