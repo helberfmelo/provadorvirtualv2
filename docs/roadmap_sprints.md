@@ -2336,7 +2336,7 @@ Critérios de aceite:
 - medidas compostas e faixas validam unidade, mínimo, máximo e consistência;
 - desativar provador por tabela afeta corretamente o produto vinculado.
 
-Status: planejada.
+Status: implementado na Sprint 134 no commit `d816f41`, publicado com sucesso no run `26635156508`. O benchmark read-only da Sizebay em `/table-measurements/form/new` e `/modelings/form/new` confirmou formulario longo de criacao com campos principais, medicao do corpo/peca, sistema de tamanho, ranges, medida composta, variacao personalizada e controle para desativar o provador. O Provador Virtual evoluiu esse fluxo com editor em blocos guiados, validacao de unidade/minimo/maximo, variacoes customizadas, preview publico do widget e modo por tabela para manter apenas Tabela de Medidas quando o provador estiver desativado. Validações locais passaram com PHPUnit completo (`109 tests`, `1063 assertions`), testes focados de tabelas/recomendacao, Pint, PHP lint, build frontend, varredura de segredos, `git diff --check` e inspecao visual desktop/mobile em `5175`; o GitHub Actions finalizou com deploy e smoke publico com sucesso, e `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
 
 ### Sprint 135 - Modelagens com diagnóstico e correção guiada
 

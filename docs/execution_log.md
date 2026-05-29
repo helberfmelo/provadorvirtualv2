@@ -1399,3 +1399,18 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
 - Commit `3c2dda6` enviado para `main`; o run `26633856533` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 134 Editor avançado de medidas e variações
+
+- Relida a documentação obrigatória antes da sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy e a sessão Sizebay.
+- Acessado o MySizebay da Zak em modo somente leitura em `/table-measurements/form/new` e `/modelings/form/new`, sem alterar dados, sem preencher formulário, sem salvar, sem publicar e sem acionar suporte.
+- O benchmark Sizebay confirmou formulário longo de criação com nome, marca, categoria, tipo, gênero, faixa etária, modelagem, sistema de tamanho, medição em cm/in, ranges, medição do corpo, medição da peça, medida composta, variação personalizada e opção para desativar o provador.
+- O Provador Virtual ganhou editor avançado em blocos guiados para uso público, medidas do corpo, medidas da peça, sistema de tamanhos, faixas, medidas compostas e variações customizadas.
+- O formulário valida unidade, mínimo, máximo e consistência das faixas no backend e no frontend, incluindo variações restritas sem faixa e máximo menor que mínimo.
+- A tabela agora guarda metadados de ativação e variações customizadas; o widget pode manter apenas `Tabela de Medidas` quando o provador virtual estiver desativado por tabela.
+- A tela `/app/tabelas-de-medidas/nova` ganhou prévia pública do widget, exibindo tamanhos, medidas e tags de variação para o lojista conferir antes de salvar.
+- Validação visual local rodou em `http://127.0.0.1:5175/app/tabelas-de-medidas/nova`, com backend local em `8001`, cobrindo desktop e mobile, rolagem horizontal interna da grade e sem overflow incoerente.
+- Validações locais passaram com `php -l`, `php vendor\bin\pint --dirty`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor\bin\phpunit --filter 'MeasurementTablesApiTest|RecommendationApiTest'`, PHPUnit completo (`109 tests`, `1063 assertions`) e `npm --prefix frontend run build` (com o aviso conhecido de bundle acima de 500 kB).
+- Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram.
+- Commit `d816f41` enviado para `main`; o run `26635156508` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
