@@ -21,6 +21,7 @@ const filters = reactive({
   readiness: '',
   category: '',
   brand: '',
+  normalized_brand: '',
   gender: '',
   age_group: '',
   modeling: '',
@@ -78,6 +79,7 @@ type BulkPreview = {
 type ProductFilterOptions = {
   categories: string[]
   brands: string[]
+  normalized_brands: string[]
   genders: string[]
   age_groups: string[]
   modelings: string[]
@@ -97,6 +99,7 @@ const emptyTabs = () => ({
 const emptyFilterOptions = (): ProductFilterOptions => ({
   categories: [],
   brands: [],
+  normalized_brands: [],
   genders: [],
   age_groups: [],
   modelings: [],
@@ -243,6 +246,7 @@ function clearAllFilters() {
   filters.readiness = ''
   filters.category = ''
   filters.brand = ''
+  filters.normalized_brand = ''
   filters.gender = ''
   filters.age_group = ''
   filters.modeling = ''
@@ -733,6 +737,12 @@ function previewStatusText(item: BulkPreviewItem) {
             {{ brand }}
           </option>
         </select>
+        <select v-model="filters.normalized_brand" aria-label="Filtrar marca normalizada">
+          <option value="">Marca normalizada</option>
+          <option v-for="brand in filterOptions.normalized_brands" :key="brand" :value="brand">
+            {{ brand }}
+          </option>
+        </select>
         <select v-model="filters.gender" aria-label="Filtrar gênero">
           <option value="">Gênero</option>
           <option v-for="gender in filterOptions.genders" :key="gender" :value="gender">
@@ -913,7 +923,10 @@ function previewStatusText(item: BulkPreviewItem) {
                 <small>{{ product.sku || product.external_product_id || 'sem SKU' }}</small>
               </td>
               <td>{{ product.category || '-' }}</td>
-              <td>{{ product.brand || '-' }}</td>
+              <td>
+                <strong class="brand-cell-name">{{ product.brand || '-' }}</strong>
+                <small v-if="product.normalized_brand?.name">Normalizada: {{ product.normalized_brand.name }}</small>
+              </td>
               <td>{{ genderLabel(product.gender) }}</td>
               <td>{{ ageGroupLabel(product.age_group) }}</td>
               <td>{{ product.fit_profile || '-' }}</td>

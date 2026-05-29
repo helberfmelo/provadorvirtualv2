@@ -113,6 +113,38 @@ export type FitProfileDiagnostics = {
   issues: FitProfileDiagnosticIssue[]
 }
 
+export type NormalizedBrand = {
+  id: number
+  name: string
+  slug: string
+  status: string
+  metadata?: Record<string, unknown>
+}
+
+export type MerchantBrandSuggestion = {
+  mode: 'mapped' | 'existing' | 'create'
+  normalized_brand_id?: number | null
+  normalized_name: string
+  confidence: 'high' | 'medium' | 'low'
+  reasons: string[]
+}
+
+export type MerchantBrand = {
+  id: number
+  merchant_company_id: number | null
+  normalized_brand_id: number | null
+  name: string
+  slug: string
+  source: string
+  status: string
+  product_count: number
+  normalized_product_count: number
+  aliases: string[]
+  suggestion: MerchantBrandSuggestion | null
+  metadata?: Record<string, unknown>
+  normalized_brand?: NormalizedBrand | null
+}
+
 export type Product = {
   id: number
   measurement_table_id: number | null
@@ -124,6 +156,15 @@ export type Product = {
   gender: string | null
   fit_profile: string | null
   brand?: string | null
+  normalized_brand?: {
+    id?: number | null
+    name: string
+    slug?: string | null
+    original_name?: string | null
+    merchant_brand_id?: number | null
+    source?: string | null
+    applied_at?: string | null
+  } | null
   age_group?: string | null
   data_source?: string
   source_label?: string

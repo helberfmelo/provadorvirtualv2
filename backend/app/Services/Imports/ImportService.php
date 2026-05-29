@@ -7,6 +7,7 @@ use App\Models\MeasurementTable;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\Product;
+use App\Services\Catalog\BrandCatalogService;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -15,7 +16,10 @@ use SimpleXMLElement;
 
 class ImportService
 {
-    public function __construct(private readonly ImportRuleMapper $ruleMapper) {}
+    public function __construct(
+        private readonly ImportRuleMapper $ruleMapper,
+        private readonly BrandCatalogService $brands
+    ) {}
 
     public function preview(Merchant $merchant, ?MerchantCompany $company, array $input): array
     {
@@ -349,6 +353,7 @@ class ImportService
                 ], fn ($value): bool => $value !== null && $value !== '')),
             ]);
             $product->save();
+            $this->brands->syncProductBrand($merchant, $company, $product, $data['brand'] ?? null, 'import');
             $imported++;
 
             if ($data['size_label'] ?? null) {

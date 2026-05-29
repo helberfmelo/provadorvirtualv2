@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\BigShopActivationController;
 use App\Http\Controllers\Api\V1\BigShopIntegrationController;
 use App\Http\Controllers\Api\V1\BillingSubscriptionController;
+use App\Http\Controllers\Api\V1\BrandController;
 use App\Http\Controllers\Api\V1\DemoProductController;
 use App\Http\Controllers\Api\V1\FitProfileController;
 use App\Http\Controllers\Api\V1\GoLiveReadinessController;
@@ -205,6 +206,20 @@ Route::prefix('v1')->group(function (): void {
         Route::apiResource('measurement-tables', MeasurementTableController::class)
             ->only(['store', 'update', 'destroy'])
             ->middleware('portal.permission:merchant,measurement_tables,edit');
+        Route::get('/brands/export', [BrandController::class, 'export'])
+            ->middleware('portal.permission:merchant,products,view');
+        Route::get('/brands/template', [BrandController::class, 'template'])
+            ->middleware('portal.permission:merchant,products,view');
+        Route::post('/brands/import', [BrandController::class, 'import'])
+            ->middleware('portal.permission:merchant,products,edit');
+        Route::post('/brands/merge', [BrandController::class, 'merge'])
+            ->middleware('portal.permission:merchant,products,edit');
+        Route::apiResource('brands', BrandController::class)
+            ->only(['index'])
+            ->middleware('portal.permission:merchant,products,view');
+        Route::apiResource('brands', BrandController::class)
+            ->only(['store', 'update', 'destroy'])
+            ->middleware('portal.permission:merchant,products,edit');
         Route::apiResource('products', ProductController::class)
             ->only(['index', 'show'])
             ->middleware('portal.permission:merchant,products,view');

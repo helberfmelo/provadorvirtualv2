@@ -110,6 +110,7 @@ const companyNavSections = computed<NavSection[]>(() => [
       { to: '/app/produtos', label: 'Produtos', icon: 'fa-shirt', show: auth.canView('products') },
       { to: '/app/tabelas-de-medidas', label: 'Tabelas', icon: 'fa-ruler-combined', show: auth.canView('measurement_tables') },
       { to: '/app/modelagens', label: 'Modelagens', icon: 'fa-sliders', show: auth.canView('measurement_tables') },
+      { to: '/app/marcas', label: 'Marcas', icon: 'fa-copyright', show: auth.canView('products') },
       { to: '/app/regras-de-importacao', label: 'Regras', icon: 'fa-filter', show: auth.canView('integrations') },
     ],
   },
@@ -196,6 +197,14 @@ const companyHelpItems: Array<ContextHelp & { prefix: string, exact?: boolean }>
     text: 'Use caimentos consistentes para importar, filtrar e recomendar com mais precisão.',
     nextTo: '/app/regras-de-importacao',
     nextLabel: 'Ajustar regras',
+  },
+  {
+    prefix: '/app/marcas',
+    topic: 'marcas',
+    title: 'Marcas',
+    text: 'Revise duplicidades e aplique marcas normalizadas antes de novas análises do catálogo.',
+    nextTo: '/app/produtos',
+    nextLabel: 'Ver produtos',
   },
   {
     prefix: '/app/importacoes',

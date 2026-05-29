@@ -11,6 +11,7 @@ use App\Http\Resources\ProductResource;
 use App\Models\MeasurementTable;
 use App\Models\Product;
 use App\Services\Audit\AuditLogger;
+use App\Services\Catalog\BrandCatalogService;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -120,6 +121,7 @@ class ProductController extends Controller
             'image_url' => $data['image_url'] ?? null,
             'metadata' => $this->metadataForStore($data),
         ]);
+        app(BrandCatalogService::class)->syncProductBrand($merchant, $company, $product, $data['brand'] ?? null, 'manual');
 
         return (new ProductResource($product->load(['company', 'measurementTable', 'variants'])))
             ->response()
@@ -168,6 +170,7 @@ class ProductController extends Controller
             ...$this->columnData($data),
             'metadata' => $metadataResult['metadata'],
         ]);
+        app(BrandCatalogService::class)->syncProductBrand($merchant, $company, $product->fresh(), $data['brand'] ?? null, 'manual');
 
         $this->logProductUpdateAudits($request, $merchant, $product, $metadataResult);
 
@@ -549,6 +552,19 @@ class ProductController extends Controller
             }
         }
 
+        if (! $skip('normalized_brand') && $value = $this->stringFilter($request, 'normalized_brand')) {
+            $query->where(function (Builder $brandQuery) use ($value): void {
+                $brandQuery->where('metadata->normalized_brand->name', $value)
+                    ->orWhere('metadata->normalized_brand_name', $value)
+                    ->orWhere('metadata->normalized_brand->slug', $value);
+
+                if (ctype_digit($value)) {
+                    $brandQuery->orWhere('metadata->normalized_brand_id', (int) $value)
+                        ->orWhere('metadata->normalized_brand->id', (int) $value);
+                }
+            });
+        }
+
         if (! $skip('source') && $source = $this->stringFilter($request, 'source')) {
             $this->applySourceFilter($query, $source);
         }
@@ -653,6 +669,7 @@ class ProductController extends Controller
         return [
             'categories' => $this->optionValues($products->pluck('category')),
             'brands' => $this->optionValues($products->map(fn (Product $product) => data_get($product->metadata ?? [], 'brand'))),
+            'normalized_brands' => $this->optionValues($products->map(fn (Product $product) => data_get($product->metadata ?? [], 'normalized_brand.name') ?: data_get($product->metadata ?? [], 'normalized_brand_name'))),
             'genders' => $this->optionValues($products->pluck('gender')),
             'age_groups' => $this->optionValues($products->map(fn (Product $product) => data_get($product->metadata ?? [], 'age_group'))),
             'modelings' => $this->optionValues($products->pluck('fit_profile')),

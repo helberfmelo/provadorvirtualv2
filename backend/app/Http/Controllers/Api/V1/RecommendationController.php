@@ -41,6 +41,7 @@ class RecommendationController extends Controller
         $product->load(['measurementTable.rows', 'variants']);
         $virtualTryOnEnabled = $this->measurementTableVirtualTryOnEnabled($product->measurementTable);
         $modelingContext = $this->modelingContext($product);
+        $brandContext = $this->brandContext($product);
 
         return response()->json([
             'configured' => true,
@@ -71,6 +72,7 @@ class RecommendationController extends Controller
                 ])->values(),
             ],
             'modeling_context' => $modelingContext,
+            'brand_context' => $brandContext,
             'theme' => WidgetInstall::query()
                 ->where('merchant_id', $product->merchant_id)
                 ->when($product->merchant_company_id, fn ($query, $companyId) => $query->where('merchant_company_id', $companyId))
@@ -100,6 +102,7 @@ class RecommendationController extends Controller
         $product->load(['measurementTable.rows', 'variants']);
         $result = $engine->recommend($product->measurementTable, $data['measurements']);
         $modelingContext = $this->modelingContext($product);
+        $brandContext = $this->brandContext($product);
         $fitNotes = $this->fitNotesWithModeling($result->fitNotes, $modelingContext);
         $warnings = $this->warningsWithModeling($result->warnings, $modelingContext);
         $recommendedVariant = $this->variantForRecommendation($product, $result->recommendedSize);
@@ -162,6 +165,7 @@ class RecommendationController extends Controller
                 'fit_notes' => $fitNotes,
                 'warnings' => $warnings,
                 'modeling_context' => $modelingContext,
+                'brand_context' => $brandContext,
             ],
         ], 201);
     }
@@ -370,6 +374,55 @@ class RecommendationController extends Controller
             'message' => 'Modelagem ativa usada como contexto operacional da recomendação.',
             'impact' => $impact['summary'] ?? 'Modelagem ativa para revisar caimento, feedback e sinais comerciais.',
             'confidence_hint' => $impact['confidence_hint'] ?? 'Sem ajuste automático sem revisão humana.',
+        ];
+    }
+
+    private function brandContext(Product $product): array
+    {
+        $metadata = $product->metadata ?? [];
+        $original = data_get($metadata, 'brand');
+        $normalized = data_get($metadata, 'normalized_brand');
+
+        if (is_array($normalized) && filled($normalized['name'] ?? null)) {
+            return [
+                'status' => 'normalized',
+                'original_name' => $normalized['original_name'] ?? $original,
+                'normalized_brand_id' => $normalized['id'] ?? data_get($metadata, 'normalized_brand_id'),
+                'normalized_name' => $normalized['name'],
+                'source' => $normalized['source'] ?? data_get($metadata, 'brand_mapping.source'),
+                'message' => 'Marca normalizada usada em regras, filtros, IA e relatórios.',
+            ];
+        }
+
+        if (filled(data_get($metadata, 'normalized_brand_name'))) {
+            return [
+                'status' => 'normalized',
+                'original_name' => $original,
+                'normalized_brand_id' => data_get($metadata, 'normalized_brand_id'),
+                'normalized_name' => data_get($metadata, 'normalized_brand_name'),
+                'source' => data_get($metadata, 'brand_mapping.source'),
+                'message' => 'Marca normalizada usada em regras, filtros, IA e relatórios.',
+            ];
+        }
+
+        if (filled($original)) {
+            return [
+                'status' => 'pending_review',
+                'original_name' => $original,
+                'normalized_brand_id' => null,
+                'normalized_name' => null,
+                'source' => null,
+                'message' => 'Marca original preservada; revise a normalização para melhorar filtros e relatórios.',
+            ];
+        }
+
+        return [
+            'status' => 'missing',
+            'original_name' => null,
+            'normalized_brand_id' => null,
+            'normalized_name' => null,
+            'source' => null,
+            'message' => 'Produto sem marca informada.',
         ];
     }
 

@@ -111,6 +111,9 @@ class AnalyticsController extends Controller
                     ->map(fn ($group): array => [
                         'product_id' => $group->first()->product_id,
                         'name' => $group->first()->product?->name,
+                        'brand' => data_get($group->first()->product?->metadata ?? [], 'brand'),
+                        'normalized_brand' => data_get($group->first()->product?->metadata ?? [], 'normalized_brand.name')
+                            ?: data_get($group->first()->product?->metadata ?? [], 'normalized_brand_name'),
                         'recommendations' => $group->count(),
                         'average_confidence' => round((float) $group->avg('confidence'), 2),
                         'average_outlier_score' => round((float) $group->avg('outlier_score'), 2),
@@ -118,6 +121,7 @@ class AnalyticsController extends Controller
                     ->sortByDesc('recommendations')
                     ->values()
                     ->all(),
+                'brands' => $this->brandSeries($logs),
                 'products_without_measurement_table' => $productsWithoutTable
                     ->take(8)
                     ->map(fn (Product $product): array => [
@@ -170,5 +174,29 @@ class AnalyticsController extends Controller
                 'count' => $logs->whereBetween('created_at', [$date->copy()->startOfDay(), $date->copy()->endOfDay()])->count(),
             ];
         })->values()->all();
+    }
+
+    private function brandSeries($logs): array
+    {
+        return $logs
+            ->whereNotNull('product_id')
+            ->groupBy(function (RecommendationLog $log): string {
+                return data_get($log->product?->metadata ?? [], 'normalized_brand.name')
+                    ?: data_get($log->product?->metadata ?? [], 'normalized_brand_name')
+                    ?: data_get($log->product?->metadata ?? [], 'brand')
+                    ?: 'Sem marca';
+            })
+            ->map(fn ($group, string $brand): array => [
+                'brand' => $brand,
+                'normalized' => (bool) (
+                    data_get($group->first()->product?->metadata ?? [], 'normalized_brand.name')
+                    ?: data_get($group->first()->product?->metadata ?? [], 'normalized_brand_name')
+                ),
+                'recommendations' => $group->count(),
+                'average_confidence' => round((float) $group->avg('confidence'), 2),
+            ])
+            ->sortByDesc('recommendations')
+            ->values()
+            ->all();
     }
 }

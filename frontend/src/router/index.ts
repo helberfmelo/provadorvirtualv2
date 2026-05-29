@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import AiAssistantView from '../views/AiAssistantView.vue'
 import AnalyticsView from '../views/AnalyticsView.vue'
 import BigShopChangeTermsView from '../views/BigShopChangeTermsView.vue'
+import BrandsView from '../views/BrandsView.vue'
 import CheckoutSuccessView from '../views/CheckoutSuccessView.vue'
 import CheckoutView from '../views/CheckoutView.vue'
 import DashboardView from '../views/DashboardView.vue'
@@ -62,6 +63,7 @@ const router = createRouter({
     { path: '/app/tabelas-de-medidas/nova', component: MeasurementTableFormView },
     { path: '/app/tabelas-de-medidas/:id/editar', component: MeasurementTableFormView },
     { path: '/app/modelagens', component: FitProfilesView },
+    { path: '/app/marcas', component: BrandsView },
     { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/analytics', component: AnalyticsView },
     { path: '/app/go-live', component: GoLiveView },

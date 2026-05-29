@@ -27,6 +27,7 @@ class ProductResource extends JsonResource
             'gender' => $this->gender,
             'fit_profile' => $this->fit_profile,
             'brand' => data_get($this->metadata ?? [], 'brand'),
+            'normalized_brand' => $this->normalizedBrandPayload(),
             'age_group' => data_get($this->metadata ?? [], 'age_group'),
             'data_source' => $source,
             'source_label' => $this->sourceLabel($source),
@@ -127,6 +128,40 @@ class ProductResource extends JsonResource
         }
 
         return 'manual';
+    }
+
+    private function normalizedBrandPayload(): ?array
+    {
+        $metadata = $this->metadata ?? [];
+        $normalized = data_get($metadata, 'normalized_brand');
+
+        if (is_array($normalized) && filled($normalized['name'] ?? null)) {
+            return [
+                'id' => $normalized['id'] ?? data_get($metadata, 'normalized_brand_id'),
+                'name' => $normalized['name'],
+                'slug' => $normalized['slug'] ?? null,
+                'original_name' => $normalized['original_name'] ?? data_get($metadata, 'brand'),
+                'merchant_brand_id' => $normalized['merchant_brand_id'] ?? null,
+                'source' => $normalized['source'] ?? data_get($metadata, 'brand_mapping.source'),
+                'applied_at' => $normalized['applied_at'] ?? data_get($metadata, 'brand_mapping.updated_at'),
+            ];
+        }
+
+        $name = data_get($metadata, 'normalized_brand_name');
+
+        if (blank($name)) {
+            return null;
+        }
+
+        return [
+            'id' => data_get($metadata, 'normalized_brand_id'),
+            'name' => $name,
+            'slug' => null,
+            'original_name' => data_get($metadata, 'brand'),
+            'merchant_brand_id' => data_get($metadata, 'brand_mapping.local_brand_id'),
+            'source' => data_get($metadata, 'brand_mapping.source'),
+            'applied_at' => data_get($metadata, 'brand_mapping.updated_at'),
+        ];
     }
 
     private function activation(): array

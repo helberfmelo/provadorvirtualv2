@@ -41,6 +41,11 @@ class Merchant extends Model
         return $this->hasMany(MeasurementTable::class);
     }
 
+    public function brands()
+    {
+        return $this->hasMany(MerchantBrand::class);
+    }
+
     public function widgetInstalls()
     {
         return $this->hasMany(WidgetInstall::class);
