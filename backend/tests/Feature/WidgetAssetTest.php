@@ -33,7 +33,12 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('button_style', $scriptContents);
         $this->assertStringContainsString('button_background', $scriptContents);
         $this->assertStringContainsString('button_text', $scriptContents);
+        $this->assertStringContainsString('button_primary_icon', $scriptContents);
+        $this->assertStringContainsString('button_secondary_icon', $scriptContents);
+        $this->assertStringContainsString('button_icon_animation', $scriptContents);
         $this->assertStringContainsString('buttonStyle', $scriptContents);
+        $this->assertStringContainsString('buttonIconSvg', $scriptContents);
+        $this->assertStringContainsString('buttonIconAnimationEnabled', $scriptContents);
         $this->assertStringContainsString('presentationMode', $scriptContents);
         $this->assertStringContainsString('pv-recommendation-modal', $scriptContents);
         $this->assertStringContainsString('widget_v2_staged', $scriptContents);
@@ -64,6 +69,10 @@ class WidgetAssetTest extends TestCase
         $this->assertStringContainsString('.pv-trigger-style-gallery_8_dotted_stack', $cssContents);
         $this->assertStringContainsString('.pv-trigger-style-gallery_9_light_block', $cssContents);
         $this->assertStringContainsString('.pv-trigger-style-gallery_10_badge_tooltip', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_11_icon_chips', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-style-gallery_12_dual_cards', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-icon-animated', $cssContents);
+        $this->assertStringContainsString('.pv-trigger-icon svg', $cssContents);
         $this->assertStringContainsString('.pv-trigger-style-clean', $cssContents);
         $this->assertStringContainsString('.pv-trigger-style-outline', $cssContents);
         $this->assertStringContainsString('.pv-trigger-style-soft', $cssContents);

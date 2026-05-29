@@ -296,17 +296,47 @@
     ].join('');
   }
 
+  function buttonIconSvg(themeKey, fallback) {
+    var icons = {
+      hanger: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.5a2.6 2.6 0 1 0-2.55-3.08"/><path d="M12 7.5v3.1"/><path d="M4.2 19.3 12 10.6l7.8 8.7"/><path d="M5.6 19.3h12.8"/></svg>',
+      ruler: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.8 16.2 16.2 3.8l4 4L7.8 20.2z"/><path d="m8 17-1.5-1.5"/><path d="m11 14-1.5-1.5"/><path d="m14 11-1.5-1.5"/><path d="m17 8-1.5-1.5"/></svg>',
+      tape: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.4 10.6a6.2 6.2 0 1 1 11.1 3.8"/><path d="M10.6 10.6a2.2 2.2 0 1 1 4.4 0 2.2 2.2 0 0 1-4.4 0Z"/><path d="M14.8 14.8h4.4c1.2 0 2 .8 2 2v2.4H9.4v-2.4c0-1.2.8-2 2-2h1.2"/><path d="M12.8 18.4v-1.8"/><path d="M16 18.4v-1.8"/><path d="M19.2 18.4v-1.8"/></svg>',
+      ruler_combined: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 20V4.5L20 20z"/><path d="M8 13v3h3"/><path d="M4.5 8h3"/><path d="M4.5 11h2"/><path d="M4.5 14h3"/><path d="M4.5 17h2"/></svg>',
+      shirt: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4.5 12 6l4-1.5 4 4-3 3V20H7v-8.5l-3-3z"/><path d="M9.5 5.2c.7 1.5 1.5 2.2 2.5 2.2s1.8-.7 2.5-2.2"/></svg>',
+      body: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.8a2.4 2.4 0 1 0 0-4.8 2.4 2.4 0 0 0 0 4.8Z"/><path d="M7.2 21.5 9 9.2h6l1.8 12.3"/><path d="M5.3 12.2 9 9.2"/><path d="m15 9.2 3.7 3"/><path d="M9 14h6"/></svg>',
+      chart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M9 5v14"/><path d="M15 5v14"/></svg>',
+      size_tag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.2V5h7.2l7.8 7.8-7.2 7.2z"/><path d="M8.2 8.2h.1"/><path d="M10 15.2h4.2"/></svg>',
+    };
+    var theme = config.theme || {};
+    var key = theme[themeKey] ? String(theme[themeKey]).toLowerCase() : fallback;
+
+    return icons[key] || icons[fallback] || icons.hanger;
+  }
+
+  function buttonIconAnimationEnabled() {
+    var theme = config.theme || {};
+    var key = theme.button_primary_icon ? String(theme.button_primary_icon).toLowerCase() : 'hanger';
+
+    return key === 'hanger' && (
+      theme.button_icon_animation === undefined
+      || theme.button_icon_animation === null
+      || theme.button_icon_animation === true
+      || theme.button_icon_animation === 'true'
+      || theme.button_icon_animation === '1'
+    );
+  }
+
   function renderTriggers() {
     root.innerHTML = '';
     applyTheme(root);
 
     var group = document.createElement('div');
-    group.className = 'pv-trigger-group pv-trigger-style-' + buttonStyle();
+    group.className = 'pv-trigger-group pv-trigger-style-' + buttonStyle() + (buttonIconAnimationEnabled() ? ' pv-trigger-icon-animated' : '');
 
     var discoverButton = document.createElement('button');
     discoverButton.className = 'pv-trigger pv-trigger-primary';
     discoverButton.type = 'button';
-    discoverButton.innerHTML = '<span aria-hidden="true">PV</span><span>Descubra seu tamanho</span>';
+    discoverButton.innerHTML = '<span class="pv-trigger-icon" aria-hidden="true">' + buttonIconSvg('button_primary_icon', 'hanger') + '</span><span>Descubra seu tamanho</span>';
     discoverButton.addEventListener('click', function (event) {
       if (Date.now() < suppressDrawerOpenUntil) {
         event.preventDefault();
@@ -319,7 +349,7 @@
     var tableButton = document.createElement('button');
     tableButton.className = 'pv-trigger pv-trigger-secondary';
     tableButton.type = 'button';
-    tableButton.innerHTML = '<span aria-hidden="true">cm</span><span>Tabela de Medidas</span>';
+    tableButton.innerHTML = '<span class="pv-trigger-icon" aria-hidden="true">' + buttonIconSvg('button_secondary_icon', 'ruler') + '</span><span>Tabela de Medidas</span>';
     tableButton.addEventListener('click', openTableModal);
 
     group.appendChild(discoverButton);
@@ -372,6 +402,8 @@
       'gallery_8_dotted_stack',
       'gallery_9_light_block',
       'gallery_10_badge_tooltip',
+      'gallery_11_icon_chips',
+      'gallery_12_dual_cards',
       'gradient',
       'clean',
       'outline',

@@ -19,6 +19,8 @@ class WidgetButtonStyleCatalog
             'gallery_8_dotted_stack',
             'gallery_9_light_block',
             'gallery_10_badge_tooltip',
+            'gallery_11_icon_chips',
+            'gallery_12_dual_cards',
             'gradient',
             'clean',
             'outline',

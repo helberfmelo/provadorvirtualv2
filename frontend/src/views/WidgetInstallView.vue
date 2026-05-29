@@ -38,6 +38,9 @@ type WidgetInstall = {
     button_style?: string
     button_background?: string
     button_text?: string
+    button_primary_icon?: string
+    button_secondary_icon?: string
+    button_icon_animation?: boolean | string
     confetti_enabled?: boolean | string
     presentation_mode?: 'drawer' | 'modal' | string
   }
@@ -76,6 +79,7 @@ const loading = ref(false)
 const saving = ref(false)
 const copied = ref(false)
 const previewDevice = ref<'desktop' | 'mobile'>('desktop')
+const previewModalOpen = ref(false)
 const savedFormSnapshot = ref('')
 let confettiPreviewTimeout: number | null = null
 
@@ -96,6 +100,9 @@ const form = reactive({
     button_style: 'gallery_1_text_icons',
     button_background: '#ff4d5e',
     button_text: '#ffffff',
+    button_primary_icon: 'hanger',
+    button_secondary_icon: 'ruler',
+    button_icon_animation: true,
     confetti_enabled: true,
     presentation_mode: 'drawer',
   },
@@ -207,6 +214,18 @@ const buttonStyleOptions = [
     icon: 'fa-certificate',
     description: 'Links com selo no provador e dica ao passar o mouse.',
   },
+  {
+    value: 'gallery_11_icon_chips',
+    label: '#11 Chips com ícone',
+    icon: 'fa-tags',
+    description: 'Chips compactos com ícone destacado e borda leve.',
+  },
+  {
+    value: 'gallery_12_dual_cards',
+    label: '#12 Cartões duplos',
+    icon: 'fa-grip',
+    description: 'Dois cards pequenos, claros e fáceis de tocar no mobile.',
+  },
 ]
 
 const buttonStyleValues = buttonStyleOptions.map((option) => option.value)
@@ -217,10 +236,68 @@ const legacyButtonStyleMap: Record<string, string> = {
   soft: 'gallery_5_pills',
 }
 
+const measureIconOptions = [
+  {
+    value: 'hanger',
+    label: 'Cabide',
+    description: 'Ícone principal para encontrar tamanho.',
+    svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7.5a2.6 2.6 0 1 0-2.55-3.08"/><path d="M12 7.5v3.1"/><path d="M4.2 19.3 12 10.6l7.8 8.7"/><path d="M5.6 19.3h12.8"/></svg>',
+  },
+  {
+    value: 'ruler',
+    label: 'Régua',
+    description: 'Boa para tabela de medidas.',
+    svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.8 16.2 16.2 3.8l4 4L7.8 20.2z"/><path d="m8 17-1.5-1.5"/><path d="m11 14-1.5-1.5"/><path d="m14 11-1.5-1.5"/><path d="m17 8-1.5-1.5"/></svg>',
+  },
+  {
+    value: 'tape',
+    label: 'Fita métrica',
+    description: 'Remete a medidas corporais e de peça.',
+    svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.4 10.6a6.2 6.2 0 1 1 11.1 3.8"/><path d="M10.6 10.6a2.2 2.2 0 1 1 4.4 0 2.2 2.2 0 0 1-4.4 0Z"/><path d="M14.8 14.8h4.4c1.2 0 2 .8 2 2v2.4H9.4v-2.4c0-1.2.8-2 2-2h1.2"/><path d="M12.8 18.4v-1.8"/><path d="M16 18.4v-1.8"/><path d="M19.2 18.4v-1.8"/></svg>',
+  },
+  {
+    value: 'ruler_combined',
+    label: 'Esquadro',
+    description: 'Visual técnico para guias de tamanho.',
+    svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 20V4.5L20 20z"/><path d="M8 13v3h3"/><path d="M4.5 8h3"/><path d="M4.5 11h2"/><path d="M4.5 14h3"/><path d="M4.5 17h2"/></svg>',
+  },
+  {
+    value: 'shirt',
+    label: 'Camiseta',
+    description: 'Indicado para moda casual.',
+    svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4.5 12 6l4-1.5 4 4-3 3V20H7v-8.5l-3-3z"/><path d="M9.5 5.2c.7 1.5 1.5 2.2 2.5 2.2s1.8-.7 2.5-2.2"/></svg>',
+  },
+  {
+    value: 'body',
+    label: 'Corpo',
+    description: 'Representa medidas do cliente.',
+    svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.8a2.4 2.4 0 1 0 0-4.8 2.4 2.4 0 0 0 0 4.8Z"/><path d="M7.2 21.5 9 9.2h6l1.8 12.3"/><path d="M5.3 12.2 9 9.2"/><path d="m15 9.2 3.7 3"/><path d="M9 14h6"/></svg>',
+  },
+  {
+    value: 'chart',
+    label: 'Tabela',
+    description: 'Útil para o botão de tabela.',
+    svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4z"/><path d="M4 10h16"/><path d="M4 15h16"/><path d="M9 5v14"/><path d="M15 5v14"/></svg>',
+  },
+  {
+    value: 'size_tag',
+    label: 'Etiqueta',
+    description: 'Comunica tamanho de produto.',
+    svg: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12.2V5h7.2l7.8 7.8-7.2 7.2z"/><path d="M8.2 8.2h.1"/><path d="M10 15.2h4.2"/></svg>',
+  },
+]
+
+const measureIconValues = measureIconOptions.map((option) => option.value)
+
 const selectedButtonStyle = computed(() => {
   return buttonStyleOptions.find((option) => option.value === form.theme.button_style)
     || buttonStyleOptions[0]
 })
+
+const selectedPrimaryIcon = computed(() => selectedMeasureIcon(form.theme.button_primary_icon, 'hanger'))
+const selectedSecondaryIcon = computed(() => selectedMeasureIcon(form.theme.button_secondary_icon, 'ruler'))
+const isHangerIconSelected = computed(() => selectedPrimaryIcon.value.value === 'hanger')
+const shouldAnimateButtonIcon = computed(() => isHangerIconSelected.value && Boolean(form.theme.button_icon_animation))
 
 const hasUnpublishedChanges = computed(() => Boolean(install.value?.draft?.has_unpublished_changes))
 const hasLocalChanges = computed(() => savedFormSnapshot.value !== JSON.stringify(formState()))
@@ -350,6 +427,19 @@ function fillForm(data: WidgetInstall) {
     : legacyButtonStyleMap[buttonStyle] || 'gallery_1_text_icons'
   form.theme.button_background = theme.button_background || theme.secondary || '#ff4d5e'
   form.theme.button_text = theme.button_text || '#ffffff'
+  form.theme.button_primary_icon = measureIconValues.includes(String(theme.button_primary_icon || ''))
+    ? String(theme.button_primary_icon)
+    : 'hanger'
+  form.theme.button_secondary_icon = measureIconValues.includes(String(theme.button_secondary_icon || ''))
+    ? String(theme.button_secondary_icon)
+    : 'ruler'
+  form.theme.button_icon_animation = form.theme.button_primary_icon === 'hanger' && (
+    theme.button_icon_animation === undefined
+    || theme.button_icon_animation === null
+    || theme.button_icon_animation === true
+    || theme.button_icon_animation === 'true'
+    || theme.button_icon_animation === '1'
+  )
   form.theme.presentation_mode = theme.presentation_mode === 'modal' ? 'modal' : 'drawer'
   form.theme.confetti_enabled = theme.confetti_enabled === undefined
     || theme.confetti_enabled === null
@@ -357,6 +447,37 @@ function fillForm(data: WidgetInstall) {
     || theme.confetti_enabled === 'true'
     || theme.confetti_enabled === '1'
   savedFormSnapshot.value = JSON.stringify(formState())
+}
+
+function selectedMeasureIcon(value: string | undefined, fallback: string) {
+  return measureIconOptions.find((option) => option.value === value)
+    || measureIconOptions.find((option) => option.value === fallback)
+    || measureIconOptions[0]
+}
+
+function buttonIconHtml(kind: 'primary' | 'secondary') {
+  return kind === 'primary' ? selectedPrimaryIcon.value.svg : selectedSecondaryIcon.value.svg
+}
+
+function buttonIconClass(kind: 'primary' | 'secondary') {
+  return [
+    'pv-measure-icon',
+    {
+      'is-swinging': kind === 'primary' && shouldAnimateButtonIcon.value,
+    },
+  ]
+}
+
+function chooseButtonIcon(field: 'button_primary_icon' | 'button_secondary_icon', value: string) {
+  if (!measureIconValues.includes(value)) {
+    return
+  }
+
+  form.theme[field] = value
+
+  if (field === 'button_primary_icon' && value !== 'hanger') {
+    form.theme.button_icon_animation = false
+  }
 }
 
 function formState() {
@@ -489,6 +610,10 @@ function removeConfettiPreview() {
         <span class="status-pill" :class="{ ok: !hasPendingChanges, warning: hasPendingChanges }">
           {{ publicationStatusLabel }}
         </span>
+        <button class="btn btn-secondary" type="button" @click="previewModalOpen = true">
+          <i class="fa-solid fa-eye" aria-hidden="true"></i>
+          Visualizar
+        </button>
         <button class="btn btn-secondary" type="button" :disabled="!currentSnippet" @click="copySnippet">
           <i class="fa-solid fa-copy" aria-hidden="true"></i>
           {{ copied ? 'Copiado' : 'Copiar código' }}
@@ -610,8 +735,14 @@ function removeConfettiPreview() {
                   <small>{{ option.description }}</small>
                 </span>
                 <span :class="['button-option-preview', `preview-button-style-${option.value}`]" aria-hidden="true">
-                  <span>PV Descubra</span>
-                  <span>cm Tabela</span>
+                  <span>
+                    <i :class="buttonIconClass('primary')" v-html="buttonIconHtml('primary')"></i>
+                    Descubra
+                  </span>
+                  <span>
+                    <i :class="buttonIconClass('secondary')" v-html="buttonIconHtml('secondary')"></i>
+                    Tabela
+                  </span>
                 </span>
               </button>
             </div>
@@ -634,9 +765,72 @@ function removeConfettiPreview() {
                 </label>
               </div>
 
+              <div class="button-icon-settings">
+                <div>
+                  <strong>Ícone do botão Descubra seu tamanho</strong>
+                  <span>Escolha um símbolo de medida para substituir PV.</span>
+                </div>
+                <div class="measure-icon-catalog" role="radiogroup" aria-label="Ícone do botão Descubra seu tamanho">
+                  <button
+                    v-for="option in measureIconOptions"
+                    :key="`primary-${option.value}`"
+                    type="button"
+                    class="measure-icon-option"
+                    :class="{ active: form.theme.button_primary_icon === option.value }"
+                    role="radio"
+                    :aria-checked="form.theme.button_primary_icon === option.value"
+                    @click="chooseButtonIcon('button_primary_icon', option.value)"
+                  >
+                    <i class="pv-measure-icon" v-html="option.svg"></i>
+                    <span>
+                      <strong>{{ option.label }}</strong>
+                      <small>{{ option.description }}</small>
+                    </span>
+                  </button>
+                </div>
+              </div>
+
+              <label v-if="isHangerIconSelected" class="settings-check widget-icon-animation-toggle">
+                <input v-model="form.theme.button_icon_animation" type="checkbox" />
+                <span>
+                  <strong>Animar ícone do cabide</strong>
+                  <small>O cabide fica pendurado e balançando no botão Descubra seu tamanho.</small>
+                </span>
+              </label>
+
+              <div class="button-icon-settings">
+                <div>
+                  <strong>Ícone do botão Tabela de Medidas</strong>
+                  <span>Escolha um símbolo para substituir cm.</span>
+                </div>
+                <div class="measure-icon-catalog compact-icons" role="radiogroup" aria-label="Ícone do botão Tabela de Medidas">
+                  <button
+                    v-for="option in measureIconOptions"
+                    :key="`secondary-${option.value}`"
+                    type="button"
+                    class="measure-icon-option"
+                    :class="{ active: form.theme.button_secondary_icon === option.value }"
+                    role="radio"
+                    :aria-checked="form.theme.button_secondary_icon === option.value"
+                    @click="chooseButtonIcon('button_secondary_icon', option.value)"
+                  >
+                    <i class="pv-measure-icon" v-html="option.svg"></i>
+                    <span>
+                      <strong>{{ option.label }}</strong>
+                    </span>
+                  </button>
+                </div>
+              </div>
+
               <div :class="['button-live-preview', `preview-button-style-${form.theme.button_style}`]">
-                <button type="button"><span>PV</span>Descubra seu tamanho</button>
-                <button type="button"><span>cm</span>Tabela de Medidas</button>
+                <button type="button">
+                  <span :class="buttonIconClass('primary')" v-html="buttonIconHtml('primary')"></span>
+                  <span class="button-label">Descubra seu tamanho</span>
+                </button>
+                <button type="button">
+                  <span :class="buttonIconClass('secondary')" v-html="buttonIconHtml('secondary')"></span>
+                  <span class="button-label">Tabela de Medidas</span>
+                </button>
               </div>
             </div>
           </section>
@@ -738,50 +932,6 @@ function removeConfettiPreview() {
       </form>
 
       <aside class="widget-install-aside">
-        <section class="panel-main widget-preview-panel">
-          <div class="subsection-heading">
-            <h2>Visualizador</h2>
-            <div class="segmented-control compact-segmented">
-              <button
-                type="button"
-                :class="{ active: previewDevice === 'desktop' }"
-                @click="previewDevice = 'desktop'"
-              >
-                <i class="fa-solid fa-display" aria-hidden="true"></i>
-                Desktop
-              </button>
-              <button
-                type="button"
-                :class="{ active: previewDevice === 'mobile' }"
-                @click="previewDevice = 'mobile'"
-              >
-                <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
-                Mobile
-              </button>
-            </div>
-          </div>
-          <div :class="['widget-style-preview', `preview-device-${previewDevice}`]" :style="previewStyle">
-            <div class="preview-product-line">
-              <strong>Vestido Midi Aurora</strong>
-              <span>Selecione seu tamanho</span>
-            </div>
-            <div :class="['preview-widget-buttons', `preview-button-style-${form.theme.button_style}`]">
-              <button type="button">Descubra seu tamanho</button>
-              <button type="button">Tabela de Medidas</button>
-            </div>
-            <div :class="['preview-launch-frame', form.theme.presentation_mode === 'modal' ? 'modal' : 'drawer']">
-              <span>{{ form.theme.presentation_mode === 'modal' ? 'Modal central' : 'Drawer lateral' }}</span>
-              <div></div>
-            </div>
-            <div class="preview-size-table">
-              <div><strong>P</strong><span>84 - 90</span><span>66 - 72</span></div>
-              <div><strong>M</strong><span>90 - 96</span><span>72 - 78</span></div>
-              <div><strong>G</strong><span>96 - 104</span><span>78 - 86</span></div>
-            </div>
-            <a href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>
-          </div>
-        </section>
-
         <section class="panel-main widget-code-panel">
           <div class="subsection-heading">
             <h2>Código</h2>
@@ -824,5 +974,74 @@ function removeConfettiPreview() {
         </section>
       </aside>
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="previewModalOpen"
+        class="widget-preview-modal-layer"
+        role="presentation"
+        @click.self="previewModalOpen = false"
+      >
+        <section
+          class="panel-main widget-preview-panel widget-preview-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="widget-preview-title"
+        >
+          <div class="subsection-heading">
+            <h2 id="widget-preview-title">Visualizador</h2>
+            <div class="widget-preview-modal-actions">
+              <div class="segmented-control compact-segmented">
+                <button
+                  type="button"
+                  :class="{ active: previewDevice === 'desktop' }"
+                  @click="previewDevice = 'desktop'"
+                >
+                  <i class="fa-solid fa-display" aria-hidden="true"></i>
+                  Desktop
+                </button>
+                <button
+                  type="button"
+                  :class="{ active: previewDevice === 'mobile' }"
+                  @click="previewDevice = 'mobile'"
+                >
+                  <i class="fa-solid fa-mobile-screen-button" aria-hidden="true"></i>
+                  Mobile
+                </button>
+              </div>
+              <button class="drawer-close" type="button" aria-label="Fechar visualizador" @click="previewModalOpen = false">
+                x
+              </button>
+            </div>
+          </div>
+          <div :class="['widget-style-preview', `preview-device-${previewDevice}`]" :style="previewStyle">
+            <div class="preview-product-line">
+              <strong>Vestido Midi Aurora</strong>
+              <span>Selecione seu tamanho</span>
+            </div>
+            <div :class="['preview-widget-buttons', `preview-button-style-${form.theme.button_style}`]">
+              <button type="button">
+                <span :class="buttonIconClass('primary')" v-html="buttonIconHtml('primary')"></span>
+                <span class="button-label">Descubra seu tamanho</span>
+              </button>
+              <button type="button">
+                <span :class="buttonIconClass('secondary')" v-html="buttonIconHtml('secondary')"></span>
+                <span class="button-label">Tabela de Medidas</span>
+              </button>
+            </div>
+            <div :class="['preview-launch-frame', form.theme.presentation_mode === 'modal' ? 'modal' : 'drawer']">
+              <span>{{ form.theme.presentation_mode === 'modal' ? 'Modal central' : 'Drawer lateral' }}</span>
+              <div></div>
+            </div>
+            <div class="preview-size-table">
+              <div><strong>P</strong><span>84 - 90</span><span>66 - 72</span></div>
+              <div><strong>M</strong><span>90 - 96</span><span>72 - 78</span></div>
+              <div><strong>G</strong><span>96 - 104</span><span>78 - 86</span></div>
+            </div>
+            <a href="https://provadorvirtual.online/" target="_blank" rel="noopener">desenvolvido por provadorvirtual.online</a>
+          </div>
+        </section>
+      </div>
+    </Teleport>
   </section>
 </template>

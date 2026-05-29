@@ -32,6 +32,9 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.is_active', true)
             ->assertJsonPath('data.theme.presentation_mode', 'drawer')
             ->assertJsonPath('data.theme.button_style', 'gallery_1_text_icons')
+            ->assertJsonPath('data.theme.button_primary_icon', 'hanger')
+            ->assertJsonPath('data.theme.button_secondary_icon', 'ruler')
+            ->assertJsonPath('data.theme.button_icon_animation', true)
             ->assertJsonPath('data.draft.has_unpublished_changes', false)
             ->assertJsonPath('data.platform_guide.key', 'custom')
             ->assertJsonPath('data.platform_guide.guide.placement_label', 'Página de produto')
@@ -50,6 +53,9 @@ class WidgetInstallApiTest extends TestCase
                     'primary' => '#101820',
                     'presentation_mode' => 'modal',
                     'button_style' => 'gallery_10_badge_tooltip',
+                    'button_primary_icon' => 'tape',
+                    'button_secondary_icon' => 'chart',
+                    'button_icon_animation' => false,
                 ],
                 'is_active' => false,
             ])
@@ -60,6 +66,9 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.draft.platform', 'bigshop')
             ->assertJsonPath('data.draft.allowed_domains.0', 'preview.loja.com.br')
             ->assertJsonPath('data.draft.theme.primary', '#101820')
+            ->assertJsonPath('data.draft.theme.button_primary_icon', 'tape')
+            ->assertJsonPath('data.draft.theme.button_secondary_icon', 'chart')
+            ->assertJsonPath('data.draft.theme.button_icon_animation', false)
             ->assertJsonPath('data.draft.is_active', false)
             ->assertJsonPath('data.draft.has_unpublished_changes', true);
 
@@ -80,9 +89,12 @@ class WidgetInstallApiTest extends TestCase
                     'secondary' => '#ff4d5e',
                     'accent' => '#17a398',
                     'presentation_mode' => 'modal',
-                    'button_style' => 'gallery_10_badge_tooltip',
+                    'button_style' => 'gallery_12_dual_cards',
                     'button_background' => '#101820',
                     'button_text' => '#ffffff',
+                    'button_primary_icon' => 'hanger',
+                    'button_secondary_icon' => 'tape',
+                    'button_icon_animation' => true,
                 ],
                 'is_active' => false,
             ])
@@ -92,9 +104,12 @@ class WidgetInstallApiTest extends TestCase
             ->assertJsonPath('data.allowed_domains.1', 'localhost')
             ->assertJsonPath('data.theme.primary', '#101820')
             ->assertJsonPath('data.theme.presentation_mode', 'modal')
-            ->assertJsonPath('data.theme.button_style', 'gallery_10_badge_tooltip')
+            ->assertJsonPath('data.theme.button_style', 'gallery_12_dual_cards')
             ->assertJsonPath('data.theme.button_background', '#101820')
             ->assertJsonPath('data.theme.button_text', '#ffffff')
+            ->assertJsonPath('data.theme.button_primary_icon', 'hanger')
+            ->assertJsonPath('data.theme.button_secondary_icon', 'tape')
+            ->assertJsonPath('data.theme.button_icon_animation', true)
             ->assertJsonPath('data.is_active', false)
             ->assertJsonPath('data.platform_guide.key', 'bigshop');
 
@@ -106,6 +121,9 @@ class WidgetInstallApiTest extends TestCase
         $this->assertStringContainsString('presentation_mode', $bigShopSnippet);
         $this->assertStringContainsString('button_style', $bigShopSnippet);
         $this->assertStringContainsString('button_background', $bigShopSnippet);
+        $this->assertStringContainsString('button_primary_icon', $bigShopSnippet);
+        $this->assertStringContainsString('button_secondary_icon', $bigShopSnippet);
+        $this->assertStringContainsString('button_icon_animation', $bigShopSnippet);
         $this->assertStringContainsString('data-platform="bigshop"', $bigShopSnippet);
         $this->assertStringContainsString('BIGSHOP_PRODUCT_ID', $bigShopSnippet);
 

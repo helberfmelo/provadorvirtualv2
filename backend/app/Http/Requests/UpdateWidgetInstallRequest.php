@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Support\PlatformCatalog;
+use App\Support\WidgetButtonIconCatalog;
 use App\Support\WidgetButtonStyleCatalog;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -35,6 +36,9 @@ class UpdateWidgetInstallRequest extends FormRequest
             'theme.button_style' => ['nullable', 'string', Rule::in(WidgetButtonStyleCatalog::keys())],
             'theme.button_background' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'theme.button_text' => ['nullable', 'string', 'regex:/^#[0-9A-Fa-f]{6}$/'],
+            'theme.button_primary_icon' => ['nullable', 'string', Rule::in(WidgetButtonIconCatalog::keys())],
+            'theme.button_secondary_icon' => ['nullable', 'string', Rule::in(WidgetButtonIconCatalog::keys())],
+            'theme.button_icon_animation' => ['nullable', 'boolean'],
             'theme.confetti_enabled' => ['nullable', 'boolean'],
             'theme.presentation_mode' => ['nullable', 'string', Rule::in(['drawer', 'modal'])],
             'is_active' => ['sometimes', 'boolean'],

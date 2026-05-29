@@ -131,6 +131,9 @@ class DemoProductController extends Controller
             'button_style' => 'gallery_1_text_icons',
             'button_background' => '#ff4d5e',
             'button_text' => '#ffffff',
+            'button_primary_icon' => 'hanger',
+            'button_secondary_icon' => 'ruler',
+            'button_icon_animation' => true,
             'confetti_enabled' => true,
             'presentation_mode' => 'drawer',
         ];
