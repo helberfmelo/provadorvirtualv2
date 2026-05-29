@@ -1,6 +1,6 @@
 # Roadmap e Sprints
 
-Atualizado em: 2026-05-25
+Atualizado em: 2026-05-29
 
 Este roadmap busca um produto enxuto, robusto e comercialmente usavel. Não e MVP mínimo; e uma primeira versao consistente.
 
@@ -1983,3 +1983,27 @@ Validação:
 - `scripts/validate-production.ps1` após deploy.
 
 Status: implementado na Sprint 119 no commit `c366754`, publicado com sucesso no run `26611218335`. Validações locais passaram com build frontend, `IntegrationsApiTest` com 7 testes e 84 assertions, varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 120 - Refinamento visual das integrações
+
+Objetivo: corrigir os vazios visuais observados na tela `/app/integracoes` após a reorganização em seções, mantendo o layout limpo e confiável mesmo quando a API não envia todos os metadados da plataforma.
+
+Entregas:
+
+- adicionar fallback de nome, resumo e ícone para a plataforma selecionada;
+- corrigir o CSS do resumo para o ícone não herdar regras genéricas de texto;
+- adicionar passos padrão quando o guia da plataforma não trouxer passo a passo;
+- ocultar `Dados suportados` quando a matriz estiver vazia;
+- ocultar `Snippet` quando não houver snippet de integração disponível;
+- manter o fluxo em uma coluna única, com seções visuais consistentes e sem cards vazios.
+
+Validação:
+
+- `npm --prefix frontend run build`;
+- `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --configuration phpunit.xml --filter IntegrationsApiTest`;
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` após deploy.
+
+Status: implementado na Sprint 120 no commit `c1ebf36`, publicado com sucesso no run `26611893093`. Validações locais passaram com build frontend, `IntegrationsApiTest` com 7 testes e 84 assertions, varredura de credenciais e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.

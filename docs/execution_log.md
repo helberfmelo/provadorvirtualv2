@@ -1243,3 +1243,14 @@
 - Validações locais passaram com `npm --prefix frontend run build`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationsApiTest`, varredura de segredos e `git diff --check`.
 - Commit `c366754` enviado para `main`; o run `26611218335` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
 - Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
+
+## 2026-05-29 - Sprint 120 Refinamento visual das integrações
+
+- Revisado o print da tela `/app/integracoes` após a Sprint 119: a estrutura em uma coluna ficou correta, mas o resumo da plataforma, o passo a passo, os dados suportados e o snippet podiam ficar vazios quando a API não retornava metadados completos.
+- A seção `Plataforma` ganhou fallback de nome, resumo e ícone, com texto específico para BigShop quando aplicável.
+- O CSS do resumo da plataforma foi refinado para o ícone não herdar regras de texto e para o status usar uma classe própria.
+- A seção `Instalação no produto` ganhou passos padrão quando o guia da plataforma não trouxer etapas.
+- As seções `Dados suportados` e `Snippet` passam a aparecer somente quando houver conteúdo real, evitando cards vazios no fluxo.
+- Validações locais passaram com `npm --prefix frontend run build`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --configuration phpunit.xml --filter IntegrationsApiTest`, varredura de credenciais e `git diff --check`.
+- Commit `c1ebf36` enviado para `main`; o run `26611893093` do GitHub Actions finalizou com sucesso, incluindo deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo `/app/integracoes`, páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.
