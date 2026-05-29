@@ -2,121 +2,178 @@
 
 Atualizado em: 2026-05-29
 
-## Escopo e cuidados
+## Escopo
 
-Este documento compara o portal do cliente da Sizebay, acessado em modo leitura para a loja Zak, com o portal da empresa e o SaaS Admin do Provador Virtual. A analise abaixo considera:
+Este documento compara o portal do cliente da Sizebay, acessado em modo somente leitura para a loja Zak, com o portal da empresa e o SaaS Admin do Provador Virtual.
 
-- recaptura autenticada em 2026-05-29 das telas principais do MySizebay: Dashboard, Products, Product form, Measurement Guide, Measurement Table, Modelings, Brands, Categories, Sizebay Brands e Sizebay Categories;
-- captura autenticada anterior de 2026-05-28, ja documentada internamente, para Settings, Sync, Importation Rules, Buttons Customization, VFR Customization, Reports, Orders, Returns e Billing;
-- estado atual documentado do Provador Virtual apos as sprints de BigShop, sincronizacao, regras, tabelas, modelagens, personalizacao do widget, troca protegida de integracao e melhorias de layout.
+Foram consideradas:
+
+- telas recapturadas em 2026-05-29: Painel, Produtos, cadastro de produto, Guia de Medidas, Tabelas, Modelagens, Marcas, Categorias, Marcas Sizebay e Categorias Sizebay;
+- telas ja estudadas na captura autenticada anterior: Configuracoes, Fontes de Dados, Sincronizacao, Regras de Importacao, Personalizacao de Botoes, Personalizacao do Provador, Relatorios, Pedidos, Devolucoes e Cobranca;
+- estado atual do Provador Virtual apos as sprints de BigShop, sincronizacao, regras, tabelas, modelagens, personalizacao do widget, troca protegida de integracao e melhorias de interface.
 
 Nenhuma alteracao foi feita na Sizebay. Nenhuma credencial, token, sessao ou segredo foi registrado neste documento.
 
-## Leitura executiva
+## Como Ler
 
-A Sizebay ainda esta melhor em maturidade operacional de catalogo, taxonomias globais, relatorios de uso do widget e visibilidade de pedidos/devolucoes. O Provador Virtual ja esta competitivo ou superior em fluxos de SaaS Admin, foco BigShop, troca comercial protegida de integracao, assistente de IA, go-live e customizacao recente dos botoes. O principal caminho para ficar no mesmo nivel ou acima e transformar as funcionalidades que ja temos em experiencia mais guiada, com diagnosticos por produto, dashboards de cobertura, taxonomias/mapeamentos e relatorios de resultado.
+O comparativo foi dividido por area para evitar uma tabela unica muito larga e dificil de navegar. Cada tabela mantem as quatro colunas solicitadas:
 
-## Comparativo tela por tela
+| Coluna | Conteudo |
+|---|---|
+| Item comparado | O recurso, tela ou comportamento analisado. |
+| Sizebay | Como a Sizebay apresenta ou resolve o item. |
+| Provador Virtual | Como nosso sistema apresenta ou resolve o item hoje. |
+| Quem esta melhor e por que | Avaliacao objetiva, incluindo impacto quando uma das plataformas nao possui o recurso. |
+
+Termos foram ajustados para uma linguagem mais amigavel:
+
+| Termo tecnico | Termo usado neste documento |
+|---|---|
+| Dashboard | Painel |
+| Sync | Sincronizacao |
+| Dry-run | Simulacao de importacao |
+| Readiness | Prontidao |
+| VFR | Provador Virtual |
+| SFA | Assistente de tamanho |
+| Data sources | Fontes de dados |
+| Billing | Cobranca |
+| Orders / Returns | Pedidos / Devolucoes |
+
+## Resumo Executivo
+
+A Sizebay ainda esta mais madura em operacao de catalogo, taxonomias, marcas, categorias, relatorios de uso, pedidos e devolucoes. Ela transmite muita organizacao porque transforma problemas complexos em telas curtas e objetivas.
+
+O Provador Virtual ja esta competitivo ou melhor em pontos estrategicos: operacao BigShop, governanca comercial, troca protegida de integracao, SaaS Admin, assistente de IA, go-live e personalizacao recente dos botoes.
+
+O caminho mais importante agora e transformar a profundidade tecnica que ja temos em experiencia simples: mostrar saude do catalogo, erros acionaveis, cobertura por produto, taxonomias normalizadas e relatorios que provem resultado.
+
+## 1. Navegacao e Experiencia Geral
 
 | Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
 |---|---|---|---|
-| Identidade e cabecalho do portal | Portal limpo, com marca Sizebay, navegacao lateral e acesso a suporte/chat. | Cabecalho com Provador Virtual, alternancia SaaS/Portal quando admin e logo direcionado conforme contexto. | Provador Virtual esta melhor em separacao SaaS/Portal; Sizebay esta melhor no acesso rapido a suporte. Falta reforcar ajuda contextual no Provador. |
-| Navegacao lateral do cliente | Menu enxuto: Dashboard, Products, Categories, Brands, Measurement Guide, Orders, Reports, Charges, Support. | Menu mais amplo: Painel, Produtos, Tabelas, Modelagens, Assistente IA, Importacoes, Regras, Provador, Integracoes, Sincronizacao, Analytics, Go-live, Usuarios. | Empate com objetivos diferentes. Sizebay e mais simples; Provador e mais completo. Risco do Provador: parecer mais complexo se nao agrupar por jornada. |
-| Limpeza visual geral | Muito limpa, com bastante espaco, textos curtos e secoes objetivas. | Evoluiu para cards mais limpos em Integracoes e outras telas, mas ainda tem mais volume funcional por tela. | Sizebay ainda esta melhor em simplicidade percebida. Provador deve manter uma coluna, secoes compactas e diagnosticos progressivos. |
-| Dashboard inicial | Mostra cobertura dos produtos, produtos ativos, pendentes e indicadores operacionais de implantacao. | Painel existe com visao da empresa e atalhos, mas a cobertura do provador ainda pode ser mais explicita. | Sizebay melhor. Desvantagem do Provador: lojista nao enxerga imediatamente saude do catalogo e proximos passos. |
-| Indicadores de cobertura | Exibe contagem de produtos cobertos/ativos/pendentes e usa isso como centro operacional. | Tem dados de produtos, sincronizacao, analytics e go-live, mas nao esta consolidado em um placar unico de cobertura. | Sizebay melhor. O Provador deve criar um "placar de cobertura" no Painel e na Sincronizacao. |
-| Alertas de pendencia | Produtos pendentes aparecem como filtro nativo e estado operacional. | Ha erros por produto em sincronizacao e go-live, mas os pendentes poderiam ter mais destaque no painel. | Sizebay melhor. Falta ao Provador transformar pendencias em fila priorizada de acao. |
-| Listagem de produtos | Tabs All, Pending, Active, Inactive; colunas Product, Category, Chart, Sizes, Brand, Age group, Modeling. | Listagem com busca/filtros, coluna de selecao, barra compacta sticky para selecionar tabela e vincular em massa. | Provador esta melhor em acao em massa de vincular tabelas; Sizebay esta melhor na visibilidade padrao dos atributos de catalogo. |
-| Filtros de produtos | Filtros por status e atributos, com Clear filters. | Busca, filtros e selecao em massa, com foco em vinculo a tabela. | Empate. Provador deve incluir filtros por marca, categoria, genero, faixa etaria, modelagem e status para ficar superior. |
-| Status de produtos | Status operacional muito claro: pending, active, inactive. | Status existe via importacao/sincronizacao e associacao, mas pode ficar menos evidente na listagem. | Sizebay melhor. Falta expor status de readiness na linha do produto. |
-| Produto com tabela vinculada | Coluna Chart mostra tabela relacionada. | Produto pode ser vinculado a tabela pela listagem, importacao/regras e edicao. | Provador melhor em fluxo de vinculo em massa; Sizebay melhor em visualizacao imediata. Ideal: combinar ambos. |
-| Produto com modelagem | Coluna Modeling aparece na listagem. | Modelagens existem e podem orientar importacao, mas devem aparecer melhor na listagem de produtos. | Sizebay melhor na exposicao. Provador deve adicionar coluna/filtro de modelagem. |
-| Produto com grade/tamanhos | Coluna Sizes mostra tamanhos do produto. | Grade/tamanho vem da importacao BigShop/XML e tabelas, mas a exibicao consolidada pode ser reforcada. | Sizebay melhor. Desvantagem do Provador: debug de grade fica menos obvio. |
-| Produto com faixa etaria | Age group aparece como atributo de produto. | Regras visuais contemplam faixa etaria, mas listagem ainda pode dar mais visibilidade. | Sizebay melhor. Provador deve colocar faixa etaria como atributo de catalogo visivel e filtravel. |
-| Formulario de produto | Form novo tem Integration information, imagem, link da imagem, Enable Virtual Fitting Room, dados do SFA e tamanhos disponiveis. | Produto e alimentado por importacao e vinculado a tabela/modelagem; foco maior em catalogo importado. | Sizebay melhor em edicao manual detalhada por produto. Provador precisa uma tela de detalhe mais completa para diagnostico e override. |
-| Ativar/desativar VFR por produto | Tem controle explicito "Enable Virtual Fitting Room". | Existe configuracao de provador/widget e regras; controle por produto precisa ficar mais claro. | Sizebay melhor. Se o Provador nao expuser por produto, e desvantagem operacional. |
-| Separacao dado importado x editado | Sizebay mostra informacoes de integracao e campos manuais no produto. | Provador tem importacoes e regras, mas deveria evidenciar origem do dado e override manual. | Sizebay melhor. Provador deve mostrar origem: API/feed, regra, manual, IA. |
-| Measurement Guide - lista | Lista Measurement Guide/Measurement Table com Export, Import, Create e filtros. | Tabelas de medidas existem com criacao/edicao e tipos avancados. | Empate. Sizebay esta melhor em export/import visivel; Provador esta forte no modelo funcional. |
-| Tabelas - medidas do corpo | Aba Body measurement no formulario. | Suporta medida do corpo. | Empate. Provador ja acompanha a logica principal. |
-| Tabelas - medidas da peca | Aba Garment measurement no formulario. | Suporta medida da peca. | Empate. Provador ja acompanha. |
-| Tabelas - sistema de tamanho | Aba Size System no formulario. | Suporta sistema de tamanho. | Empate. Provador ja acompanha. |
-| Tabelas - ranges de medida | Sizebay permite mostrar medidas como range. | Provador evoluiu para ranges. | Empate. Provador esta no mesmo nivel nesse ponto. |
-| Tabelas - medidas compostas | Sizebay tem Add composed measurement / Composed measure. | Provador evoluiu para medidas compostas. | Empate. Provador acompanha a funcionalidade critica. |
-| Tabelas - variacao customizada | Sizebay tem Custom variation. | Provador tem estrutura de tabelas e variacoes, mas a nomenclatura e o fluxo podem ficar mais explicitos. | Sizebay levemente melhor. Provador deve expor "variacao customizada" com ajuda contextual. |
-| Tabelas - observacoes | Sizebay tem Observations. | Provador pode registrar detalhes, mas deve padronizar observacoes por tabela/tamanho/medida. | Sizebay melhor se o Provador nao expuser isso claramente. |
-| Desativar VFR por tabela | Sizebay tem "Disable virtual fitting room" na tabela/modelagem. | Provador tem configuracoes de provador e vinculacao, mas precisa controle claro por tabela. | Sizebay melhor. Desvantagem do Provador se nao houver bloqueio por tabela. |
-| Modelagens | Sizebay possui area de Modelings e formulario com medidas, ranges, compostas e variacoes. | Provador possui cadastro de modelagens/fit profiles. | Empate funcional. Provador deve ligar modelagem a diagnostico de produto/importacao com mais clareza. |
-| Erros de modelagem | Sizebay evidencia casos como "Modeling not found" na sincronizacao. | Provador tem erros por produto na sincronizacao. | Empate em base; Sizebay melhor se a mensagem for mais acionavel. Provador deve sugerir criacao/correcao da modelagem. |
-| Marcas do lojista | Sizebay tem Brands com Name e Associated brand, import/export/create. | Provador usa marca em regras/importacao, mas nao ha tela especifica forte de mapeamento de marcas. | Sizebay melhor. Desvantagem relevante para escala de catalogo. |
-| Mapeamento para marca global | Sizebay mapeia marca local para Sizebay Brand. | Provador ainda nao tem catalogo global de marcas equivalente. | Sizebay melhor. Provador deve criar mapeamento local -> marca normalizada. |
-| Categorias do lojista | Sizebay tem Categories com Name e Type, import/export/create. | Provador usa categoria em produtos/regras, mas precisa tela de mapeamento dedicada. | Sizebay melhor. Desvantagem para importacao automatica e IA. |
-| Taxonomia global de categorias | Sizebay tem Sizebay Categories, subcategories e translations. | Provador ainda nao tem taxonomia global madura. | Sizebay melhor. E uma das maiores lacunas para qualidade de recomendacao. |
-| Traducoes de categorias | Sizebay mostra traducoes em categorias globais. | Provador e focado em PT-BR, sem camada forte multi-idioma de taxonomia. | Sizebay melhor para operacao internacional; para mercado BR nao e urgente, mas vira vantagem futura. |
-| Exportacao de catalogo | Sizebay oferece Export em produtos/tabelas/marcas/categorias. | Provador tem importacoes e sync, mas export operacional deve ser ampliado. | Sizebay melhor. Provador precisa export CSV/XLSX por area. |
-| Importacao manual | Sizebay oferece Import em tabelas, marcas e categorias. | Provador tem importacoes e BigShop/XML/feed; importa catalogo, mas precisa UX de import manual por entidade. | Empate parcial. Provador melhor em BigShop; Sizebay melhor em import granular. |
-| Integracoes - escolha de plataforma | Sizebay adapta instrucoes por fonte/plataforma e data source. | Provador tem Plataforma no SaaS Admin e tela de Integracoes adaptavel; fluxo de troca protegido para BigShop. | Provador melhor em governanca comercial; Sizebay melhor em maturidade de instrucoes por plataforma. |
-| Integracao BigShop | Sizebay nao e focada no beneficio comercial BigShop do Provador. | Provador tem cadastro BigShop, dry-run, sync, regras e troca protegida quando cliente quer sair da BigShop. | Provador melhor. E diferencial competitivo claro. |
-| Plano BigShop com desconto | Sizebay nao apresenta essa regra comercial no portal Zak. | Provador tem regra: BigShop paga menos; troca para outra integracao gera solicitacao e aceite de termos. | Provador melhor. Protege receita e deixa processo auditavel. |
-| Solicitacao de troca de integracao | Sizebay parece tratar plataforma/data source como configuracao operacional. | Provador abre modal, termos, aceite e alerta para SaaS quando BigShop quer migrar. | Provador melhor para controle comercial; Sizebay e mais direta para operacao tecnica. |
-| Termos de troca BigShop | Nao identificado equivalente no portal Sizebay. | Provador tem pagina de termos de troca BigShop para outra integracao. | Provador melhor. E vantagem juridica/comercial. |
-| Data sources | Sizebay mostra Processing data, Sync, XML Feed ativo, feed link, Google Shopping, Sizebay API e plataformas. | Provador tem Integracoes com credenciais, XML/feed, API, validacao, snippet e sincronizacao. | Empate. Sizebay melhor em documentacao de fontes; Provador melhor em adequacao BigShop. |
-| XML/feed | Sizebay tem XML Feed ativo e instrucoes de feed/Google Shopping. | Provador tem feed URL, sincronizar XML/feed e dry-run. | Empate. Provador deve manter exemplos por plataforma. |
-| API | Sizebay documenta Sizebay API e usa endpoints internos robustos. | Provador tem URL da API/token/webhook secret e validacoes. | Sizebay melhor em maturidade; Provador bom, mas precisa documentacao publica/portal por plataforma. |
-| Webhook | Sizebay possui integracoes/data sources; detalhes dependem da plataforma. | Provador expõe webhook secret e validacao no painel. | Provador melhor se entregar teste de webhook e logs. |
-| Validacao de instalacao | Sizebay orienta instalacao conforme plataforma e data source. | Provador tem URL para validar e botao "Validar instalacao". | Provador melhor em acao direta. Deve complementar com diagnostico detalhado do que foi encontrado na PDP. |
-| Snippet de instalacao | Sizebay tem instrucoes de widget e ancoragem. | Provador tem snippet no final da pagina, codigo copiavel e guia de instalacao. | Empate. Provador evoluiu bem; precisa adaptar cada plataforma. |
-| Posicao do botao no PDP | Sizebay permite Before/After/Inside selector, anchor/tag e posicao. | Provador tem customizacao de widget e instalacao, mas deve tornar seletor/ancora mais guiado por plataforma. | Sizebay melhor. Provador deve adicionar configuracao de anchor CSS/teste visual. |
-| Google Tag Manager | Sizebay usa/aborda fontes e instalacao de tracking; GTM pode ser usado para tags/tracking conforme implantacao. | Provador ainda pode liberar GTM para inserir script/tracker, eventos e validacao sem mexer no tema. | Sizebay melhor se ja documenta esse caminho. Para Provador, GTM e vantagem para tracking e implantacao rapida, mas nao deve substituir instalacao nativa quando a plataforma permitir. |
-| Sincronizacao - historico | Sizebay tem tela Sync com historico, totais, inseridos, atualizados, desconhecidos e erros. | Provador tem tela de Sincronizacao com eventos dry-run, sync e XML/feed. | Empate em direcao; Sizebay melhor em densidade de historico. Provador deve mostrar comparativo por execucao com counters padronizados. |
-| Sincronizacao - erros por produto | Sizebay mostra erros por produto/permalink, contexto e "see more sizes". | Provador ja tem proposta/tela de erros por produto. | Sizebay ainda melhor se o Provador nao mostrar correcoes sugeridas. Provador deve adicionar CTA: vincular tabela, criar modelagem, revisar categoria. |
-| Dry-run antes de importar | Sizebay mostra previa/diagnostico de sync. | Provador implementou dry-run BigShop com paginacao, product_grids, join por produto e extracao de tamanho. | Provador melhor em BigShop. Deve replicar o mesmo padrao para outras plataformas. |
-| Regras de importacao | Sizebay tem visual Where/Then com condicoes por nome, categoria, marca, status e operadores AND/OR. | Provador tem regras visuais por categoria, marca, genero, faixa etaria, status e modelagem. | Empate, com Provador potencialmente melhor pelo foco em modelagem/genero/faixa. Precisa UX tao limpa quanto a Sizebay. |
-| Acoes das regras | Sizebay agrupa acoes/condicoes para transformar dados importados. | Provador pode aplicar regras para categorizar, vincular e tratar dados. | Empate. Provador deve registrar impacto das regras no dry-run. |
-| Personalizacao dos botoes | Sizebay tem Buttons Customization com preview desktop/mobile e publicar/desfazer. | Provador tem 12 modelos, 3 colunas x 4 linhas, cores, icones de medida, preview modal, mobile/desktop, publicar/desfazer. | Provador melhor nos modelos e icones apos as ultimas sprints; Sizebay ainda e referencia em polimento visual. |
-| Galeria de botoes | Sizebay tem galeria com modelos e animacoes, incluindo cabide balancando em um modelo. | Provador replicou catalogo inspirado, adicionou 12 opcoes, icones e animacao condicional para cabide. | Provador melhor em variedade; precisa validar pixel/performance e consistencia no widget real. |
-| Icones dos botoes | Sizebay usa icones coerentes com medidas/moda. | Provador substituiu PV/cm por catalogo de icones como cabide, regua e fita metrica. | Empate/Provador melhor. Ajuste importante para parecer profissional. |
-| Animacao de icone | Sizebay tem animacoes sutis em botoes especificos. | Provador tem checkbox de animar cabide com movimento pendurado/balancando. | Empate. Provador precisa garantir que a animacao seja elegante e nao chame atencao demais. |
-| Cores dos botoes | Sizebay permite personalizacao visual com preview. | Provador permite cor de background e texto abaixo da galeria, com preview. | Empate. Provador atende ao requisito. |
-| Preview mobile/desktop | Sizebay tem preview contextual desktop/mobile. | Provador tem preview mobile/desktop e visualizador em modal. | Empate. Provador esta no nivel esperado. |
-| Publicar/desfazer customizacao | Sizebay tem publish/discard. | Provador implementou publicar/desfazer. | Empate. |
-| Customizacao do VFR | Sizebay tem VFR Customization separada, com preview e publish/discard. | Provador tem customizacao do widget/provador, mas pode separar melhor experiencia do modal VFR de botoes. | Sizebay melhor. Provador deve criar editor do modal/provador alem dos botoes. |
-| Relatorio de uso | Sizebay tem Usage Data com filtros de periodo/dispositivo e KPIs de impressoes, recomendacoes, consultas de tabela e taxa de uso. | Provador tem Analytics com vendas/devolucoes/trocas e insights por tabela. | Sizebay melhor em funil de uso do widget; Provador melhor em aproximar resultado comercial. O ideal e unir ambos. |
-| Segmentacao mobile/desktop | Sizebay mostra mobile/desktop em relatorios. | Provador tem preview mobile/desktop, mas analytics precisa segmentar uso por dispositivo. | Sizebay melhor. Falta ao Provador relatorio de dispositivo. |
-| Ranking de produtos | Sizebay ranqueia produtos por uso/recomendacoes. | Provador pode cruzar produtos, tabelas e pedidos, mas precisa ranking operacional claro. | Sizebay melhor. Provador deve criar ranking de produtos com maior uso, erro e devolucao. |
-| Relatorio de recomendacoes | Sizebay tem area Reports > Recommendations. | Provador tem analytics/IA e sugestoes, mas precisa relatorio dedicado de recomendacoes emitidas. | Sizebay melhor. Desvantagem para explicar valor do provador ao lojista. |
-| Orders overview | Sizebay possui Orders Overview, ainda que dependa de tracker configurado. | Provador possui pedidos no SaaS e proposta de usar pedidos para IA, mas portal da empresa precisa visao operacional de pedidos do lojista. | Sizebay melhor no conceito de tracking; Provador deve integrar pedidos da plataforma para feedback loop. |
-| Lista de pedidos | Sizebay mostra pedidos com status, data, quantidade, preco e uso do SFA. | Provador tem modulo SaaS de pedidos/checkout e pode importar dados comerciais, mas precisa expor no portal do cliente como relatorio do provador. | Sizebay melhor para portal do cliente. Desvantagem do Provador se pedidos ficarem so no SaaS. |
-| Devolucoes | Sizebay tem Returns com upload CSV e mapeamento de metodo. | Provador planeja usar pedidos/devolucoes/feedback para IA; precisa fluxo concreto de upload/import. | Sizebay melhor. Provador deve implementar importacao de devolucoes e motivo/tamanho. |
-| Feedback do consumidor | Sizebay usa relatorios e tracking para melhorar recomendacoes. | Provador pode alimentar IA com pedidos/devolucoes/feedback, ainda precisa fechar ciclo. | Sizebay melhor hoje; Provador pode ficar superior com IA assistida e explicavel. |
-| IA para lojista | Nao identificado assistente de IA no portal Sizebay da Zak. | Provador tem Assistente IA para ajudar a configurar tabelas e plataforma. | Provador melhor. E diferencial se alimentado com dados reais e diagnosticos. |
-| Sugestao automatica de tabelas | Sizebay tem estrutura robusta de tabelas/modelagens, mas nao foi observado assistente generativo para montar tabela. | Provador pode usar IA e base importada para sugerir tabelas. | Provador tem maior potencial. Precisa transformar em fluxo guiado com revisao humana. |
-| Go-live | Sizebay opera com configuracoes e suporte, mas nao apareceu checklist de go-live como tela dedicada. | Provador tem Go-live e validacoes. | Provador melhor. Deve ligar checklist a cobertura, instalacao, sincronizacao e analytics. |
-| Suporte | Sizebay tem Support e Chat with Sizebay visiveis. | Provador tem usuarios, SaaS Admin e pode ter suporte interno, mas suporte no portal deve ficar mais evidente. | Sizebay melhor. Desvantagem do Provador: lojista pode nao saber onde pedir ajuda. |
-| Charges/Billing | Sizebay tem Charges/Billing no menu. | Provador tem checkout, pedidos e cobrancas no SaaS Admin, mas portal da empresa precisa uma area de plano/cobranca clara. | Sizebay melhor para autonomia do cliente. Provador melhor no backoffice SaaS. |
-| Usuarios da empresa | Sizebay portal observado nao enfatiza usuarios na navegacao principal. | Provador tem Usuarios no portal e usuarios das empresas no SaaS. | Provador melhor. |
-| SaaS Admin | Sizebay acessada e portal do cliente, nao admin SaaS. | Provador tem SaaS Admin para empresas, usuarios, checkout, pedidos e emails. | Provador melhor neste comparativo, pois tem operacao interna propria. |
-| Seletor de empresa para admin | Nao aplicavel no portal cliente Sizebay. | Admin SaaS pode acessar portal da empresa e selecionar empresa; houve problema de perder selecao no refresh ja apontado. | Provador tem funcionalidade util, mas precisa corrigir persistencia. Enquanto nao corrigido, e desvantagem de UX. |
-| Cadastro de plataforma no cliente | Sizebay mostra configuracoes/data sources dentro do portal. | Provador cadastra plataforma no SaaS Admin e mostra/adapta no portal. | Sizebay melhor em autonomia do cliente comum; Provador melhor em controle comercial. Recomendado permitir troca controlada no portal conforme regra BigShop. |
-| Plataforma exibida no portal | Sizebay adapta contexto de fonte/plataforma. | Provador deve mostrar BigShop para Zak e adaptar textos, campos, guias e acoes conforme plataforma. | Sizebay melhor se o Provador mostrar "Plataforma" generico. Corrigir exibicao e origem da plataforma e prioridade. |
-| Cliente BigShop com desconto | Nao identificado equivalente. | Provador tem regra comercial especifica e deve bloquear troca direta para nao-BigShop sem solicitacao. | Provador melhor. |
-| Documentacao dentro da tela | Sizebay usa textos curtos, docs e suporte contextual. | Provador tem documentacao interna e instrucoes na tela de Integracoes. | Empate, com Sizebay melhor em concisao. Provador deve reduzir texto visivel e usar detalhes expansivos. |
-| Manual/base de conhecimento | Sizebay possui manuais e base de conhecimento sobre feeds, plataformas e integracoes. | Provador tem docs internos e paginas de termos/manual, mas precisa base de conhecimento para cliente final. | Sizebay melhor. Desvantagem importante em onboarding. |
-| Registro de logs/auditoria | Sizebay mostra historicos de sync e resultados. | Provador tem eventos de sincronizacao e solicitacoes BigShop, mas deve expandir auditoria visivel. | Empate parcial. Provador deve mostrar quem mudou integracao, publicou widget ou vinculou tabelas. |
-| Segurança de credenciais | Sizebay opera com portal autenticado e APIs. | Provador tem token/API/webhook secret e deve mascarar/rotacionar segredos. | Empate conceitual. Provador deve garantir mascaramento, teste e rotacao no portal. |
-| LGPD e termos | Sizebay tem termos/politicas no ecossistema, nao detalhado no portal Zak observado. | Provador tem termos, privacidade e termos especificos de troca BigShop. | Provador melhor no contexto BR se mantiver aceite/auditoria. |
-| Operacao por etapas | Sizebay e orientada por areas maduras: produtos, tabelas, sync, reports. | Provador tem jornada completa: integracao, sync, regras, tabelas, widget, analytics, go-live. | Provador tem melhor potencial de jornada, Sizebay melhor em maturidade de cada area. |
-| Densidade de informacao | Sizebay mostra informacao suficiente sem parecer pesada. | Provador tem muitas capacidades e precisa continuar simplificando telas. | Sizebay melhor em UX. Provador deve priorizar "menos texto, mais estado e acao". |
-| Nivel atual de benchmark | Produto maduro, especialmente em catalogo, taxonomia, sync e reports. | Produto em evolucao rapida, com diferenciais BigShop, IA e SaaS Admin. | Sizebay melhor hoje como referencia operacional completa; Provador pode superar em nicho BR/BigShop e automacao inteligente. |
+| Clareza visual | Telas limpas, poucos blocos por pagina e textos curtos. | Melhorou bastante, mas ainda concentra muitas capacidades por tela. | Sizebay. A vantagem dela e a sensacao de simplicidade. O Provador deve continuar usando uma coluna, secoes curtas e menos texto fixo. |
+| Menu do portal | Menu curto: Painel, Produtos, Categorias, Marcas, Guia de Medidas, Pedidos, Relatorios, Cobranca e Suporte. | Menu mais completo: Painel, Produtos, Tabelas, Modelagens, IA, Importacoes, Regras, Provador, Integracoes, Sincronizacao, Analiticos, Go-live e Usuarios. | Empate com risco para o Provador. Nosso menu e mais completo, mas pode parecer pesado se nao for agrupado por jornada. |
+| Cabecalho e identidade | Cabecalho simples e suporte visivel. | Cabecalho separa Portal da Empresa e SaaS Admin; logo respeita o contexto. | Provador em estrutura SaaS; Sizebay em suporte visivel. Falta ao Provador um caminho de ajuda mais evidente. |
+| Linguagem da interface | Usa muitos termos em ingles no portal acessado. | Interface em portugues, com foco no lojista brasileiro. | Provador. E vantagem local, desde que evite termos tecnicos desnecessarios. |
+| Ajuda e suporte | Suporte e chat aparecem de forma clara. | Ainda depende mais de documentacao interna e operacao do SaaS. | Sizebay. Falta ao Provador ajuda contextual dentro do portal do cliente. |
 
-## Prioridades recomendadas
+## 2. Painel e Saude da Operacao
 
-1. Criar um dashboard de cobertura igual ou melhor que a Sizebay: produtos totais, cobertos, ativos, pendentes, sem tabela, sem modelagem, sem categoria e com erro de sincronizacao.
-2. Mostrar na listagem de produtos as colunas de categoria, marca, faixa etaria, modelagem, tamanhos, tabela vinculada e status de readiness.
-3. Criar telas de mapeamento de marcas e categorias locais para uma taxonomia normalizada do Provador Virtual.
-4. Transformar a Sincronizacao em central de diagnostico com historico por execucao, counters padronizados e erro acionavel por produto.
-5. Ampliar analytics com funil do widget: impressoes, cliques, recomendacoes, consultas de tabela, uso por dispositivo, ranking de produtos e taxa de uso.
-6. Implementar pedidos/devolucoes/feedback no portal da empresa para alimentar IA e provar reducao de troca/devolucao.
-7. Melhorar autonomia do cliente com base de conhecimento, suporte contextual e manuais por plataforma.
-8. Corrigir exibicao/persistencia de plataforma e empresa selecionada para admins acessando o portal da empresa.
-9. Adaptar a tela de Integracoes 100% por plataforma, incluindo BigShop, Shopify, XML/feed, API, GTM e instrucoes especificas de instalacao.
-10. Separar a customizacao do botao da customizacao completa do provador/modal, mantendo preview, publicar/desfazer e auditoria.
+| Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
+|---|---|---|---|
+| Painel inicial | Mostra cobertura, produtos ativos e pendentes como centro da operacao. | Possui painel e atalhos, mas a cobertura do provador ainda pode ficar mais evidente. | Sizebay. O lojista entende rapidamente o que falta resolver. |
+| Cobertura do catalogo | Deixa claro quantos produtos estao cobertos, ativos ou pendentes. | Tem dados em Produtos, Sincronizacao, Analiticos e Go-live, mas nao em um placar unico. | Sizebay. O Provador precisa de um placar de cobertura no Painel. |
+| Pendencias operacionais | Produtos pendentes aparecem como filtro e estado importante. | Erros aparecem na sincronizacao e go-live, mas precisam virar fila priorizada. | Sizebay. Falta transformar problemas em proximas acoes. |
+| Prontidao para publicar | A maturidade aparece pela cobertura e configuracoes. | Tem Go-live e validacoes dedicadas. | Provador. O checklist de go-live e um diferencial, mas deve puxar dados reais de cobertura e instalacao. |
+
+## 3. Produtos e Vinculo com Tabelas
+
+| Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
+|---|---|---|---|
+| Listagem de produtos | Abas por status: todos, pendentes, ativos e inativos. | Lista com busca, filtros e selecao em massa. | Empate. Sizebay e melhor em estado operacional; Provador e melhor em acao em massa. |
+| Colunas da lista | Mostra produto, categoria, tabela, tamanhos, marca, faixa etaria e modelagem. | Mostra dados principais e permite vincular tabela em massa, mas pode expor mais atributos. | Sizebay. O Provador deve adicionar categoria, marca, faixa etaria, modelagem, tamanhos e status de prontidao. |
+| Vinculo de tabela ao produto | A tabela aparece diretamente na coluna do produto. | Permite selecionar produtos e vincular tabela em massa. | Provador na acao; Sizebay na visualizacao. O melhor caminho e juntar os dois modelos. |
+| Filtros | Filtros claros e botao para limpar filtros. | Busca e filtros existem; devem crescer para marca, categoria, genero, faixa etaria, modelagem e status. | Sizebay por enquanto. O Provador tem boa base, mas precisa filtros mais ricos. |
+| Detalhe do produto | Cadastro mostra informacoes de integracao, imagem, ativacao do provador e tamanhos. | Produto e mais orientado por importacao, regras e vinculos. | Sizebay. Falta ao Provador uma tela de detalhe com origem dos dados, diagnostico e ajustes manuais. |
+| Ativar provador por produto | Controle explicito para ativar ou desativar o provador no produto. | Pode controlar por configuracao, regra e vinculo, mas precisa ficar claro por produto. | Sizebay. Se o Provador nao expuser esse controle, o lojista perde autonomia fina. |
+| Origem dos dados | Separa melhor dados de integracao e campos editaveis. | Tem importacao e regras, mas deve mostrar se o dado veio da API, feed, regra, IA ou ajuste manual. | Sizebay. Mostrar origem do dado e essencial para confianca. |
+
+## 4. Tabelas, Medidas e Modelagens
+
+| Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
+|---|---|---|---|
+| Lista de tabelas | Possui exportar, importar, criar e filtrar. | Possui criacao e edicao de tabelas com tipos avancados. | Empate. Sizebay e melhor em importacao/exportacao visivel; Provador tem boa estrutura de dados. |
+| Medidas do corpo | Possui aba propria para medidas do corpo. | Suporta medidas do corpo. | Empate. O Provador acompanha a logica principal. |
+| Medidas da peca | Possui aba propria para medidas da peca. | Suporta medidas da peca. | Empate. |
+| Sistema de tamanhos | Possui aba para sistema de tamanho. | Suporta sistema de tamanho. | Empate. |
+| Faixas de medida | Permite mostrar medidas como intervalo. | Suporta intervalos de medida. | Empate. |
+| Medidas compostas | Permite medidas compostas. | Suporta medidas compostas. | Empate. |
+| Variacao personalizada | Possui campo especifico para variacoes personalizadas. | A estrutura existe, mas a interface pode ser mais clara. | Sizebay levemente. O Provador deve usar o termo "variacao personalizada" e explicar quando usar. |
+| Observacoes | Possui observacoes na tabela. | Deve padronizar observacoes por tabela, tamanho e medida. | Sizebay. Observacoes ajudam muito no suporte e na revisao. |
+| Desativar provador por tabela | Permite desativar o provador em uma tabela/modelagem. | Ainda precisa deixar esse controle mais evidente. | Sizebay. E importante para produtos que devem exibir apenas tabela de medidas. |
+| Modelagens | Possui area dedicada de modelagens. | Possui cadastro de modelagens/perfis de caimento. | Empate. O Provador deve conectar modelagem a diagnosticos e sugestoes da IA. |
+| Erros de modelagem | Mostra erro quando modelagem nao e encontrada. | Mostra erros por produto na sincronizacao. | Empate parcial. O Provador fica melhor se sugerir a correcao automaticamente. |
+
+## 5. Marcas, Categorias e Taxonomia
+
+| Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
+|---|---|---|---|
+| Marcas do lojista | Tela propria para marcas, com criar, importar, exportar e associar. | Usa marca em regras e importacao, mas ainda nao tem tela forte de mapeamento. | Sizebay. E uma lacuna relevante para catalogos grandes. |
+| Marca normalizada | Associa a marca local a uma marca padronizada da Sizebay. | Ainda nao possui catalogo global de marcas equivalente. | Sizebay. O Provador precisa de marca local -> marca normalizada. |
+| Categorias do lojista | Tela propria para categorias, tipo e importacao/exportacao. | Usa categoria em produtos e regras, mas precisa tela dedicada. | Sizebay. Sem mapeamento dedicado, a automacao fica menos confiavel. |
+| Categoria normalizada | Possui catalogo de categorias e subcategorias Sizebay. | Ainda nao possui taxonomia propria madura. | Sizebay. Esta e uma das maiores diferencas de maturidade. |
+| Traducoes de categorias | Possui traducoes no catalogo global. | Foco atual e portugues brasileiro. | Sizebay para operacao internacional. Para o Provador, nao e urgente, mas pode virar vantagem futura. |
+| Importar e exportar cadastros | Exporta e importa tabelas, marcas e categorias. | Tem importacao por plataforma/feed, mas deve ampliar importacao/exportacao manual por entidade. | Sizebay. O Provador deve oferecer CSV/XLSX para produtos, tabelas, marcas e categorias. |
+
+## 6. Integracoes, Fontes de Dados e Sincronizacao
+
+| Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
+|---|---|---|---|
+| Escolha de plataforma | Adapta configuracoes conforme fonte de dados e plataforma. | Plataforma vem do SaaS, checkout ou portal; tela de Integracoes se adapta. | Empate. Sizebay e mais madura nas instrucoes; Provador tem melhor governanca comercial. |
+| Integracao BigShop | Nao possui o mesmo foco comercial BigShop do Provador. | Tem cadastro BigShop, simulacao de importacao, sincronizacao, regras e troca protegida. | Provador. E diferencial competitivo claro. |
+| Beneficio BigShop | Nao identificado fluxo equivalente. | Lojas BigShop com desconto precisam solicitar troca de integracao e aceitar termos. | Provador. Protege a regra comercial e cria auditoria. |
+| Troca de integracao | Parece tratar como configuracao operacional. | Permite troca direta para nao BigShop e troca protegida para BigShop com beneficio. | Provador. Mais adequado ao modelo comercial do produto. |
+| Fontes de dados | Mostra feed XML, API, Google Shopping, sincronizacao e plataformas. | Mostra URL da API, feed, token, segredo de webhook, validacao e snippet. | Empate. O Provador precisa instrucoes ainda mais especificas por plataforma. |
+| Feed XML | Possui feed ativo e orientacoes de catalogo. | Possui URL do feed e sincronizacao XML/feed. | Empate. |
+| API | Possui documentacao e uso maduro de API. | Possui campos e validacoes de API, token e webhook. | Sizebay. O Provador deve evoluir documentacao publica e exemplos por plataforma. |
+| Webhook | Faz parte do ecossistema de fontes e rastreamento. | Exibe segredo de webhook e pode validar conexao. | Provador se entregar teste, logs e rotacao. |
+| Validar instalacao | Orienta instalacao conforme plataforma. | Possui campo de URL e botao para validar instalacao. | Provador em acao direta. Falta mostrar diagnostico detalhado da pagina validada. |
+| Local do botao na pagina | Permite configurar posicao antes, depois ou dentro de um seletor. | Ainda deve tornar seletor/ancora mais guiado. | Sizebay. O Provador deve adicionar teste visual de seletor CSS. |
+| Google Tag Manager | Pode ser usado em cenarios de tag e rastreamento conforme implantacao. | Pode ser liberado como caminho opcional para script e eventos. | Sizebay se ja documenta melhor. Para o Provador, e util em lojas sem app/tema simples, mas nao deve substituir integracao nativa quando houver. |
+| Historico de sincronizacao | Mostra historico, totais, inseridos, atualizados, desconhecidos e erros. | Possui eventos de simulacao, sincronizacao e feed. | Sizebay. O Provador deve padronizar contadores por execucao. |
+| Erros por produto | Mostra produto, link, contexto e detalhes de tamanho. | Possui base de erros por produto. | Sizebay por enquanto. O Provador deve adicionar botoes de correcao: vincular tabela, criar modelagem, revisar categoria. |
+| Simulacao antes de importar | Apresenta diagnosticos antes de consolidar dados. | Possui simulacao BigShop com paginacao, grades e extracao de tamanho. | Provador em BigShop. Precisa repetir o padrao para outras plataformas. |
+| Regras de importacao | Usa logica visual "quando isso acontecer, faca aquilo". | Possui regras por categoria, marca, genero, faixa etaria, status e modelagem. | Empate. O Provador pode ficar melhor se mostrar o impacto da regra na simulacao. |
+
+## 7. Personalizacao do Widget e do Provador
+
+| Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
+|---|---|---|---|
+| Personalizacao de botoes | Possui pre-visualizacao para computador e celular, publicar e desfazer. | Possui 12 modelos, cores, icones, pre-visualizacao, publicar e desfazer. | Provador em variedade; Sizebay em acabamento. |
+| Galeria de modelos | Possui modelos com animacoes sutis, incluindo cabide balancando. | Possui 12 opcoes em grade, icones de medida e animacao opcional do cabide. | Provador. Precisa manter o polimento visual no widget real. |
+| Icones dos botoes | Usa icones coerentes com moda e medidas. | Usa catalogo com cabide, regua, fita metrica e outros icones. | Empate com vantagem para o Provador pela escolha do lojista. |
+| Animacao | Animacoes pontuais e discretas. | Checkbox aparece quando o cabide e escolhido e anima o icone como pendurado. | Empate. A animacao do Provador deve continuar sutil. |
+| Cores | Permite personalizacao com pre-visualizacao. | Permite cor de fundo e texto com pre-visualizacao. | Empate. |
+| Pre-visualizacao | Mostra contexto de computador e celular. | Possui pre-visualizacao em modal e modos computador/celular. | Empate. |
+| Customizacao do provador | Possui area separada para personalizar o provador. | Ainda deve separar melhor botoes, modal e experiencia completa do provador. | Sizebay. O Provador precisa de editor dedicado do modal/provador. |
+
+## 8. Relatorios, Pedidos e Devolucoes
+
+| Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
+|---|---|---|---|
+| Relatorio de uso | Mostra impressoes, recomendacoes, consultas de tabela e taxa de uso. | Analiticos ja olham vendas, devolucoes, trocas e tabelas. | Sizebay no funil do widget; Provador no potencial comercial. O ideal e unir os dois. |
+| Uso por dispositivo | Separa computador e celular. | Ainda precisa segmentar relatorios por dispositivo. | Sizebay. Isso ajuda a entender comportamento real do comprador. |
+| Ranking de produtos | Mostra produtos com mais uso/recomendacoes. | Pode cruzar produtos, tabelas e pedidos, mas precisa ranking claro. | Sizebay. O Provador deve listar produtos com maior uso, erro e devolucao. |
+| Recomendacoes emitidas | Possui relatorio dedicado. | Deve criar relatorio especifico de recomendacoes do assistente de tamanho. | Sizebay. Sem isso, fica mais dificil provar valor. |
+| Pedidos | Mostra pedidos com status, data, quantidade, valor e uso do assistente de tamanho. | Tem pedidos no SaaS, mas precisa levar a visao operacional para o portal da empresa. | Sizebay. E uma lacuna importante para aprendizado e prova de resultado. |
+| Devolucoes | Possui importacao por arquivo e mapeamento de motivo/metodo. | Planeja usar pedidos, devolucoes e feedback para IA; precisa fluxo concreto. | Sizebay. O Provador deve implementar importacao e leitura de devolucoes. |
+| Aprendizado com dados reais | Usa rastreamento e relatorios para melhorar recomendacoes. | Pode alimentar IA com pedidos, devolucoes e feedback. | Sizebay hoje; Provador tem maior potencial se fechar esse ciclo com IA explicavel. |
+
+## 9. IA, Go-live, SaaS Admin e Governanca
+
+| Item comparado | Sizebay | Provador Virtual | Quem esta melhor e por que |
+|---|---|---|---|
+| Assistente para o lojista | Nao foi identificado assistente de IA no portal Zak. | Possui Assistente IA para apoiar configuracao e tabelas. | Provador. Diferencial forte se alimentado por dados reais. |
+| Sugestao de tabela | Estrutura de tabela e modelagem e madura, mas sem assistente generativo observado. | Pode sugerir tabelas com IA e base importada. | Provador em potencial. Precisa fluxo guiado com revisao humana. |
+| Go-live | Opera por configuracoes e suporte. | Possui tela dedicada de Go-live e validacoes. | Provador. Deve conectar o checklist a cobertura, instalacao, sincronizacao e analiticos. |
+| Usuarios | Nao apareceu como foco principal no portal cliente observado. | Possui Usuarios no portal e usuarios das empresas no SaaS. | Provador. |
+| SaaS Admin | Nao foi analisado porque o acesso era ao portal do cliente. | Possui empresas, usuarios, checkout, pedidos, emails e solicitacoes. | Provador. E uma vantagem estrutural para operacao interna. |
+| Cobranca | Possui menu de cobranca no portal. | Possui checkout e pedidos no SaaS Admin, mas precisa area clara no portal do cliente. | Sizebay para autonomia do cliente; Provador para controle interno. |
+| Seletor de empresa para admin | Nao aplicavel no portal cliente observado. | Admin SaaS pode escolher empresa ao acessar o portal. | Provador pela funcionalidade, mas precisa manter a persistencia sempre confiavel. |
+| Termos e governanca | Possui ecossistema de termos e politicas. | Possui termos, privacidade e termos de troca BigShop. | Provador no contexto brasileiro e BigShop, desde que mantenha aceite e auditoria. |
+| Auditoria | Historicos aparecem principalmente em sincronizacao e operacao. | Tem eventos e solicitacoes; deve ampliar trilha de auditoria visivel. | Empate parcial. O Provador deve mostrar quem publicou widget, mudou integracao ou vinculou tabela. |
+
+## Prioridades Recomendadas
+
+| Prioridade | O que fazer | Por que importa |
+|---|---|---|
+| 1 | Criar Painel de Cobertura. | O lojista precisa ver produtos totais, cobertos, ativos, pendentes, sem tabela, sem modelagem, sem categoria e com erro. |
+| 2 | Melhorar a listagem de produtos. | Incluir categoria, marca, faixa etaria, modelagem, tamanhos, tabela vinculada e prontidao. |
+| 3 | Criar mapeamento de marcas e categorias. | Aumenta qualidade da importacao, das regras e das recomendacoes. |
+| 4 | Criar taxonomia normalizada do Provador. | Aproxima o Provador da maturidade operacional da Sizebay. |
+| 5 | Evoluir Sincronizacao para central de diagnostico. | Cada erro deve ter causa, produto afetado e acao sugerida. |
+| 6 | Ampliar Analiticos com funil do widget. | Medir impressoes, cliques, recomendacoes, consultas de tabela, uso por dispositivo e ranking de produtos. |
+| 7 | Implementar pedidos, devolucoes e feedback no portal. | Fecha o ciclo de aprendizado e prova impacto em troca/devolucao. |
+| 8 | Criar base de conhecimento no portal. | Reduz suporte manual e deixa a experiencia mais proxima da Sizebay. |
+| 9 | Adaptar Integracoes por plataforma com mais profundidade. | Cada plataforma deve ter campos, instrucoes, validacao e instalacao especificos. |
+| 10 | Separar editor de botoes do editor do provador completo. | A Sizebay separa bem botao, aparencia e experiencia; o Provador deve fazer o mesmo. |

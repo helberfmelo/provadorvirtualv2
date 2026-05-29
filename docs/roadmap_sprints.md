@@ -2110,3 +2110,25 @@ Validação:
 - `scripts/validate-production.ps1` apos deploy.
 
 Status: implementado na Sprint 124 no commit `041ad07`, publicado com sucesso no run `26619251869`. Validação local documental passou com varredura de segredos e `git diff --check`. Validação de produção passou com `scripts/validate-production.ps1`, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
+
+### Sprint 125 - Reorganização do comparativo Sizebay
+
+Objetivo: refazer o documento comparativo Sizebay x Provador Virtual para ficar visualmente mais organizado, mais facil de ler e com termos menos tecnicos/americanizados.
+
+Entregas:
+
+- substituir a tabela unica e larga por tabelas menores agrupadas por area;
+- manter as quatro colunas solicitadas no comparativo;
+- encurtar os textos das celulas para melhorar a leitura;
+- criar glossario de termos tecnicos traduzidos para portugues amigavel;
+- revisar termos como dashboard, sync, dry-run, readiness, VFR, SFA, data sources, billing, orders e returns;
+- manter o conteudo comparativo tela por tela sem registrar credenciais ou segredos.
+
+Validação:
+
+- varredura de segredos;
+- `git diff --check`;
+- commit, push e Actions/deploy;
+- `scripts/validate-production.ps1` apos deploy.
+
+Status: em validacao.
