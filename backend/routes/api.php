@@ -88,6 +88,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,dashboard,edit');
         Route::patch('/merchant/company-platform', [MerchantCompanyProfileController::class, 'updatePlatform'])
             ->middleware('portal.permission:merchant,integrations,edit');
+        Route::get('/merchant/integration-change-requests/current', [IntegrationChangeRequestController::class, 'current'])
+            ->middleware('portal.permission:merchant,integrations,view');
         Route::post('/merchant/integration-change-requests', [IntegrationChangeRequestController::class, 'store'])
             ->middleware('portal.permission:merchant,integrations,edit');
         Route::get('/measurement-templates', [MeasurementTemplateController::class, 'index'])

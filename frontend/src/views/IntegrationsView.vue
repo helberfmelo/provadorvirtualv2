@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import { showFeedback } from '../services/saveFeedback'
+import type { IntegrationChangeRequest } from '../services/saasTypes'
 import { useAuthStore } from '../stores/auth'
 
 type PlatformConnection = {
@@ -164,6 +165,7 @@ const integrationReport = ref<Record<string, number | string> | null>(null)
 const validation = ref<ValidationResult | null>(null)
 const bigShopActivations = ref<BigShopActivation[]>([])
 const bigShopDryRun = ref<BigShopDryRunResult | null>(null)
+const currentChangeRequest = ref<IntegrationChangeRequest | null>(null)
 
 const form = reactive({
   external_store_id: '',
@@ -287,6 +289,63 @@ const companyPlatformOptions = computed(() => {
   return platformOptions
 })
 const changeRequestPlatformOptions = computed(() => platformOptions.filter((platform) => platform.value !== 'bigshop'))
+const hasOpenChangeRequest = computed(() => Boolean(
+  currentChangeRequest.value
+    && ['pending', 'payment_requested', 'approved'].includes(currentChangeRequest.value.status),
+))
+const changeRequestActionLabel = computed(() => hasOpenChangeRequest.value ? 'Acompanhar troca' : 'Mudar integração')
+const changeFinancialSummary = computed(() => currentChangeRequest.value?.financial_summary || {
+  currency: 'BRL',
+  from_label: 'Cliente BigShop',
+  to_label: 'Qualquer plataforma',
+  annual_from_monthly_cents: 34990,
+  annual_to_monthly_cents: 44980,
+  annual_monthly_difference_cents: 9990,
+  annual_total_difference_cents: 119880,
+  monthly_from_cents: 38980,
+  monthly_to_cents: 48980,
+  monthly_difference_cents: 10000,
+  short_text: 'Referência anual: R$ 349,90/mês para R$ 449,80/mês. Diferença estimada: R$ 99,90/mês, sujeita ao ciclo e pagamento.',
+})
+const changeRequestSteps = computed(() => {
+  if (!currentChangeRequest.value) {
+    return [
+      'Você escolhe a nova plataforma e aceita os termos de troca.',
+      'O SaaS revisa o impacto comercial e envia link de pagamento quando houver diferença.',
+      'Depois da confirmação, a nova integração é liberada e o benefício BigShop é encerrado para esta empresa.',
+    ]
+  }
+
+  if (currentChangeRequest.value.status === 'payment_requested') {
+    return [
+      'O SaaS enviou a etapa comercial da troca.',
+      'Após a confirmação do pagamento, a equipe conclui a solicitação.',
+      'A nova plataforma aparece no painel de integrações quando a troca for aplicada.',
+    ]
+  }
+
+  if (currentChangeRequest.value.status === 'completed') {
+    return [
+      'A troca já foi concluída pelo SaaS.',
+      'Configure a nova plataforma no painel de integrações.',
+      'O benefício comercial BigShop não fica ativo para esta empresa após a troca.',
+    ]
+  }
+
+  if (currentChangeRequest.value.status === 'cancelled') {
+    return [
+      'A solicitação anterior foi cancelada.',
+      'Você pode abrir uma nova solicitação se ainda precisar sair do benefício BigShop.',
+      'O contrato BigShop continua limitado à integração BigShop enquanto o benefício estiver ativo.',
+    ]
+  }
+
+  return [
+    'A solicitação está na fila de revisão SaaS.',
+    'A equipe pode enviar um link de pagamento ou aprovar a troca diretamente.',
+    'A plataforma só muda quando o SaaS concluir e aplicar a solicitação.',
+  ]
+})
 const canEditCompanyPlatform = computed(() => !hasBigShopDiscount.value && auth.canEdit('integrations'))
 const companyPlatformHelp = computed(() => {
   if (hasBigShopDiscount.value) {
@@ -378,6 +437,7 @@ async function loadPlatforms() {
 
     fillForm()
     await loadBigShopActivations()
+    await loadCurrentChangeRequest()
   } catch (requestError: any) {
     platforms.value = []
     selectedKey.value = ''
@@ -439,7 +499,9 @@ async function saveCompanyPlatform() {
 }
 
 function openChangeRequestModal() {
-  changeRequestForm.to_platform = changeRequestPlatformOptions.value[0]?.value || 'custom'
+  changeRequestForm.to_platform = currentChangeRequest.value?.to_platform
+    || changeRequestPlatformOptions.value[0]?.value
+    || 'custom'
   changeRequestForm.accepted_terms = false
   changeRequestModalOpen.value = true
 }
@@ -452,10 +514,11 @@ async function requestPlatformChange() {
   requestingPlatformChange.value = true
 
   try {
-    await api.post('/merchant/integration-change-requests', {
+    const { data } = await api.post('/merchant/integration-change-requests', {
       to_platform: changeRequestForm.to_platform,
       accepted_terms: changeRequestForm.accepted_terms,
     })
+    currentChangeRequest.value = data.data || null
     changeRequestModalOpen.value = false
     showFeedback({
       status: 'success',
@@ -654,6 +717,16 @@ async function loadBigShopActivations() {
   bigShopActivations.value = data.data || []
 }
 
+async function loadCurrentChangeRequest() {
+  if (!hasBigShopDiscount.value) {
+    currentChangeRequest.value = null
+    return
+  }
+
+  const { data } = await api.get('/merchant/integration-change-requests/current').catch(() => ({ data: { data: null } }))
+  currentChangeRequest.value = data.data || null
+}
+
 async function validateInstall() {
   if (!selected.value) {
     return
@@ -768,6 +841,26 @@ function dryRunStatusLabel(status: string) {
   return status === 'ready' ? 'Pronto' : 'Com alertas'
 }
 
+function money(cents: number) {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL',
+  }).format(cents / 100)
+}
+
+function shortDate(value: string | null | undefined) {
+  if (!value) {
+    return '-'
+  }
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value))
+}
+
 function friendlyRequestMessage(requestError: any, fallback: string) {
   return requestError.response?.data?.message
     || requestError.response?.data?.errors?.feed_url?.[0]
@@ -828,6 +921,27 @@ function canRunBigShopApiAction() {
         : 'Integração BigShop ativa: este painel exibe a configuração específica da BigShop.' }}
     </p>
 
+    <section v-if="hasBigShopDiscount" class="panel-main bigshop-governance-panel">
+      <div>
+        <span class="eyebrow">Governança BigShop</span>
+        <h2>Integração protegida pelo benefício comercial</h2>
+        <p>
+          O preço BigShop é exclusivo para lojas operando na BigShop. A mudança para outra plataforma passa por revisão
+          comercial, aceite eletrônico e aplicação pelo SaaS, sem expor token ou credencial no portal.
+        </p>
+      </div>
+      <div class="bigshop-governance-status">
+        <span v-if="currentChangeRequest" class="status-pill warning">{{ currentChangeRequest.status_label }}</span>
+        <small v-if="currentChangeRequest">
+          {{ currentChangeRequest.to_platform_label }} · {{ shortDate(currentChangeRequest.requested_at) }}
+        </small>
+        <button class="btn btn-secondary btn-compact" type="button" @click="openChangeRequestModal">
+          <i class="fa-solid fa-right-left" aria-hidden="true"></i>
+          {{ changeRequestActionLabel }}
+        </button>
+      </div>
+    </section>
+
     <div v-if="loading" class="empty-state">Carregando integrações...</div>
     <div v-else-if="loadError" class="empty-state">{{ loadError }}</div>
     <div v-else-if="!platforms.length" class="empty-state">
@@ -874,7 +988,7 @@ function canRunBigShopApiAction() {
                 @click="openChangeRequestModal"
               >
                 <i class="fa-solid fa-right-left" aria-hidden="true"></i>
-                Mudar integração
+                {{ changeRequestActionLabel }}
               </button>
             </div>
           </div>
@@ -1315,25 +1429,63 @@ function canRunBigShopApiAction() {
 
         <div class="integration-change-copy">
           <p>
-            Esta loja usa BigShop com benefício comercial no Provador Virtual. A troca para outra plataforma é possível,
-            mas precisa de revisão do SaaS porque pode existir diferença de valor antes da liberação.
+            Esta loja usa BigShop com benefício comercial. A troca para outra plataforma é possível, mas precisa de
+            revisão do SaaS porque o desconto deixa de valer fora da BigShop.
           </p>
           <p>
-            Depois de confirmar, o time SaaS recebe um alerta e pode enviar o link de pagamento da diferença. Quando o
-            pagamento for confirmado, a plataforma poderá ser alterada no cadastro da empresa.
+            Nenhuma credencial é exibida nesse processo. A plataforma só muda depois do aceite, da revisão comercial e
+            da aplicação feita pelo SaaS.
           </p>
         </div>
 
+        <div v-if="currentChangeRequest" class="integration-change-current">
+          <span>
+            <small>Status</small>
+            <strong>{{ currentChangeRequest.status_label }}</strong>
+          </span>
+          <span>
+            <small>Destino</small>
+            <strong>{{ currentChangeRequest.to_platform_label }}</strong>
+          </span>
+          <span>
+            <small>Solicitada em</small>
+            <strong>{{ shortDate(currentChangeRequest.requested_at) }}</strong>
+          </span>
+          <a v-if="currentChangeRequest.payment_link" class="btn btn-secondary btn-compact" :href="currentChangeRequest.payment_link" target="_blank" rel="noopener">
+            <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+            Abrir pagamento
+          </a>
+        </div>
+
+        <div class="integration-change-financial">
+          <span>
+            <small>BigShop anual</small>
+            <strong>{{ money(changeFinancialSummary.annual_from_monthly_cents) }}/mês</strong>
+          </span>
+          <span>
+            <small>Nova plataforma anual</small>
+            <strong>{{ money(changeFinancialSummary.annual_to_monthly_cents) }}/mês</strong>
+          </span>
+          <span>
+            <small>Diferença estimada</small>
+            <strong>{{ money(changeFinancialSummary.annual_monthly_difference_cents) }}/mês</strong>
+          </span>
+        </div>
+
+        <ol class="integration-change-steps">
+          <li v-for="step in changeRequestSteps" :key="step">{{ step }}</li>
+        </ol>
+
         <label>
           Nova integração
-          <select v-model="changeRequestForm.to_platform">
+          <select v-model="changeRequestForm.to_platform" :disabled="hasOpenChangeRequest">
             <option v-for="platform in changeRequestPlatformOptions" :key="platform.value" :value="platform.value">
               {{ platform.label }}
             </option>
           </select>
         </label>
 
-        <label class="settings-check">
+        <label v-if="!hasOpenChangeRequest" class="settings-check">
           <input v-model="changeRequestForm.accepted_terms" type="checkbox" />
           <span>
             <strong>Concordo com os termos de troca</strong>
@@ -1345,7 +1497,7 @@ function canRunBigShopApiAction() {
         </label>
 
         <div class="action-row compact">
-          <button class="btn btn-primary" type="button" :disabled="requestingPlatformChange || !changeRequestForm.accepted_terms" @click="requestPlatformChange">
+          <button v-if="!hasOpenChangeRequest" class="btn btn-primary" type="button" :disabled="requestingPlatformChange || !changeRequestForm.accepted_terms" @click="requestPlatformChange">
             <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
             {{ requestingPlatformChange ? 'Enviando...' : 'Confirmar solicitação' }}
           </button>

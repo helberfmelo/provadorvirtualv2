@@ -23,6 +23,12 @@ class TransactionalEmailService
 
     public const CODE_PAYMENT_ERROR = 'erro_pagamento';
 
+    public const CODE_BIGSHOP_CHANGE_REQUESTED = 'troca_bigshop_solicitada';
+
+    public const CODE_BIGSHOP_CHANGE_PAYMENT_PENDING = 'troca_bigshop_pagamento_pendente';
+
+    public const CODE_BIGSHOP_CHANGE_COMPLETED = 'troca_bigshop_concluida';
+
     public function sendForCheckout(
         string $code,
         CheckoutSession $session,
@@ -162,6 +168,8 @@ class TransactionalEmailService
         ?MerchantCompany $company = null,
         ?User $user = null,
     ): TransactionalEmailSend {
+        TransactionalEmail::ensureDefaults();
+
         $template = TransactionalEmail::query()
             ->where('code', TransactionalEmail::normalizeCode($code))
             ->first();

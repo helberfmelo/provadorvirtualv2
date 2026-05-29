@@ -22,6 +22,16 @@ Implementado:
 
 Publicado no run `26647308642` e validado em produção com `scripts/validate-production.ps1`, incluindo `API integrations OK`.
 
+## Status Sprint 140
+
+Implementado localmente para publicação:
+
+- `/app/integracoes` mostra governança do benefício BigShop, solicitação atual, resumo financeiro estimado, termos e próximos passos antes de qualquer troca;
+- `GET /api/v1/merchant/integration-change-requests/current` permite ao lojista acompanhar status e link de pagamento sem receber observações internas do SaaS;
+- `/saas/trocas-bigshop` centraliza a operação das solicitações, com filtros por status/empresa, histórico de auditoria, edição de link de pagamento e aplicação da troca;
+- auditoria cobre solicitação, aceite, atualização, pagamento solicitado, conclusão/cancelamento e aplicação da nova plataforma;
+- e-mails transacionais avisam solicitação recebida, pagamento pendente e troca concluída, sempre respeitando SMTP inativo como `skipped`.
+
 ## Onde a plataforma é informada
 
 A plataforma da loja é gravada em `merchant_companies.platform`.
@@ -70,7 +80,13 @@ Payload:
 }
 ```
 
-O pedido aparece no SaaS em `Solicitações de troca` e na edição da empresa. O time interno registra link de pagamento, status e aplica a troca somente quando a solicitação estiver concluída.
+Consulta do status pelo lojista:
+
+```http
+GET /api/v1/merchant/integration-change-requests/current
+```
+
+O pedido aparece no SaaS em `/saas/trocas-bigshop`, na visão geral SaaS e na edição da empresa. O time interno registra link de pagamento, status e aplica a troca somente quando a solicitação estiver concluída. Observações internas ficam restritas ao SaaS.
 
 ## Checklist padrão
 

@@ -240,6 +240,25 @@ Pedidos, trocas e devolucoes não são obrigatórios para o Provador Virtual fun
 
 A integração de pedidos/trocas/devolucoes entra em uma fase posterior de analytics e aprendizado, parecida com a abordagem da Sizebay. Ela permite medir conversão, add-to-cart, compra, troca/devolucao por tamanho e qualidade da recomendação. Portanto, para BigShop piloto, isso pode ficar fora do escopo inicial.
 
+## Governança comercial da troca
+
+Sprint 140 reforça que `platform=bigshop` e `bigshop_discount_active=true` são coisas diferentes:
+
+- a plataforma BigShop define instalação, API e dados técnicos;
+- o benefício BigShop define a condição comercial especial e trava troca direta para outra plataforma;
+- lojas BigShop sem benefício podem trocar a plataforma operacional normalmente;
+- lojas com benefício ativo solicitam troca em `/app/integracoes`, aceitam os termos e aguardam o SaaS.
+
+Fluxos:
+
+- lojista cria solicitação em `POST /api/v1/merchant/integration-change-requests`;
+- lojista acompanha status em `GET /api/v1/merchant/integration-change-requests/current`;
+- SaaS opera a fila em `/saas/trocas-bigshop` usando `GET/PATCH /api/v1/saas/integration-change-requests`;
+- aplicação da troca muda `merchant_companies.platform`, desativa `bigshop_discount_active` e registra auditoria;
+- e-mails transacionais informam solicitação recebida, pagamento pendente e troca concluída.
+
+O portal não exibe observações internas, tokens, segredos ou credenciais da BigShop durante esse fluxo.
+
 ## Padrão simples de assinatura
 
 Para ativação one-click e qualquer webhook futuro, usar o padrão simples já documentado:

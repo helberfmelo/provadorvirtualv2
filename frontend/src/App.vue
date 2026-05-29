@@ -154,6 +154,7 @@ const saasNavSections = computed<NavSection[]>(() => [
     links: [
       { to: '/saas/checkout', label: 'Checkout', icon: 'fa-credit-card', show: auth.canSaasView('saas_checkout') },
       { to: '/saas/pedidos', label: 'Pedidos', icon: 'fa-receipt', show: auth.canSaasView('saas_checkout') },
+      { to: '/saas/trocas-bigshop', label: 'Trocas BigShop', icon: 'fa-right-left', show: auth.canSaasView('saas_companies') },
       { to: '/saas/emails', label: 'E-mails', icon: 'fa-envelope-open-text', show: auth.canSaasView('saas_emails') },
     ],
   },

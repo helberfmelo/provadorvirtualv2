@@ -32,6 +32,7 @@ import SaasCheckoutSettingsView from '../views/SaasCheckoutSettingsView.vue'
 import SaasEmailFormView from '../views/SaasEmailFormView.vue'
 import SaasEmailsView from '../views/SaasEmailsView.vue'
 import SaasEmailSettingsView from '../views/SaasEmailSettingsView.vue'
+import SaasIntegrationChangeRequestsView from '../views/SaasIntegrationChangeRequestsView.vue'
 import SaasUserFormView from '../views/SaasUserFormView.vue'
 import SaasUsersView from '../views/SaasUsersView.vue'
 import SyncStatusView from '../views/SyncStatusView.vue'
@@ -91,6 +92,7 @@ const router = createRouter({
     { path: '/saas/usuarios-empresas/novo', component: SaasCompanyUserFormView },
     { path: '/saas/usuarios-empresas/:id/editar', component: SaasCompanyUserFormView },
     { path: '/saas/checkout', component: SaasCheckoutSettingsView },
+    { path: '/saas/trocas-bigshop', component: SaasIntegrationChangeRequestsView },
     { path: '/saas/pedidos', component: SaasCheckoutOrdersView },
     { path: '/saas/pedidos/:id', component: SaasCheckoutOrderDetailView },
     { path: '/saas/emails', component: SaasEmailsView },

@@ -42,4 +42,9 @@ class IntegrationChangeRequest extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function auditLogs()
+    {
+        return $this->morphMany(AuditLog::class, 'auditable')->latest('id');
+    }
 }

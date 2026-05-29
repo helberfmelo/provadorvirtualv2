@@ -6,6 +6,7 @@ use App\Models\IntegrationChangeRequest;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\User;
+use App\Services\TransactionalEmailService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
@@ -27,7 +28,10 @@ class IntegrationChangeRequestApiTest extends TestCase
             ->assertJsonPath('data.company.id', $company->id)
             ->assertJsonPath('data.from_platform', 'bigshop')
             ->assertJsonPath('data.to_platform', 'shopify')
-            ->assertJsonPath('data.status', 'pending');
+            ->assertJsonPath('data.status', 'pending')
+            ->assertJsonPath('data.admin_notes', null)
+            ->assertJsonPath('data.financial_summary.annual_monthly_difference_cents', 9990)
+            ->assertJsonCount(2, 'data.history');
 
         $this->assertDatabaseHas('integration_change_requests', [
             'merchant_company_id' => $company->id,
@@ -35,6 +39,21 @@ class IntegrationChangeRequestApiTest extends TestCase
             'to_platform' => 'shopify',
             'status' => IntegrationChangeRequest::STATUS_PENDING,
         ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'merchant_company_id' => $company->id,
+            'event' => 'integration_change.requested',
+            'auditable_type' => (new IntegrationChangeRequest)->getMorphClass(),
+        ]);
+        $this->assertDatabaseHas('transactional_email_sends', [
+            'merchant_company_id' => $company->id,
+            'code' => TransactionalEmailService::CODE_BIGSHOP_CHANGE_REQUESTED,
+        ]);
+
+        $this->withHeaders($this->headers($user, $merchant, $company))
+            ->getJson('/api/v1/merchant/integration-change-requests/current')
+            ->assertOk()
+            ->assertJsonPath('data.to_platform', 'shopify')
+            ->assertJsonPath('data.admin_notes', null);
     }
 
     public function test_change_request_requires_discounted_bigshop_company(): void
@@ -85,7 +104,37 @@ class IntegrationChangeRequestApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('data.status', IntegrationChangeRequest::STATUS_PAYMENT_REQUESTED)
-            ->assertJsonPath('data.payment_link', 'https://provadorvirtual.online/checkout?upgrade=zak');
+            ->assertJsonPath('data.payment_link', 'https://provadorvirtual.online/checkout?upgrade=zak')
+            ->assertJsonPath('data.history.0.event', 'integration_change.payment_requested');
+
+        $this->assertDatabaseHas('transactional_email_sends', [
+            'merchant_company_id' => $company->id,
+            'code' => TransactionalEmailService::CODE_BIGSHOP_CHANGE_PAYMENT_PENDING,
+        ]);
+
+        $this->withHeader('Authorization', 'Bearer '.$adminToken)
+            ->patchJson('/api/v1/saas/integration-change-requests/'.$changeRequest->id, [
+                'status' => IntegrationChangeRequest::STATUS_COMPLETED,
+                'apply_change' => true,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.status', IntegrationChangeRequest::STATUS_COMPLETED)
+            ->assertJsonPath('data.company.platform', 'shopify')
+            ->assertJsonPath('data.company.bigshop_discount_active', false);
+
+        $this->assertDatabaseHas('merchant_companies', [
+            'id' => $company->id,
+            'platform' => 'shopify',
+            'bigshop_discount_active' => false,
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'merchant_company_id' => $company->id,
+            'event' => 'integration_change.applied',
+        ]);
+        $this->assertDatabaseHas('transactional_email_sends', [
+            'merchant_company_id' => $company->id,
+            'code' => TransactionalEmailService::CODE_BIGSHOP_CHANGE_COMPLETED,
+        ]);
     }
 
     private function headers(User $user, Merchant $merchant, MerchantCompany $company): array

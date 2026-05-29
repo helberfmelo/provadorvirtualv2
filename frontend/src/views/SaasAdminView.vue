@@ -107,6 +107,11 @@ async function loadOverview() {
         <strong>Pedidos</strong>
         <span>Contratações, tentativas recusadas e detalhes da operadora.</span>
       </RouterLink>
+      <RouterLink to="/saas/trocas-bigshop" class="quick-card">
+        <i class="fa-solid fa-right-left" aria-hidden="true"></i>
+        <strong>Trocas BigShop</strong>
+        <span>Fila de revisão, pagamento, aceite e aplicação de nova integração.</span>
+      </RouterLink>
     </div>
 
     <section v-if="integrationChangeRequests.length" class="panel-main subsection">
@@ -124,8 +129,8 @@ async function loadOverview() {
               solicitado por {{ request.user.name || request.user.email || 'usuário do portal' }}
             </small>
           </span>
-          <RouterLink class="btn btn-secondary btn-compact" :to="`/saas/empresas/${request.company.id}/editar`">
-            Abrir empresa
+          <RouterLink class="btn btn-secondary btn-compact" to="/saas/trocas-bigshop">
+            Operar fila
           </RouterLink>
         </article>
       </div>

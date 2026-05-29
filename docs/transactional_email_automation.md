@@ -1,6 +1,6 @@
 # Automações de E-mail Transacional
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-29
 
 ## Objetivo
 
@@ -20,6 +20,19 @@ Implementado:
 - envio de `erro_pagamento` quando checkout falha, expira, e cancelado ou estornado;
 - comando `php artisan pv:emails-dispatch --limit=50`;
 - scheduler executando o dispatcher de e-mails a cada 10 minutos.
+
+## Status Sprint 140
+
+Implementado localmente para publicação:
+
+- templates padrão de governança BigShop:
+  - `troca_bigshop_solicitada`;
+  - `troca_bigshop_pagamento_pendente`;
+  - `troca_bigshop_concluida`;
+- `TransactionalEmailService::sendForCompany` garante criação dos templates padrão antes do envio;
+- solicitação de troca BigShop registra e-mail para o usuário solicitante;
+- atualização para `payment_requested` registra e-mail com link de pagamento quando informado pelo SaaS;
+- aplicação da troca concluída registra e-mail de liberação da nova integração.
 
 ## Regras
 
@@ -41,6 +54,15 @@ Implementado:
 - `link_pix`
 - `link_renovacao`
 - `valor`
+
+## Variáveis BigShop
+
+- `plataforma_atual`
+- `nova_plataforma`
+- `status_solicitacao`
+- `link_pagamento`
+- `link_integracoes`
+- `resumo_financeiro`
 
 ## Cron
 

@@ -42,7 +42,7 @@ class SaasEmailApiTest extends TestCase
         $this->withHeaders($headers)
             ->getJson('/api/v1/saas/transactional-emails')
             ->assertOk()
-            ->assertJsonCount(6, 'data');
+            ->assertJsonCount(9, 'data');
 
         $created = $this->withHeaders($headers)
             ->postJson('/api/v1/saas/transactional-emails', [

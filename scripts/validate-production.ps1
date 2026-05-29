@@ -81,6 +81,7 @@ Assert-Page "/saas/usuarios-empresas"
 Assert-Page "/saas/usuarios-empresas/novo"
 Assert-Page "/saas/checkout"
 Assert-Page "/saas/pedidos"
+Assert-Page "/saas/trocas-bigshop"
 Assert-Page "/saas/emails"
 Assert-Page "/saas/emails/configuracoes"
 Assert-Page "/app"
@@ -265,6 +266,10 @@ Assert-True ($null -eq $xmlFeedIntegration.setup.fields.access_token) "xml_feed 
 Assert-True ($apiIntegration.setup.fields.api_base_url.required -eq $true) "api sem api_base_url obrigatoria"
 Assert-True ($apiIntegration.setup.fields.access_token.secret -eq $true) "api sem token secreto"
 "API integrations OK"
+
+$integrationChangeCurrent = Invoke-RestMethod -Uri "$ApiBase/merchant/integration-change-requests/current" -Headers $headers
+Assert-True ($integrationChangeCurrent.PSObject.Properties.Name -contains "data") "integration change current sem data"
+"API integration change current OK"
 
 $taxonomy = Invoke-RestMethod -Uri "$ApiBase/taxonomy/intelligence" -Headers $headers
 Assert-True ($null -ne $taxonomy.summary) "taxonomy summary ausente"

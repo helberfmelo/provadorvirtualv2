@@ -6755,6 +6755,189 @@ textarea {
   line-height: 1.5;
 }
 
+.bigshop-governance-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.bigshop-governance-panel h2 {
+  margin: 4px 0 6px;
+  color: #0f172a;
+  font-size: 1.05rem;
+}
+
+.bigshop-governance-panel p {
+  margin: 0;
+  color: #475569;
+  line-height: 1.45;
+}
+
+.bigshop-governance-status {
+  display: grid;
+  justify-items: end;
+  gap: 7px;
+  min-width: 190px;
+}
+
+.bigshop-governance-status small {
+  color: #64748b;
+  font-weight: 800;
+}
+
+.integration-change-current,
+.integration-change-financial,
+.bigshop-change-request-grid,
+.bigshop-change-money {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.integration-change-current span,
+.integration-change-financial span,
+.bigshop-change-request-grid span,
+.bigshop-change-money span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+}
+
+.integration-change-current small,
+.integration-change-financial small,
+.bigshop-change-request-grid small,
+.bigshop-change-money small {
+  color: #64748b;
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.integration-change-current strong,
+.integration-change-financial strong,
+.bigshop-change-request-grid strong,
+.bigshop-change-money strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: #0f172a;
+  line-height: 1.25;
+}
+
+.integration-change-current .btn {
+  align-self: stretch;
+  justify-self: stretch;
+}
+
+.integration-change-steps {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding-left: 20px;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.bigshop-change-board {
+  display: grid;
+  gap: 16px;
+}
+
+.bigshop-change-request-card {
+  display: grid;
+  gap: 16px;
+}
+
+.bigshop-change-request-card header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.bigshop-change-request-card header span,
+.bigshop-change-request-card header strong,
+.bigshop-change-request-card header small {
+  display: block;
+  min-width: 0;
+}
+
+.bigshop-change-request-card header small {
+  margin-top: 3px;
+  color: #64748b;
+}
+
+.bigshop-change-money {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.bigshop-change-edit-grid {
+  grid-template-columns: minmax(190px, 0.36fr) minmax(260px, 1fr);
+}
+
+.bigshop-change-notes {
+  display: grid;
+  gap: 7px;
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.bigshop-change-history {
+  display: grid;
+  gap: 10px;
+}
+
+.bigshop-change-history h2 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 0.98rem;
+}
+
+.bigshop-change-history ol {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bigshop-change-history li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.bigshop-change-history strong,
+.bigshop-change-history small {
+  display: block;
+}
+
+.bigshop-change-history small {
+  margin-top: 2px;
+  color: #64748b;
+}
+
+.bigshop-change-history em {
+  padding: 5px 8px;
+  border-radius: 8px;
+  color: #334155;
+  background: #e2e8f0;
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
 .settings-check a {
   color: #0f172a;
   text-decoration: underline;
@@ -7593,6 +7776,12 @@ td small {
   .company-profile-grid,
   .inline-form,
   .company-platform-source,
+  .bigshop-governance-panel,
+  .integration-change-current,
+  .integration-change-financial,
+  .bigshop-change-request-grid,
+  .bigshop-change-money,
+  .bigshop-change-edit-grid,
   .integration-platform-summary,
   .integration-platform-details,
   .integration-platform-picker,
@@ -7626,6 +7815,11 @@ td small {
   .help-grid,
   .legal-grid {
     grid-template-columns: 1fr;
+  }
+
+  .bigshop-governance-status {
+    justify-items: stretch;
+    min-width: 0;
   }
 
   .product-list-toolbar {

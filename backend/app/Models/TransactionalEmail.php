@@ -38,6 +38,15 @@ class TransactionalEmail extends Model
     public static function defaultTemplates(): array
     {
         $commonVariables = ['nome', 'empresa', 'codigo_empresa', 'email_acesso', 'link_login', 'link_checkout', 'link_pix', 'link_renovacao', 'valor'];
+        $changeVariables = [
+            ...$commonVariables,
+            'plataforma_atual',
+            'nova_plataforma',
+            'status_solicitacao',
+            'link_pagamento',
+            'link_integracoes',
+            'resumo_financeiro',
+        ];
 
         return [
             [
@@ -92,6 +101,33 @@ class TransactionalEmail extends Model
                 'subject' => 'Renove o Provador Virtual da sua loja',
                 'body' => "Olá {{nome}},\n\nO plano da {{empresa}} precisa de renovação. Você pode pagar em até 10x sem juros no cartão ou Pix à vista com 5% de desconto: {{link_renovacao}}\n\nCódigo da empresa: {{codigo_empresa}}",
                 'variables' => $commonVariables,
+                'is_active' => true,
+            ],
+            [
+                'code' => 'troca_bigshop_solicitada',
+                'name' => 'Troca BigShop solicitada',
+                'description' => 'Confirma ao lojista que a solicitação de troca do benefício BigShop entrou na fila SaaS.',
+                'subject' => 'Recebemos sua solicitação de troca BigShop',
+                'body' => "Olá {{nome}},\n\nRecebemos a solicitação da {{empresa}} para trocar de {{plataforma_atual}} para {{nova_plataforma}}.\nStatus: {{status_solicitacao}}\nResumo comercial: {{resumo_financeiro}}\n\nAcompanhe pelo painel de integrações: {{link_integracoes}}",
+                'variables' => $changeVariables,
+                'is_active' => true,
+            ],
+            [
+                'code' => 'troca_bigshop_pagamento_pendente',
+                'name' => 'Troca BigShop com pagamento pendente',
+                'description' => 'Enviado quando o SaaS informa link ou orientação de pagamento para liberar a troca.',
+                'subject' => 'Pagamento pendente para liberar sua nova integração',
+                'body' => "Olá {{nome}},\n\nA solicitação da {{empresa}} para usar {{nova_plataforma}} está aguardando a confirmação comercial.\nLink de pagamento: {{link_pagamento}}\n\nDepois da confirmação, o SaaS conclui a troca e libera a nova integração no painel.",
+                'variables' => $changeVariables,
+                'is_active' => true,
+            ],
+            [
+                'code' => 'troca_bigshop_concluida',
+                'name' => 'Troca BigShop concluída',
+                'description' => 'Confirma que o SaaS concluiu a troca e liberou a nova plataforma da empresa.',
+                'subject' => 'Sua nova integração foi liberada',
+                'body' => "Olá {{nome}},\n\nA troca da {{empresa}} para {{nova_plataforma}} foi concluída. O benefício BigShop foi encerrado para essa empresa e a nova integração já pode ser configurada.\n\nAcesse: {{link_integracoes}}",
+                'variables' => $changeVariables,
                 'is_active' => true,
             ],
         ];

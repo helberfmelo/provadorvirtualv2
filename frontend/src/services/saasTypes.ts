@@ -103,9 +103,34 @@ export type IntegrationChangeRequest = {
   to_platform_label: string
   status: string
   status_label: string
+  terms_version: string | null
+  terms_accepted_at: string | null
   requested_at: string | null
+  resolved_at: string | null
   payment_link: string | null
   admin_notes: string | null
+  financial_summary: {
+    currency: string
+    from_label: string
+    to_label: string
+    annual_from_monthly_cents: number
+    annual_to_monthly_cents: number
+    annual_monthly_difference_cents: number
+    annual_total_difference_cents: number
+    monthly_from_cents: number
+    monthly_to_cents: number
+    monthly_difference_cents: number
+    short_text: string
+  } | null
+  history: Array<{
+    id: number
+    event: string
+    label: string
+    severity: string
+    actor_name: string | null
+    occurred_at: string | null
+    metadata: Record<string, unknown>
+  }>
   company: {
     id: number
     name: string

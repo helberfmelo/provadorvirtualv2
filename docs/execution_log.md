@@ -1505,3 +1505,18 @@
 - Validação visual local rodou em `http://127.0.0.1:5178/app/integracoes` com backend em `8002` porque `5177` já estava ocupado; Chrome headless/CDP confirmou campos de XML/feed e API no desktop/mobile sem erros de console. As capturas ficaram em `.tmp/sprint139-integracoes-*.png` e não devem ser versionadas.
 - Commit `3ae241b` enviado para `main`; o run `26647308642` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/integracoes`, `GET /api/v1/integrations` com `xml_feed`/`api`, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 140 BigShop com governança comercial superior
+
+- Relida a documentação obrigatória antes da sprint, incluindo `docs/credentials.local.md` somente em modo mascarado. Não houve novo acesso ao portal Sizebay nem uso de credenciais.
+- Usado o benchmark Sizebay já documentado de Data Sources/integrações apenas como referência: no Provador Virtual, BigShop precisa ser mais forte porque é diferencial próprio e tem benefício comercial travado.
+- `/app/integracoes` ganhou painel de governança BigShop explicando desconto, limitação de troca e ausência de exposição de credenciais no portal.
+- O modal de troca protegida passou a mostrar resumo financeiro de referência, status da solicitação existente, link de pagamento quando enviado pelo SaaS, termos, aceite e próximos passos.
+- Criado `GET /api/v1/merchant/integration-change-requests/current` para o lojista acompanhar a solicitação sem receber observações internas.
+- Criada a tela SaaS dedicada `/saas/trocas-bigshop`, com filtros por status/empresa, métricas, edição de status, link de pagamento, observações internas, aplicação da troca e histórico de auditoria.
+- `IntegrationChangeRequestController` passou a registrar auditoria de solicitação, aceite, atualização, pagamento solicitado, aprovação, conclusão, cancelamento e aplicação da nova plataforma.
+- A aplicação da troca remove `bigshop_discount_active`, altera a plataforma da empresa e registra evento auditável sem retornar tokens ou segredos.
+- `TransactionalEmailService` ganhou os templates/códigos `troca_bigshop_solicitada`, `troca_bigshop_pagamento_pendente` e `troca_bigshop_concluida`, com histórico `skipped` quando SMTP estiver inativo.
+- `scripts/validate-production.ps1` passou a validar `/saas/trocas-bigshop` e `GET /api/v1/merchant/integration-change-requests/current`.
+- Validações locais já executadas: `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter IntegrationChangeRequestApiTest`, suíte focada BigShop/integrações/SaaS/e-mails/checkout (`51 tests`, `448 assertions`), PHPUnit completo (`121 tests`, `1285 assertions`), `php vendor/bin/pint --dirty --test` e `npm --prefix frontend run build` com o aviso conhecido de bundle acima de 500 kB.
+- Commit, push, run do GitHub Actions e validação final de produção serão registrados após publicação da sprint.

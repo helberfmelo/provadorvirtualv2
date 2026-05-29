@@ -2521,7 +2521,7 @@ Critérios de aceite:
 - SaaS consegue operar a solicitação sem acessar banco;
 - nenhum dado sensível aparece no portal.
 
-Status: planejada.
+Status: implementada localmente na Sprint 140. O portal `/app/integracoes` agora explica o benefício BigShop, mostra acompanhamento da solicitação e abre modal protegido com resumo financeiro, termos, aceite e próximos passos. O SaaS ganhou `/saas/trocas-bigshop` para operar solicitações com filtros, status, histórico de auditoria, link de pagamento, observações internas e aplicação da troca sem acessar banco. A API registra auditoria de solicitação, aceite, atualização, pagamento, conclusão e aplicação; e-mails transacionais novos cobrem `troca_bigshop_solicitada`, `troca_bigshop_pagamento_pendente` e `troca_bigshop_concluida`. Validações locais passaram com `php -l`, `IntegrationChangeRequestApiTest`, suíte focada BigShop/integrações/SaaS/e-mails/checkout, PHPUnit completo (`121 tests`, `1285 assertions`), Pint e build frontend. O commit, deploy green e validação de produção serão registrados após publicação.
 
 ### Sprint 141 - API, webhook, GTM e validação de instalação
 
