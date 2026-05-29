@@ -1330,3 +1330,6 @@
 - `docs/sizebay_vs_provador_virtual_comparison.md` virou apenas um indice apontando para a versao HTML, evitando duas fontes divergentes.
 - `docs/README.md` passou a listar a versao HTML como documento obrigatorio de leitura.
 - O conteudo manteve linguagem amigavel em portugues e nao registra credenciais, tokens, sessoes ou segredos.
+- Validada renderizacao local com Playwright: tabela com largura total de 1560px e colunas em 240px, 410px, 410px e 500px.
+- Commit `6c45ddf` enviado para `main`; o run `26621177334` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
+- Validação de produção pós-deploy retornou `PRODUCTION VALIDATION OK`, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs públicas, CORS, login demo e go-live readiness.

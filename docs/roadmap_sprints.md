@@ -2153,4 +2153,4 @@ Validação:
 - commit, push e Actions/deploy;
 - `scripts/validate-production.ps1` apos deploy.
 
-Status: em validacao.
+Status: implementado na Sprint 126 no commit `6c45ddf`, publicado com sucesso no run `26621177334`. Validação local passou com varredura de segredos, `git diff --check` e renderizacao Playwright confirmando tabela com 1560px e colunas de 240px, 410px, 410px e 500px. Validação de produção passou com `scripts/validate-production.ps1`, incluindo páginas públicas, SaaS, portal da empresa, widget JS/CSS, APIs, CORS, login demo e go-live readiness.
