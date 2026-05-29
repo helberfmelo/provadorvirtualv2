@@ -190,6 +190,70 @@ export type MerchantCategory = {
   taxonomy_category?: TaxonomyCategory | null
 }
 
+export type TaxonomyVersion = {
+  id: number
+  version: string
+  label: string
+  status: string
+  summary?: Record<string, unknown>
+  metadata?: Record<string, unknown>
+  published_at?: string | null
+}
+
+export type TaxonomyMappingSuggestion = {
+  id: number
+  merchant_company_id: number | null
+  taxonomy_version_id: number | null
+  suggestion_type: 'category' | 'brand'
+  source: string
+  original_value: string
+  suggested_target_type: 'taxonomy_category' | 'normalized_brand' | 'proposed_category' | 'proposed_brand'
+  suggested_name: string | null
+  confidence_score: number
+  confidence_level: 'high' | 'medium' | 'low'
+  status: 'pending' | 'approved' | 'applied' | 'rejected'
+  review_required: boolean
+  can_auto_apply: boolean
+  reasons: string[]
+  impact: {
+    products_count?: number
+    affected_product_ids?: number[]
+    uses?: string[]
+    can_auto_apply?: boolean
+    requires_confirmation?: boolean
+    critical_fields?: string[]
+    applied_products?: number
+    approved_target_name?: string
+  }
+  context: {
+    mapping_type?: string
+    local_value?: string
+    suggested_value?: string
+    category_type?: string
+    mode?: string
+    signals?: {
+      gender?: string | null
+      age_group?: string | null
+      fit_profile?: string | null
+      size_system?: string | null
+      sources?: string[]
+    }
+    sample?: {
+      products_count?: number
+      product_ids?: number[]
+    }
+  }
+  version?: TaxonomyVersion | null
+  merchant_category?: MerchantCategory | null
+  merchant_brand?: MerchantBrand | null
+  taxonomy_category?: TaxonomyCategory | null
+  normalized_brand?: NormalizedBrand | null
+  reviewed_at?: string | null
+  applied_at?: string | null
+  created_at?: string | null
+  updated_at?: string | null
+}
+
 export type Product = {
   id: number
   measurement_table_id: number | null

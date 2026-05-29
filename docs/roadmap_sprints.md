@@ -2458,7 +2458,7 @@ Critérios de aceite:
 - toda sugestão mostra motivo;
 - mapeamentos aprovados melhoram próximas importações.
 
-Status: planejada.
+Status: implementada localmente na Sprint 138, aguardando commit, push, Actions/deploy e validação de produção. O benchmark read-only da Sizebay em `/sizebay-categories`, `/sizebay-brands`, regras de importação e relatórios confirmou taxonomia global, marcas com estatísticas, regras condicionais e filtros por marca/categoria/gênero/faixa etária/dispositivo/período; o Provador Virtual evoluiu esse padrão com versionamento de taxonomia, fila `/app/taxonomia`, sugestões de categoria e marca com confiança, motivo, impacto, contexto de gênero/faixa etária/modelagem/sistema de tamanho, confirmação obrigatória para baixa confiança e eventos de aprendizado sem dados sensíveis. Validações locais passaram com `php -l`, `TaxonomyIntelligenceApiTest`, suíte focada de taxonomia/categorias/marcas/produtos/recomendação/importações/integrações/analytics, PHPUnit completo (`120 tests`, `1242 assertions`), Pint, build frontend e validação visual headless desktop/mobile em `5177` com backend em `8002`.
 
 ### Sprint 139 - Integrações por plataforma melhores que Sizebay
 

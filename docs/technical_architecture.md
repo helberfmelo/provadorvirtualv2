@@ -58,6 +58,10 @@ APIs protegidas já implementadas:
 - `POST /api/v1/measurement-tables/import`: cria ou atualiza tabelas por nome no escopo da empresa ativa, substitui linhas somente após prévia sem falhas e audita `measurement_table.imported`.
 - `measurement_tables.metadata`: guarda `activation.virtual_try_on_enabled`, `custom_variations` e futuras configurações avançadas do editor sem alterar o contrato antigo das linhas.
 - `GET /api/v1/measurement-templates`: retorna templates inteligentes normalizados a partir de `backend/database/data/default_measurement_tables_data.json`, herdado do v1, com base brasileira por gênero, tipo de produto, altura, peso, idade e formato corporal.
+- `GET /api/v1/brands` e `GET /api/v1/categories`: descobrem valores locais do catálogo, retornam saúde de normalização e opções para regras, IA, relatórios e filtros.
+- `GET /api/v1/taxonomy/intelligence`: retorna versão ativa, métricas, fila de sugestões, eventos de aprendizado e sinais usados por regras/IA.
+- `POST /api/v1/taxonomy/intelligence/generate`: gera ou atualiza sugestões revisáveis de categoria/marca com confiança, motivo, impacto e contexto operacional.
+- `POST /api/v1/taxonomy/suggestions/{suggestion}/approve|reject`: aprova ou rejeita sugestão; baixa confiança exige confirmação explícita e aprovações registram aprendizado para próximas importações.
 - `GET|PATCH /api/v1/widget-install`
 - `POST /api/v1/public/bigshop/activate`
 - `GET /api/v1/integrations`
@@ -188,6 +192,13 @@ Tabelas propostas:
 - `measurement_templates`
 - `measurement_tables`
 - `measurement_table_rows`
+- `merchant_brands`
+- `normalized_brands`
+- `merchant_categories`
+- `taxonomy_categories`
+- `taxonomy_versions`
+- `taxonomy_mapping_suggestions`
+- `taxonomy_learning_events`
 - `widget_installs`
 - `recommendation_sessions`
 - `recommendation_logs`

@@ -173,7 +173,7 @@ class BrandCatalogService
             'normalized_brand_id' => $normalizedBrand->id,
             'normalized_name' => $normalizedBrand->name,
             'source' => $source,
-            'reviewed' => in_array($source, ['merchant_review', 'merge', 'import'], true),
+            'reviewed' => in_array($source, ['merchant_review', 'ai_review', 'merge', 'import'], true),
             'updated_at' => now()->toISOString(),
         ];
         $metadata['rules_context'] = is_array($metadata['rules_context'] ?? null) ? $metadata['rules_context'] : [];

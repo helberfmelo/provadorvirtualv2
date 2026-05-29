@@ -35,6 +35,7 @@ import SaasEmailSettingsView from '../views/SaasEmailSettingsView.vue'
 import SaasUserFormView from '../views/SaasUserFormView.vue'
 import SaasUsersView from '../views/SaasUsersView.vue'
 import SyncStatusView from '../views/SyncStatusView.vue'
+import TaxonomyIntelligenceView from '../views/TaxonomyIntelligenceView.vue'
 import TermsView from '../views/TermsView.vue'
 import UserFormView from '../views/UserFormView.vue'
 import UsersView from '../views/UsersView.vue'
@@ -66,6 +67,7 @@ const router = createRouter({
     { path: '/app/modelagens', component: FitProfilesView },
     { path: '/app/marcas', component: BrandsView },
     { path: '/app/categorias', component: CategoriesView },
+    { path: '/app/taxonomia', component: TaxonomyIntelligenceView },
     { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/analytics', component: AnalyticsView },
     { path: '/app/go-live', component: GoLiveView },

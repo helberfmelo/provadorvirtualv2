@@ -1465,3 +1465,16 @@
 - Varredura de segredos nos arquivos versionados alterados, `git diff --check` e `git diff --cached --check` passaram; os achados foram falsos positivos esperados em testes/demo e nomes técnicos de token.
 - Commit `8c4d505` enviado para `main`; o run `26640876246` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação local pós-deploy com `scripts/validate-production.ps1` passou integralmente após incluir `/app/categorias` e `API categories`. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-29 - Sprint 138 Taxonomia inteligente e base de aprendizado
+
+- Relida a documentação obrigatória antes de retomar a sprint, incluindo `credentials.local.md` de forma mascarada por envolver produção/deploy, banco, IA, integrações e sessão Sizebay.
+- Mantido o benchmark Sizebay read-only já coletado em `.tmp/sizebay-readonly/`, sem alterar dados, salvar, publicar, acionar suporte ou registrar credenciais. As capturas cobrem `/sizebay-categories`, `/sizebay-brands`, regras de importação e relatórios.
+- Criadas as tabelas `taxonomy_versions`, `taxonomy_mapping_suggestions` e `taxonomy_learning_events`, com versão ativa `2026.05.29-sprint138`, confiança decimal, contexto operacional e aprendizado sem dados sensíveis.
+- Criados modelos, resources, controller e `TaxonomyIntelligenceService` para descobrir categorias/marcas locais, gerar sugestões revisáveis, medir impacto, exigir confirmação para baixa confiança, aprovar/rejeitar mapeamentos e registrar eventos de aprendizado.
+- `CategoryCatalogService` e `BrandCatalogService` passam a reaplicar mapeamentos aprovados em novas importações, preservando o valor original e alimentando `rules_context` e `ai_context`.
+- Criada a rota protegida `/app/taxonomia`, item `Taxonomia IA` no menu e endpoints `/api/v1/taxonomy/intelligence`, `/api/v1/taxonomy/intelligence/generate`, `/api/v1/taxonomy/suggestions/{id}/approve` e `/api/v1/taxonomy/suggestions/{id}/reject`.
+- A tela mostra métricas, fila de sugestões, motivo, confiança, impacto, contexto de gênero/faixa etária/modelagem/grade, confirmação para baixa confiança e aprendizados recentes.
+- O script `scripts/validate-production.ps1` passou a validar `/app/taxonomia`, redirect legado e `GET /api/v1/taxonomy/intelligence`.
+- Validações locais passaram com `php -l`, `php -d extension=pdo_sqlite -d extension=sqlite3 vendor/bin/phpunit --filter TaxonomyIntelligenceApiTest`, suíte focada de taxonomia/categorias/marcas/produtos/recomendação/importações/integrações/analytics, PHPUnit completo (`120 tests`, `1242 assertions`), `php vendor/bin/pint --dirty --test` e `npm --prefix frontend run build` com o aviso conhecido de bundle acima de 500 kB.
+- Validação visual local rodou em `http://127.0.0.1:5177/app/taxonomia`, com backend local em `8002`, Chrome headless/CDP, desktop e mobile, sem overflow horizontal e sem erros de console. As capturas foram salvas em `.tmp/sprint138-taxonomia-desktop.png` e `.tmp/sprint138-taxonomia-mobile.png` e não devem ser versionadas.

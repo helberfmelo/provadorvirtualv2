@@ -94,6 +94,7 @@ Assert-Page "/app/tabelas-de-medidas/nova"
 Assert-Page "/app/modelagens"
 Assert-Page "/app/categorias"
 Assert-Page "/app/marcas"
+Assert-Page "/app/taxonomia"
 Assert-Page "/app/regras-de-importacao"
 Assert-Page "/app/integracoes"
 Assert-Page "/app/sincronizacao"
@@ -106,6 +107,7 @@ if (-not $BaseUrl.EndsWith("/provadorvirtual_v2")) {
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/produtos/novo" "/app/produtos/novo"
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/categorias" "/app/categorias"
     Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/marcas" "/app/marcas"
+    Assert-LegacyFrontendRedirect "/provadorvirtual_v2/app/taxonomia" "/app/taxonomia"
 }
 
 $WidgetBase = if ($BaseUrl.EndsWith("/provadorvirtual_v2")) {
@@ -251,5 +253,11 @@ Assert-True ($null -ne $categories.summary) "categories summary ausente"
 Assert-True ($null -ne $categories.data) "categories data ausente"
 Assert-True ($null -ne $categories.taxonomy_categories) "categories taxonomy ausente"
 "API categories OK"
+
+$taxonomy = Invoke-RestMethod -Uri "$ApiBase/taxonomy/intelligence" -Headers $headers
+Assert-True ($null -ne $taxonomy.summary) "taxonomy summary ausente"
+Assert-True ($null -ne $taxonomy.active_version) "taxonomy active version ausente"
+Assert-True ($null -ne $taxonomy.signals) "taxonomy signals ausentes"
+"API taxonomy intelligence OK"
 
 "PRODUCTION VALIDATION OK"

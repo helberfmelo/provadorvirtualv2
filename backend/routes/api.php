@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\V1\SaasAdminController;
 use App\Http\Controllers\Api\V1\SaasCheckoutController;
 use App\Http\Controllers\Api\V1\SaasCheckoutOrderController;
 use App\Http\Controllers\Api\V1\SaasEmailController;
+use App\Http\Controllers\Api\V1\TaxonomyIntelligenceController;
 use App\Http\Controllers\Api\V1\UserAccessController;
 use App\Http\Controllers\Api\V1\WidgetInstallController;
 use Illuminate\Support\Facades\Route;
@@ -234,6 +235,14 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,products,view');
         Route::apiResource('categories', CategoryController::class)
             ->only(['store', 'update', 'destroy'])
+            ->middleware('portal.permission:merchant,products,edit');
+        Route::get('/taxonomy/intelligence', [TaxonomyIntelligenceController::class, 'index'])
+            ->middleware('portal.permission:merchant,products,view');
+        Route::post('/taxonomy/intelligence/generate', [TaxonomyIntelligenceController::class, 'generate'])
+            ->middleware('portal.permission:merchant,products,edit');
+        Route::post('/taxonomy/suggestions/{suggestion}/approve', [TaxonomyIntelligenceController::class, 'approve'])
+            ->middleware('portal.permission:merchant,products,edit');
+        Route::post('/taxonomy/suggestions/{suggestion}/reject', [TaxonomyIntelligenceController::class, 'reject'])
             ->middleware('portal.permission:merchant,products,edit');
         Route::apiResource('products', ProductController::class)
             ->only(['index', 'show'])

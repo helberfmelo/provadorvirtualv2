@@ -112,6 +112,7 @@ const companyNavSections = computed<NavSection[]>(() => [
       { to: '/app/modelagens', label: 'Modelagens', icon: 'fa-sliders', show: auth.canView('measurement_tables') },
       { to: '/app/categorias', label: 'Categorias', icon: 'fa-sitemap', show: auth.canView('products') },
       { to: '/app/marcas', label: 'Marcas', icon: 'fa-copyright', show: auth.canView('products') },
+      { to: '/app/taxonomia', label: 'Taxonomia IA', icon: 'fa-brain', show: auth.canView('products') },
       { to: '/app/regras-de-importacao', label: 'Regras', icon: 'fa-filter', show: auth.canView('integrations') },
     ],
   },
@@ -214,6 +215,14 @@ const companyHelpItems: Array<ContextHelp & { prefix: string, exact?: boolean }>
     text: 'Revise duplicidades e aplique marcas normalizadas antes de novas análises do catálogo.',
     nextTo: '/app/produtos',
     nextLabel: 'Ver produtos',
+  },
+  {
+    prefix: '/app/taxonomia',
+    topic: 'taxonomia',
+    title: 'Taxonomia IA',
+    text: 'Aprove sugestões com contexto de categoria, marca, gênero, faixa etária, modelagem e grade.',
+    nextTo: '/app/regras-de-importacao',
+    nextLabel: 'Ver regras',
   },
   {
     prefix: '/app/importacoes',
