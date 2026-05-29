@@ -33,6 +33,21 @@ function Assert-True {
     }
 }
 
+function Get-HeaderValue {
+    param(
+        $Headers,
+        [string] $Name
+    )
+
+    $value = $Headers[$Name]
+
+    if ($value -is [System.Array]) {
+        return [string] ($value -join ", ")
+    }
+
+    return [string] $value
+}
+
 function Assert-Page {
     param([string] $Path)
 
@@ -263,8 +278,9 @@ Assert-True ($null -ne $recommendationAnalytics.data.recommendation_report.meta)
 "API recommendation analytics OK"
 
 $recommendationExport = Invoke-WebRequest -UseBasicParsing -Uri "$ApiBase/analytics/recommendations/export?report=recommendations&period=30d" -Headers $headers
+$recommendationExportContentType = Get-HeaderValue -Headers $recommendationExport.Headers -Name "Content-Type"
 Assert-True ($recommendationExport.StatusCode -eq 200) "export de recomendacoes nao retornou 200"
-Assert-True ($recommendationExport.Headers["Content-Type"] -like "text/csv*") "export de recomendacoes sem CSV"
+Assert-True ($recommendationExportContentType -like "text/csv*") "export de recomendacoes sem CSV"
 "API recommendation export OK"
 
 $placementBody = @{
