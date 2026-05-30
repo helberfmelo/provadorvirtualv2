@@ -1,6 +1,6 @@
 # Assistente de IA para Tabelas
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-30
 
 ## Objetivo
 
@@ -31,11 +31,22 @@ Implementado:
 - tela `/app/tabelas-de-medidas/nova` permite iniciar por modelo inteligente e depois revisar manualmente;
 - site público e assistente comunicam IA como ferramenta de automação, qualidade e aprendizado seguro.
 
+## Status Sprint 153
+
+Implementado:
+
+- o assistente agora aceita categoria, marca, base da tabela, sistema de tamanho, faixas e tabela atual para comparação;
+- `POST /api/v1/ai/measurement-table-suggestions` retorna `review_context` com dados usados, confiança, riscos, explicação simples, plano de ação e comparação com a tabela atual;
+- a sugestão criada já sai com `measurement_target`, `size_system` e `range_mode`;
+- o contexto de aprendizado passou a considerar também categoria e marca quando houver sinais compatíveis;
+- `/app/assistente` ganhou fluxo de revisão guiada antes de criar o rascunho, com comparação entre a tabela atual e a sugerida;
+- o modo `Explicar para o lojista` traduz a recomendação para linguagem mais operacional, sem liberar publicação automática.
+
 ## Variáveis
 
 ```env
 AI_PROVIDER=local
-AI_MODEL=local-table-parser-v1
+AI_MODEL=local-table-parser-v2
 OPENAI_API_KEY=
 GEMINI_API_KEY=
 ```
@@ -57,6 +68,12 @@ Payload:
   "product_type": "shirt",
   "gender": "unisex",
   "fit_profile": "regular",
+  "category": "Camisas",
+  "brand": "Colecao propria",
+  "measurement_target": "body",
+  "size_system": "br_alpha",
+  "compare_table_id": 12,
+  "explain_for_merchant": true,
   "content": "Tamanho Busto Cintura Quadril\nP 88-94 70-76 92-98"
 }
 ```
@@ -68,11 +85,17 @@ Resposta:
   "data": {
     "status": "completed",
     "review_required": true,
-    "confidence": 0.72,
+    "confidence": 0.77,
     "provider": "local_parser",
+    "review_context": {
+      "risk_level": "medium"
+    },
     "suggestion": {
       "status": "draft",
       "source": "ai",
+      "measurement_target": "body",
+      "size_system": "br_alpha",
+      "range_mode": "min_max",
       "rows": []
     }
   }
@@ -88,6 +111,8 @@ Resposta:
 - Conteúdo bruto não e salvo em `ai_usage_logs`.
 - Logs guardam hash, provider, modelo, tokens estimados, custo estimado, status e resumo operacional.
 - Imagem sem provider configurado não recebe OCR falso.
+- Mudanca crítica continua dependente de comparação e confirmação humana.
+- Dados reais entram como contexto de revisão e nunca como publicação automática.
 - Resultado precisa ser revisado e salvo pelo lojista.
 
 ## Formatos de texto aceitos

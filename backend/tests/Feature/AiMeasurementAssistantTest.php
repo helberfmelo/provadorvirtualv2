@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\AiUsageLog;
+use App\Models\MeasurementTable;
 use App\Models\Product;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -38,30 +39,59 @@ class AiMeasurementAssistantTest extends TestCase
             'order_reference' => 'ORDER-AI-1',
         ])->assertCreated();
 
+        $comparisonTable = MeasurementTable::query()
+            ->where('merchant_id', $product->merchant_id)
+            ->where('product_type', 'dress')
+            ->where('gender', 'female')
+            ->where('fit_profile', 'regular')
+            ->firstOrFail();
+
         $content = implode("\n", [
             'Tamanho Busto Cintura Quadril',
-            'P 88-94 70-76 92-98',
-            'M 94-100 76-82 98-104',
+            'P 84-90 66-72 92-98',
+            'M 91-97 72-79 98-105',
+            'G 96-104 78-86 104-112',
         ]);
 
-        $this->withHeaders($headers)
+        $response = $this->withHeaders($headers)
             ->postJson('/api/v1/ai/measurement-table-suggestions', [
                 'source_type' => 'text',
                 'name' => 'Camisa assistida',
                 'product_type' => 'dress',
                 'gender' => 'female',
                 'fit_profile' => 'regular',
+                'category' => 'Vestidos',
+                'brand' => 'Colecao propria',
+                'measurement_target' => 'body',
+                'size_system' => 'br_alpha',
+                'compare_table_id' => $comparisonTable->id,
+                'explain_for_merchant' => true,
                 'content' => $content,
             ])
             ->assertOk()
             ->assertJsonPath('data.status', 'completed')
             ->assertJsonPath('data.review_required', true)
+            ->assertJsonPath('data.risk_level', 'high')
             ->assertJsonPath('data.suggestion.name', 'Camisa assistida')
             ->assertJsonPath('data.suggestion.rows.0.size_label', 'P')
-            ->assertJsonPath('data.suggestion.rows.0.bust_min', 88)
+            ->assertJsonPath('data.suggestion.rows.0.bust_min', 84)
+            ->assertJsonPath('data.suggestion.measurement_target', 'body')
+            ->assertJsonPath('data.suggestion.size_system', 'br_alpha')
+            ->assertJsonPath('data.suggestion.range_mode', 'min_max')
             ->assertJsonPath('data.learning_context.has_signals', true)
             ->assertJsonPath('data.learning_context.matching_insights.0.suggested_action', 'review_size_too_small')
-            ->assertJsonCount(2, 'data.suggestion.rows');
+            ->assertJsonPath('data.review_context.data_used.category', 'Vestidos')
+            ->assertJsonPath('data.review_context.data_used.brand', 'Colecao propria')
+            ->assertJsonPath('data.review_context.data_used.comparison_table.id', $comparisonTable->id)
+            ->assertJsonPath('data.review_context.comparison.current_table.id', $comparisonTable->id)
+            ->assertJsonCount(3, 'data.suggestion.rows');
+
+        $this->assertSame('changed', $response->json('data.review_context.comparison.rows.0.status'));
+        $this->assertContains(
+            $response->json('data.review_context.comparison.rows.0.size_label'),
+            ['P', 'M', 'G']
+        );
+        $this->assertGreaterThan(0, (float) $response->json('data.review_context.confidence_breakdown.final'));
 
         $log = AiUsageLog::query()->firstOrFail();
 
@@ -70,7 +100,11 @@ class AiMeasurementAssistantTest extends TestCase
         $this->assertSame('completed', $log->status);
         $this->assertNotNull($log->input_fingerprint);
         $this->assertTrue($log->summary['learning_context_used']);
-        $this->assertStringNotContainsString('88-94', json_encode($log->summary));
+        $this->assertSame($comparisonTable->id, $log->summary['comparison_table_id']);
+        $this->assertSame('Vestidos', $log->summary['category']);
+        $this->assertSame('Colecao propria', $log->summary['brand']);
+        $this->assertSame('body', $log->summary['measurement_target']);
+        $this->assertStringNotContainsString('84-90', json_encode($log->summary));
     }
 
     public function test_image_source_requires_provider_when_secret_is_missing(): void

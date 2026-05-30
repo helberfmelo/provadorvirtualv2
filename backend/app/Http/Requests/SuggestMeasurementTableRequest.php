@@ -23,6 +23,13 @@ class SuggestMeasurementTableRequest extends FormRequest
             'product_type' => ['nullable', 'string', 'max:80'],
             'gender' => ['nullable', 'string', 'max:40'],
             'fit_profile' => ['nullable', 'string', 'max:80'],
+            'category' => ['nullable', 'string', 'max:120'],
+            'brand' => ['nullable', 'string', 'max:120'],
+            'measurement_target' => ['nullable', Rule::in(['body', 'garment', 'mixed'])],
+            'size_system' => ['nullable', Rule::in(['br_alpha', 'br_numeric', 'international', 'custom'])],
+            'range_mode' => ['nullable', Rule::in(['min_max', 'exact', 'tolerance'])],
+            'compare_table_id' => ['nullable', 'integer', 'min:1'],
+            'explain_for_merchant' => ['nullable', 'boolean'],
             'unit' => ['nullable', Rule::in(['cm'])],
         ];
     }

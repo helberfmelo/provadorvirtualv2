@@ -61,6 +61,22 @@ class MeasurementTableInsightService
         /** @var RecommendationLearningEvent $first */
         $first = $events->first();
         $table = $first->product->measurementTable;
+        $topCategory = $events
+            ->pluck('product.category')
+            ->filter()
+            ->map(fn (string $value): string => trim($value))
+            ->countBy()
+            ->sortDesc()
+            ->keys()
+            ->first();
+        $topBrand = $events
+            ->pluck('product.brand')
+            ->filter()
+            ->map(fn (string $value): string => trim($value))
+            ->countBy()
+            ->sortDesc()
+            ->keys()
+            ->first();
         $returnEvents = $events->whereIn('event_type', ['return', 'exchange']);
         $purchaseEvents = $events->where('event_type', 'purchase');
         $feedbackEvents = $events->where('event_type', 'feedback');
@@ -87,6 +103,8 @@ class MeasurementTableInsightService
             'product_type' => $table->product_type,
             'gender' => $table->gender,
             'fit_profile' => $table->fit_profile,
+            'category' => $topCategory,
+            'brand' => $topBrand,
             'suggested_action' => $action,
             'reason' => $reason,
             'priority_score' => $priority,
@@ -186,7 +204,7 @@ class MeasurementTableInsightService
 
     private function matchesInput(array $insight, array $input): bool
     {
-        foreach (['product_type', 'gender', 'fit_profile'] as $field) {
+        foreach (['product_type', 'gender', 'fit_profile', 'category', 'brand'] as $field) {
             if (! filled($input[$field] ?? null)) {
                 continue;
             }

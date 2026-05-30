@@ -1698,3 +1698,16 @@
 - A validação visual local rodou em `http://127.0.0.1:5177/app/analytics`, com backend local em `8002`, Playwright headless e usuário demo. Desktop e mobile passaram sem erros de console/página e sem overflow horizontal; as capturas ficaram em `.tmp/sprint152-analytics-desktop.png` e `.tmp/sprint152-analytics-mobile.png` e não devem ser versionadas.
 - Commit `f419109` enviado para `main`; o run `26672977847` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/analytics`, `API recommendation analytics OK`, `API recommendation export OK`, widget JS/CSS, páginas públicas, SaaS, portal, APIs, CORS, login demo, go-live readiness, integrações, sincronização, taxonomia, pedidos e devoluções. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-30 - Sprint 153 Assistente IA para criação e revisão de tabelas
+
+- Relida a documentação obrigatória antes da sprint, incluindo `docs/README.md`, `docs/sprint_governance.md`, `docs/ai_assistant.md` e `docs/portal_ui_guidelines.md`.
+- Usado o benchmark já registrado de `Measurement Guide`, `Modelings`, `Products` e relatórios da Sizebay como referência para revisão guiada, comparação antes de aplicar e explicação simples para o lojista.
+- `POST /api/v1/ai/measurement-table-suggestions` agora aceita categoria, marca, base da tabela, sistema de tamanho, ranges, tabela para comparação e modo de explicação simples.
+- `MeasurementTableSuggestionService` passou a devolver `review_context` com dados usados, confiança por bloco, nível de risco, riscos explicados, plano de ação, explicação simples para o lojista e comparação entre tabela atual e tabela sugerida.
+- O assistente agora sugere tabela inicial já com `measurement_target`, `size_system` e `range_mode`, mantendo publicação sempre em rascunho e revisão humana obrigatória.
+- `MeasurementTableInsightService` passou a considerar também categoria e marca ao reutilizar sinais reais compatíveis para enriquecer o contexto de revisão.
+- `/app/assistente` ganhou coleta de categoria/marca, seletor de tabela para comparação, modo `Explicar para o lojista`, resumo de confiança, riscos, comparação com a tabela atual, plano recomendado e edição final do rascunho antes de salvar.
+- Validações locais passaram com `php -l`, suíte focada `AiMeasurementAssistantTest|AnalyticsApiTest`, PHPUnit completo (`132 tests`, `1530 assertions`), `C:\php\php.exe vendor\bin\pint --dirty --test` e `npm --prefix frontend run build`.
+- `git diff --check` e a varredura de segredos ainda serão repetidos no fechamento final da sprint, depois da atualização documental pós-deploy.
+- A validação visual local rodou em `http://127.0.0.1:5177/app/assistente`, com backend local em `8002`, navegador headless e usuário demo. Desktop e mobile passaram com a revisão guiada, a explicação simples e a comparação com a tabela atual; as capturas ficaram em `.tmp/sprint153-assistente-*.png` e não devem ser versionadas.
