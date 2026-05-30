@@ -42,6 +42,13 @@ type LearningContext = {
     table_name: string
     suggested_action: string
     reason: string
+    suggested_adjustment?: {
+      direction: string
+      focus_measurements: string[]
+      review_required: boolean
+      headline: string
+      explanation: string
+    } | null
     signals: {
       total: number
       purchases: number
@@ -198,6 +205,30 @@ function actionLabel(action: string) {
   return labels[action] || action.replaceAll('_', ' ')
 }
 
+function adjustmentDirectionLabel(direction: string) {
+  const labels: Record<string, string> = {
+    increase_tolerance: 'Ampliar folga',
+    decrease_tolerance: 'Reduzir folga',
+    review_fit_profile: 'Revisar modelagem',
+    review_feedback: 'Revisar feedback',
+    observe: 'Seguir observando',
+  }
+
+  return labels[direction] || direction.replaceAll('_', ' ')
+}
+
+function focusLabel(measurement: string) {
+  const labels: Record<string, string> = {
+    bust: 'Busto',
+    waist: 'Cintura',
+    hip: 'Quadril',
+    length: 'Comprimento',
+    fit_profile: 'Modelagem',
+  }
+
+  return labels[measurement] || measurement
+}
+
 function addRow() {
   suggestion.value?.rows.push({ size_label: '', sort_order: suggestion.value.rows.length })
 }
@@ -272,6 +303,10 @@ function readAsDataUrl(file: File): Promise<string> {
       <span class="status-pill ok">
         <i class="fa-solid fa-user-check" aria-hidden="true"></i>
         Revisão obrigatória
+      </span>
+      <span class="status-pill ok">
+        <i class="fa-solid fa-shield-heart" aria-hidden="true"></i>
+        Aprendizado separado da publicação
       </span>
     </div>
 
@@ -363,6 +398,14 @@ function readAsDataUrl(file: File): Promise<string> {
               <small>
                 {{ insight.signals.total }} sinais · {{ insight.signals.purchases }} pedidos ·
                 {{ insight.signals.returns }} devoluções/trocas
+              </small>
+              <small v-if="insight.suggested_adjustment">
+                {{ insight.suggested_adjustment.headline }} ·
+                {{ adjustmentDirectionLabel(insight.suggested_adjustment.direction) }} ·
+                {{ insight.suggested_adjustment.focus_measurements.map(focusLabel).join(', ') }}
+              </small>
+              <small v-if="insight.suggested_adjustment">
+                {{ insight.suggested_adjustment.explanation }}
               </small>
             </span>
           </article>

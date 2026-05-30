@@ -1,12 +1,14 @@
 # Aprendizado de Dados, LGPD e Outliers
 
-Atualizado em: 2026-05-23
+Atualizado em: 2026-05-30
 
 Objetivo: definir como o v2 deve usar dados de consumidores e lojistas para ficar mais inteligente sem transformar excecoes em regra e sem violar privacidade.
 
 Status Sprint 36: implementada e publicada no run `26339824157` a primeira base operacional com `shopper_profiles`, `recommendation_learning_events`, consentimento no widget, esquecimento por token local, sinais de feedback/compra/devolucao/troca e `outlier_score` antes de qualquer uso estatístico.
 
 Status Sprint 115: os sinais comerciais passam a carregar contexto seguro de tamanho comprado/devolvido, motivo de devolução, plataforma, quantidade, valor e data do evento. Referências de pedido são persistidas somente como hash. A base gera insights por tabela para Analytics e Assistente de IA, sempre com revisão humana obrigatória.
+
+Status Sprint 152: o analytics passa a expor `learning_pipeline` com padrões por produto/tabela/categoria/marca/modelagem, candidatas estáveis para IA, fila de revisão manual e sugestões explicadas de ajuste. A anonimização também passa a usar janelas separadas para dados do widget, comentários, perfis e payloads de aprendizado.
 
 ## Principios
 

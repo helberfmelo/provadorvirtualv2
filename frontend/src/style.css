@@ -8506,6 +8506,46 @@ textarea {
   font-weight: 700;
 }
 
+.analytics-learning-note span,
+.analytics-pattern-strip span {
+  align-items: flex-start;
+}
+
+.analytics-pattern-columns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.analytics-pattern-columns > div {
+  display: grid;
+  gap: 12px;
+}
+
+.analytics-pattern-columns > div > strong,
+.analytics-privacy-card > strong {
+  color: #111827;
+  font-size: 0.92rem;
+}
+
+.analytics-learning-list .job-row small {
+  display: block;
+}
+
+.analytics-privacy-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #fff7ed 0%, #f8fafc 100%);
+  border: 1px solid #fed7aa;
+}
+
+.analytics-privacy-card small {
+  color: #4b5563;
+  line-height: 1.45;
+}
+
 .bar-row div {
   height: 10px;
   overflow: hidden;
@@ -9030,6 +9070,7 @@ td small {
   .saas-grid,
   .user-grid,
   .analytics-grid,
+  .analytics-pattern-columns,
   .color-grid,
   .data-support-grid,
   .order-detail-grid,

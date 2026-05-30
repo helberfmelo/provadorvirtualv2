@@ -172,12 +172,19 @@ Artisan::command('pv:ensure-demo-store-owner {--email=} {--name=} {--cpf=} {--pa
 })->purpose('Vincula o master admin como owner da loja teste usada no provador virtual demo.');
 
 Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do widget} {--dry-run}', function (): int {
-    $days = (int) ($this->option('days') ?: config('privacy.widget_data_retention_days', 30));
-    $cutoff = now()->subDays(max(1, $days));
+    $overrideDays = filled($this->option('days')) ? max(1, (int) $this->option('days')) : null;
+    $widgetDays = $overrideDays ?? max(1, (int) config('privacy.widget_data_retention_days', 30));
+    $feedbackDays = $overrideDays ?? max(1, (int) config('privacy.feedback_comment_retention_days', 90));
+    $profileDays = $overrideDays ?? max(1, (int) config('privacy.profile_retention_days', 180));
+    $learningDays = $overrideDays ?? max(1, (int) config('privacy.learning_event_payload_retention_days', 180));
+    $widgetCutoff = now()->subDays($widgetDays);
+    $feedbackCutoff = now()->subDays($feedbackDays);
+    $profileCutoff = now()->subDays($profileDays);
+    $learningCutoff = now()->subDays($learningDays);
     $dryRun = (bool) $this->option('dry-run');
 
     $sessions = RecommendationSession::query()
-        ->where('created_at', '<', $cutoff)
+        ->where('created_at', '<', $widgetCutoff)
         ->where(function ($query): void {
             $query->whereNotNull('shopper_profile')
                 ->orWhereNotNull('ip_hash')
@@ -185,7 +192,7 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
         });
 
     $logs = RecommendationLog::query()
-        ->where('created_at', '<', $cutoff)
+        ->where('created_at', '<', $widgetCutoff)
         ->where(function ($query): void {
             $query->whereNotNull('input_measurements')
                 ->orWhereNotNull('raw_widget_payload')
@@ -193,11 +200,11 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
         });
 
     $feedbacks = RecommendationFeedback::query()
-        ->where('created_at', '<', $cutoff)
+        ->where('created_at', '<', $feedbackCutoff)
         ->whereNotNull('comment');
 
     $profiles = ShopperProfile::query()
-        ->where('updated_at', '<', $cutoff)
+        ->where('updated_at', '<', $profileCutoff)
         ->where(function ($query): void {
             $query->whereNotNull('measurements')
                 ->orWhereNotNull('preferences')
@@ -205,11 +212,22 @@ Artisan::command('pv:privacy-anonymize {--days= : Dias de retencao de dados do w
         });
 
     $learningEvents = RecommendationLearningEvent::query()
-        ->where('created_at', '<', $cutoff)
+        ->where('created_at', '<', $learningCutoff)
         ->whereNotNull('payload');
 
     $summary = [
-        'cutoff' => $cutoff->toISOString(),
+        'cutoffs' => [
+            'widget_data' => $widgetCutoff->toISOString(),
+            'feedback_comments' => $feedbackCutoff->toISOString(),
+            'profiles' => $profileCutoff->toISOString(),
+            'learning_payloads' => $learningCutoff->toISOString(),
+        ],
+        'retention_days' => [
+            'widget_data' => $widgetDays,
+            'feedback_comments' => $feedbackDays,
+            'profiles' => $profileDays,
+            'learning_payloads' => $learningDays,
+        ],
         'dry_run' => $dryRun,
         'recommendation_sessions' => $sessions->count(),
         'recommendation_logs' => $logs->count(),

@@ -47,6 +47,7 @@ class MeasurementTableInsightService
                 'table_name' => $insight['table_name'],
                 'suggested_action' => $insight['suggested_action'],
                 'reason' => $insight['reason'],
+                'suggested_adjustment' => $insight['suggested_adjustment'] ?? null,
                 'signals' => $insight['signals'],
             ])->all(),
             'warnings' => $matches
@@ -106,6 +107,15 @@ class MeasurementTableInsightService
                     ? round(($returnEvents->count() / $purchaseEvents->count()) * 100, 1)
                     : null,
             ],
+            'suggested_adjustment' => $this->suggestedAdjustment(
+                $table->product_type,
+                $action,
+                $smallReturns,
+                $largeReturns,
+                $fitReturns,
+                $negativeFeedback,
+                $positiveFeedback,
+            ),
         ];
     }
 
@@ -191,5 +201,71 @@ class MeasurementTableInsightService
         }
 
         return true;
+    }
+
+    private function suggestedAdjustment(
+        ?string $productType,
+        string $action,
+        int $smallReturns,
+        int $largeReturns,
+        int $fitReturns,
+        int $negativeFeedback,
+        int $positiveFeedback,
+    ): array {
+        $focusMeasurements = ['bust', 'waist', 'hip'];
+
+        if (in_array($productType, ['pants', 'skirt', 'shorts', 'kids_pants'], true)) {
+            $focusMeasurements = ['waist', 'hip'];
+        } elseif ($productType === 'shoes') {
+            $focusMeasurements = ['length'];
+        }
+
+        if ($action === 'review_size_too_small') {
+            return [
+                'direction' => 'increase_tolerance',
+                'focus_measurements' => $focusMeasurements,
+                'review_required' => true,
+                'headline' => 'Ajuste sugerido para pecas pequenas',
+                'explanation' => "Foram detectadas {$smallReturns} devolucoes por peca pequena. Revise ranges e folgas antes de publicar qualquer mudanca.",
+            ];
+        }
+
+        if ($action === 'review_size_too_large') {
+            return [
+                'direction' => 'decrease_tolerance',
+                'focus_measurements' => $focusMeasurements,
+                'review_required' => true,
+                'headline' => 'Ajuste sugerido para pecas grandes',
+                'explanation' => "Foram detectadas {$largeReturns} devolucoes por peca grande. Revise ranges e folgas antes de publicar qualquer mudanca.",
+            ];
+        }
+
+        if ($action === 'review_fit_profile') {
+            return [
+                'direction' => 'review_fit_profile',
+                'focus_measurements' => ['fit_profile'],
+                'review_required' => true,
+                'headline' => 'Revisar modelagem antes de alterar medidas',
+                'explanation' => "Ha {$fitReturns} sinais de caimento. Revise a modelagem e a descricao da peca antes de mexer na grade.",
+            ];
+        }
+
+        if ($action === 'review_feedback') {
+            return [
+                'direction' => 'review_feedback',
+                'focus_measurements' => $focusMeasurements,
+                'review_required' => true,
+                'headline' => 'Revisar sinais de feedback',
+                'explanation' => "Feedback negativo ({$negativeFeedback}) superou o positivo ({$positiveFeedback}). Use isso como fila de revisao, nao como ajuste automatico.",
+            ];
+        }
+
+        return [
+            'direction' => 'observe',
+            'focus_measurements' => $focusMeasurements,
+            'review_required' => true,
+            'headline' => 'Seguir observando a tabela',
+            'explanation' => 'Os sinais ajudam a orientar a IA, mas ainda nao justificam alteracao automatica de tabela.',
+        ];
     }
 }

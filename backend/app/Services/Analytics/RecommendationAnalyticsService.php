@@ -11,6 +11,7 @@ use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
 use App\Models\ShopperProfile;
 use App\Models\WidgetUsageEvent;
+use App\Services\Recommendation\LearningPipelineService;
 use App\Services\Recommendation\MeasurementTableInsightService;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
@@ -22,6 +23,7 @@ class RecommendationAnalyticsService
 {
     public function __construct(
         private readonly MeasurementTableInsightService $tableInsights,
+        private readonly LearningPipelineService $learningPipeline,
     ) {}
 
     public function report(Merchant $merchant, ?MerchantCompany $company, array $filters): array
@@ -32,12 +34,15 @@ class RecommendationAnalyticsService
             ->with(['product.measurementTable', 'recommendationUsageEvent'])
             ->get();
 
-        $learningEvents = $this->learningEvents($merchant, $company, $normalizedFilters, $dateFrom, $dateTo)->get();
+        $learningEvents = $this->learningEvents($merchant, $company, $normalizedFilters, $dateFrom, $dateTo)
+            ->with(['product.measurementTable', 'shopperProfile'])
+            ->get();
         $feedbackStats = $this->feedbackStats($summaryLogs);
         $productsWithoutTable = $this->productsWithoutTable($merchant, $company, $normalizedFilters);
         $measurementTableInsights = $this->tableInsights->insights($merchant, $company);
         $shopperProfiles = $this->shopperProfiles($merchant, $company, $normalizedFilters, $dateFrom, $dateTo)->get();
         $recommendationReport = $this->recommendationReport($merchant, $company, $normalizedFilters, $dateFrom, $dateTo);
+        $learningPipeline = $this->learningPipeline->build($learningEvents, $shopperProfiles, $measurementTableInsights);
 
         $commercePurchases = $learningEvents->where('event_type', 'purchase')->count();
         $commerceReturns = $learningEvents->where('event_type', 'return')->count();
@@ -120,6 +125,7 @@ class RecommendationAnalyticsService
                 ->map(fn (Collection $group, string $signal): array => ['signal' => $signal, 'count' => $group->count()])
                 ->values()
                 ->all(),
+            'learning_pipeline' => $learningPipeline,
             'measurement_table_insights' => $measurementTableInsights,
             'outliers' => $learningEvents
                 ->where('status', 'blocked_outlier')

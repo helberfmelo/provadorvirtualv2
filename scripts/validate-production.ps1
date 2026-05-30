@@ -277,6 +277,8 @@ $recommendationAnalytics = Invoke-RestMethod -Uri "$ApiBase/analytics/recommenda
 Assert-True ($null -ne $recommendationAnalytics.data) "recommendation analytics sem data"
 Assert-True ($null -ne $recommendationAnalytics.data.product_ranking) "recommendation analytics sem ranking"
 Assert-True ($null -ne $recommendationAnalytics.data.recommendation_report.meta) "recommendation analytics sem paginacao"
+Assert-True ($null -ne $recommendationAnalytics.data.learning_pipeline.summary) "recommendation analytics sem pipeline de aprendizado"
+Assert-True ($recommendationAnalytics.data.learning_pipeline.guardrails.review_required -eq $true) "recommendation analytics sem guardrail de revisao"
 "API recommendation analytics OK"
 
 $recommendationExport = Invoke-WebRequest -UseBasicParsing -Uri "$ApiBase/analytics/recommendations/export?report=recommendations&period=30d" -Headers $headers

@@ -2886,7 +2886,7 @@ Critérios de aceite:
 - sugestão não altera tabela sem aprovação;
 - dados sensíveis são minimizados e auditáveis.
 
-Status: planejada.
+Status: implementada na Sprint 152. O portal `/app/analytics` passou a expor uma camada explícita de aprendizado com dados reais, separando recomendações aplicadas, sinais prontos para aprendizado, fila de revisão manual, padrões por produto/tabela/categoria/marca/modelagem e guardrails de LGPD. `GET /api/v1/analytics/recommendations` agora inclui `learning_pipeline`, com resumo operacional, candidatas de base estável para IA, sugestões de ajuste explicadas por tabela e bloco de retenção/anonimização. `MeasurementTableInsightService` passou a devolver `suggested_adjustment` para explicar direção, foco e revisão obrigatória das sugestões, e `/app/assistente` reaproveita esse contexto para mostrar por que a IA recomenda revisar uma tabela antes de publicar. A rotina `pv:privacy-anonymize` ganhou janelas separadas para dados do widget, comentários, perfis e payloads de aprendizado, reforçando retenção mínima e anonimização auditável. Validações locais passaram com `php -l`, suíte focada (`AnalyticsApiTest|AiMeasurementAssistantTest|HardeningApiTest`), PHPUnit completo (`132 tests`, `1515 assertions`), `C:\php\php.exe vendor\bin\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `5177` com backend local em `8002`.
 
 ### Sprint 153 - Assistente IA para criação e revisão de tabelas
 

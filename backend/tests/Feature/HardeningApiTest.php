@@ -9,6 +9,7 @@ use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\PlatformConnection;
 use App\Models\RecommendationFeedback;
+use App\Models\RecommendationLearningEvent;
 use App\Models\RecommendationLog;
 use App\Models\RecommendationSession;
 use App\Services\Audit\AuditLogger;
@@ -190,12 +191,14 @@ class HardeningApiTest extends TestCase
 
         $log->forceFill(['created_at' => $old, 'updated_at' => $old])->save();
         RecommendationFeedback::query()->firstOrFail()->forceFill(['created_at' => $old])->save();
+        RecommendationLearningEvent::query()->update(['created_at' => $old, 'updated_at' => $old]);
 
         Artisan::call('pv:privacy-anonymize', ['--days' => 30]);
 
         $session = RecommendationSession::query()->findOrFail($log->recommendation_session_id);
         $log->refresh();
         $feedback = RecommendationFeedback::query()->firstOrFail();
+        $learningEvent = RecommendationLearningEvent::query()->firstOrFail();
 
         $this->assertNull($session->shopper_profile);
         $this->assertNull($session->ip_hash);
@@ -204,6 +207,7 @@ class HardeningApiTest extends TestCase
         $this->assertNull($log->raw_widget_payload);
         $this->assertNull($log->score_breakdown);
         $this->assertNull($feedback->comment);
+        $this->assertNull($learningEvent->payload);
     }
 
     public function test_privacy_prune_removes_old_operational_logs(): void

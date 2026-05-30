@@ -1,6 +1,6 @@
 # Analytics, SaaS Admin e Auditoria
 
-Atualizado em: 2026-05-29
+Atualizado em: 2026-05-30
 
 ## Objetivo
 
@@ -44,6 +44,8 @@ Status Sprint 36: `/app/analytics` mostra os novos cards de perfis, aprendizado 
 Status Sprint 115: `/app/analytics` passa a mostrar sugestões por tabela de medidas com base em pedidos, devoluções, trocas e feedback. A referência de pedido é guardada apenas como hash, e os insights indicam revisão humana em vez de alterar tabelas automaticamente.
 
 Status Sprint 148: `/app/analytics` também passa a mostrar o relatório `Uso do widget`, alimentado por `GET /api/v1/analytics/widget-usage`.
+
+Status Sprint 152: `/app/analytics` também passa a mostrar `learning_pipeline` dentro de `GET /api/v1/analytics/recommendations`, separando recomendações aplicadas, sinais prontos para aprendizado, fila de revisão manual, padrões por produto/tabela/categoria/marca/modelagem e bloco de retenção/anonimização.
 
 Resumo entregue por `/analytics/widget-usage`:
 

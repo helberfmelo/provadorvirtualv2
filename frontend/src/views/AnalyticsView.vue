@@ -56,6 +56,82 @@ type RecommendationAnalyticsPayload = {
   products_without_measurement_table: { id: number; name: string; sku: string | null; category: string | null }[]
   learning_statuses: { status: string; count: number }[]
   commerce_signals: { signal: string; count: number }[]
+  learning_pipeline: {
+    summary: {
+      applied_recommendations: number
+      commercial_signals: number
+      ready_for_learning: number
+      manual_review: number
+      blocked_outliers: number
+      linked_orders: number
+      linked_returns_exchanges: number
+      feedback_signals: number
+      profiles_anonymized: number
+      payloads_pending_anonymization: number
+    }
+    guardrails: {
+      review_required: boolean
+      applied_recommendation_scope: string
+      automatic_learning_scope: string
+      lgpd_scope: string
+    }
+    automatic_learning: {
+      enabled: boolean
+      review_required: boolean
+      candidates: {
+        measurement_table_id: number
+        table_name: string
+        confidence: string
+        accepted_signals: number
+        purchases: number
+        positive_feedback: number
+        explanation: string
+      }[]
+    }
+    manual_review_queue: {
+      measurement_table_id: number
+      table_name: string
+      suggested_action: string
+      reason: string
+      priority_score: number
+      confidence: string
+      review_required: boolean
+      signals: {
+        accepted: number
+        review: number
+        blocked_outliers: number
+        purchases: number
+        returns: number
+        positive_feedback: number
+        negative_feedback: number
+      }
+      suggested_adjustment: {
+        direction: string
+        focus_measurements: string[]
+        review_required: boolean
+        headline: string
+        explanation: string
+      } | null
+    }[]
+    patterns: {
+      by_product: LearningPattern[]
+      by_measurement_table: LearningPattern[]
+      by_category: LearningPattern[]
+      by_brand: LearningPattern[]
+      by_fit_profile: LearningPattern[]
+    }
+    privacy: {
+      order_reference_policy: string
+      widget_retention_days: number
+      feedback_comment_retention_days: number
+      profile_retention_days: number
+      learning_event_payload_retention_days: number
+      operational_log_retention_days: number
+      payloads_pending_anonymization: number
+      payloads_already_anonymized: number
+      review_required: boolean
+    }
+  }
   measurement_table_insights: {
     measurement_table_id: number
     table_name: string
@@ -80,6 +156,13 @@ type RecommendationAnalyticsPayload = {
       fit_issue: number
       return_rate: number | null
     }
+    suggested_adjustment?: {
+      direction: string
+      focus_measurements: string[]
+      review_required: boolean
+      headline: string
+      explanation: string
+    } | null
   }[]
   product_ranking: {
     product_id: number
@@ -198,6 +281,21 @@ type WidgetUsagePayload = {
     platforms: string[]
     device_types: string[]
   }
+}
+
+type LearningPattern = {
+  label: string
+  total_signals: number
+  ready_for_learning: number
+  manual_review: number
+  blocked_outliers: number
+  purchases: number
+  returns: number
+  exchanges: number
+  positive_feedback: number
+  negative_feedback: number
+  return_rate: number | null
+  attention: string
 }
 
 type AuditLog = {
@@ -412,6 +510,30 @@ function attentionLabel(flag: string) {
   }
 
   return labels[flag] || eventLabel(flag)
+}
+
+function pipelineDirectionLabel(direction: string) {
+  const labels: Record<string, string> = {
+    increase_tolerance: 'Ampliar folga',
+    decrease_tolerance: 'Reduzir folga',
+    review_fit_profile: 'Revisar modelagem',
+    review_feedback: 'Revisar feedback',
+    observe: 'Seguir observando',
+  }
+
+  return labels[direction] || eventLabel(direction)
+}
+
+function focusLabel(measurement: string) {
+  const labels: Record<string, string> = {
+    bust: 'Busto',
+    waist: 'Cintura',
+    hip: 'Quadril',
+    length: 'Comprimento',
+    fit_profile: 'Modelagem',
+  }
+
+  return labels[measurement] || eventLabel(measurement)
 }
 
 function formatDateTime(value: string | null) {
@@ -779,6 +901,262 @@ async function downloadRecommendationExport(report: 'ranking' | 'recommendations
               <strong>{{ brand.recommendations }}</strong>
               <small>{{ brand.brand }}{{ brand.normalized ? ' · normalizada' : '' }}</small>
             </span>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel-main analytics-section-panel">
+        <div class="subsection-heading">
+          <h2>Aprendizado com dados reais</h2>
+          <span>{{ recommendationAnalytics.learning_pipeline.summary.ready_for_learning }} sinais prontos</span>
+        </div>
+        <p class="page-heading-help analytics-section-help">
+          A recomendação aplicada no produto continua separada do aprendizado. Pedidos, devoluções, trocas e feedback
+          só viram contexto e fila de revisão até aprovação humana.
+        </p>
+        <div class="summary-strip analytics-learning-note">
+          <span>
+            <strong>Recomendação aplicada</strong>
+            <small>{{ recommendationAnalytics.learning_pipeline.guardrails.applied_recommendation_scope }}</small>
+          </span>
+          <span>
+            <strong>Aprendizado automático</strong>
+            <small>{{ recommendationAnalytics.learning_pipeline.guardrails.automatic_learning_scope }}</small>
+          </span>
+          <span>
+            <strong>LGPD</strong>
+            <small>{{ recommendationAnalytics.learning_pipeline.guardrails.lgpd_scope }}</small>
+          </span>
+        </div>
+      </section>
+
+      <div class="metric-grid analytics-metric-grid">
+        <article class="metric-card">
+          <i class="fa-solid fa-robot" aria-hidden="true"></i>
+          <strong>{{ recommendationAnalytics.learning_pipeline.summary.applied_recommendations }}</strong>
+          <span>recomendações aplicadas</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-brain" aria-hidden="true"></i>
+          <strong>{{ recommendationAnalytics.learning_pipeline.summary.ready_for_learning }}</strong>
+          <span>prontos para aprendizado</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-list-check" aria-hidden="true"></i>
+          <strong>{{ recommendationAnalytics.learning_pipeline.summary.manual_review }}</strong>
+          <span>na fila de revisão</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-shield-halved" aria-hidden="true"></i>
+          <strong>{{ recommendationAnalytics.learning_pipeline.summary.blocked_outliers }}</strong>
+          <span>bloqueados por outlier</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-bag-shopping" aria-hidden="true"></i>
+          <strong>{{ recommendationAnalytics.learning_pipeline.summary.linked_orders }}</strong>
+          <span>pedidos ligados</span>
+        </article>
+        <article class="metric-card">
+          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+          <strong>{{ recommendationAnalytics.learning_pipeline.summary.linked_returns_exchanges }}</strong>
+          <span>devoluções e trocas</span>
+        </article>
+      </div>
+
+      <div class="analytics-grid">
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Base consistente para IA</h2>
+            <span>{{ recommendationAnalytics.learning_pipeline.automatic_learning.candidates.length }} candidatas</span>
+          </div>
+          <div
+            v-if="!recommendationAnalytics.learning_pipeline.automatic_learning.candidates.length"
+            class="empty-state"
+          >
+            Ainda não há tabelas suficientes para entrar como referência estável.
+          </div>
+          <div v-else class="job-list">
+            <article
+              v-for="candidate in recommendationAnalytics.learning_pipeline.automatic_learning.candidates"
+              :key="candidate.measurement_table_id"
+              class="job-row"
+            >
+              <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
+              <span>
+                <strong>{{ candidate.table_name }}</strong>
+                <small>
+                  {{ candidate.accepted_signals }} sinais aproveitados · {{ candidate.purchases }} pedidos ·
+                  {{ candidate.positive_feedback }} feedbacks positivos
+                </small>
+                <small>{{ candidate.explanation }}</small>
+              </span>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Sugestões para revisão</h2>
+            <span>{{ recommendationAnalytics.learning_pipeline.manual_review_queue.length }} tabelas</span>
+          </div>
+          <div v-if="!recommendationAnalytics.learning_pipeline.manual_review_queue.length" class="empty-state">
+            Nenhuma tabela com alerta forte no período.
+          </div>
+          <div v-else class="job-list analytics-learning-list">
+            <article
+              v-for="item in recommendationAnalytics.learning_pipeline.manual_review_queue"
+              :key="item.measurement_table_id"
+              class="job-row"
+            >
+              <i class="fa-solid fa-magnifying-glass-chart" aria-hidden="true"></i>
+              <span>
+                <strong>{{ item.table_name }}</strong>
+                <small>{{ actionLabel(item.suggested_action) }} · prioridade {{ item.priority_score }}</small>
+                <small v-if="item.suggested_adjustment">
+                  {{ item.suggested_adjustment.headline }} ·
+                  {{ pipelineDirectionLabel(item.suggested_adjustment.direction) }} ·
+                  {{ item.suggested_adjustment.focus_measurements.map(focusLabel).join(', ') }}
+                </small>
+                <small>{{ item.reason }}</small>
+                <small v-if="item.suggested_adjustment">{{ item.suggested_adjustment.explanation }}</small>
+              </span>
+            </article>
+          </div>
+        </section>
+      </div>
+
+      <div class="analytics-grid">
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Padrões por produto</h2>
+            <span>{{ recommendationAnalytics.learning_pipeline.patterns.by_product.length }} grupos</span>
+          </div>
+          <div v-if="!recommendationAnalytics.learning_pipeline.patterns.by_product.length" class="empty-state">
+            Sem padrões por produto no período.
+          </div>
+          <div v-else class="summary-strip analytics-pattern-strip">
+            <span
+              v-for="pattern in recommendationAnalytics.learning_pipeline.patterns.by_product"
+              :key="pattern.label"
+            >
+              <strong>{{ pattern.label }}</strong>
+              <small>
+                {{ pattern.total_signals }} sinais · {{ pattern.returns + pattern.exchanges }} devoluções/trocas
+              </small>
+              <small>{{ pattern.attention }}</small>
+            </span>
+          </div>
+        </section>
+
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Padrões por tabela</h2>
+            <span>{{ recommendationAnalytics.learning_pipeline.patterns.by_measurement_table.length }} grupos</span>
+          </div>
+          <div
+            v-if="!recommendationAnalytics.learning_pipeline.patterns.by_measurement_table.length"
+            class="empty-state"
+          >
+            Sem padrões por tabela no período.
+          </div>
+          <div v-else class="summary-strip analytics-pattern-strip">
+            <span
+              v-for="pattern in recommendationAnalytics.learning_pipeline.patterns.by_measurement_table"
+              :key="pattern.label"
+            >
+              <strong>{{ pattern.label }}</strong>
+              <small>{{ pattern.ready_for_learning }} prontos · {{ pattern.manual_review }} em revisão</small>
+              <small>{{ pattern.attention }}</small>
+            </span>
+          </div>
+        </section>
+      </div>
+
+      <div class="analytics-grid">
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Padrões por marca e categoria</h2>
+            <span>
+              {{ recommendationAnalytics.learning_pipeline.patterns.by_brand.length }} marcas ·
+              {{ recommendationAnalytics.learning_pipeline.patterns.by_category.length }} categorias
+            </span>
+          </div>
+          <div class="analytics-pattern-columns">
+            <div>
+              <strong>Marcas</strong>
+              <div v-if="!recommendationAnalytics.learning_pipeline.patterns.by_brand.length" class="empty-state">
+                Sem sinais por marca.
+              </div>
+              <div v-else class="summary-strip analytics-pattern-strip">
+                <span
+                  v-for="pattern in recommendationAnalytics.learning_pipeline.patterns.by_brand"
+                  :key="pattern.label"
+                >
+                  <strong>{{ pattern.label }}</strong>
+                  <small>{{ pattern.total_signals }} sinais · {{ pattern.attention }}</small>
+                </span>
+              </div>
+            </div>
+            <div>
+              <strong>Categorias</strong>
+              <div
+                v-if="!recommendationAnalytics.learning_pipeline.patterns.by_category.length"
+                class="empty-state"
+              >
+                Sem sinais por categoria.
+              </div>
+              <div v-else class="summary-strip analytics-pattern-strip">
+                <span
+                  v-for="pattern in recommendationAnalytics.learning_pipeline.patterns.by_category"
+                  :key="pattern.label"
+                >
+                  <strong>{{ pattern.label }}</strong>
+                  <small>{{ pattern.total_signals }} sinais · {{ pattern.attention }}</small>
+                </span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel-main">
+          <div class="subsection-heading">
+            <h2>Padrões por modelagem e privacidade</h2>
+            <span>{{ recommendationAnalytics.learning_pipeline.patterns.by_fit_profile.length }} modelagens</span>
+          </div>
+          <div class="analytics-pattern-columns">
+            <div>
+              <strong>Modelagem</strong>
+              <div
+                v-if="!recommendationAnalytics.learning_pipeline.patterns.by_fit_profile.length"
+                class="empty-state"
+              >
+                Sem sinais por modelagem.
+              </div>
+              <div v-else class="summary-strip analytics-pattern-strip">
+                <span
+                  v-for="pattern in recommendationAnalytics.learning_pipeline.patterns.by_fit_profile"
+                  :key="pattern.label"
+                >
+                  <strong>{{ pattern.label }}</strong>
+                  <small>{{ pattern.ready_for_learning }} prontos · {{ pattern.attention }}</small>
+                </span>
+              </div>
+            </div>
+            <div class="analytics-privacy-card">
+              <strong>Retenção e anonimização</strong>
+              <small>
+                Pedido em {{ recommendationAnalytics.learning_pipeline.privacy.order_reference_policy === 'hash_only' ? 'hash' : 'texto' }}
+                · widget {{ recommendationAnalytics.learning_pipeline.privacy.widget_retention_days }} dias
+              </small>
+              <small>
+                comentários {{ recommendationAnalytics.learning_pipeline.privacy.feedback_comment_retention_days }} dias ·
+                perfis {{ recommendationAnalytics.learning_pipeline.privacy.profile_retention_days }} dias
+              </small>
+              <small>
+                payloads de aprendizado {{ recommendationAnalytics.learning_pipeline.privacy.learning_event_payload_retention_days }} dias ·
+                {{ recommendationAnalytics.learning_pipeline.privacy.payloads_pending_anonymization }} pendentes
+              </small>
+            </div>
           </div>
         </section>
       </div>
