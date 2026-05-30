@@ -38,6 +38,7 @@ Implementado:
 - o assistente agora aceita categoria, marca, base da tabela, sistema de tamanho, faixas e tabela atual para comparação;
 - `POST /api/v1/ai/measurement-table-suggestions` retorna `review_context` com dados usados, confiança, riscos, explicação simples, plano de ação e comparação com a tabela atual;
 - a sugestão criada já sai com `measurement_target`, `size_system` e `range_mode`;
+- Publicado em produção no run `26674078434`.
 - o contexto de aprendizado passou a considerar também categoria e marca quando houver sinais compatíveis;
 - `/app/assistente` ganhou fluxo de revisão guiada antes de criar o rascunho, com comparação entre a tabela atual e a sugerida;
 - o modo `Explicar para o lojista` traduz a recomendação para linguagem mais operacional, sem liberar publicação automática.

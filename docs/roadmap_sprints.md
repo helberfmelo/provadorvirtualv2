@@ -2916,7 +2916,7 @@ Critérios de aceite:
 - sugestão inclui justificativa;
 - lojista consegue comparar tabela atual e sugerida.
 
-Status: implementada e validada localmente; aguardando publicação final desta sprint.
+Status: concluída e publicada em produção no run `26674078434`.
 
 ### Sprint 154 - Publicação e checklist conectado a dados reais
 
