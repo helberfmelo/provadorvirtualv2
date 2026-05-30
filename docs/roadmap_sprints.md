@@ -3223,4 +3223,14 @@ Validações:
 - build frontend e validação visual local na porta `5177`, com backend em `8002`;
 - `git diff --check`, Pint, varredura de segredos e validação de produção quando a sprint for implementada.
 
-Status: planejada.
+Status: implementada localmente e em fechamento de governança.
+
+Implementação desta sprint:
+
+- criado `SizebayMigrationService` com suporte a pacote `JSON`, `CSV`, `XLSX` e `ZIP`, leitura por seções e dry-run unificado antes de qualquer gravação;
+- a prévia da migração agora devolve resumo por seção, linhas válidas/inválidas, cobertura contra catálogo atual ou BigShop, fila de revisão, avisos do pacote e snapshot agregado de relatórios e regras;
+- o commit do lote gera `batch_id`, aplica apenas vínculos confiáveis, registra sugestões revisáveis para taxonomia e preserva snapshots suficientes para rollback do lote;
+- criado `POST /api/v1/imports/{importJob}/rollback`, protegido por permissão de importações e escopo de empresa, com auditoria de desfazer lote;
+- `PreviewImportRequest` e `ImportService` passaram a aceitar `type=sizebay_migration`, arquivos binários com `content_base64`, seleção de seção para `CSV/XLSX` isolado e comparação opcional com BigShop;
+- `/app/importacoes` foi reconstruída para suportar migração assistida com upload binário/texto, amostra JSON, cobertura, fila de revisão, histórico detalhado e botão de desfazer lote;
+- validações locais concluídas: `C:\\php\\php.exe artisan test --filter=ImportsApiTest`, PHPUnit completo, `C:\\php\\php.exe vendor\\bin\\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `/app/importacoes`.

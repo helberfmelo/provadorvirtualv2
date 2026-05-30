@@ -152,6 +152,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,imports,edit');
         Route::post('/imports', [ImportController::class, 'store'])
             ->middleware('portal.permission:merchant,imports,edit');
+        Route::post('/imports/{importJob}/rollback', [ImportController::class, 'rollback'])
+            ->middleware('portal.permission:merchant,imports,edit');
         Route::get('/imports/{importJob}', [ImportController::class, 'show'])
             ->middleware('portal.permission:merchant,imports,view');
         Route::get('/ai/status', [AiMeasurementAssistantController::class, 'status'])

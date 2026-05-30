@@ -20,11 +20,16 @@ class ImportService
     public function __construct(
         private readonly ImportRuleMapper $ruleMapper,
         private readonly BrandCatalogService $brands,
-        private readonly CategoryCatalogService $categories
+        private readonly CategoryCatalogService $categories,
+        private readonly SizebayMigrationService $sizebayMigrations
     ) {}
 
     public function preview(Merchant $merchant, ?MerchantCompany $company, array $input): array
     {
+        if ($input['type'] === 'sizebay_migration') {
+            return $this->sizebayMigrations->preview($merchant, $company, $input);
+        }
+
         $rows = $this->parse($input['type'], $input['source_format'], $input['content']);
         $importRules = array_key_exists('import_rules', $input)
             ? $this->ruleMapper->normalize($input['import_rules'])
@@ -47,6 +52,10 @@ class ImportService
 
     public function commit(Merchant $merchant, ?MerchantCompany $company, array $input): ImportJob
     {
+        if ($input['type'] === 'sizebay_migration') {
+            return $this->sizebayMigrations->commit($merchant, $company, $input);
+        }
+
         $preview = $this->preview($merchant, $company, $input);
         $job = ImportJob::query()->create([
             'merchant_id' => $merchant->id,
@@ -87,6 +96,15 @@ class ImportService
         }
 
         return $job->refresh();
+    }
+
+    public function rollback(Merchant $merchant, ?MerchantCompany $company, ImportJob $job): ImportJob
+    {
+        if ($job->type !== 'sizebay_migration') {
+            throw new RuntimeException('Rollback disponível apenas para migração Sizebay.');
+        }
+
+        return $this->sizebayMigrations->rollback($merchant, $company, $job);
     }
 
     private function parse(string $type, string $format, string $content): array

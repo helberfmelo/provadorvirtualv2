@@ -7805,6 +7805,164 @@ textarea {
   gap: 16px;
 }
 
+.import-form-grid {
+  align-items: end;
+}
+
+.import-file-chip {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #dbeafe;
+  border-radius: 999px;
+  color: #1e3a8a;
+  background: #eff6ff;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.import-file-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.import-binary-state {
+  gap: 8px;
+  align-items: flex-start;
+  text-align: left;
+}
+
+.import-sections-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+}
+
+.import-sections-grid article {
+  display: grid;
+  gap: 5px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.import-sections-grid header {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.import-sections-grid strong {
+  color: #0f172a;
+  font-size: 0.92rem;
+}
+
+.import-sections-grid span,
+.import-sections-grid small {
+  color: #64748b;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.import-coverage-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+}
+
+.import-insight-list,
+.import-review-list {
+  display: grid;
+  gap: 10px;
+}
+
+.import-insight,
+.import-review-item {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.import-insight p,
+.import-review-item p {
+  margin: 0;
+  color: #0f172a;
+  font-size: 0.9rem;
+}
+
+.import-insight small,
+.import-review-item small {
+  color: #64748b;
+  font-size: 0.77rem;
+  font-weight: 800;
+}
+
+.import-review-head,
+.import-job-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.import-review-head strong,
+.import-job-head strong {
+  color: #0f172a;
+  font-size: 0.92rem;
+}
+
+.import-job-head {
+  padding: 4px 0;
+}
+
+.import-job-head small {
+  display: block;
+  margin-top: 4px;
+  color: #64748b;
+  font-size: 0.77rem;
+  font-weight: 800;
+}
+
+.import-plain-list {
+  display: grid;
+  gap: 8px;
+  padding-left: 18px;
+  margin: 0;
+  color: #334155;
+  font-size: 0.84rem;
+}
+
+.job-row-button {
+  width: 100%;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+  text-align: left;
+}
+
+.job-row-button.active {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.summary-strip.compact span {
+  min-width: 94px;
+  padding: 10px;
+}
+
 .summary-strip {
   display: flex;
   flex-wrap: wrap;

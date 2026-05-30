@@ -101,9 +101,54 @@ class ImportController extends Controller
         $merchant = $this->currentMerchant($request);
         $company = $this->currentCompany($request, $merchant);
 
-        abort_unless((int) $importJob->merchant_id === (int) $merchant->id, 404);
-        abort_if($company && $importJob->merchant_company_id && (int) $importJob->merchant_company_id !== (int) $company->id, 404);
+        $this->assertJobScope($merchant->id, $company?->id, $importJob);
 
         return new ImportJobResource($importJob);
+    }
+
+    public function rollback(Request $request, ImportJob $importJob)
+    {
+        $merchant = $this->currentMerchant($request);
+        $company = $this->currentCompany($request, $merchant);
+
+        $this->assertJobScope($merchant->id, $company?->id, $importJob);
+
+        try {
+            $job = $this->imports->rollback($merchant, $company, $importJob);
+        } catch (RuntimeException $exception) {
+            throw ValidationException::withMessages([
+                'import_job' => $exception->getMessage(),
+            ]);
+        }
+
+        app(AuditLogger::class)->log($request, $merchant, 'imports.rolled_back', 'imports', 'warning', [
+            'merchant_company_id' => $company?->id,
+            'module' => 'imports',
+            'action' => 'rollback',
+            'before' => [
+                'import_job_id' => $importJob->id,
+                'status' => $importJob->status,
+            ],
+            'after' => [
+                'import_job_id' => $job->id,
+                'status' => $job->status,
+            ],
+            'context_data' => [
+                'type' => $job->type,
+                'filename' => $job->filename,
+                'batch_id' => $job->metadata['batch_id'] ?? null,
+            ],
+        ], $job);
+
+        return new ImportJobResource($job);
+    }
+
+    private function assertJobScope(int $merchantId, ?int $merchantCompanyId, ImportJob $importJob): void
+    {
+        abort_unless((int) $importJob->merchant_id === $merchantId, 404);
+        abort_if(
+            $merchantCompanyId && $importJob->merchant_company_id && (int) $importJob->merchant_company_id !== $merchantCompanyId,
+            404
+        );
     }
 }
