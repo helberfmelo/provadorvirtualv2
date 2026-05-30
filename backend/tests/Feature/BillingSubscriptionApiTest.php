@@ -110,6 +110,8 @@ class BillingSubscriptionApiTest extends TestCase
     public function test_merchant_can_resolve_checkout_status_link_with_audit(): void
     {
         [$token, $subscription, $checkout] = $this->subscriptionFixture();
+        $expectedUrl = rtrim((string) config('app.frontend_url', config('app.url')), '/')
+            .'/checkout/sucesso?ref=checkout-recorrencia-ref';
 
         $this->withHeader('Authorization', 'Bearer '.$token)
             ->postJson('/api/v1/billing/payment-links/resolve', [
@@ -118,7 +120,7 @@ class BillingSubscriptionApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('data.title', 'Ver comprovante da contratação')
-            ->assertJsonPath('data.url', 'http://localhost/checkout/sucesso?ref=checkout-recorrencia-ref');
+            ->assertJsonPath('data.url', $expectedUrl);
 
         $this->assertDatabaseHas('audit_logs', [
             'merchant_id' => $checkout->merchant_id,
