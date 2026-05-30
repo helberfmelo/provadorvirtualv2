@@ -2826,7 +2826,7 @@ Critérios de aceite:
 - dados sensíveis são minimizados;
 - pedido alimenta relatórios e IA.
 
-Status: planejada.
+Status: implementada localmente, aguardando publicação. O portal ganhou `/app/pedidos` com filtros por período/status/origem/uso do Provador, visão geral de pedidos assistidos, origem dos dados, produtos com mais pedidos, tabela operacional e fallback de importação CSV com modelo e prévia antes de gravar. A API passou a expor `GET /api/v1/orders/overview`, `GET /api/v1/orders`, `GET /api/v1/orders/template` e `POST /api/v1/orders/import`, usando `merchant_orders` e `merchant_order_items` para registrar pedido, itens, tamanho comprado, receita e vínculo com uso do Provador sem expor dados pessoais do consumidor. Validações locais passaram com `php -l`, `C:\php\php.exe artisan test --filter=MerchantOrdersApiTest`, `C:\php\php.exe artisan test`, `C:\php\php.exe vendor\bin\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `5177` com backend local em `8002`.
 
 ### Sprint 151 - Devoluções e trocas com mapeamento de motivos
 

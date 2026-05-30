@@ -17,6 +17,7 @@ import IntegrationsView from '../views/IntegrationsView.vue'
 import LoginView from '../views/LoginView.vue'
 import MeasurementTableFormView from '../views/MeasurementTableFormView.vue'
 import MeasurementTablesView from '../views/MeasurementTablesView.vue'
+import MerchantOrdersView from '../views/MerchantOrdersView.vue'
 import ProductFormView from '../views/ProductFormView.vue'
 import PrivacyView from '../views/PrivacyView.vue'
 import ProductsView from '../views/ProductsView.vue'
@@ -71,6 +72,7 @@ const router = createRouter({
     { path: '/app/taxonomia', component: TaxonomyIntelligenceView },
     { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/analytics', component: AnalyticsView },
+    { path: '/app/pedidos', component: MerchantOrdersView },
     { path: '/app/go-live', component: GoLiveView },
     { path: '/app/ajuda', component: HelpView },
     { path: '/app/importacoes', component: ImportsView },

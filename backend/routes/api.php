@@ -19,6 +19,7 @@ use App\Http\Controllers\Api\V1\IntegrationController;
 use App\Http\Controllers\Api\V1\MeasurementTableController;
 use App\Http\Controllers\Api\V1\MeasurementTemplateController;
 use App\Http\Controllers\Api\V1\MerchantCompanyProfileController;
+use App\Http\Controllers\Api\V1\MerchantOrderController;
 use App\Http\Controllers\Api\V1\MerchantOverviewController;
 use App\Http\Controllers\Api\V1\OperationalStatusController;
 use App\Http\Controllers\Api\V1\ProductController;
@@ -159,6 +160,14 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,analytics,view');
         Route::get('/analytics/widget-usage', [AnalyticsController::class, 'widgetUsage'])
             ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/orders/overview', [MerchantOrderController::class, 'overview'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/orders', [MerchantOrderController::class, 'index'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/orders/template', [MerchantOrderController::class, 'template'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::post('/orders/import', [MerchantOrderController::class, 'import'])
+            ->middleware('portal.permission:merchant,analytics,edit');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])
             ->middleware('portal.permission:merchant,analytics,view');
         Route::get('/go-live/readiness', GoLiveReadinessController::class)

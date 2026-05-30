@@ -128,6 +128,7 @@ const companyNavSections = computed<NavSection[]>(() => [
     label: 'Resultados',
     links: [
       { to: '/app/analytics', label: 'Relatórios', icon: 'fa-chart-line', show: auth.canView('analytics') },
+      { to: '/app/pedidos', label: 'Pedidos', icon: 'fa-receipt', show: auth.canView('analytics') },
       { to: '/app/assistente', label: 'Assistente IA', icon: 'fa-wand-magic-sparkles', show: auth.canView('ai_assistant') },
     ],
   },
@@ -270,6 +271,14 @@ const companyHelpItems: Array<ContextHelp & { prefix: string, exact?: boolean }>
     topic: 'relatorios',
     title: 'Relatórios',
     text: 'Acompanhe recomendações, feedbacks e sinais comerciais para priorizar revisão.',
+    nextTo: '/app/pedidos',
+    nextLabel: 'Abrir pedidos',
+  },
+  {
+    prefix: '/app/pedidos',
+    topic: 'pedidos',
+    title: 'Pedidos',
+    text: 'Cruze pedidos com uso do provador para medir conversão assistida e revisar tamanhos comprados.',
     nextTo: '/app/go-live',
     nextLabel: 'Ver publicação',
   },

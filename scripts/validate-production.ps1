@@ -105,6 +105,7 @@ Assert-Page "/saas/emails"
 Assert-Page "/saas/emails/configuracoes"
 Assert-Page "/app"
 Assert-Page "/app/analytics"
+Assert-Page "/app/pedidos"
 Assert-Page "/app/assistente"
 Assert-Page "/app/widget"
 Assert-Page "/app/produtos"
@@ -282,6 +283,17 @@ $recommendationExportContentType = Get-HeaderValue -Headers $recommendationExpor
 Assert-True ($recommendationExport.StatusCode -eq 200) "export de recomendacoes nao retornou 200"
 Assert-True ($recommendationExportContentType -like "text/csv*") "export de recomendacoes sem CSV"
 "API recommendation export OK"
+
+$ordersOverview = Invoke-RestMethod -Uri "$ApiBase/orders/overview?period=30d" -Headers $headers
+Assert-True ($null -ne $ordersOverview.data) "orders overview sem data"
+Assert-True ($null -ne $ordersOverview.data.summary) "orders overview sem resumo"
+Assert-True ($null -ne $ordersOverview.data.filter_options) "orders overview sem filtros"
+"API orders overview OK"
+
+$ordersList = Invoke-RestMethod -Uri "$ApiBase/orders?period=30d&per_page=5" -Headers $headers
+Assert-True ($null -ne $ordersList.data) "orders list sem data"
+Assert-True ($null -ne $ordersList.meta) "orders list sem paginacao"
+"API orders list OK"
 
 $placementBody = @{
     platform = $widgetInstall.data.platform

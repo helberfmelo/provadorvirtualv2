@@ -7,6 +7,7 @@ use App\Models\MeasurementTable;
 use App\Models\MeasurementTableRow;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
+use App\Models\MerchantOrder;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\TransactionalEmail;
@@ -184,6 +185,7 @@ class DatabaseSeeder extends Seeder
             'color' => 'Jeans escuro',
             'price' => 219.90,
         ], ['38', '40', '42', '44', '46']);
+        $this->seedMerchantOrders($merchant, $company);
 
         WidgetInstall::query()->updateOrCreate(
             ['public_key' => 'pv_demo_luna'],
@@ -334,5 +336,91 @@ class DatabaseSeeder extends Seeder
         }
 
         return $product;
+    }
+
+    private function seedMerchantOrders(Merchant $merchant, MerchantCompany $company): void
+    {
+        $orders = [
+            [
+                'reference' => 'PV-ORDER-2026-001',
+                'ordered_at' => now()->subDays(2),
+                'status' => 'paid',
+                'source' => 'csv',
+                'source_platform' => 'custom',
+                'items' => [
+                    ['sku' => 'PV-AURORA-MIDI-M', 'product_name' => 'Vestido Midi Aurora', 'ordered_size' => 'M', 'quantity' => 1, 'unit_price_cents' => 18990, 'used_virtual_try_on' => true, 'recommended_size' => 'M', 'recommendation_confidence' => 96],
+                    ['sku' => 'PV-SOLAR-BLUSA-P', 'product_name' => 'Blusa Canelada Solar', 'ordered_size' => 'P', 'quantity' => 1, 'unit_price_cents' => 9990, 'used_virtual_try_on' => false, 'recommended_size' => null, 'recommendation_confidence' => null],
+                ],
+            ],
+            [
+                'reference' => 'PV-ORDER-2026-002',
+                'ordered_at' => now()->subDay(),
+                'status' => 'paid',
+                'source' => 'csv',
+                'source_platform' => 'custom',
+                'items' => [
+                    ['sku' => 'PV-ESSENCIAL-CAMISETA-M', 'product_name' => 'Camiseta Essencial Marinho', 'ordered_size' => 'M', 'quantity' => 2, 'unit_price_cents' => 7990, 'used_virtual_try_on' => true, 'recommended_size' => 'M', 'recommendation_confidence' => 88],
+                ],
+            ],
+            [
+                'reference' => 'PV-ORDER-2026-003',
+                'ordered_at' => now()->subHours(8),
+                'status' => 'pending',
+                'source' => 'manual',
+                'source_platform' => 'custom',
+                'items' => [
+                    ['sku' => 'PV-JEANS-RETA-42', 'product_name' => 'Calca Jeans Reta Masculina', 'ordered_size' => '42', 'quantity' => 1, 'unit_price_cents' => 21990, 'used_virtual_try_on' => false, 'recommended_size' => null, 'recommendation_confidence' => null],
+                ],
+            ],
+        ];
+
+        foreach ($orders as $seededOrder) {
+            $order = MerchantOrder::query()->updateOrCreate(
+                [
+                    'merchant_id' => $merchant->id,
+                    'merchant_company_id' => $company->id,
+                    'order_reference_hash' => hash('sha256', $seededOrder['reference']),
+                ],
+                [
+                    'source' => $seededOrder['source'],
+                    'source_platform' => $seededOrder['source_platform'],
+                    'order_reference' => $seededOrder['reference'],
+                    'status' => $seededOrder['status'],
+                    'ordered_at' => $seededOrder['ordered_at'],
+                    'currency' => 'BRL',
+                ]
+            );
+
+            $order->items()->delete();
+
+            $items = collect($seededOrder['items'])->map(function (array $item): array {
+                $lineTotal = $item['unit_price_cents'] * $item['quantity'];
+
+                return [
+                    'sku' => $item['sku'],
+                    'product_name' => $item['product_name'],
+                    'ordered_size' => $item['ordered_size'],
+                    'recommended_size' => $item['recommended_size'],
+                    'recommendation_confidence' => $item['recommendation_confidence'],
+                    'quantity' => $item['quantity'],
+                    'unit_price_cents' => $item['unit_price_cents'],
+                    'line_total_cents' => $lineTotal,
+                    'used_virtual_try_on' => $item['used_virtual_try_on'],
+                    'metadata' => ['source' => 'seed_demo_orders'],
+                ];
+            });
+
+            $order->items()->createMany($items->all());
+
+            $order->update([
+                'items_count' => $items->count(),
+                'total_quantity' => (int) $items->sum('quantity'),
+                'total_amount_cents' => (int) $items->sum('line_total_cents'),
+                'used_virtual_try_on' => $items->contains('used_virtual_try_on', true),
+                'assisted_items_count' => $items->where('used_virtual_try_on', true)->count(),
+                'assisted_revenue_cents' => (int) $items->where('used_virtual_try_on', true)->sum('line_total_cents'),
+                'metadata' => ['source' => 'seed_demo_orders'],
+            ]);
+        }
     }
 }
