@@ -108,6 +108,12 @@ export type IntegrationChangeRequest = {
   requested_at: string | null
   resolved_at: string | null
   payment_link: string | null
+  payment_link_available: boolean
+  payment_link_host: string | null
+  payment_link_access: {
+    type: 'checkout_status' | 'commercial_request'
+    id: number
+  } | null
   admin_notes: string | null
   financial_summary: {
     currency: string

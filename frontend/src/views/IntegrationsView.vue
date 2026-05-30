@@ -227,6 +227,7 @@ const saving = ref(false)
 const savingCompanyPlatform = ref(false)
 const requestingPlatformChange = ref(false)
 const changeRequestModalOpen = ref(false)
+const openingChangeRequestLink = ref(false)
 const running = ref(false)
 const validating = ref(false)
 const testingWebhook = ref(false)
@@ -647,6 +648,33 @@ async function requestPlatformChange() {
     })
   } finally {
     requestingPlatformChange.value = false
+  }
+}
+
+async function openCommercialPaymentLink() {
+  if (!currentChangeRequest.value?.payment_link_access || openingChangeRequestLink.value) {
+    return
+  }
+
+  openingChangeRequestLink.value = true
+
+  try {
+    const { data } = await api.post('/billing/payment-links/resolve', currentChangeRequest.value.payment_link_access)
+    const url = data.data?.url
+
+    if (!url) {
+      throw new Error('Link comercial indisponível.')
+    }
+
+    window.open(url, '_blank', 'noopener')
+  } catch (requestError: any) {
+    showFeedback({
+      status: 'error',
+      title: 'Não foi possível abrir o link',
+      message: friendlyRequestMessage(requestError, 'Não foi possível abrir o link comercial agora.'),
+    })
+  } finally {
+    openingChangeRequestLink.value = false
   }
 }
 
@@ -1660,10 +1688,16 @@ function canRunBigShopApiAction() {
             <small>Solicitada em</small>
             <strong>{{ shortDate(currentChangeRequest.requested_at) }}</strong>
           </span>
-          <a v-if="currentChangeRequest.payment_link" class="btn btn-secondary btn-compact" :href="currentChangeRequest.payment_link" target="_blank" rel="noopener">
+          <button
+            v-if="currentChangeRequest.payment_link_available"
+            class="btn btn-secondary btn-compact"
+            type="button"
+            :disabled="openingChangeRequestLink"
+            @click="openCommercialPaymentLink"
+          >
             <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-            Abrir pagamento
-          </a>
+            {{ openingChangeRequestLink ? 'Abrindo...' : 'Abrir pagamento' }}
+          </button>
         </div>
 
         <div class="integration-change-financial">

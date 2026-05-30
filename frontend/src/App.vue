@@ -146,6 +146,7 @@ const companyNavSections = computed<NavSection[]>(() => [
   {
     label: 'Conta',
     links: [
+      { to: '/app/plano-e-cobranca', label: 'Plano e cobrança', icon: 'fa-wallet', show: auth.canView('dashboard') },
       { to: '/app/usuarios', label: 'Usuários', icon: 'fa-users-gear', show: auth.canView('users') },
     ],
   },
@@ -316,6 +317,14 @@ const companyHelpItems: Array<ContextHelp & { prefix: string, exact?: boolean }>
     text: 'Confira bloqueios, avisos e links diretos antes de liberar a loja para clientes.',
     nextTo: '/app/widget',
     nextLabel: 'Abrir provador',
+  },
+  {
+    prefix: '/app/plano-e-cobranca',
+    topic: 'cobranca',
+    title: 'Plano e cobrança',
+    text: 'Veja plano, benefício BigShop, cobranças em aberto e solicitações comerciais sem precisar acessar o Admin.',
+    nextTo: '/app/integracoes',
+    nextLabel: 'Ver integrações',
   },
   {
     prefix: '/app/usuarios',

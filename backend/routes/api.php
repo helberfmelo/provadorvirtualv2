@@ -89,6 +89,8 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:merchant,dashboard,view');
         Route::get('/billing/subscription', [BillingSubscriptionController::class, 'show'])
             ->middleware('portal.permission:merchant,dashboard,view');
+        Route::post('/billing/payment-links/resolve', [BillingSubscriptionController::class, 'resolvePaymentLink'])
+            ->middleware('portal.permission:merchant,dashboard,view');
         Route::patch('/billing/subscription/auto-renewal', [BillingSubscriptionController::class, 'updateAutoRenewal'])
             ->middleware('portal.permission:merchant,dashboard,edit');
         Route::patch('/merchant/company-profile', [MerchantCompanyProfileController::class, 'update'])

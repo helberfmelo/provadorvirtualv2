@@ -3027,7 +3027,16 @@ Critérios de aceite:
 - BigShop com desconto fica claro;
 - links de pagamento são seguros e auditados.
 
-Status: planejada.
+Status: implementada localmente; publicação em andamento.
+
+Implementação desta sprint:
+
+- o portal ganhou `/app/plano-e-cobranca`, com resumo do plano atual, plataforma, benefício BigShop, status comercial, vencimento, governança financeira e histórico comercial em linguagem operacional;
+- `GET /api/v1/billing/subscription` passou a devolver `company`, `plan`, `subscription`, `payment_links`, `commercial_requests` e `actions`, usando assinatura atual, último checkout e solicitações comerciais da empresa ativa;
+- `POST /api/v1/billing/payment-links/resolve` passou a abrir links financeiros de forma auditada, registrando ator, empresa, origem do link e host sem expor a URL bruta no payload do portal;
+- `/app/integracoes` deixou de abrir o link comercial bruto e passou a reutilizar o mesmo fluxo auditado do billing para a troca BigShop;
+- `backend/config/cors.php` passou a incluir `api/v1/billing*`, corrigindo o carregamento do portal local em `5177` para a validação visual desta sprint;
+- validações locais já concluídas: `php -l`, suíte focada `BillingSubscriptionApiTest|IntegrationChangeRequestApiTest`, PHPUnit completo, `pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless em `/app/plano-e-cobranca`.
 
 ### Sprint 157 - Auditoria, termos e segurança operacional
 

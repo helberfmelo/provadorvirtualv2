@@ -23,6 +23,7 @@ return [
     'paths' => [
         'api/v1/auth/*',
         'api/v1/me',
+        'api/v1/billing*',
         'api/v1/merchant/*',
         'api/v1/products*',
         'api/v1/brands*',

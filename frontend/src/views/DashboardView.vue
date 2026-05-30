@@ -296,7 +296,7 @@ async function loadBillingSubscription() {
 
   try {
     const { data } = await api.get('/billing/subscription')
-    billing.subscription = data.data
+    billing.subscription = data.data?.subscription || data.data || null
   } catch {
     billing.subscription = null
   } finally {
@@ -615,6 +615,11 @@ function priorityLabel(priority: NextAction['priority']) {
         />
         <span>Renovação automática</span>
       </label>
+
+      <RouterLink class="btn btn-secondary btn-compact" to="/app/plano-e-cobranca">
+        <i class="fa-solid fa-wallet" aria-hidden="true"></i>
+        Ver plano e cobrança
+      </RouterLink>
 
       <small v-if="billing.saved" class="billing-note ok">{{ billing.saved }}</small>
       <small v-else-if="billing.error" class="billing-note warning">{{ billing.error }}</small>

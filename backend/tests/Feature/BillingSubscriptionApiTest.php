@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\BillingSubscription;
 use App\Models\CheckoutSession;
+use App\Models\IntegrationChangeRequest;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\User;
@@ -15,6 +16,42 @@ use Tests\TestCase;
 class BillingSubscriptionApiTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function test_billing_summary_includes_plan_company_payment_links_and_commercial_history(): void
+    {
+        [$token, $subscription, $checkout] = $this->subscriptionFixture();
+        $changeRequest = IntegrationChangeRequest::query()->create([
+            'merchant_id' => $checkout->merchant_id,
+            'merchant_company_id' => $checkout->merchant_company_id,
+            'user_id' => $checkout->user_id,
+            'from_platform' => 'bigshop',
+            'to_platform' => 'shopify',
+            'status' => IntegrationChangeRequest::STATUS_PAYMENT_REQUESTED,
+            'terms_version' => 'bigshop-change-2026-05-29',
+            'terms_accepted_at' => now()->subDay(),
+            'requested_at' => now()->subDay(),
+            'payment_link' => 'https://provadorvirtual.online/checkout?upgrade=loja-recorrencia',
+            'metadata' => [
+                'financial_summary' => [
+                    'short_text' => 'Diferença estimada sob revisão comercial.',
+                ],
+            ],
+        ]);
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->getJson('/api/v1/billing/subscription')
+            ->assertOk()
+            ->assertJsonPath('data.company.company.platform_label', 'BigShop')
+            ->assertJsonPath('data.company.company.commercial_status', 'bigshop_benefit')
+            ->assertJsonPath('data.plan.plan_code', 'monthly')
+            ->assertJsonPath('data.plan.billing_cycle_label', 'Mensal')
+            ->assertJsonPath('data.subscription.id', $subscription->id)
+            ->assertJsonPath('data.payment_links.0.access.type', 'checkout_status')
+            ->assertJsonPath('data.commercial_requests.0.id', $changeRequest->id)
+            ->assertJsonPath('data.commercial_requests.0.payment_link_available', true)
+            ->assertJsonPath('data.commercial_requests.0.payment_link_access.type', 'commercial_request')
+            ->assertJsonPath('data.actions.financial_changes_managed_by', 'admin');
+    }
 
     public function test_merchant_can_disable_future_auto_renewal_without_canceling_paid_checkout(): void
     {
@@ -41,8 +78,8 @@ class BillingSubscriptionApiTest extends TestCase
         $this->withHeader('Authorization', 'Bearer '.$token)
             ->getJson('/api/v1/billing/subscription')
             ->assertOk()
-            ->assertJsonPath('data.id', $subscription->id)
-            ->assertJsonPath('data.auto_renewal_enabled', true);
+            ->assertJsonPath('data.subscription.id', $subscription->id)
+            ->assertJsonPath('data.subscription.auto_renewal_enabled', true);
 
         $this->withHeader('Authorization', 'Bearer '.$token)
             ->patchJson('/api/v1/billing/subscription/auto-renewal', [
@@ -70,6 +107,62 @@ class BillingSubscriptionApiTest extends TestCase
         ]);
     }
 
+    public function test_merchant_can_resolve_checkout_status_link_with_audit(): void
+    {
+        [$token, $subscription, $checkout] = $this->subscriptionFixture();
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/v1/billing/payment-links/resolve', [
+                'type' => 'checkout_status',
+                'id' => $checkout->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.title', 'Ver comprovante da contratação')
+            ->assertJsonPath('data.url', 'http://localhost/checkout/sucesso?ref=checkout-recorrencia-ref');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'merchant_id' => $checkout->merchant_id,
+            'merchant_company_id' => $checkout->merchant_company_id,
+            'event' => 'billing.payment_link_opened',
+            'auditable_type' => $checkout->getMorphClass(),
+            'auditable_id' => $checkout->id,
+        ]);
+    }
+
+    public function test_merchant_can_resolve_commercial_payment_link_with_audit(): void
+    {
+        [$token, $subscription, $checkout] = $this->subscriptionFixture();
+        $changeRequest = IntegrationChangeRequest::query()->create([
+            'merchant_id' => $checkout->merchant_id,
+            'merchant_company_id' => $checkout->merchant_company_id,
+            'user_id' => $checkout->user_id,
+            'from_platform' => 'bigshop',
+            'to_platform' => 'shopify',
+            'status' => IntegrationChangeRequest::STATUS_PAYMENT_REQUESTED,
+            'terms_version' => 'bigshop-change-2026-05-29',
+            'terms_accepted_at' => now(),
+            'requested_at' => now(),
+            'payment_link' => 'https://provadorvirtual.online/checkout?upgrade=loja-recorrencia',
+        ]);
+
+        $this->withHeader('Authorization', 'Bearer '.$token)
+            ->postJson('/api/v1/billing/payment-links/resolve', [
+                'type' => 'commercial_request',
+                'id' => $changeRequest->id,
+            ])
+            ->assertOk()
+            ->assertJsonPath('data.title', 'Abrir link comercial')
+            ->assertJsonPath('data.url', 'https://provadorvirtual.online/checkout?upgrade=loja-recorrencia');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'merchant_id' => $checkout->merchant_id,
+            'merchant_company_id' => $checkout->merchant_company_id,
+            'event' => 'billing.payment_link_opened',
+            'auditable_type' => $changeRequest->getMorphClass(),
+            'auditable_id' => $changeRequest->id,
+        ]);
+    }
+
     private function subscriptionFixture(): array
     {
         $user = User::query()->create([
@@ -87,7 +180,8 @@ class BillingSubscriptionApiTest extends TestCase
             'merchant_id' => $merchant->id,
             'name' => 'Loja Recorrencia Ltda',
             'document' => '11222333000181',
-            'platform' => 'custom',
+            'platform' => 'bigshop',
+            'bigshop_discount_active' => true,
             'status' => 'active',
         ]);
         $user->merchants()->attach($merchant->id, ['role' => 'owner', 'is_owner' => true]);
