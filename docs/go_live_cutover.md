@@ -141,3 +141,5 @@ Publicado em produção no run `26340033238`; `scripts/validate-production.ps1` 
 - blocos conectados de catálogo, widget e sincronização com links diretos para correção;
 - relatório pronto para compartilhar com o lojista, incluindo resumo, recomendações e pendências;
 - botão de revalidação para atualizar o diagnóstico sem sair da tela.
+
+Publicado em produção no run `26675093553`; `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
