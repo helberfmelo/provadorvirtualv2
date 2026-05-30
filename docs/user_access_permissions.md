@@ -42,6 +42,8 @@ Implementado:
 - `/app/usuarios` e `/saas/usuarios-empresas` passaram a exibir status de convite e permitir reenviar convite operacional sem expor credenciais;
 - quando um admin/support entra no portal da empresa, a interface mostra explicitamente o contexto SaaS + empresa ativa.
 
+Publicado em produção no run `26675615573`; `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
 ## Módulos do portal da empresa
 
 - `dashboard`

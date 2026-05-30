@@ -2987,7 +2987,7 @@ Critérios de aceite:
 - usuário sem permissão não vê ações sensíveis;
 - ações críticas registram ator e contexto.
 
-Status: implementada e validada localmente; aguardando publicação final desta sprint.
+Status: concluída e publicada em produção no run `26675615573`.
 
 Implementação desta sprint:
 
@@ -2996,7 +2996,8 @@ Implementação desta sprint:
 - `POST /api/v1/auth/login` passou a marcar aceite do convite no primeiro acesso da empresa e gerar evento auditável;
 - `/app/usuarios`, `/saas/usuarios` e `/saas/usuarios-empresas` escondem ações sensíveis quando o usuário só pode visualizar e exibem status de convite;
 - o portal reforça a trilha visual quando um admin SaaS está dentro do contexto da empresa, incluindo lojista e código da empresa ativa;
-- validações locais já concluídas: `php -l`, suíte focada `UserAccessApiTest|AuthTest|AnalyticsApiTest`, PHPUnit completo, `pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless em `/app/usuarios`.
+- validações locais já concluídas: `php -l`, suíte focada `UserAccessApiTest|AuthTest|AnalyticsApiTest`, PHPUnit completo, `pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless em `/app/usuarios`;
+- publicada no commit `4c42900`, com `scripts/validate-production.ps1` retornando `PRODUCTION VALIDATION OK`.
 
 ### Sprint 156 - Cobranca, plano e autonomia do cliente
 
