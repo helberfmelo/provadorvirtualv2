@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import OperationalStateCard from '../components/OperationalStateCard.vue'
 import { api } from '../services/api'
 
 type SyncIssue = {
@@ -237,6 +238,12 @@ const timeline = computed(() => {
     warnings: event.counters.warnings,
   }))
 })
+
+function resetFilters() {
+  statusFilter.value = 'all'
+  typeFilter.value = 'all'
+  originFilter.value = 'all'
+}
 
 const originOptions = computed(() => {
   const origins = new Map<string, string>()
@@ -569,13 +576,36 @@ function formatDuration(seconds: number | null) {
           </em>
         </span>
       </div>
-      <div v-else class="empty-state">Escolha duas execuções diferentes para comparar.</div>
+      <OperationalStateCard
+        v-else
+        tone="empty"
+        eyebrow="Comparação"
+        title="Escolha duas execuções diferentes para comparar."
+        description="Selecione uma base e outra execução para enxergar a diferença de volume, erros e alertas."
+        compact
+      />
     </div>
 
     <div class="app-grid sync-grid">
       <aside class="panel-list sync-event-list">
-        <div v-if="loading" class="empty-state">Carregando sincronizações...</div>
-        <div v-else-if="!filteredEvents.length" class="empty-state">Nenhuma sincronização encontrada.</div>
+        <OperationalStateCard
+          v-if="loading"
+          tone="loading"
+          eyebrow="Sincronização"
+          title="Carregando histórico da integração"
+          description="Estamos buscando execuções, erros por produto e resumo operacional da empresa ativa."
+          compact
+        />
+        <OperationalStateCard
+          v-else-if="!filteredEvents.length"
+          tone="empty"
+          eyebrow="Sincronização"
+          title="Nenhuma sincronização encontrada para esse filtro."
+          description="Revise origem, status e tipo para localizar a execução que você quer analisar."
+          action-label="Limpar filtros"
+          compact
+          @action="resetFilters"
+        />
         <template v-else>
           <button
             v-for="event in filteredEvents"
@@ -600,7 +630,14 @@ function formatDuration(seconds: number | null) {
       </aside>
 
       <section class="panel-main sync-detail-panel">
-        <div v-if="!selectedEvent" class="empty-state">Selecione uma execução para ver os detalhes.</div>
+        <OperationalStateCard
+          v-if="!selectedEvent"
+          tone="empty"
+          eyebrow="Detalhes"
+          title="Selecione uma execução para ver os detalhes."
+          description="A linha do tempo e a lista à esquerda mostram as execuções mais recentes da empresa."
+          compact
+        />
         <template v-else>
           <div class="subsection-heading">
             <h2>{{ selectedEvent.title }}</h2>
@@ -661,7 +698,14 @@ function formatDuration(seconds: number | null) {
             </button>
           </div>
 
-          <div v-if="!selectedEvent.issues.length" class="empty-state">Nenhum erro por produto nesta execução.</div>
+          <OperationalStateCard
+            v-if="!selectedEvent.issues.length"
+            tone="success"
+            eyebrow="Erros por produto"
+            title="Nenhum erro por produto nesta execução."
+            description="Essa rodada terminou sem pendências por item, então você pode seguir para a próxima revisão operacional."
+            compact
+          />
           <div v-else-if="selectedIssueGroups.length" class="sync-issue-groups">
             <article v-for="group in selectedIssueGroups" :key="group.key">
               <div>

@@ -3153,7 +3153,18 @@ Critérios de aceite:
 - nenhuma tela tem texto ou card desnecessário;
 - build, testes, smoke e validação de produção passam.
 
-Status: planejada.
+Status: concluída localmente e pronta para publicação.
+
+Implementação desta sprint:
+
+- criado o componente compartilhado `OperationalStateCard` para padronizar estados de carregamento, vazio, erro, sucesso e modo leitura;
+- o carregamento do contexto autenticado em `App.vue` passou a usar o mesmo padrão visual do restante do portal;
+- `/app/produtos` passou a esconder criação, edição, remoção e vínculo em lote para acessos sem permissão de edição, além de orientar melhor erros e vazios;
+- `/app/usuarios` ganhou estados padronizados de carregamento/erro/vazio e aviso explícito quando o acesso está em modo leitura;
+- `/app/integracoes` passou a mostrar modo leitura claro, além de estados mais orientados para carregamento, falha e empresa sem plataforma configurada;
+- `/app/sincronizacao` passou a orientar melhor comparação vazia, filtros sem resultado, ausência de seleção e execuções sem erro por produto;
+- criado `docs/portal_visual_checklist.md` como checklist visual Sizebay-plus para futuras telas;
+- validações locais concluídas: `npm --prefix frontend run build` e revisão visual headless desktop/mobile das telas polidas.
 
 ### Sprint 160 - Migração Sizebay e importação assistida de clientes
 

@@ -1793,3 +1793,16 @@
 - A validação visual local rodou em `http://127.0.0.1:5177/app/ajuda`, com backend local em `8002`, navegador headless e usuário demo da empresa. Desktop e mobile passaram com busca, troca de artigo, botão `Suporte com contexto` e CTA relacionado; a barra de ajuda contextual em `http://127.0.0.1:5177/app/produtos` também apontou corretamente para o artigo de produtos. As capturas ficaram em `.tmp/sprint158-help-desktop.png` e `.tmp/sprint158-help-mobile.png` e não devem ser versionadas.
 - O fechamento publicado da sprint saiu no commit `b30ce84`; o run `26677519329` do workflow `Deploy Production` terminou verde.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, cobrindo páginas públicas, páginas SaaS, portal autenticado, widget JS/CSS, APIs operacionais, CORS, login demo, readiness e retornando `PRODUCTION VALIDATION OK`.
+
+## 2026-05-30 - Sprint 159 Polimento final Sizebay-plus do portal
+
+- Relida a documentação obrigatória antes da sprint, incluindo `docs/README.md`, `docs/current_platform_state.md`, `docs/development_guidelines.md`, `docs/portal_ui_guidelines.md`, `docs/sprint_governance.md` e o trecho final do roadmap com as Sprints 159 e 160.
+- Feito benchmark local rápido das telas críticas do portal autenticado (`/app`, `/app/produtos`, `/app/integracoes`, `/app/sincronizacao`, `/app/analytics` e `/app/usuarios`) para localizar ruído visual, estados rasos e pontos de permissão pouco explícitos.
+- Criado o componente compartilhado `frontend/src/components/OperationalStateCard.vue` para padronizar carregamento, vazio, erro, sucesso e modo leitura com linguagem curta, ação opcional e comportamento responsivo.
+- `App.vue` passou a usar o novo estado compartilhado para o carregamento do contexto da empresa, evitando mensagem solta e alinhando a experiência entre telas.
+- `/app/produtos` foi polida com modo leitura explícito, erro orientado, estado vazio com próximo passo, ocultação de ações sensíveis para acessos sem edição e vínculo em lote exibido só para quem realmente pode alterar o catálogo.
+- `/app/usuarios` passou a distinguir melhor modo leitura, carregamento, erro e vazio; ações de convite, edição e ativação continuam escondidas para quem não pode editar.
+- `/app/integracoes` ganhou estado padrão para carregamento/erro/vazio e aviso claro quando o usuário só pode consultar a configuração sem salvar conexão, token, feed ou validação.
+- `/app/sincronizacao` ganhou estados orientados para comparação vazia, histórico filtrado sem resultados, detalhe sem execução selecionada e rodada sem erro por produto.
+- Criado `docs/portal_visual_checklist.md` e referenciado em `docs/portal_ui_guidelines.md` como checklist rápido de clareza, estados, permissão e responsividade para futuras telas.
+- Validações locais passaram com `npm --prefix frontend run build` e revisão visual headless em `http://127.0.0.1:5177/app/produtos`, `/app/integracoes`, `/app/sincronizacao` e `/app/usuarios`, incluindo cenário com filtro vazio em produtos e checagem mobile sem rolagem horizontal em `.tmp/sprint159-visual/`.

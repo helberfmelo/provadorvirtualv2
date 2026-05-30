@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { RouterLink } from 'vue-router'
+import OperationalStateCard from '../components/OperationalStateCard.vue'
 import { api } from '../services/api'
 import type { PortalUser } from '../services/merchantTypes'
 import { showFeedback } from '../services/saveFeedback'
@@ -10,6 +11,7 @@ const auth = useAuthStore()
 const users = ref<PortalUser[]>([])
 const loading = ref(false)
 const error = ref('')
+const canEditUsers = computed(() => auth.canEdit('users'))
 
 onMounted(() => {
   loadUsers()
@@ -111,14 +113,32 @@ function invitationDate(user: PortalUser) {
           <i class="fa-solid fa-rotate" aria-hidden="true"></i>
           Atualizar
         </button>
-        <RouterLink v-if="auth.canEdit('users')" class="btn btn-primary" to="/app/usuarios/novo">
+        <RouterLink v-if="canEditUsers" class="btn btn-primary" to="/app/usuarios/novo">
           <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
           Novo usuário
         </RouterLink>
       </div>
     </div>
 
-    <p v-if="error" class="form-error">{{ error }}</p>
+    <OperationalStateCard
+      v-if="!canEditUsers"
+      tone="permission"
+      eyebrow="Modo leitura"
+      title="Seu acesso pode consultar usuários, mas não pode alterar convites ou permissões."
+      description="A lista continua disponível para conferência. Para convidar, editar ou ativar acessos, use um perfil com permissão de edição."
+      compact
+    />
+
+    <OperationalStateCard
+      v-if="error"
+      tone="error"
+      eyebrow="Falha ao carregar"
+      :title="error"
+      description="Atualize a lista ou tente novamente depois para confirmar os acessos da empresa."
+      action-label="Tentar novamente"
+      compact
+      @action="loadUsers"
+    />
 
     <section class="panel-main subsection">
       <div class="subsection-heading">
@@ -126,7 +146,27 @@ function invitationDate(user: PortalUser) {
         <span>{{ loading ? 'carregando' : `${users.length} usuários` }}</span>
       </div>
 
-      <div class="table-wrap">
+      <OperationalStateCard
+        v-if="loading && !users.length"
+        tone="loading"
+        eyebrow="Usuários"
+        title="Carregando acessos da empresa"
+        description="Estamos buscando convites, perfis e permissões da empresa ativa."
+        compact
+      />
+
+      <OperationalStateCard
+        v-else-if="!users.length"
+        tone="empty"
+        eyebrow="Usuários"
+        title="Nenhum acesso cadastrado nesta empresa."
+        description="Convide a equipe que vai operar o portal ou mantenha apenas o acesso principal enquanto a loja estiver em preparação."
+        :action-label="canEditUsers ? 'Criar primeiro usuário' : ''"
+        :action-to="canEditUsers ? '/app/usuarios/novo' : ''"
+        compact
+      />
+
+      <div v-else class="table-wrap">
         <table>
           <thead>
             <tr>
@@ -138,9 +178,6 @@ function invitationDate(user: PortalUser) {
             </tr>
           </thead>
           <tbody>
-            <tr v-if="!users.length">
-              <td colspan="5">Nenhum usuário cadastrado.</td>
-            </tr>
             <tr v-for="user in users" :key="user.id">
               <td>
                 <strong>{{ user.name }}</strong>
@@ -160,7 +197,7 @@ function invitationDate(user: PortalUser) {
               </td>
               <td class="row-actions">
                 <RouterLink
-                  v-if="auth.canEdit('users')"
+                  v-if="canEditUsers"
                   class="icon-link"
                   :to="`/app/usuarios/${user.id}/editar`"
                   title="Editar"
@@ -169,7 +206,7 @@ function invitationDate(user: PortalUser) {
                   <i class="fa-solid fa-pen" aria-hidden="true"></i>
                 </RouterLink>
                 <button
-                  v-if="auth.canEdit('users')"
+                  v-if="canEditUsers"
                   type="button"
                   :title="user.access?.status === 'active' ? 'Desativar' : 'Ativar'"
                   @click="toggleUser(user)"
@@ -177,13 +214,14 @@ function invitationDate(user: PortalUser) {
                   <i :class="user.access?.status === 'active' ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off'" aria-hidden="true"></i>
                 </button>
                 <button
-                  v-if="auth.canEdit('users') && user.access?.invitation.status !== 'accepted'"
+                  v-if="canEditUsers && user.access?.invitation.status !== 'accepted'"
                   type="button"
                   title="Reenviar convite"
                   @click="resendInvite(user)"
                 >
                   <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
                 </button>
+                <span v-if="!canEditUsers" class="table-readonly-chip">Leitura</span>
               </td>
             </tr>
           </tbody>

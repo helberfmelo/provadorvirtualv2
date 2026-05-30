@@ -66,6 +66,8 @@ A navegação autenticada deve priorizar jornadas, não uma lista solta de telas
 
 ## Checklist antes de finalizar sprint
 
+Use também `docs/portal_visual_checklist.md` como revisão rápida de clareza, estados, permissão e mobile.
+
 - `npm run build`;
 - `git diff --check`;
 - validar rotas públicas e autenticadas pelo `scripts/validate-production.ps1` após deploy;

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import OperationalStateCard from './components/OperationalStateCard.vue'
 import SaveFeedbackModal from './components/SaveFeedbackModal.vue'
 import { buildSupportUrl, findHelpArticleByRoute } from './content/helpCenter'
 import { useAuthStore } from './stores/auth'
@@ -412,9 +413,14 @@ function handleBrandClick(event: MouseEvent) {
             </a>
           </div>
         </section>
-        <div v-if="!workContextReady" class="empty-state work-context-loading">
-          Carregando contexto da empresa...
-        </div>
+        <OperationalStateCard
+          v-if="!workContextReady"
+          tone="loading"
+          eyebrow="Contexto"
+          title="Carregando a empresa ativa"
+          description="Estamos confirmando seu acesso, empresa e permissões antes de abrir a próxima tela."
+          compact
+        />
         <RouterView v-else :key="workViewKey" />
       </main>
     </div>

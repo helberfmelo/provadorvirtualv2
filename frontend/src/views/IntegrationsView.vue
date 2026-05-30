@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink } from 'vue-router'
+import OperationalStateCard from '../components/OperationalStateCard.vue'
 import { api } from '../services/api'
 import { showFeedback } from '../services/saveFeedback'
 import type { IntegrationChangeRequest } from '../services/saasTypes'
@@ -461,6 +462,7 @@ const changeRequestSteps = computed(() => {
   ]
 })
 const canEditCompanyPlatform = computed(() => !hasBigShopDiscount.value && auth.canEdit('integrations'))
+const showReadOnlyIntegrationNote = computed(() => !hasBigShopDiscount.value && !auth.canEdit('integrations'))
 const companyPlatformHelp = computed(() => {
   if (hasBigShopDiscount.value) {
     return 'Esta loja usa BigShop com benefício comercial ativo. Para trocar por outra plataforma, solicite a mudança e o SaaS fará a revisão de diferença de plano.'
@@ -1102,6 +1104,15 @@ function canRunBigShopApiAction() {
         : 'Integração BigShop ativa: este painel exibe a configuração específica da BigShop.' }}
     </p>
 
+    <OperationalStateCard
+      v-if="showReadOnlyIntegrationNote"
+      tone="permission"
+      eyebrow="Modo leitura"
+      title="Seu acesso pode revisar integrações, mas não pode salvar conexão ou validação."
+      description="Status, instruções e histórico continuam visíveis. Para editar feed, token, plataforma ou instalação, entre com um perfil com permissão de edição."
+      compact
+    />
+
     <section v-if="hasBigShopDiscount" class="panel-main bigshop-governance-panel">
       <div>
         <span class="eyebrow">Governança BigShop</span>
@@ -1123,11 +1134,34 @@ function canRunBigShopApiAction() {
       </div>
     </section>
 
-    <div v-if="loading" class="empty-state">Carregando integrações...</div>
-    <div v-else-if="loadError" class="empty-state">{{ loadError }}</div>
-    <div v-else-if="!platforms.length" class="empty-state">
-      Nenhuma plataforma foi encontrada para a empresa ativa. Atualize a página ou revise o cadastro da empresa no SaaS.
-    </div>
+    <OperationalStateCard
+      v-if="loading"
+      tone="loading"
+      eyebrow="Integrações"
+      title="Carregando plataformas da empresa"
+      description="Estamos trazendo conexão, catálogo, validação e guias da integração ativa."
+      compact
+    />
+    <OperationalStateCard
+      v-else-if="loadError"
+      tone="error"
+      eyebrow="Integrações"
+      :title="loadError"
+      description="Atualize a página ou revise a empresa ativa antes de salvar credenciais e validar a instalação."
+      action-label="Tentar novamente"
+      compact
+      @action="loadPlatforms"
+    />
+    <OperationalStateCard
+      v-else-if="!platforms.length"
+      tone="empty"
+      eyebrow="Integrações"
+      title="Nenhuma plataforma disponível para esta empresa."
+      description="Revise o cadastro da empresa no SaaS ou atualize a página para recarregar a configuração operacional."
+      action-label="Atualizar página"
+      compact
+      @action="loadPlatforms"
+    />
 
     <div v-else class="integrations-stack">
       <form class="admin-form integrations-form" @submit.prevent="savePlatform">

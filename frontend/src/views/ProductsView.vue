@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { RouterLink, useRoute } from 'vue-router'
+import OperationalStateCard from '../components/OperationalStateCard.vue'
 import { api } from '../services/api'
 import type { MeasurementTableOption, Product } from '../services/merchantTypes'
 import { showFeedback } from '../services/saveFeedback'
+import { useAuthStore } from '../stores/auth'
 
+const auth = useAuthStore()
 const products = ref<Product[]>([])
 const measurementTables = ref<MeasurementTableOption[]>([])
 const selectedProductIds = ref<number[]>([])
@@ -129,6 +132,7 @@ const pagination = reactive({
 })
 
 const selectedCount = computed(() => selectedProductIds.value.length)
+const canEditProducts = computed(() => auth.canEdit('products'))
 const hasSelection = computed(() => selectedCount.value > 0)
 const visibleProductIds = computed(() => products.value.map((product) => product.id))
 const allVisibleSelected = computed(() => (
@@ -190,6 +194,7 @@ const activeShortcutLabel = computed(() => {
 const activeFilterCount = computed(() => Object.entries(filters)
   .filter(([key, value]) => key !== 'readiness' && key !== 'status' ? Boolean(String(value).trim()) : Boolean(String(value).trim()))
   .length)
+const hasActiveProductFilters = computed(() => Boolean(activeShortcutLabel.value || activeFilterCount.value))
 const canPreviousPage = computed(() => pagination.current_page > 1)
 const canNextPage = computed(() => pagination.current_page < pagination.last_page)
 const selectedTargetTable = computed(() => measurementTables.value.find((table) => table.id === Number(bulkMeasurementTableId.value)) || null)
@@ -199,6 +204,12 @@ const canConfirmBulkPreview = computed(() => Boolean(bulkPreview.value) && (!bul
 const withoutTableCount = computed(() => summary.tabs.without_measurement_table || 0)
 const bulkPreviewRows = computed(() => bulkPreview.value?.preview || [])
 const bulkTargetLabel = computed(() => bulkPreview.value?.summary.target_table.name || selectedTargetTable.value?.name || 'tabela selecionada')
+const emptyProductsActionLabel = computed(() => hasActiveProductFilters.value
+  ? 'Limpar filtros'
+  : (canEditProducts.value ? 'Ir para importações' : 'Revisar integrações'))
+const emptyProductsActionTo = computed(() => hasActiveProductFilters.value
+  ? ''
+  : (canEditProducts.value ? '/app/importacoes' : '/app/integracoes'))
 
 let filterTimer: ReturnType<typeof window.setTimeout> | null = null
 
@@ -664,14 +675,32 @@ function previewStatusText(item: BulkPreviewItem) {
           <i class="fa-solid fa-rotate" aria-hidden="true"></i>
           Atualizar
         </button>
-        <RouterLink class="btn btn-primary" to="/app/produtos/novo">
+        <RouterLink v-if="canEditProducts" class="btn btn-primary" to="/app/produtos/novo">
           <i class="fa-solid fa-plus" aria-hidden="true"></i>
           Novo produto
         </RouterLink>
       </div>
     </div>
 
-    <p v-if="error" class="form-error">{{ error }}</p>
+    <OperationalStateCard
+      v-if="!canEditProducts"
+      tone="permission"
+      eyebrow="Modo leitura"
+      title="Seu acesso pode revisar o catálogo, mas não pode alterar produtos."
+      description="Filtros e diagnósticos continuam disponíveis. Para criar, editar, remover ou vincular em lote, use um perfil com permissão de edição."
+      compact
+    />
+
+    <OperationalStateCard
+      v-if="error"
+      tone="error"
+      eyebrow="Falha ao carregar"
+      :title="error"
+      description="Atualize a página ou revise a integração ativa antes de seguir com o catálogo."
+      action-label="Tentar novamente"
+      compact
+      @action="loadData"
+    />
 
     <section class="panel-main subsection">
       <div class="subsection-heading">
@@ -787,35 +816,37 @@ function previewStatusText(item: BulkPreviewItem) {
           <i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i>
           Filtros
         </button>
-        <span class="toolbar-divider"></span>
-        <select v-model.number="bulkMeasurementTableId" :disabled="!hasSelection" aria-label="Tabela para vincular">
-          <option value="">Vincular tabela</option>
-          <option v-for="table in measurementTables" :key="table.id" :value="table.id">
-            {{ table.name }}
-          </option>
-        </select>
-        <button class="btn btn-primary btn-compact" type="button" :disabled="!hasSelection || !bulkMeasurementTableId || linking" @click="previewSelectedProducts">
-          <i class="fa-solid fa-eye" aria-hidden="true"></i>
-          Prévia
-        </button>
-        <button
-          v-if="lastBulkAction"
-          class="btn btn-secondary btn-compact"
-          type="button"
-          :disabled="linking"
-          :title="`Desfazer ${lastBulkAction.label}`"
-          @click="undoLastBulkLink"
-        >
-          <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
-          Desfazer
-        </button>
-        <button class="btn btn-secondary btn-compact" type="button" :disabled="!products.length || allVisibleSelected" @click="selectAllVisible">
-          Todos
-        </button>
-        <button class="btn btn-secondary btn-compact" type="button" :disabled="!hasSelection" @click="clearSelection">
-          Limpar
-        </button>
-        <strong>{{ selectedCount }} sel.</strong>
+        <template v-if="canEditProducts">
+          <span class="toolbar-divider"></span>
+          <select v-model.number="bulkMeasurementTableId" :disabled="!hasSelection" aria-label="Tabela para vincular">
+            <option value="">Vincular tabela</option>
+            <option v-for="table in measurementTables" :key="table.id" :value="table.id">
+              {{ table.name }}
+            </option>
+          </select>
+          <button class="btn btn-primary btn-compact" type="button" :disabled="!hasSelection || !bulkMeasurementTableId || linking" @click="previewSelectedProducts">
+            <i class="fa-solid fa-eye" aria-hidden="true"></i>
+            Prévia
+          </button>
+          <button
+            v-if="lastBulkAction"
+            class="btn btn-secondary btn-compact"
+            type="button"
+            :disabled="linking"
+            :title="`Desfazer ${lastBulkAction.label}`"
+            @click="undoLastBulkLink"
+          >
+            <i class="fa-solid fa-rotate-left" aria-hidden="true"></i>
+            Desfazer
+          </button>
+          <button class="btn btn-secondary btn-compact" type="button" :disabled="!products.length || allVisibleSelected" @click="selectAllVisible">
+            Todos
+          </button>
+          <button class="btn btn-secondary btn-compact" type="button" :disabled="!hasSelection" @click="clearSelection">
+            Limpar
+          </button>
+          <strong>{{ selectedCount }} sel.</strong>
+        </template>
       </div>
       <p v-if="activeShortcutLabel || activeFilterCount" class="filter-hint">
         Filtro ativo: <strong>{{ activeShortcutLabel || `${activeFilterCount} filtro(s)` }}</strong>
@@ -899,11 +930,34 @@ function previewStatusText(item: BulkPreviewItem) {
         </div>
       </section>
 
-      <div class="table-wrap products-table-wrap">
+      <OperationalStateCard
+        v-if="loading && !products.length"
+        tone="loading"
+        eyebrow="Produtos"
+        title="Carregando catálogo"
+        description="Estamos trazendo os produtos da empresa ativa com filtros, contadores e diagnósticos."
+        compact
+      />
+
+      <OperationalStateCard
+        v-else-if="!products.length"
+        tone="empty"
+        eyebrow="Produtos"
+        :title="hasActiveProductFilters ? 'Nenhum produto encontrado para este recorte.' : 'Nenhum produto disponível nesta empresa.'"
+        :description="hasActiveProductFilters
+          ? 'Limpe filtros, troque a aba operacional ou revise a busca para voltar a encontrar itens.'
+          : 'Importe o catálogo, confira a integração da loja ou cadastre manualmente os primeiros itens para começar.'"
+        :action-label="emptyProductsActionLabel"
+        :action-to="emptyProductsActionTo"
+        compact
+        @action="clearAllFilters"
+      />
+
+      <div v-else class="table-wrap products-table-wrap">
         <table>
           <thead>
             <tr>
-              <th class="selection-column"></th>
+              <th v-if="canEditProducts" class="selection-column"></th>
               <th>Produto</th>
               <th>Categoria</th>
               <th>Marca</th>
@@ -918,11 +972,8 @@ function previewStatusText(item: BulkPreviewItem) {
             </tr>
           </thead>
           <tbody>
-            <tr v-if="!products.length">
-              <td colspan="12">Nenhum produto encontrado.</td>
-            </tr>
             <tr v-for="product in products" :key="product.id" :class="{ 'is-selected': selectedProductIds.includes(product.id) }">
-              <td class="selection-column">
+              <td v-if="canEditProducts" class="selection-column">
                 <input
                   type="checkbox"
                   :checked="selectedProductIds.includes(product.id)"
@@ -961,12 +1012,15 @@ function previewStatusText(item: BulkPreviewItem) {
                 </span>
               </td>
               <td class="row-actions">
-                <RouterLink class="icon-link" :to="`/app/produtos/${product.id}/editar`" title="Editar">
-                  <i class="fa-solid fa-pen" aria-hidden="true"></i>
-                </RouterLink>
-                <button type="button" title="Remover produto" @click="removeProduct(product)">
-                  <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                </button>
+                <template v-if="canEditProducts">
+                  <RouterLink class="icon-link" :to="`/app/produtos/${product.id}/editar`" title="Editar">
+                    <i class="fa-solid fa-pen" aria-hidden="true"></i>
+                  </RouterLink>
+                  <button type="button" title="Remover produto" @click="removeProduct(product)">
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                  </button>
+                </template>
+                <span v-else class="table-readonly-chip">Leitura</span>
               </td>
             </tr>
           </tbody>
