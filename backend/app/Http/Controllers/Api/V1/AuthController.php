@@ -10,6 +10,7 @@ use App\Services\Audit\AuditLogger;
 use App\Support\ActiveTenant;
 use App\Support\PermissionCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -50,6 +51,7 @@ class AuthController extends Controller
         }
 
         [$merchant, $company] = $this->resolveLoginContext($user, $request);
+        $this->markInvitationAccepted($request, $user, $merchant, $company);
         $token = $this->issueToken($user, $merchant, $company);
 
         app(AuditLogger::class)->log($request, $merchant, 'auth.login', 'auth', 'info', [
@@ -277,6 +279,42 @@ class AuthController extends Controller
         $pivotCompanyId = $merchant->pivot?->merchant_company_id;
 
         return ! $pivotCompanyId || (int) $pivotCompanyId === (int) $company->id;
+    }
+
+    private function markInvitationAccepted(Request $request, User $user, ?Merchant $merchant, ?MerchantCompany $company): void
+    {
+        if (! $merchant || ! $company || in_array($user->role, ['admin', 'support'], true)) {
+            return;
+        }
+
+        $pivot = $user->merchants()
+            ->whereKey($merchant->id)
+            ->first()
+            ?->pivot;
+
+        if (! $pivot || ($pivot->merchant_company_id && (int) $pivot->merchant_company_id !== (int) $company->id)) {
+            return;
+        }
+
+        if (($pivot->invitation_status ?? 'accepted') === 'accepted') {
+            return;
+        }
+
+        DB::table('merchant_user')
+            ->where('merchant_id', $merchant->id)
+            ->where('user_id', $user->id)
+            ->update([
+                'invitation_status' => 'accepted',
+                'accepted_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+        app(AuditLogger::class)->log($request, $merchant, 'users.invite_accepted', 'users', 'info', [
+            'merchant_company_id' => $company->id,
+            'module' => 'users',
+            'action' => 'accept_invite',
+            'target_user_id' => $user->id,
+        ], actor: $user);
     }
 
     private function issueToken(User $user, ?Merchant $merchant, ?MerchantCompany $company): string

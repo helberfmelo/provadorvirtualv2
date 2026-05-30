@@ -9,9 +9,11 @@ import {
   type PermissionMap,
   type PortalUser,
 } from '../services/merchantTypes'
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 const userId = computed(() => Number(route.params.id || 0))
 const editing = computed(() => Boolean(userId.value))
 
@@ -30,6 +32,7 @@ const form = reactive({
   merchant_role: 'staff',
   merchant_user_status: 'active',
   is_owner: false,
+  send_invite: true,
 })
 
 onMounted(() => {
@@ -37,6 +40,11 @@ onMounted(() => {
 })
 
 async function loadForm() {
+  if (!auth.canEdit('users')) {
+    await router.replace('/app/usuarios')
+    return
+  }
+
   loading.value = true
   error.value = ''
 
@@ -71,6 +79,7 @@ function editUser(user: PortalUser) {
   form.merchant_role = user.access?.role || 'staff'
   form.merchant_user_status = user.access?.status || 'active'
   form.is_owner = Boolean(user.access?.is_owner)
+  form.send_invite = false
   permissionDraft.value = normalizePermissions(user.access?.permissions, modules.value)
 }
 
@@ -103,6 +112,7 @@ async function saveUser() {
       merchant_role: form.is_owner ? 'owner' : form.merchant_role,
       merchant_user_status: form.merchant_user_status,
       is_owner: form.is_owner,
+      send_invite: form.send_invite,
       permissions: permissionDraft.value,
     }
 
@@ -175,6 +185,11 @@ async function saveUser() {
       <label class="check-line">
         <input v-model="form.is_owner" type="checkbox" />
         <span>Dono da empresa com acesso total</span>
+      </label>
+
+      <label class="check-line">
+        <input v-model="form.send_invite" type="checkbox" />
+        <span>Registrar convite pendente até o primeiro acesso</span>
       </label>
 
       <div class="permission-grid" :class="{ disabled: form.is_owner }">

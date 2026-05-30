@@ -433,6 +433,11 @@ export type PortalUser = {
   access: {
     role: string
     status: string
+    invitation: {
+      status: 'not_sent' | 'pending' | 'accepted'
+      invited_at: string | null
+      accepted_at: string | null
+    }
     is_owner: boolean
     permissions: PermissionMap
   } | null

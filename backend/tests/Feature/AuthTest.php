@@ -178,6 +178,58 @@ class AuthTest extends TestCase
             ->assertJsonPath('summary.products', 1);
     }
 
+    public function test_pending_invite_is_marked_as_accepted_on_first_company_login(): void
+    {
+        $user = User::query()->create([
+            'name' => 'Convite Pendente',
+            'email' => 'convite@example.com',
+            'cpf' => '99988877766',
+            'role' => 'merchant',
+            'status' => 'active',
+            'password' => Hash::make('password123'),
+        ]);
+        $merchant = Merchant::query()->create([
+            'name' => 'Loja Convite',
+            'slug' => 'loja-convite',
+            'billing_status' => 'active',
+        ]);
+        $company = MerchantCompany::query()->create([
+            'merchant_id' => $merchant->id,
+            'name' => 'Loja Convite Ltda',
+            'platform' => 'custom',
+            'status' => 'active',
+        ]);
+        $company->ensureAccessCode();
+
+        $user->merchants()->attach($merchant->id, [
+            'merchant_company_id' => $company->id,
+            'role' => 'manager',
+            'status' => 'active',
+            'invitation_status' => 'pending',
+        ]);
+
+        $this->postJson('/api/v1/auth/login', [
+            'login' => 'convite@example.com',
+            'password' => 'password123',
+            'company_access' => $company->access_code,
+        ])
+            ->assertOk()
+            ->assertJsonPath('active_company.id', $company->id);
+
+        $this->assertDatabaseHas('merchant_user', [
+            'merchant_id' => $merchant->id,
+            'user_id' => $user->id,
+            'merchant_company_id' => $company->id,
+            'invitation_status' => 'accepted',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'users.invite_accepted',
+            'merchant_id' => $merchant->id,
+            'merchant_company_id' => $company->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
     public function test_company_code_selects_active_merchant_context(): void
     {
         $user = User::query()->create([

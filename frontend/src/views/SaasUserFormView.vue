@@ -9,9 +9,11 @@ import {
   type PermissionMap,
   type SaasUser,
 } from '../services/saasTypes'
+import { useAuthStore } from '../stores/auth'
 
 const route = useRoute()
 const router = useRouter()
+const auth = useAuthStore()
 const userId = computed(() => Number(route.params.id || 0))
 const editing = computed(() => Boolean(userId.value))
 
@@ -38,6 +40,11 @@ onMounted(() => {
 })
 
 async function loadForm() {
+  if (!auth.canSaasEdit('saas_users')) {
+    await router.replace('/saas/usuarios')
+    return
+  }
+
   loading.value = true
   error.value = ''
 

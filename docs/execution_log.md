@@ -1729,3 +1729,16 @@
 - A validação visual local rodou em `http://127.0.0.1:5177/app/go-live`, com backend local em `8002`, navegador headless e usuário demo. Desktop e mobile passaram com resumo, dados conectados, relatório e checklist agrupado; as capturas ficaram em `.tmp/sprint154-go-live-*.png` e não devem ser versionadas.
 - Commit `024f665` enviado para `main`; o run `26675093553` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/go-live`, `/app/widget`, `/app/analytics`, pedidos, devoluções, usuários, taxonomia, integrações, sincronização, widget JS/CSS, páginas públicas, SaaS, portal, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
+
+## 2026-05-30 - Sprint 155 Usuários, permissões e contexto de empresa
+
+- Relida a documentação obrigatória antes da sprint, incluindo `docs/README.md`, `docs/sprint_governance.md`, `docs/user_access_permissions.md` e `docs/portal_ui_guidelines.md`.
+- Usado o benchmark já registrado de portal cliente, comportamento de conta e navegação do admin SaaS dentro do portal da empresa como referência para convites, permissões visíveis e trilha de contexto.
+- Criada a migration `2026_05_30_051500_add_invitation_tracking_to_merchant_user_table` para rastrear `invitation_status`, `invited_at` e `accepted_at` por empresa.
+- `UserAccessController` passou a devolver status de convite no payload dos usuários, aceitar `send_invite`, registrar auditoria detalhada para criação/edição/convite e manter antes/depois do acesso da empresa.
+- `AuthController` passou a marcar convite pendente como aceito no primeiro login da empresa e registrar `users.invite_accepted`.
+- `AuditLogController` passou a aceitar filtros por usuário, empresa, módulo, categoria e limite, preparando a rastreabilidade operacional dos acessos.
+- `/app/usuarios`, `/app/usuarios/novo`, `/saas/usuarios`, `/saas/usuarios-empresas` e seus formulários passaram a esconder ações sensíveis sem permissão de edição, mostrar status de convite e permitir reenviar convite operacional.
+- `App.vue` reforçou a faixa visual quando um admin SaaS está dentro do portal da empresa, exibindo o lojista e o código da empresa ativa.
+- Validações locais passaram com `php -l`, suíte focada `UserAccessApiTest|AuthTest|AnalyticsApiTest`, PHPUnit completo (`133 tests`, `1583 assertions`), `C:\\php\\php.exe vendor\\bin\\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check` e varredura de segredos.
+- A validação visual local rodou em `http://127.0.0.1:5177/app/usuarios`, com backend local em `8002`, Playwright headless e três contextos: lojista dono, usuário restrito sem `users.edit` e admin SaaS dentro do portal. As capturas ficaram em `.tmp/sprint155-users-*.png` e não devem ser versionadas.

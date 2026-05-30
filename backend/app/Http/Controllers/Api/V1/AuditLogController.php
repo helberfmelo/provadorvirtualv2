@@ -13,10 +13,15 @@ class AuditLogController extends Controller
 
     public function index(Request $request): array
     {
+        $limit = max(1, min(100, (int) $request->integer('limit', 50)));
         $query = AuditLog::query()
             ->with(['user:id,name,email', 'company:id,name,access_code'])
             ->orderByDesc('id')
-            ->limit(50);
+            ->limit($limit)
+            ->when($request->integer('user_id'), fn ($builder, $userId) => $builder->where('user_id', $userId))
+            ->when($request->filled('module'), fn ($builder) => $builder->where('module', (string) $request->string('module')))
+            ->when($request->filled('category'), fn ($builder) => $builder->where('category', (string) $request->string('category')))
+            ->when($request->integer('merchant_company_id'), fn ($builder, $companyId) => $builder->where('merchant_company_id', $companyId));
 
         if (! in_array($request->user()?->role, ['admin', 'support'], true)) {
             $merchant = $this->currentMerchant($request);

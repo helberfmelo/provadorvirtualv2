@@ -282,6 +282,11 @@ export type SaasUser = {
     access: {
       role: string
       status: string
+      invitation: {
+        status: 'not_sent' | 'pending' | 'accepted'
+        invited_at: string | null
+        accepted_at: string | null
+      }
       is_owner: boolean
       merchant_company_id?: number | null
       company?: CompanyOption | null

@@ -4,7 +4,9 @@ import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { SaasUser } from '../services/saasTypes'
 import { showFeedback } from '../services/saveFeedback'
+import { useAuthStore } from '../stores/auth'
 
+const auth = useAuthStore()
 const users = ref<SaasUser[]>([])
 const loading = ref(false)
 const error = ref('')
@@ -62,7 +64,7 @@ async function toggleUser(user: SaasUser) {
           <i class="fa-solid fa-rotate" aria-hidden="true"></i>
           Atualizar
         </button>
-        <RouterLink class="btn btn-primary" to="/saas/usuarios/novo">
+        <RouterLink v-if="auth.canSaasEdit('saas_users')" class="btn btn-primary" to="/saas/usuarios/novo">
           <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
           Novo usuário
         </RouterLink>
@@ -110,10 +112,21 @@ async function toggleUser(user: SaasUser) {
                 </span>
               </td>
               <td class="row-actions">
-                <RouterLink class="icon-link" :to="`/saas/usuarios/${user.id}/editar`" title="Editar" aria-label="Editar usuário">
+                <RouterLink
+                  v-if="auth.canSaasEdit('saas_users')"
+                  class="icon-link"
+                  :to="`/saas/usuarios/${user.id}/editar`"
+                  title="Editar"
+                  aria-label="Editar usuário"
+                >
                   <i class="fa-solid fa-pen" aria-hidden="true"></i>
                 </RouterLink>
-                <button type="button" :title="user.status === 'active' ? 'Desativar' : 'Ativar'" @click="toggleUser(user)">
+                <button
+                  v-if="auth.canSaasEdit('saas_users')"
+                  type="button"
+                  :title="user.status === 'active' ? 'Desativar' : 'Ativar'"
+                  @click="toggleUser(user)"
+                >
                   <i :class="user.status === 'active' ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off'" aria-hidden="true"></i>
                 </button>
               </td>

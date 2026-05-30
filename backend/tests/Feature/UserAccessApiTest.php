@@ -66,6 +66,7 @@ class UserAccessApiTest extends TestCase
                 'merchant_role' => 'manager',
                 'merchant_user_status' => 'active',
                 'is_owner' => false,
+                'send_invite' => true,
                 'permissions' => [
                     'products' => ['view' => false, 'edit' => true],
                     'users' => ['view' => true, 'edit' => false],
@@ -73,6 +74,7 @@ class UserAccessApiTest extends TestCase
             ])
             ->assertCreated()
             ->assertJsonPath('data.access.role', 'manager')
+            ->assertJsonPath('data.access.invitation.status', 'pending')
             ->assertJsonPath('data.access.permissions.products.view', true)
             ->assertJsonPath('data.access.permissions.products.edit', true)
             ->assertJsonPath('data.access.permissions.users.edit', false)
@@ -84,7 +86,8 @@ class UserAccessApiTest extends TestCase
             'company_access' => $companyCode,
         ])
             ->assertOk()
-            ->assertJsonPath('active_company.access_code', $companyCode);
+            ->assertJsonPath('active_company.access_code', $companyCode)
+            ->assertJsonPath('permissions.products.edit', true);
 
         $this->withHeaders($ownerHeaders)
             ->patchJson('/api/v1/merchant/users/'.$created['id'], [
@@ -92,6 +95,22 @@ class UserAccessApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('data.access.status', 'inactive');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'users.company_created',
+            'module' => 'users',
+            'action' => 'created',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'users.invite_sent',
+            'module' => 'users',
+            'action' => 'send_invite',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'users.company_updated',
+            'module' => 'users',
+            'action' => 'updated',
+        ]);
 
         $this->postJson('/api/v1/auth/login', [
             'login' => 'gerente@example.com',
@@ -119,6 +138,7 @@ class UserAccessApiTest extends TestCase
                 'merchant_role' => 'manager',
                 'merchant_user_status' => 'active',
                 'is_owner' => false,
+                'send_invite' => true,
                 'permissions' => [
                     'products' => ['view' => false, 'edit' => true],
                     'analytics' => ['view' => true, 'edit' => false],
@@ -128,6 +148,7 @@ class UserAccessApiTest extends TestCase
             ->assertJsonPath('data.role', 'merchant')
             ->assertJsonPath('data.merchants.0.access.role', 'manager')
             ->assertJsonPath('data.merchants.0.access.company.access_code', $company->access_code)
+            ->assertJsonPath('data.merchants.0.access.invitation.status', 'pending')
             ->assertJsonPath('data.merchants.0.access.permissions.products.view', true)
             ->assertJsonPath('data.merchants.0.access.permissions.products.edit', true)
             ->json('data');
@@ -150,6 +171,17 @@ class UserAccessApiTest extends TestCase
             ])
             ->assertOk()
             ->assertJsonPath('data.merchants.0.access.status', 'inactive');
+
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'users.company_created',
+            'module' => 'saas_company_users',
+            'action' => 'created',
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'users.invite_sent',
+            'module' => 'saas_company_users',
+            'action' => 'send_invite',
+        ]);
     }
 
     public function test_merchant_user_without_edit_permission_cannot_manage_users(): void

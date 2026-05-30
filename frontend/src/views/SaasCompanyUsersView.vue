@@ -4,7 +4,9 @@ import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { SaasUser } from '../services/saasTypes'
 import { showFeedback } from '../services/saveFeedback'
+import { useAuthStore } from '../stores/auth'
 
+const auth = useAuthStore()
 type CompanyUserRow = {
   key: string
   user: SaasUser
@@ -63,6 +65,25 @@ async function toggleAccess(row: CompanyUserRow) {
   }
 }
 
+async function resendInvite(row: CompanyUserRow) {
+  error.value = ''
+
+  try {
+    await api.patch(`/saas/company-users/${row.user.id}`, {
+      merchant_company_id: row.merchant.access.merchant_company_id,
+      send_invite: true,
+    })
+    showFeedback({
+      status: 'success',
+      title: 'Convite atualizado',
+      message: 'O convite voltou para pendente até o primeiro acesso deste usuário.',
+    })
+    await loadUsers()
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Não foi possível atualizar o convite.'
+  }
+}
+
 function companyLabel(row: CompanyUserRow) {
   const company = row.merchant.access.company
 
@@ -75,6 +96,31 @@ function companyLabel(row: CompanyUserRow) {
 
 function companyDocument(row: CompanyUserRow) {
   return row.merchant.access.company?.document || row.merchant.slug
+}
+
+function invitationLabel(row: CompanyUserRow) {
+  switch (row.merchant.access.invitation.status) {
+    case 'pending':
+      return 'Convite pendente'
+    case 'not_sent':
+      return 'Convite não enviado'
+    default:
+      return 'Aceito'
+  }
+}
+
+function invitationDate(row: CompanyUserRow) {
+  const invitation = row.merchant.access.invitation
+
+  if (invitation.status === 'accepted' && invitation.accepted_at) {
+    return `Primeiro acesso em ${new Date(invitation.accepted_at).toLocaleString('pt-BR')}`
+  }
+
+  if (invitation.invited_at) {
+    return `Último convite em ${new Date(invitation.invited_at).toLocaleString('pt-BR')}`
+  }
+
+  return 'Aguardando envio do convite'
 }
 </script>
 
@@ -91,7 +137,7 @@ function companyDocument(row: CompanyUserRow) {
           <i class="fa-solid fa-rotate" aria-hidden="true"></i>
           Atualizar
         </button>
-        <RouterLink class="btn btn-primary" to="/saas/usuarios-empresas/novo">
+        <RouterLink v-if="auth.canSaasEdit('saas_company_users')" class="btn btn-primary" to="/saas/usuarios-empresas/novo">
           <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
           Novo usuário
         </RouterLink>
@@ -116,12 +162,13 @@ function companyDocument(row: CompanyUserRow) {
               <th>Perfil</th>
               <th>Status usuário</th>
               <th>Status acesso</th>
+              <th>Convite</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="!rows.length">
-              <td colspan="7">Nenhum usuário de empresa cadastrado.</td>
+              <td colspan="8">Nenhum usuário de empresa cadastrado.</td>
             </tr>
             <tr v-for="row in rows" :key="row.key">
               <td>
@@ -144,8 +191,15 @@ function companyDocument(row: CompanyUserRow) {
                   {{ row.merchant.access.status === 'active' ? 'Ativo' : 'Inativo' }}
                 </span>
               </td>
+              <td>
+                <span class="status-pill" :class="{ ok: row.merchant.access.invitation.status === 'accepted', warning: row.merchant.access.invitation.status !== 'accepted' }">
+                  {{ invitationLabel(row) }}
+                </span>
+                <small>{{ invitationDate(row) }}</small>
+              </td>
               <td class="row-actions">
                 <RouterLink
+                  v-if="auth.canSaasEdit('saas_company_users')"
                   class="icon-link"
                   :to="{ path: `/saas/usuarios-empresas/${row.user.id}/editar`, query: { company: row.merchant.access.merchant_company_id || '' } }"
                   title="Editar"
@@ -153,8 +207,21 @@ function companyDocument(row: CompanyUserRow) {
                 >
                   <i class="fa-solid fa-pen" aria-hidden="true"></i>
                 </RouterLink>
-                <button type="button" :title="row.merchant.access.status === 'active' ? 'Desativar' : 'Ativar'" @click="toggleAccess(row)">
+                <button
+                  v-if="auth.canSaasEdit('saas_company_users')"
+                  type="button"
+                  :title="row.merchant.access.status === 'active' ? 'Desativar' : 'Ativar'"
+                  @click="toggleAccess(row)"
+                >
                   <i :class="row.merchant.access.status === 'active' ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off'" aria-hidden="true"></i>
+                </button>
+                <button
+                  v-if="auth.canSaasEdit('saas_company_users') && row.merchant.access.invitation.status !== 'accepted'"
+                  type="button"
+                  title="Reenviar convite"
+                  @click="resendInvite(row)"
+                >
+                  <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
                 </button>
               </td>
             </tr>

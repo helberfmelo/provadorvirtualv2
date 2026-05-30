@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\User;
+use App\Services\Audit\AuditLogger;
 use App\Support\ActiveTenant;
 use App\Support\PermissionCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -40,15 +42,18 @@ class UserAccessController extends Controller
 
         $data = $this->validateUserPayload($request, allowSaasRole: true);
         $user = $this->saveUser($data, allowRole: true);
+        $before = null;
 
         if (filled($data['merchant_id'] ?? null)) {
             $merchant = Merchant::query()->findOrFail((int) $data['merchant_id']);
             $company = $this->companyForMerchant($merchant, $data['merchant_company_id'] ?? null);
             $this->syncMerchantAccess($user, $merchant, $company, $data);
+            $this->logMerchantUserMutation($request, $merchant, $company, $user->fresh(['merchants']) ?? $user, $before, 'created', $data, true);
         } elseif (in_array($user->role, ['admin', 'support'], true)) {
             $user->forceFill([
                 'permissions' => PermissionCatalog::normalize($data['permissions'] ?? null, 'saas'),
             ])->save();
+            $this->logSaasUserMutation($request, null, $user, 'created');
         }
 
         return response()->json([
@@ -67,16 +72,22 @@ class UserAccessController extends Controller
             throw new HttpException(422, 'Não desative seu próprio usuário SaaS.');
         }
 
+        $beforeUser = $this->snapshotSaasUser($user);
         $user = $this->saveUser($data, $user, allowRole: true);
 
         if (filled($data['merchant_id'] ?? null)) {
             $merchant = Merchant::query()->findOrFail((int) $data['merchant_id']);
             $company = $this->companyForMerchant($merchant, $data['merchant_company_id'] ?? null);
             $this->syncMerchantAccess($user, $merchant, $company, $data);
-        } elseif (array_key_exists('permissions', $data) && in_array($user->role, ['admin', 'support'], true)) {
-            $user->forceFill([
-                'permissions' => PermissionCatalog::normalize($data['permissions'] ?? null, 'saas'),
-            ])->save();
+            $beforeAccess = $beforeUser['merchant_access'][$company?->id ?: 0] ?? null;
+            $this->logMerchantUserMutation($request, $merchant, $company, $user->fresh(['merchants']) ?? $user, $beforeAccess, 'updated', $data, true);
+        } else {
+            if (array_key_exists('permissions', $data) && in_array($user->role, ['admin', 'support'], true)) {
+                $user->forceFill([
+                    'permissions' => PermissionCatalog::normalize($data['permissions'] ?? null, 'saas'),
+                ])->save();
+            }
+            $this->logSaasUserMutation($request, $beforeUser, $user, 'updated');
         }
 
         return response()->json([
@@ -121,6 +132,7 @@ class UserAccessController extends Controller
 
         $user = $this->saveUser($data, allowRole: false);
         $this->syncMerchantAccess($user, $company->merchant, $company, $data);
+        $this->logMerchantUserMutation($request, $company->merchant, $company, $user->fresh(['merchants']) ?? $user, null, 'created', $data, true);
         $companyMap = [$company->id => $this->serializeCompanyOption($company)];
 
         return response()->json([
@@ -139,12 +151,15 @@ class UserAccessController extends Controller
             throw new HttpException(422, 'Não desative seu próprio usuário SaaS.');
         }
 
+        $beforeUser = $this->snapshotSaasUser($user);
         $company = $this->companyForCompanyUser($user, $data['merchant_company_id'] ?? null);
         $data['role'] = 'merchant';
         $data['merchant_id'] = $company->merchant_id;
 
         $user = $this->saveUser($data, $user, allowRole: false);
         $this->syncMerchantAccess($user, $company->merchant, $company, $data);
+        $beforeAccess = $beforeUser['merchant_access'][$company->id] ?? null;
+        $this->logMerchantUserMutation($request, $company->merchant, $company, $user->fresh(['merchants']) ?? $user, $beforeAccess, 'updated', $data, true);
         $companyMap = [$company->id => $this->serializeCompanyOption($company)];
 
         return response()->json([
@@ -180,6 +195,7 @@ class UserAccessController extends Controller
         $data['role'] = 'merchant';
         $user = $this->saveUser($data, allowRole: false);
         $this->syncMerchantAccess($user, $merchant, $company, $data);
+        $this->logMerchantUserMutation($request, $merchant, $company, $user->fresh(['merchants']) ?? $user, null, 'created', $data);
 
         return response()->json([
             'data' => $this->serializeUser($user->fresh(['merchants']) ?? $user, $merchant),
@@ -205,9 +221,11 @@ class UserAccessController extends Controller
             throw new HttpException(422, 'Não desative seu próprio acesso à empresa.');
         }
 
+        $beforeAccess = $this->serializeAccess($user, $merchant);
         $data['role'] = $user->role;
         $user = $this->saveUser($data, $user, allowRole: false);
         $this->syncMerchantAccess($user, $merchant, $company, $data);
+        $this->logMerchantUserMutation($request, $merchant, $company, $user->fresh(['merchants']) ?? $user, $beforeAccess, 'updated', $data);
 
         return response()->json([
             'data' => $this->serializeUser($user->fresh(['merchants']) ?? $user, $merchant),
@@ -243,6 +261,7 @@ class UserAccessController extends Controller
             'merchant_role' => ['sometimes', 'string', 'in:owner,manager,staff'],
             'merchant_user_status' => ['sometimes', 'string', 'in:active,inactive'],
             'is_owner' => ['sometimes', 'boolean'],
+            'send_invite' => ['sometimes', 'boolean'],
             'permissions' => ['sometimes', 'array'],
             'permissions.*.view' => ['sometimes', 'boolean'],
             'permissions.*.edit' => ['sometimes', 'boolean'],
@@ -352,11 +371,28 @@ class UserAccessController extends Controller
             $permissions = PermissionCatalog::full('merchant');
         }
 
+        $invitationStatus = $existing->invitation_status ?? 'accepted';
+        $invitedAt = $existing->invited_at ?? null;
+        $acceptedAt = $existing->accepted_at ?? null;
+
+        if ((bool) ($data['send_invite'] ?? false)) {
+            $invitationStatus = 'pending';
+            $invitedAt = now();
+            $acceptedAt = null;
+        } elseif (! $existing) {
+            $invitationStatus = 'not_sent';
+            $invitedAt = null;
+            $acceptedAt = null;
+        }
+
         $merchant->users()->syncWithoutDetaching([
             $user->id => [
                 'merchant_company_id' => $company?->id ?: $existing?->merchant_company_id,
                 'role' => $role,
                 'status' => $data['merchant_user_status'] ?? $existing->status ?? 'active',
+                'invitation_status' => $invitationStatus,
+                'invited_at' => $invitedAt,
+                'accepted_at' => $acceptedAt,
                 'is_owner' => $isOwner,
                 'permissions' => json_encode($permissions),
                 'updated_at' => now(),
@@ -455,11 +491,104 @@ class UserAccessController extends Controller
             'company' => $companyId && $companiesById ? ($companiesById[$companyId] ?? null) : null,
             'role' => $pivot->role ?? 'staff',
             'status' => $pivot->status ?? 'active',
+            'invitation' => [
+                'status' => $pivot->invitation_status ?? 'accepted',
+                'invited_at' => $pivot->invited_at ? Carbon::parse($pivot->invited_at)->toISOString() : null,
+                'accepted_at' => $pivot->accepted_at ? Carbon::parse($pivot->accepted_at)->toISOString() : null,
+            ],
             'is_owner' => $isOwner,
             'permissions' => $isOwner
                 ? PermissionCatalog::full('merchant')
                 : PermissionCatalog::normalize(PermissionCatalog::decode($pivot->permissions ?? null), 'merchant'),
         ];
+    }
+
+    private function snapshotSaasUser(User $user): array
+    {
+        $user->loadMissing('merchants');
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'status' => $user->status ?? 'active',
+            'permissions' => PermissionCatalog::forSaasUser($user),
+            'merchant_access' => $user->merchants->mapWithKeys(fn (Merchant $merchant): array => [
+                (int) ($merchant->pivot->merchant_company_id ?: 0) => $this->serializePivotAccess($merchant->pivot),
+            ])->all(),
+        ];
+    }
+
+    private function logSaasUserMutation(Request $request, ?array $before, User $user, string $action): void
+    {
+        app(AuditLogger::class)->log(
+            $request,
+            null,
+            'users.saas_'.$action,
+            'users',
+            'info',
+            [
+                'module' => 'saas_users',
+                'action' => $action,
+                'target_user_id' => $user->id,
+                'before' => $before,
+                'after' => $this->snapshotSaasUser($user->fresh(['merchants']) ?? $user),
+            ],
+            auditable: $user
+        );
+    }
+
+    private function logMerchantUserMutation(
+        Request $request,
+        Merchant $merchant,
+        ?MerchantCompany $company,
+        User $user,
+        ?array $beforeAccess,
+        string $action,
+        array $data,
+        bool $fromSaas = false,
+    ): void {
+        $afterAccess = $this->serializeAccess($user, $merchant);
+
+        app(AuditLogger::class)->log(
+            $request,
+            $merchant,
+            'users.company_'.$action,
+            'users',
+            'info',
+            [
+                'merchant_company_id' => $company?->id,
+                'module' => $fromSaas ? 'saas_company_users' : 'users',
+                'action' => $action,
+                'target_user_id' => $user->id,
+                'before_access' => $beforeAccess,
+                'after_access' => $afterAccess,
+                'before_status' => data_get($beforeAccess, 'status'),
+                'after_status' => data_get($afterAccess, 'status'),
+                'before_invitation_status' => data_get($beforeAccess, 'invitation.status'),
+                'after_invitation_status' => data_get($afterAccess, 'invitation.status'),
+            ],
+            auditable: $user
+        );
+
+        if ((bool) ($data['send_invite'] ?? false)) {
+            app(AuditLogger::class)->log(
+                $request,
+                $merchant,
+                'users.invite_sent',
+                'users',
+                'info',
+                [
+                    'merchant_company_id' => $company?->id,
+                    'module' => $fromSaas ? 'saas_company_users' : 'users',
+                    'action' => 'send_invite',
+                    'target_user_id' => $user->id,
+                    'invitation_status' => data_get($afterAccess, 'invitation.status'),
+                ],
+                auditable: $user
+            );
+        }
     }
 
     private function companyMapForUsers($users): array

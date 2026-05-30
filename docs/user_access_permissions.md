@@ -1,6 +1,6 @@
 # Usuários e Permissões
 
-Atualizado em: 2026-05-29
+Atualizado em: 2026-05-30
 
 ## Objetivo
 
@@ -31,6 +31,17 @@ Implementado:
 - queries de produtos, tabelas, widget, integrações, importacoes, analytics, go-live e auditoria respeitam a empresa ativa;
 - `audit_logs` registra `merchant_company_id`, `module` e `action` para eventos novos e negacoes de permissão.
 
+## Status Sprint 155
+
+Implementado:
+
+- `merchant_user.invitation_status`, `invited_at` e `accepted_at` para diferenciar convite pendente, convite não enviado e convite aceito por empresa;
+- `POST /api/v1/auth/login` marca automaticamente o primeiro acesso pendente como aceito e registra `users.invite_accepted`;
+- `POST/PATCH /api/v1/merchant/users`, `POST/PATCH /api/v1/saas/company-users` e `POST/PATCH /api/v1/saas/users` geram auditoria detalhada com ator, contexto, antes/depois e eventos de convite;
+- listas e formulários de usuários do portal e do SaaS escondem ações sensíveis quando o usuário só tem permissão de visualização;
+- `/app/usuarios` e `/saas/usuarios-empresas` passaram a exibir status de convite e permitir reenviar convite operacional sem expor credenciais;
+- quando um admin/support entra no portal da empresa, a interface mostra explicitamente o contexto SaaS + empresa ativa.
+
 ## Módulos do portal da empresa
 
 - `dashboard`
@@ -59,11 +70,13 @@ Implementado:
 - `saas_users` gerencia somente equipe interna do SaaS; `saas_company_users` gerencia usuários vinculados a empresas clientes.
 - `owner` da empresa tem acesso total no portal da empresa.
 - Usuários `merchant` sem permissão `users.edit` podem visualizar a lista se tiverem `users.view`, mas não podem criar, editar, ativar ou desativar usuários.
+- Usuários `merchant` sem `users.edit` também não veem botões de criar, editar, ativar/desativar ou reenviar convite no frontend.
 - Usuário globalmente inativo não consegue fazer login.
 - Usuário desativado em uma empresa não consegue entrar naquela empresa, mesmo que exista em outra.
 - O sistema impede o usuário de desativar o próprio acesso no CRUD correspondente.
 - Se o usuário estiver vinculado a varias empresas e tentar entrar sem código/CNPJ, a API responde `409` com `company_options`.
 - Negacoes de acesso geram evento `permission.denied` com escopo, módulo e ação.
+- Convites por empresa podem ficar em `not_sent`, `pending` ou `accepted`, sem necessidade de gravar senha, token ou segredo em logs/documentação.
 
 ## Endpoints
 
@@ -82,7 +95,8 @@ Portal da empresa:
 - `POST /api/v1/merchant/users`
 - `PATCH /api/v1/merchant/users/{user}`
 - `POST /api/v1/auth/select-company`
+- `GET /api/v1/audit-logs?user_id=&merchant_company_id=&module=&category=&limit=`
 
 ## Pendências
 
-- Registrar auditoria detalhada por alteracao de permissão.
+- Centralizar a futura tela SaaS dedicada de auditoria por empresa, prevista na Sprint 157.

@@ -64,6 +64,16 @@ const brandAriaLabel = computed(() => {
 const workNavTitle = computed(() => isSaasRoute.value ? 'Operação SaaS' : 'Operação da loja')
 const activeCompanyName = computed(() => auth.activeCompany?.name || 'Sem empresa ativa')
 const isSaasViewingCompanyPortal = computed(() => isCompanyRoute.value && canSeeSaas.value)
+const saasPortalContextLabel = computed(() => {
+  if (!isSaasViewingCompanyPortal.value || !auth.activeCompany) {
+    return ''
+  }
+
+  const companyCode = auth.activeCompany.access_code || `Empresa ${auth.activeCompany.id}`
+  const merchantName = auth.activeMerchant?.name || 'Lojista'
+
+  return `${merchantName} · ${companyCode}`
+})
 const publicPlatformLink = computed<NavLink | null>(() => {
   if (!auth.isAuthenticated || !auth.user) {
     return null
@@ -477,8 +487,8 @@ function handleBrandClick(event: MouseEvent) {
         <div v-if="isSaasViewingCompanyPortal" class="admin-context-note">
           <i class="fa-solid fa-user-shield" aria-hidden="true"></i>
           <span>
-            <strong>Acesso SaaS</strong>
-            <small>Você está no portal da empresa. Use o atalho SaaS para voltar à administração.</small>
+            <strong>Acesso SaaS em empresa</strong>
+            <small>{{ saasPortalContextLabel }}. Você está vendo o portal da empresa com credenciais administrativas.</small>
           </span>
         </div>
 

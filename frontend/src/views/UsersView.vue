@@ -4,7 +4,9 @@ import { RouterLink } from 'vue-router'
 import { api } from '../services/api'
 import type { PortalUser } from '../services/merchantTypes'
 import { showFeedback } from '../services/saveFeedback'
+import { useAuthStore } from '../stores/auth'
 
+const auth = useAuthStore()
 const users = ref<PortalUser[]>([])
 const loading = ref(false)
 const error = ref('')
@@ -47,6 +49,53 @@ async function toggleUser(user: PortalUser) {
     error.value = requestError.response?.data?.message || 'Não foi possível alterar o status.'
   }
 }
+
+async function resendInvite(user: PortalUser) {
+  error.value = ''
+
+  try {
+    await api.patch(`/merchant/users/${user.id}`, {
+      send_invite: true,
+    })
+    showFeedback({
+      status: 'success',
+      title: 'Convite atualizado',
+      message: 'O convite deste acesso voltou para pendente até o primeiro login.',
+    })
+    await loadUsers()
+  } catch (requestError: any) {
+    error.value = requestError.response?.data?.message || 'Não foi possível atualizar o convite.'
+  }
+}
+
+function invitationLabel(user: PortalUser) {
+  switch (user.access?.invitation.status) {
+    case 'pending':
+      return 'Convite pendente'
+    case 'not_sent':
+      return 'Convite não enviado'
+    default:
+      return 'Aceito'
+  }
+}
+
+function invitationDate(user: PortalUser) {
+  const invitation = user.access?.invitation
+
+  if (!invitation) {
+    return ''
+  }
+
+  if (invitation.status === 'accepted' && invitation.accepted_at) {
+    return `Primeiro acesso em ${new Date(invitation.accepted_at).toLocaleString('pt-BR')}`
+  }
+
+  if (invitation.invited_at) {
+    return `Último convite em ${new Date(invitation.invited_at).toLocaleString('pt-BR')}`
+  }
+
+  return 'Aguardando envio do convite'
+}
 </script>
 
 <template>
@@ -62,7 +111,7 @@ async function toggleUser(user: PortalUser) {
           <i class="fa-solid fa-rotate" aria-hidden="true"></i>
           Atualizar
         </button>
-        <RouterLink class="btn btn-primary" to="/app/usuarios/novo">
+        <RouterLink v-if="auth.canEdit('users')" class="btn btn-primary" to="/app/usuarios/novo">
           <i class="fa-solid fa-user-plus" aria-hidden="true"></i>
           Novo usuário
         </RouterLink>
@@ -84,12 +133,13 @@ async function toggleUser(user: PortalUser) {
               <th>Usuário</th>
               <th>Perfil</th>
               <th>Status</th>
+              <th>Convite</th>
               <th>Ações</th>
             </tr>
           </thead>
           <tbody>
             <tr v-if="!users.length">
-              <td colspan="4">Nenhum usuário cadastrado.</td>
+              <td colspan="5">Nenhum usuário cadastrado.</td>
             </tr>
             <tr v-for="user in users" :key="user.id">
               <td>
@@ -102,12 +152,37 @@ async function toggleUser(user: PortalUser) {
                   {{ user.access?.status === 'active' ? 'Ativo' : 'Inativo' }}
                 </span>
               </td>
+              <td>
+                <span class="status-pill" :class="{ ok: user.access?.invitation.status === 'accepted', warning: user.access?.invitation.status !== 'accepted' }">
+                  {{ invitationLabel(user) }}
+                </span>
+                <small>{{ invitationDate(user) }}</small>
+              </td>
               <td class="row-actions">
-                <RouterLink class="icon-link" :to="`/app/usuarios/${user.id}/editar`" title="Editar" aria-label="Editar usuário">
+                <RouterLink
+                  v-if="auth.canEdit('users')"
+                  class="icon-link"
+                  :to="`/app/usuarios/${user.id}/editar`"
+                  title="Editar"
+                  aria-label="Editar usuário"
+                >
                   <i class="fa-solid fa-pen" aria-hidden="true"></i>
                 </RouterLink>
-                <button type="button" :title="user.access?.status === 'active' ? 'Desativar' : 'Ativar'" @click="toggleUser(user)">
+                <button
+                  v-if="auth.canEdit('users')"
+                  type="button"
+                  :title="user.access?.status === 'active' ? 'Desativar' : 'Ativar'"
+                  @click="toggleUser(user)"
+                >
                   <i :class="user.access?.status === 'active' ? 'fa-solid fa-toggle-on' : 'fa-solid fa-toggle-off'" aria-hidden="true"></i>
+                </button>
+                <button
+                  v-if="auth.canEdit('users') && user.access?.invitation.status !== 'accepted'"
+                  type="button"
+                  title="Reenviar convite"
+                  @click="resendInvite(user)"
+                >
+                  <i class="fa-solid fa-paper-plane" aria-hidden="true"></i>
                 </button>
               </td>
             </tr>

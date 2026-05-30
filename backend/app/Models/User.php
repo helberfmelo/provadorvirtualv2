@@ -32,7 +32,16 @@ class User extends Authenticatable
     public function merchants()
     {
         return $this->belongsToMany(Merchant::class)
-            ->withPivot(['merchant_company_id', 'role', 'status', 'is_owner', 'permissions'])
+            ->withPivot([
+                'merchant_company_id',
+                'role',
+                'status',
+                'invitation_status',
+                'invited_at',
+                'accepted_at',
+                'is_owner',
+                'permissions',
+            ])
             ->withTimestamps();
     }
 
