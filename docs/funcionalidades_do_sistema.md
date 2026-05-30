@@ -1,0 +1,82 @@
+# Funcionalidades do Sistema
+
+- Apresentação pública do serviço
+- Planos e contratação online
+- Pagamento por cartão, Pix e boleto
+- Área de sucesso após a contratação
+- Login da empresa
+- Login administrativo
+- Painel geral da empresa
+- Painel administrativo
+- Cadastro de empresas
+- Cadastro de usuários
+- Convite de usuários
+- Controle de permissões
+- Troca de empresa ativa
+- Cadastro de produtos
+- Edição de produtos
+- Ativação e desativação de produtos
+- Cadastro de tamanhos por produto
+- Cadastro de tabelas de medidas
+- Importação de tabelas de medidas
+- Exportação de tabelas de medidas
+- Vínculo de produtos com tabelas
+- Vínculo em lote de produtos com tabelas
+- Cadastro de modelagens
+- Cadastro de marcas
+- Cadastro de categorias
+- Padronização de marcas
+- Padronização de categorias
+- Sugestões para revisão de marcas e categorias
+- Regras de importação
+- Simulação de impacto antes de aplicar regras
+- Importação simples de produtos
+- Importação simples de tabelas
+- Migração assistida de clientes vindos da Sizebay
+- Prévia da migração antes de aplicar
+- Fila de revisão da migração
+- Desfazer lote de migração
+- Histórico de importações
+- Integração com BigShop
+- Integração com outras plataformas
+- Validação de instalação do provador
+- Histórico de atualizações com plataformas
+- Exportação de problemas de atualização
+- Ações para tratar problemas de atualização
+- Configuração do provador
+- Escolha de posição do provador na página do produto
+- Escolha do visual do botão do provador
+- Personalização da janela do provador
+- Prévia do provador no computador
+- Prévia do provador no celular
+- Rascunho e publicação da configuração do provador
+- Validação de contraste antes da publicação
+- Loja de teste pública
+- Provador virtual com recomendação de tamanho
+- Tabela de medidas no produto
+- Avaliação do cliente sobre a recomendação
+- Registro de uso do provador
+- Relatórios de uso do provador
+- Relatórios de recomendações
+- Lista dos produtos mais usados
+- Relatórios de pedidos
+- Importação de pedidos
+- Relatórios de devoluções e trocas
+- Importação de devoluções e trocas
+- Motivos padronizados para devoluções
+- Assistente para apoiar criação e revisão de tabelas
+- Aprendizado com sinais de compra, devolução e troca
+- Lista de conferência da publicação da loja
+- Situação de prontidão da loja
+- Plano e cobrança da empresa
+- Abertura registrada de acessos financeiros
+- Desligamento da renovação futura
+- Solicitação de troca de plataforma
+- Base de conhecimento
+- Ajuda contextual por tela
+- Suporte com contexto da empresa
+- Registro de ações importantes
+- Histórico administrativo
+- Exportação de auditoria
+- Registro de aceite de termos
+- Avisos de privacidade e uso de dados
