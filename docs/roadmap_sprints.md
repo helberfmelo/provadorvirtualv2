@@ -3223,7 +3223,7 @@ Validações:
 - build frontend e validação visual local na porta `5177`, com backend em `8002`;
 - `git diff --check`, Pint, varredura de segredos e validação de produção quando a sprint for implementada.
 
-Status: implementada localmente e em fechamento de governança.
+Status: concluída e publicada em produção.
 
 Implementação desta sprint:
 
@@ -3233,4 +3233,5 @@ Implementação desta sprint:
 - criado `POST /api/v1/imports/{importJob}/rollback`, protegido por permissão de importações e escopo de empresa, com auditoria de desfazer lote;
 - `PreviewImportRequest` e `ImportService` passaram a aceitar `type=sizebay_migration`, arquivos binários com `content_base64`, seleção de seção para `CSV/XLSX` isolado e comparação opcional com BigShop;
 - `/app/importacoes` foi reconstruída para suportar migração assistida com upload binário/texto, amostra JSON, cobertura, fila de revisão, histórico detalhado e botão de desfazer lote;
-- validações locais concluídas: `C:\\php\\php.exe artisan test --filter=ImportsApiTest`, PHPUnit completo, `C:\\php\\php.exe vendor\\bin\\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `/app/importacoes`.
+- validações locais concluídas: `C:\\php\\php.exe artisan test --filter=ImportsApiTest`, PHPUnit completo, `C:\\php\\php.exe vendor\\bin\\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `/app/importacoes`;
+- publicada no commit `4cd0d2f`, com run `26678665133` verde e `scripts/validate-production.ps1` retornando `PRODUCTION VALIDATION OK`.
