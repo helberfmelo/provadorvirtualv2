@@ -98,6 +98,8 @@ class IntegrationController extends Controller
             'merchant_id' => $merchant->id,
             'platform' => $platform,
         ]);
+        $before = $connection->exists ? $this->connectionSummary($connection) : null;
+        $rotatedSecrets = [];
 
         $connection->fill([
             'merchant_company_id' => $company?->id,
@@ -112,12 +114,14 @@ class IntegrationController extends Controller
         ]);
 
         if (array_key_exists('access_token', $data)) {
+            $rotatedSecrets[] = 'access_token';
             $connection->access_token_encrypted = filled($data['access_token'])
                 ? Crypt::encryptString($data['access_token'])
                 : null;
         }
 
         if (array_key_exists('webhook_secret', $data)) {
+            $rotatedSecrets[] = 'webhook_secret';
             $connection->webhook_secret_encrypted = filled($data['webhook_secret'])
                 ? Crypt::encryptString($data['webhook_secret'])
                 : null;
@@ -131,11 +135,12 @@ class IntegrationController extends Controller
             'merchant_company_id' => $company?->id,
             'module' => 'integrations',
             'action' => 'update',
-            'status' => $connection->status,
-            'has_access_token' => filled($connection->access_token_encrypted),
-            'has_webhook_secret' => filled($connection->webhook_secret_encrypted),
-            'has_feed_url' => filled($connection->feed_url),
-            'import_rules_active' => app(ImportRuleMapper::class)->summarize($connection->import_rules ?? [])['active'],
+            'before' => $before,
+            'after' => $this->connectionSummary($connection),
+            'context_data' => [
+                'secrets_rotated' => array_values(array_unique($rotatedSecrets)),
+                'secret_rotation_count' => count(array_unique($rotatedSecrets)),
+            ],
         ], $connection);
 
         return (new PlatformConnectionResource($connection->refresh()))
@@ -1497,5 +1502,21 @@ class IntegrationController extends Controller
         $host = parse_url(Str::startsWith($value, ['http://', 'https://']) ? $value : 'https://'.$value, PHP_URL_HOST) ?: $value;
 
         return preg_replace('/^www\./', '', $host) ?: $host;
+    }
+
+    private function connectionSummary(PlatformConnection $connection): array
+    {
+        return [
+            'platform' => $connection->platform,
+            'merchant_company_id' => $connection->merchant_company_id,
+            'external_store_id' => $connection->external_store_id,
+            'api_base_url' => $connection->api_base_url,
+            'feed_url' => $connection->feed_url,
+            'feed_format' => $connection->feed_format ?: 'google_xml',
+            'status' => $connection->status,
+            'has_access_token' => filled($connection->access_token_encrypted),
+            'has_webhook_secret' => filled($connection->webhook_secret_encrypted),
+            'import_rules_active' => app(ImportRuleMapper::class)->summarize($connection->import_rules ?? [])['active'],
+        ];
     }
 }

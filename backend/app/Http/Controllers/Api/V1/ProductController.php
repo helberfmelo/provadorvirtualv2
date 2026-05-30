@@ -217,6 +217,11 @@ class ProductController extends Controller
         $preview = $measurementTable
             ? $this->bulkMeasurementTablePreview($products, $measurementTable, $candidateTables)
             : null;
+        $before = $products->map(fn (Product $product): array => [
+            'product_id' => $product->id,
+            'measurement_table_id' => $product->measurement_table_id,
+            'measurement_table_name' => $product->measurementTable?->name,
+        ])->values()->all();
 
         if ($action === 'preview') {
             return response()->json($preview);
@@ -267,11 +272,20 @@ class ProductController extends Controller
             'module' => 'products',
             'action' => 'bulk_measurement_table_link',
             'merchant_company_id' => $company?->id,
-            'batch_id' => $batchId,
-            'product_ids' => $products->pluck('id')->values()->all(),
-            'updated_product_ids' => $updatedIds,
-            'measurement_table_id' => $measurementTable?->id,
-            'conflicts' => $preview['summary']['conflicts'] ?? 0,
+            'before' => $before,
+            'after' => $this->productsForBulkResponse($products->pluck('id'))
+                ->map(fn (Product $product): array => [
+                    'product_id' => $product->id,
+                    'measurement_table_id' => $product->measurement_table_id,
+                    'measurement_table_name' => $product->measurementTable?->name,
+                ])->values()->all(),
+            'context_data' => [
+                'batch_id' => $batchId,
+                'product_ids' => $products->pluck('id')->values()->all(),
+                'updated_product_ids' => $updatedIds,
+                'measurement_table_id' => $measurementTable?->id,
+                'conflicts' => $preview['summary']['conflicts'] ?? 0,
+            ],
         ]);
 
         $updatedProducts = $this->productsForBulkResponse($products->pluck('id'));
@@ -291,6 +305,11 @@ class ProductController extends Controller
 
     private function undoBulkMeasurementTable(Request $request, $merchant, $company, Collection $products, ?string $batchId)
     {
+        $before = $products->map(fn (Product $product): array => [
+            'product_id' => $product->id,
+            'measurement_table_id' => $product->measurement_table_id,
+            'measurement_table_name' => $product->measurementTable?->name,
+        ])->values()->all();
         $updatedIds = [];
         $skippedIds = [];
 
@@ -331,10 +350,19 @@ class ProductController extends Controller
             'module' => 'products',
             'action' => 'bulk_measurement_table_undo',
             'merchant_company_id' => $company?->id,
-            'batch_id' => $batchId,
-            'product_ids' => $products->pluck('id')->values()->all(),
-            'updated_product_ids' => $updatedIds,
-            'skipped_product_ids' => $skippedIds,
+            'before' => $before,
+            'after' => $this->productsForBulkResponse($products->pluck('id'))
+                ->map(fn (Product $product): array => [
+                    'product_id' => $product->id,
+                    'measurement_table_id' => $product->measurement_table_id,
+                    'measurement_table_name' => $product->measurementTable?->name,
+                ])->values()->all(),
+            'context_data' => [
+                'batch_id' => $batchId,
+                'product_ids' => $products->pluck('id')->values()->all(),
+                'updated_product_ids' => $updatedIds,
+                'skipped_product_ids' => $skippedIds,
+            ],
         ]);
 
         return ProductResource::collection($this->productsForBulkResponse($products->pluck('id')))->additional([

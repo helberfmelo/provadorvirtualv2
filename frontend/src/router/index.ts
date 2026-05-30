@@ -25,6 +25,7 @@ import PrivacyView from '../views/PrivacyView.vue'
 import ProductsView from '../views/ProductsView.vue'
 import ProductTestView from '../views/ProductTestView.vue'
 import SaasAdminView from '../views/SaasAdminView.vue'
+import SaasAuditView from '../views/SaasAuditView.vue'
 import SaasCompaniesView from '../views/SaasCompaniesView.vue'
 import SaasCompanyFormView from '../views/SaasCompanyFormView.vue'
 import SaasCompanyUserFormView from '../views/SaasCompanyUserFormView.vue'
@@ -89,6 +90,7 @@ const router = createRouter({
     { path: '/app/usuarios/:id/editar', component: UserFormView },
     { path: '/saas', component: SaasAdminView },
     { path: '/saas/empresas', component: SaasCompaniesView },
+    { path: '/saas/auditoria', component: SaasAuditView },
     { path: '/saas/empresas/nova', component: SaasCompanyFormView },
     { path: '/saas/empresas/:id/editar', component: SaasCompanyFormView },
     { path: '/saas/usuarios', component: SaasUsersView },

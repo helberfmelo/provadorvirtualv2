@@ -255,6 +255,72 @@ export type CheckoutOrderDetail = CheckoutOrderRow & {
   timestamps: Record<string, string | null>
 }
 
+export type AuditLogRow = {
+  id: number
+  event: string
+  event_label: string
+  category: string
+  module: string
+  action: string | null
+  severity: string
+  company: {
+    id: number
+    name: string
+    access_code: string | null
+  } | null
+  user: {
+    id: number
+    name: string
+    email: string
+  } | null
+  before: Record<string, unknown> | null
+  after: Record<string, unknown> | null
+  context: Record<string, unknown>
+  created_at: string | null
+}
+
+export type LegalAcceptanceRow = {
+  id: number
+  context: string
+  context_label: string
+  document_type: string
+  document_label: string
+  source_label: string
+  terms_version: string
+  privacy_version: string | null
+  accepted_at: string | null
+  ip_masked: string | null
+  company: {
+    id: number
+    name: string
+    access_code: string | null
+  } | null
+  user: {
+    id: number
+    name: string
+    email: string
+  } | null
+  metadata: Record<string, unknown>
+}
+
+export type SaasAuditPayload = {
+  summary: {
+    logs: number
+    critical_logs: number
+    acceptances: number
+    companies: number
+  }
+  logs: AuditLogRow[]
+  acceptances: LegalAcceptanceRow[]
+  filters: {
+    companies: Array<{ id: number; name: string; access_code: string | null }>
+    categories: string[]
+    modules: string[]
+    events: string[]
+    document_types: string[]
+  }
+}
+
 export type Permission = { view: boolean; edit: boolean }
 export type PermissionMap = Record<string, Permission>
 export type Module = { key: string; label: string; description: string }

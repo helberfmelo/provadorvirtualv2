@@ -92,6 +92,7 @@ Assert-Page "/produto-teste"
 Assert-Page "/privacidade"
 Assert-Page "/termos"
 Assert-Page "/saas"
+Assert-Page "/saas/auditoria"
 Assert-Page "/saas/empresas"
 Assert-Page "/saas/empresas/nova"
 Assert-Page "/saas/usuarios"
@@ -262,6 +263,8 @@ $headers = @{
     Authorization = "Bearer $($login.token)"
 }
 
+$me = Invoke-RestMethod -Uri "$ApiBase/me" -Headers $headers
+
 $widgetInstall = Invoke-RestMethod -Uri "$ApiBase/widget-install" -Headers $headers
 Assert-True ($widgetInstall.data.theme.placement.selector -eq "#provador-virtual-container") "widget sem placement padrao"
 Assert-True (@($widgetInstall.data.platform_guide.guide.placement_suggestions).Count -gt 0) "widget sem sugestoes de seletor"
@@ -375,6 +378,14 @@ Assert-True ($checkKeys -contains "variant_id_found") "checklist sem variacao"
 Assert-True ($checkKeys -contains "sku_found") "checklist sem SKU"
 Assert-True ($checkKeys -contains "buttons_rendered") "checklist sem botoes renderizados"
 "API integrations OK"
+
+if ($me.saas_permissions.saas_audit.view -eq $true) {
+    $saasAudit = Invoke-RestMethod -Uri "$ApiBase/saas/audit-logs?limit=5" -Headers $headers
+    Assert-True ($null -ne $saasAudit.data.summary) "saas audit sem resumo"
+    Assert-True ($null -ne $saasAudit.data.logs) "saas audit sem logs"
+    Assert-True ($null -ne $saasAudit.data.acceptances) "saas audit sem aceites"
+    "API saas audit OK"
+}
 
 $ruleSimulationBody = @{
     import_rules = @{}

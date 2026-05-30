@@ -39,6 +39,10 @@ class WidgetInstallController extends Controller
         $merchant = $this->currentMerchant($request);
         $activeCompany = app(ActiveTenant::class)->company($request, $merchant);
         $install = $this->resolveInstall($merchant, $activeCompany);
+        $before = [
+            'live' => $this->stateSummary($this->liveState($install)),
+            'draft' => $this->stateSummary($this->draftState($install), $install),
+        ];
         $data = $request->validated();
         $mode = $data['mode'] ?? 'publish';
         unset($data['mode']);
@@ -80,17 +84,25 @@ class WidgetInstallController extends Controller
             ]);
         }
 
-        app(AuditLogger::class)->log($request, $merchant, 'widget_install.updated', 'widget', 'info', [
+        $install->refresh();
+
+        app(AuditLogger::class)->log($request, $merchant, $this->widgetEvent($mode), 'widget', 'info', [
             'platform' => $install->platform,
             'merchant_company_id' => $install->merchant_company_id,
             'module' => 'widget',
             'action' => $mode,
-            'is_active' => $install->is_active,
-            'allowed_domains_count' => count($install->allowed_domains ?? []),
-            'has_draft' => filled($install->draft_platform) || is_array($install->draft_theme),
+            'before' => $before,
+            'after' => [
+                'live' => $this->stateSummary($this->liveState($install)),
+                'draft' => $this->stateSummary($this->draftState($install), $install),
+            ],
+            'context_data' => [
+                'published_at' => $install->published_at?->toISOString(),
+                'has_draft' => filled($install->draft_platform) || is_array($install->draft_theme),
+            ],
         ], $install);
 
-        return new WidgetInstallResource($install->refresh()->load('company'));
+        return new WidgetInstallResource($install->load('company'));
     }
 
     public function placementPreview(Request $request)
@@ -273,6 +285,31 @@ class WidgetInstallController extends Controller
         }
 
         return $install;
+    }
+
+    private function widgetEvent(string $mode): string
+    {
+        return match ($mode) {
+            'draft' => 'widget_install.draft_saved',
+            'discard' => 'widget_install.discarded',
+            default => 'widget_install.published',
+        };
+    }
+
+    private function stateSummary(array $state, ?WidgetInstall $install = null): array
+    {
+        return [
+            'platform' => $state['platform'] ?? 'custom',
+            'is_active' => (bool) ($state['is_active'] ?? false),
+            'allowed_domains_count' => count($state['allowed_domains'] ?? []),
+            'allowed_domains' => array_values($state['allowed_domains'] ?? []),
+            'presentation_mode' => data_get($state, 'theme.presentation_mode', 'drawer'),
+            'button_style' => data_get($state, 'theme.button_style'),
+            'has_modal_theme' => is_array(data_get($state, 'theme.modal')),
+            'has_unpublished_changes' => $install
+                ? filled($install->draft_platform) || is_array($install->draft_theme)
+                : false,
+        ];
     }
 
     private function normalizeTheme(array $theme): array

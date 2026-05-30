@@ -10144,3 +10144,12 @@ td small {
     width: 100%;
   }
 }
+
+.saas-audit-table td small {
+  margin-top: 6px;
+}
+
+.saas-audit-cell {
+  min-width: 240px;
+  color: #374151;
+}

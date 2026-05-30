@@ -9,7 +9,9 @@ use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\User;
 use App\Models\WidgetInstall;
+use App\Services\Audit\AuditLogger;
 use App\Services\CheckoutPaymentManager;
+use App\Services\Legal\LegalAcceptanceRecorder;
 use App\Services\TransactionalEmailService;
 use App\Support\CheckoutPlanCatalog;
 use App\Support\PlatformCatalog;
@@ -335,6 +337,43 @@ class PublicCheckoutController extends Controller
                     && ($plan['billing_cycle'] ?? null) === CheckoutPlanCatalog::PLAN_MONTHLY,
             ],
         ]);
+
+        app(LegalAcceptanceRecorder::class)->record(
+            request: $request,
+            context: 'checkout',
+            documentType: 'terms_and_privacy',
+            termsVersion: self::TERMS_VERSION,
+            privacyVersion: self::PRIVACY_VERSION,
+            merchant: $merchant,
+            company: $company,
+            user: $user,
+            source: $session,
+            acceptedAt: $acceptedAt,
+            metadata: [
+                'plan_code' => $plan['code'],
+                'payment_method' => $data['payment_method'],
+                'platform' => $company->platform,
+            ],
+        );
+
+        app(AuditLogger::class)->log($request, $merchant, 'legal.checkout_terms_accepted', 'legal', 'info', [
+            'merchant_company_id' => $company->id,
+            'module' => 'checkout',
+            'action' => 'accept_terms',
+            'before' => null,
+            'after' => [
+                'context' => 'checkout',
+                'document_type' => 'terms_and_privacy',
+                'terms_version' => self::TERMS_VERSION,
+                'privacy_version' => self::PRIVACY_VERSION,
+                'accepted_at' => $acceptedAt->toISOString(),
+            ],
+            'context_data' => [
+                'plan_code' => $plan['code'],
+                'payment_method' => $data['payment_method'],
+                'platform' => $company->platform,
+            ],
+        ], $session, $user);
 
         return $session;
     }

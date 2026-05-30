@@ -160,6 +160,7 @@ const saasNavSections = computed<NavSection[]>(() => [
       { to: '/saas/empresas', label: 'Empresas', icon: 'fa-building', show: auth.canSaasView('saas_companies') },
       { to: '/saas/usuarios', label: 'Usuários SaaS', icon: 'fa-user-shield', show: auth.canSaasView('saas_users') },
       { to: '/saas/usuarios-empresas', label: 'Usuários das empresas', icon: 'fa-users-gear', show: auth.canSaasView('saas_company_users') },
+      { to: '/saas/auditoria', label: 'Auditoria', icon: 'fa-shield-halved', show: auth.canSaasView('saas_audit') },
     ],
   },
   {

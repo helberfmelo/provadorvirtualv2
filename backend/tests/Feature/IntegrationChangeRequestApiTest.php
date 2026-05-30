@@ -44,6 +44,12 @@ class IntegrationChangeRequestApiTest extends TestCase
             'event' => 'integration_change.requested',
             'auditable_type' => (new IntegrationChangeRequest)->getMorphClass(),
         ]);
+        $this->assertDatabaseHas('legal_acceptances', [
+            'merchant_company_id' => $company->id,
+            'context' => 'integration_change',
+            'document_type' => 'bigshop_change_terms',
+            'terms_version' => 'bigshop-change-2026-05-29',
+        ]);
         $this->assertDatabaseHas('transactional_email_sends', [
             'merchant_company_id' => $company->id,
             'code' => TransactionalEmailService::CODE_BIGSHOP_CHANGE_REQUESTED,

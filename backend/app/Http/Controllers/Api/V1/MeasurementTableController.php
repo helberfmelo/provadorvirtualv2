@@ -199,15 +199,23 @@ class MeasurementTableController extends Controller
                     $tableIds[] = $table->id;
                 });
         });
+        $tablesAfter = MeasurementTable::query()
+            ->whereIn('id', array_values(array_unique($tableIds)))
+            ->with('rows')
+            ->get();
 
         app(AuditLogger::class)->log($request, $merchant, 'measurement_table.imported', 'measurement_tables', 'info', [
             'module' => 'measurement_tables',
             'action' => 'import',
             'merchant_company_id' => $company?->id,
-            'measurement_table_ids' => array_values(array_unique($tableIds)),
-            'imported_rows' => $imported,
-            'filename' => $data['filename'] ?? null,
-            'format' => $data['format'],
+            'before' => null,
+            'after' => $tablesAfter->map(fn (MeasurementTable $table): array => $this->tableSnapshot($table))->values()->all(),
+            'context_data' => [
+                'measurement_table_ids' => array_values(array_unique($tableIds)),
+                'imported_rows' => $imported,
+                'filename' => $data['filename'] ?? null,
+                'format' => $data['format'],
+            ],
         ]);
 
         return response()->json([
@@ -227,6 +235,7 @@ class MeasurementTableController extends Controller
             ? $this->merchantCompany($merchant, $data['merchant_company_id'])
             : $activeCompany;
         $metadata = $this->tableMetadataPayload($data) ?? [];
+        $before = null;
 
         $table = DB::transaction(function () use ($merchant, $company, $data, $metadata): MeasurementTable {
             $table = MeasurementTable::query()->create([
@@ -252,11 +261,11 @@ class MeasurementTableController extends Controller
         });
 
         app(AuditLogger::class)->log($request, $merchant, 'measurement_table.created', 'measurement_tables', 'info', [
-            'measurement_table_id' => $table->id,
-            'merchant_company_id' => $company?->id,
             'module' => 'measurement_tables',
             'action' => 'create',
-            'rows_count' => $table->rows()->count(),
+            'merchant_company_id' => $company?->id,
+            'before' => $before,
+            'after' => $this->tableSnapshot($table->fresh(['rows']) ?? $table),
         ], $table);
 
         return (new MeasurementTableResource($table->load(['company', 'rows'])))
@@ -279,6 +288,7 @@ class MeasurementTableController extends Controller
         $company = $this->currentCompany($request, $merchant);
         $this->scopedMeasurementTable($merchant, $measurementTable, $company);
         $data = $request->validated();
+        $before = $this->tableSnapshot($measurementTable->loadMissing('rows'));
 
         DB::transaction(function () use ($merchant, $measurementTable, $data): void {
             if (array_key_exists('merchant_company_id', $data)) {
@@ -302,11 +312,11 @@ class MeasurementTableController extends Controller
         });
 
         app(AuditLogger::class)->log($request, $merchant, 'measurement_table.updated', 'measurement_tables', 'info', [
-            'measurement_table_id' => $measurementTable->id,
-            'merchant_company_id' => $measurementTable->merchant_company_id,
             'module' => 'measurement_tables',
             'action' => 'update',
-            'rows_count' => $measurementTable->rows()->count(),
+            'merchant_company_id' => $measurementTable->merchant_company_id,
+            'before' => $before,
+            'after' => $this->tableSnapshot($measurementTable->fresh(['rows']) ?? $measurementTable),
         ], $measurementTable);
 
         return new MeasurementTableResource($measurementTable->refresh()->load(['company', 'rows']));
@@ -317,6 +327,7 @@ class MeasurementTableController extends Controller
         $merchant = $this->currentMerchant($request);
         $company = $this->currentCompany($request, $merchant);
         $this->scopedMeasurementTable($merchant, $measurementTable, $company);
+        $before = $this->tableSnapshot($measurementTable->loadMissing('rows'));
 
         DB::transaction(function () use ($measurementTable): void {
             $measurementTable->products()->update(['measurement_table_id' => null]);
@@ -324,10 +335,11 @@ class MeasurementTableController extends Controller
         });
 
         app(AuditLogger::class)->log($request, $merchant, 'measurement_table.deleted', 'measurement_tables', 'warning', [
-            'measurement_table_id' => $measurementTable->id,
-            'merchant_company_id' => $measurementTable->merchant_company_id,
             'module' => 'measurement_tables',
             'action' => 'delete',
+            'merchant_company_id' => $measurementTable->merchant_company_id,
+            'before' => $before,
+            'after' => null,
         ], $measurementTable);
 
         return response()->json([
@@ -1149,6 +1161,24 @@ class MeasurementTableController extends Controller
             'weight' => 'Peso',
             'length' => 'Comprimento',
             'shoulder' => 'Ombro',
+        ];
+    }
+
+    private function tableSnapshot(MeasurementTable $table): array
+    {
+        return [
+            'id' => $table->id,
+            'merchant_company_id' => $table->merchant_company_id,
+            'name' => $table->name,
+            'product_type' => $table->product_type,
+            'gender' => $table->gender,
+            'fit_profile' => $table->fit_profile,
+            'measurement_target' => $table->measurement_target,
+            'size_system' => $table->size_system,
+            'range_mode' => $table->range_mode,
+            'status' => $table->status,
+            'rows_count' => $table->relationLoaded('rows') ? $table->rows->count() : $table->rows()->count(),
+            'virtual_try_on_enabled' => (bool) data_get($table->metadata ?? [], 'activation.virtual_try_on_enabled', true),
         ];
     }
 }

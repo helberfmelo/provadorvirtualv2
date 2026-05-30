@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\ProductVariantController;
 use App\Http\Controllers\Api\V1\PublicCheckoutController;
 use App\Http\Controllers\Api\V1\RecommendationController;
 use App\Http\Controllers\Api\V1\SaasAdminController;
+use App\Http\Controllers\Api\V1\SaasAuditController;
 use App\Http\Controllers\Api\V1\SaasCheckoutController;
 use App\Http\Controllers\Api\V1\SaasCheckoutOrderController;
 use App\Http\Controllers\Api\V1\SaasEmailController;
@@ -195,6 +196,10 @@ Route::prefix('v1')->group(function (): void {
             ->middleware('portal.permission:saas,saas_dashboard,view');
         Route::get('/saas/companies', [SaasAdminController::class, 'companies'])
             ->middleware('portal.permission:saas,saas_companies,view');
+        Route::get('/saas/audit-logs', [SaasAuditController::class, 'index'])
+            ->middleware('portal.permission:saas,saas_audit,view');
+        Route::get('/saas/audit-logs/export', [SaasAuditController::class, 'export'])
+            ->middleware('portal.permission:saas,saas_audit,view');
         Route::get('/saas/integration-change-requests', [IntegrationChangeRequestController::class, 'index'])
             ->middleware('portal.permission:saas,saas_companies,view');
         Route::patch('/saas/integration-change-requests/{integrationChangeRequest}', [IntegrationChangeRequestController::class, 'update'])

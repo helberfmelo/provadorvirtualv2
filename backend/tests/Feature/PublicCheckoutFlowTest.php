@@ -55,6 +55,17 @@ class PublicCheckoutFlowTest extends TestCase
             'terms_version' => '2026-05-25',
             'privacy_version' => '2026-05-25',
         ]);
+        $this->assertDatabaseHas('legal_acceptances', [
+            'context' => 'checkout',
+            'document_type' => 'terms_and_privacy',
+            'terms_version' => '2026-05-25',
+            'privacy_version' => '2026-05-25',
+            'merchant_company_id' => 1,
+        ]);
+        $this->assertDatabaseHas('audit_logs', [
+            'event' => 'legal.checkout_terms_accepted',
+            'merchant_company_id' => 1,
+        ]);
 
         Http::assertSent(function ($request): bool {
             $payload = $request->data();
@@ -153,6 +164,10 @@ class PublicCheckoutFlowTest extends TestCase
         $this->assertDatabaseHas('checkout_acceptances', [
             'checkout_session_id' => $session->id,
             'lead_email' => 'admin.checkout@example.com',
+        ]);
+        $this->assertDatabaseHas('legal_acceptances', [
+            'context' => 'checkout',
+            'merchant_company_id' => $session->merchant_company_id,
         ]);
     }
 

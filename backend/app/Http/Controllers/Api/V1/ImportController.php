@@ -8,6 +8,7 @@ use App\Http\Requests\PreviewImportRequest;
 use App\Http\Requests\StoreImportRequest;
 use App\Http\Resources\ImportJobResource;
 use App\Models\ImportJob;
+use App\Services\Audit\AuditLogger;
 use App\Services\Imports\ImportService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
@@ -69,6 +70,26 @@ class ImportController extends Controller
                 'content' => $exception->getMessage(),
             ]);
         }
+
+        app(AuditLogger::class)->log($request, $merchant, 'imports.committed', 'imports', 'info', [
+            'merchant_company_id' => $company?->id,
+            'module' => 'imports',
+            'action' => 'commit',
+            'before' => null,
+            'after' => [
+                'import_job_id' => $job->id,
+                'type' => $job->type,
+                'source_format' => $job->source_format,
+                'status' => $job->status,
+                'total_rows' => $job->total_rows,
+                'imported_rows' => $job->imported_rows,
+                'failed_rows' => $job->failed_rows,
+            ],
+            'context_data' => [
+                'filename' => $job->filename,
+                'summary' => $job->summary,
+            ],
+        ], $job);
 
         return (new ImportJobResource($job))
             ->response()

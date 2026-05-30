@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\IntegrationChangeRequest;
 use App\Models\MerchantCompany;
 use App\Services\Audit\AuditLogger;
+use App\Services\Legal\LegalAcceptanceRecorder;
 use App\Services\TransactionalEmailService;
 use App\Support\ActiveTenant;
 use App\Support\CheckoutPlanCatalog;
@@ -90,6 +91,23 @@ class IntegrationChangeRequestController extends Controller
             'terms_version' => $changeRequest->terms_version,
             'accepted_at' => $changeRequest->terms_accepted_at?->toISOString(),
         ], $changeRequest);
+
+        app(LegalAcceptanceRecorder::class)->record(
+            request: $request,
+            context: 'integration_change',
+            documentType: 'bigshop_change_terms',
+            termsVersion: $changeRequest->terms_version,
+            merchant: $merchant,
+            company: $company,
+            user: $request->user(),
+            source: $changeRequest,
+            acceptedAt: $changeRequest->terms_accepted_at,
+            metadata: [
+                'from_platform' => $changeRequest->from_platform,
+                'to_platform' => $changeRequest->to_platform,
+                'request_id' => $changeRequest->id,
+            ],
+        );
 
         $this->notifyChangeRequest(TransactionalEmailService::CODE_BIGSHOP_CHANGE_REQUESTED, $changeRequest);
 

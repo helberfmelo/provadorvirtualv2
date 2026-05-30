@@ -3068,7 +3068,18 @@ Critérios de aceite:
 - credencial sensível não aparece em texto puro;
 - auditoria não expõe dados pessoais desnecessários.
 
-Status: planejada.
+Status: concluída localmente e pronta para publicação.
+
+Implementação desta sprint:
+
+- criada a tabela `legal_acceptances` para centralizar aceite legal por empresa, usuário, IP mascarado, hash de IP, documento, versões e origem;
+- `PublicCheckoutController` e `IntegrationChangeRequestController` passaram a registrar aceites centralizados e eventos auditáveis de termos;
+- `WidgetInstallController`, `IntegrationController`, `MeasurementTableController`, `ImportController` e `ProductController` agora registram trilha crítica com ator, antes/depois e contexto para publicação do widget, descarte de rascunho, rotação de segredo, alterações/importações de tabela, commit de importação e vínculo em lote;
+- criado `SaasAuditController` com `GET /api/v1/saas/audit-logs` e `GET /api/v1/saas/audit-logs/export`, retornando resumo, filtros, logs críticos, aceites centralizados e CSV por empresa;
+- o SaaS ganhou `/saas/auditoria`, com filtros operacionais, cards de resumo, tabela `Ações críticas`, tabela `Aceites de termos` e exportação CSV;
+- `scripts/validate-production.ps1` passou a validar `/saas/auditoria` e, quando houver permissão, também o endpoint autenticado de auditoria;
+- validações locais já concluídas: `php -l`, suíte focada `PublicCheckoutFlowTest|IntegrationChangeRequestApiTest|SaasAuditApiTest|WidgetInstallApiTest|IntegrationsApiTest`, PHPUnit completo, `pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `/saas/auditoria`;
+- a validação visual local identificou e corrigiu uma quebra real do ambiente `8002`: a migration `legal_acceptances` ainda não estava aplicada no SQLite local; após `artisan migrate --force`, a tela passou em desktop e mobile sem erro.
 
 ### Sprint 158 - Base de conhecimento e suporte contextual
 
