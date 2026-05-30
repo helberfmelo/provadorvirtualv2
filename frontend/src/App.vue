@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import SaveFeedbackModal from './components/SaveFeedbackModal.vue'
+import { buildSupportUrl, findHelpArticleByRoute } from './content/helpCenter'
 import { useAuthStore } from './stores/auth'
 
 type NavLink = {
@@ -17,21 +18,12 @@ type NavSection = {
   links: NavLink[]
 }
 
-type ContextHelp = {
-  topic: string
-  title: string
-  text: string
-  nextTo?: string
-  nextLabel?: string
-}
-
 const route = useRoute()
 const router = useRouter()
 const auth = useAuthStore()
 const navOpen = ref(false)
 const cookieNoticeVisible = ref(false)
 const brandLogoUrl = `${import.meta.env.BASE_URL}images/brand/logo_provador_virtual.png`
-const supportUrl = 'https://wa.me/5531993157573?text=Oi,%20preciso%20de%20ajuda%20no%20Provador%20Virtual.'
 
 const canSeeSaas = computed(() => ['admin', 'support'].includes(auth.user?.role || ''))
 const isCompanyRoute = computed(() => route.path === '/app' || route.path.startsWith('/app/'))
@@ -148,6 +140,7 @@ const companyNavSections = computed<NavSection[]>(() => [
     links: [
       { to: '/app/plano-e-cobranca', label: 'Plano e cobrança', icon: 'fa-wallet', show: auth.canView('dashboard') },
       { to: '/app/usuarios', label: 'Usuários', icon: 'fa-users-gear', show: auth.canView('users') },
+      { to: '/app/ajuda', label: 'Ajuda', icon: 'fa-life-ring', show: auth.canView('dashboard') },
     ],
   },
 ])
@@ -181,183 +174,24 @@ const visibleWorkSections = computed(() => (
   links: section.links.filter((link) => link.show),
 })).filter((section) => section.links.length > 0))
 
-const companyHelpItems: Array<ContextHelp & { prefix: string, exact?: boolean }> = [
-  {
-    prefix: '/app',
-    exact: true,
-    topic: 'painel',
-    title: 'Painel da loja',
-    text: 'Veja o estado geral e avance para os cadastros que liberam o provador.',
-    nextTo: '/app/produtos',
-    nextLabel: 'Ir para produtos',
-  },
-  {
-    prefix: '/app/produtos',
-    topic: 'produtos',
-    title: 'Produtos',
-    text: 'Revise tabela, modelagem, categoria e status antes de publicar o provador.',
-    nextTo: '/app/tabelas-de-medidas',
-    nextLabel: 'Revisar tabelas',
-  },
-  {
-    prefix: '/app/tabelas-de-medidas',
-    topic: 'tabelas',
-    title: 'Tabelas de medidas',
-    text: 'Mantenha medidas revisadas e vinculadas aos produtos que receberão recomendação.',
-    nextTo: '/app/produtos',
-    nextLabel: 'Vincular produtos',
-  },
-  {
-    prefix: '/app/modelagens',
-    topic: 'modelagens',
-    title: 'Modelagens',
-    text: 'Use caimentos consistentes para importar, filtrar e recomendar com mais precisão.',
-    nextTo: '/app/regras-de-importacao',
-    nextLabel: 'Ajustar regras',
-  },
-  {
-    prefix: '/app/categorias',
-    topic: 'categorias',
-    title: 'Categorias',
-    text: 'Normalize categorias locais para manter filtros, regras e relatórios falando a mesma língua.',
-    nextTo: '/app/produtos',
-    nextLabel: 'Ver produtos',
-  },
-  {
-    prefix: '/app/marcas',
-    topic: 'marcas',
-    title: 'Marcas',
-    text: 'Revise duplicidades e aplique marcas normalizadas antes de novas análises do catálogo.',
-    nextTo: '/app/produtos',
-    nextLabel: 'Ver produtos',
-  },
-  {
-    prefix: '/app/taxonomia',
-    topic: 'taxonomia',
-    title: 'Taxonomia IA',
-    text: 'Aprove sugestões com contexto de categoria, marca, gênero, faixa etária, modelagem e grade.',
-    nextTo: '/app/regras-de-importacao',
-    nextLabel: 'Ver regras',
-  },
-  {
-    prefix: '/app/importacoes',
-    topic: 'importacoes',
-    title: 'Importações',
-    text: 'Faça prévia, valide erros e só depois grave dados no catálogo.',
-    nextTo: '/app/sincronizacao',
-    nextLabel: 'Ver sincronizações',
-  },
-  {
-    prefix: '/app/regras-de-importacao',
-    topic: 'regras',
-    title: 'Regras de importação',
-    text: 'Normalize categoria, marca, gênero e modelagem antes de novas importações.',
-    nextTo: '/app/importacoes',
-    nextLabel: 'Testar importação',
-  },
-  {
-    prefix: '/app/widget',
-    topic: 'provador',
-    title: 'Instalação do provador',
-    text: 'Publique somente depois de conferir domínios, botões e prévia desktop/mobile.',
-    nextTo: '/app/integracoes',
-    nextLabel: 'Conferir integração',
-  },
-  {
-    prefix: '/app/integracoes',
-    topic: 'integracoes',
-    title: 'Integrações',
-    text: 'Separe plataforma, catálogo, instalação na página de produto e rastreamento.',
-    nextTo: '/app/sincronizacao',
-    nextLabel: 'Ver histórico',
-  },
-  {
-    prefix: '/app/sincronizacao',
-    topic: 'sincronizacao',
-    title: 'Sincronização',
-    text: 'Use contadores e erros por produto para corrigir a origem antes de importar de novo.',
-    nextTo: '/app/regras-de-importacao',
-    nextLabel: 'Corrigir regras',
-  },
-  {
-    prefix: '/app/analytics',
-    topic: 'relatorios',
-    title: 'Relatórios',
-    text: 'Acompanhe recomendações, feedbacks e sinais comerciais para priorizar revisão.',
-    nextTo: '/app/pedidos',
-    nextLabel: 'Abrir pedidos',
-  },
-  {
-    prefix: '/app/pedidos',
-    topic: 'pedidos',
-    title: 'Pedidos',
-    text: 'Cruze pedidos com uso do provador para medir conversão assistida e revisar tamanhos comprados.',
-    nextTo: '/app/devolucoes',
-    nextLabel: 'Abrir devoluções',
-  },
-  {
-    prefix: '/app/devolucoes',
-    topic: 'devolucoes',
-    title: 'Devoluções',
-    text: 'Normalize motivos, compare com uso do provador e revise sinais de tamanho antes de ajustar a operação.',
-    nextTo: '/app/go-live',
-    nextLabel: 'Ver publicação',
-  },
-  {
-    prefix: '/app/assistente',
-    topic: 'assistente',
-    title: 'Assistente IA',
-    text: 'Gere rascunhos e sugestões, mas revise tudo antes de salvar como tabela.',
-    nextTo: '/app/tabelas-de-medidas/nova',
-    nextLabel: 'Criar tabela',
-  },
-  {
-    prefix: '/app/go-live',
-    topic: 'publicacao',
-    title: 'Publicação',
-    text: 'Confira bloqueios, avisos e links diretos antes de liberar a loja para clientes.',
-    nextTo: '/app/widget',
-    nextLabel: 'Abrir provador',
-  },
-  {
-    prefix: '/app/plano-e-cobranca',
-    topic: 'cobranca',
-    title: 'Plano e cobrança',
-    text: 'Veja plano, benefício BigShop, cobranças em aberto e solicitações comerciais sem precisar acessar o Admin.',
-    nextTo: '/app/integracoes',
-    nextLabel: 'Ver integrações',
-  },
-  {
-    prefix: '/app/usuarios',
-    topic: 'usuarios',
-    title: 'Usuários',
-    text: 'Mantenha acessos por função e evite liberar edição para quem só acompanha operação.',
-    nextTo: '/app',
-    nextLabel: 'Voltar ao painel',
-  },
-]
-
-const contextHelp = computed<ContextHelp | null>(() => {
+const contextHelp = computed(() => {
   if (!isCompanyRoute.value || route.path === '/app/ajuda') {
     return null
   }
 
-  const item = companyHelpItems.find((help) => (
-    help.exact ? route.path === help.prefix : route.path === help.prefix || route.path.startsWith(`${help.prefix}/`)
-  ))
-
-  if (!item) {
-    return null
-  }
-
-  return {
-    topic: item.topic,
-    title: item.title,
-    text: item.text,
-    nextTo: item.nextTo,
-    nextLabel: item.nextLabel,
-  }
+  return findHelpArticleByRoute(route.path)
 })
+
+const contextualSupportUrl = computed(() => buildSupportUrl({
+  article: contextHelp.value,
+  routePath: route.path,
+  companyName: auth.activeCompany?.name || null,
+  companyCode: auth.activeCompany?.access_code || null,
+  merchantName: auth.activeMerchant?.name || null,
+  platform: auth.activeCompany?.platform || null,
+  userName: auth.user?.name || null,
+  userEmail: auth.user?.email || null,
+}))
 
 onMounted(() => {
   auth.ensureLoaded().catch(() => undefined)
@@ -564,16 +398,16 @@ function handleBrandClick(event: MouseEvent) {
               <i class="fa-solid fa-circle-question" aria-hidden="true"></i>
               {{ contextHelp.title }}
             </strong>
-            <span>{{ contextHelp.text }}</span>
+            <span>{{ contextHelp.summary }}</span>
           </div>
           <div class="context-help-actions">
-            <RouterLink :to="{ path: '/app/ajuda', query: { topico: contextHelp.topic } }">
+            <RouterLink :to="{ path: '/app/ajuda', query: { topico: contextHelp.key } }">
               Manual
             </RouterLink>
             <RouterLink v-if="contextHelp.nextTo" :to="contextHelp.nextTo">
               {{ contextHelp.nextLabel || 'Próximo passo' }}
             </RouterLink>
-            <a :href="supportUrl" target="_blank" rel="noopener noreferrer">
+            <a :href="contextualSupportUrl" target="_blank" rel="noopener noreferrer">
               Suporte
             </a>
           </div>

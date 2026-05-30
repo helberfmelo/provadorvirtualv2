@@ -3110,7 +3110,17 @@ Critérios de aceite:
 - suporte recebe contexto sem o lojista precisar explicar tudo;
 - base não contém credenciais nem dados sensíveis.
 
-Status: planejada.
+Status: concluída localmente e pronta para publicação.
+
+Implementação desta sprint:
+
+- a ajuda criada na Sprint 128 foi promovida a uma base de conhecimento compartilhada em `frontend/src/content/helpCenter.ts`;
+- foram adicionados artigos para telas críticas do portal e guias por plataforma, cobrindo painel, produtos, tabelas, modelagens, regras, sincronização, relatórios, cobrança e integrações;
+- `/app/ajuda` agora tem busca interna, agrupamento por assunto, artigos relacionados e CTA `Suporte com contexto`;
+- `App.vue` passou a usar a mesma base para a barra de ajuda contextual e para o link do manual, evitando listas duplicadas;
+- o link de suporte agora leva assunto, rota, empresa, código, plataforma e usuário, reduzindo explicação manual;
+- o menu do portal ganhou entrada explícita para `/app/ajuda`;
+- validações locais já concluídas: `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `/app/ajuda`, além da checagem da barra contextual em `/app/produtos`.
 
 ### Sprint 159 - Polimento final Sizebay-plus do portal
 
