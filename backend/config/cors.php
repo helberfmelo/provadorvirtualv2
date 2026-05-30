@@ -35,6 +35,7 @@ return [
         'api/v1/imports*',
         'api/v1/ai*',
         'api/v1/analytics*',
+        'api/v1/go-live*',
         'api/v1/orders*',
         'api/v1/returns*',
         'api/v1/audit-logs',

@@ -8919,6 +8919,163 @@ td small {
   line-height: 1.5;
 }
 
+.go-live-summary-grid {
+  margin-top: 24px;
+}
+
+.go-live-summary-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+}
+
+.go-live-summary-card i {
+  font-size: 1.2rem;
+}
+
+.go-live-summary-card strong {
+  font-size: 1.15rem;
+}
+
+.go-live-summary-card span,
+.go-live-summary-card small {
+  color: #475569;
+}
+
+.go-live-summary-card.tone-good {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+
+.go-live-summary-card.tone-good i,
+.go-live-summary-card.tone-good strong {
+  color: #166534;
+}
+
+.go-live-summary-card.tone-warning {
+  border-color: #fde68a;
+  background: #fffbeb;
+}
+
+.go-live-summary-card.tone-warning i,
+.go-live-summary-card.tone-warning strong {
+  color: #92400e;
+}
+
+.go-live-summary-card.tone-danger {
+  border-color: #fecaca;
+  background: #fef2f2;
+}
+
+.go-live-summary-card.tone-danger i,
+.go-live-summary-card.tone-danger strong {
+  color: #991b1b;
+}
+
+.go-live-summary-card.tone-neutral {
+  border-color: #dbeafe;
+  background: #eff6ff;
+}
+
+.go-live-summary-card.tone-neutral i,
+.go-live-summary-card.tone-neutral strong {
+  color: #1d4ed8;
+}
+
+.go-live-connected-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+
+.go-live-connected-card {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.go-live-connected-head {
+  display: grid;
+  gap: 8px;
+}
+
+.go-live-connected-card p,
+.go-live-connected-card small {
+  color: #475569;
+}
+
+.go-live-connected-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.go-live-connected-metrics span {
+  display: grid;
+  gap: 2px;
+  padding: 10px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.go-live-connected-metrics strong {
+  color: #0f172a;
+}
+
+.go-live-report-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.go-live-report-panel p,
+.go-live-report-panel small {
+  color: #475569;
+}
+
+.go-live-report-text {
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #334155;
+  font-size: 0.84rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.go-live-group-list {
+  display: grid;
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.go-live-group {
+  display: grid;
+  gap: 10px;
+}
+
+.go-live-check-row {
+  gap: 14px;
+}
+
+.go-live-check-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.btn-sm {
+  padding: 8px 12px;
+  font-size: 0.85rem;
+}
+
 .command-list {
   display: grid;
   gap: 10px;
@@ -9251,6 +9408,7 @@ td small {
   .saas-grid,
   .user-grid,
   .analytics-grid,
+  .go-live-connected-grid,
   .assistant-review-grid,
   .assistant-comparison-meta,
   .assistant-comparison-change-list,

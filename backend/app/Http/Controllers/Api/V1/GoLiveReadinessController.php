@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Api\V1\Concerns\ResolvesMerchant;
 use App\Http\Controllers\Controller;
 use App\Models\CheckoutSession;
+use App\Models\IntegrationEvent;
 use App\Models\MeasurementTable;
 use App\Models\PlatformConnection;
 use App\Models\Product;
@@ -12,6 +13,7 @@ use App\Models\RecommendationLog;
 use App\Models\WidgetInstall;
 use App\Services\CheckoutPaymentManager;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 
 class GoLiveReadinessController extends Controller
@@ -22,12 +24,21 @@ class GoLiveReadinessController extends Controller
     {
         $merchant = $this->currentMerchant($request);
         $company = $this->currentCompany($request, $merchant);
+        $generatedAt = now()->toISOString();
+
+        $coverage = $this->coverageSnapshot($merchant->id, $company?->id);
+        $widget = $this->widgetSnapshot($merchant->id, $company?->id);
+        $sync = $this->syncSnapshot($merchant->id, $company?->id);
+
         $checks = collect([
-            $this->productsCheck($merchant->id, $company?->id),
-            $this->measurementTablesCheck($merchant->id, $company?->id),
-            $this->productTestCheck($merchant->id, $company?->id),
-            $this->widgetCheck($merchant->id, $company?->id),
-            $this->recommendationSmokeCheck($merchant->id, $company?->id),
+            $this->productsCheck($coverage),
+            $this->measurementTablesCheck($coverage),
+            $this->catalogCoverageCheck($coverage),
+            $this->productDataQualityCheck($coverage),
+            $this->productTestCheck($coverage),
+            $this->widgetPublicationCheck($widget),
+            $this->recommendationSmokeCheck($coverage['recommendations_total']),
+            $this->syncHealthCheck($sync),
             $this->paymentProviderCheck(),
             $this->paymentRealTransactionCheck(),
             $this->schedulerCheck(),
@@ -43,16 +54,26 @@ class GoLiveReadinessController extends Controller
         $blockers = $checks->where('status', 'blocked')->count();
         $warnings = $checks->where('status', 'warning')->count();
         $passed = $checks->where('status', 'passed')->count();
+        $summaryStatus = $blockers > 0 ? 'blocked' : ($warnings > 0 ? 'ready_with_warnings' : 'ready');
+
+        $summary = [
+            'status' => $summaryStatus,
+            'status_label' => $this->summaryStatusLabel($summaryStatus),
+            'passed' => $passed,
+            'warnings' => $warnings,
+            'blockers' => $blockers,
+            'total' => $checks->count(),
+            'generated_at' => $generatedAt,
+        ];
 
         return response()->json([
-            'summary' => [
-                'status' => $blockers > 0 ? 'blocked' : ($warnings > 0 ? 'ready_with_warnings' : 'ready'),
-                'passed' => $passed,
-                'warnings' => $warnings,
-                'blockers' => $blockers,
-                'total' => $checks->count(),
-            ],
+            'summary' => $summary,
             'checks' => $checks->values(),
+            'connected_data' => [
+                'coverage' => $coverage,
+                'widget' => $widget,
+                'sync' => $sync,
+            ],
             'production_urls' => [
                 'app' => config('app.url'),
                 'root' => config('app.frontend_url', config('app.url')),
@@ -73,93 +94,306 @@ class GoLiveReadinessController extends Controller
                 'cron_scheduler_recent' => ! $this->hasRecentSchedulerLog(),
             ],
             'pilot_package' => $this->pilotPackage(),
+            'report' => $this->publicationReport($company?->name, $summary, $checks, $coverage, $widget, $sync, $generatedAt),
         ]);
     }
 
-    private function productsCheck(int $merchantId, ?int $companyId): array
+    private function coverageSnapshot(int $merchantId, ?int $companyId): array
     {
-        $count = Product::query()
+        $products = Product::query()
             ->where('merchant_id', $merchantId)
             ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
-            ->where('status', 'active')
-            ->count();
+            ->select(['id', 'measurement_table_id', 'category', 'fit_profile', 'status', 'metadata', 'updated_at'])
+            ->get();
 
-        return $this->check(
-            key: 'products',
-            label: 'Produtos ativos',
-            status: $count > 0 ? 'passed' : 'blocked',
-            detail: $count.' produto(s) ativo(s).',
-            action: $count > 0 ? 'Manter pelo menos o produto teste configurado.' : 'Cadastrar ao menos um produto ativo.'
-        );
+        $activeProducts = $products->where('status', 'active');
+        $activeProductsCount = $activeProducts->count();
+        $readyProducts = $activeProducts->filter(fn (Product $product): bool => $this->productIsReady($product))->count();
+        $withoutTable = $activeProducts->whereNull('measurement_table_id')->count();
+        $withoutModeling = $activeProducts->filter(fn (Product $product): bool => blank($product->fit_profile))->count();
+        $withoutCategory = $activeProducts->filter(fn (Product $product): bool => blank($product->category))->count();
+        $syncErrors = $activeProducts->filter(fn (Product $product): bool => $this->hasSyncError($product))->count();
+        $virtualTryOnDisabled = $activeProducts->filter(fn (Product $product): bool => ! $this->activationEnabled($product, 'virtual_try_on_enabled'))->count();
+        $measurementTableDisabled = $activeProducts->filter(fn (Product $product): bool => ! $this->activationEnabled($product, 'measurement_table_enabled'))->count();
+        $criticalProducts = $withoutTable + $syncErrors + $virtualTryOnDisabled + $measurementTableDisabled;
+        $coverageRate = $activeProductsCount > 0 ? round(($readyProducts / $activeProductsCount) * 100, 1) : 0.0;
+        $status = $activeProductsCount === 0 || $readyProducts === 0
+            ? 'blocked'
+            : ($criticalProducts > 0 || $withoutModeling > 0 || $withoutCategory > 0 ? 'warning' : 'passed');
+
+        return [
+            'status' => $status,
+            'label' => 'Catálogo',
+            'summary' => $activeProductsCount === 0
+                ? 'Nenhum produto ativo pronto para receber o provador.'
+                : $readyProducts.' de '.$activeProductsCount.' produto(s) ativo(s) estão prontos para publicar.',
+            'detail' => 'Cobertura ativa de '.$coverageRate.'%. Pendências críticas: '.$criticalProducts.'. Pendências de revisão: '.($withoutModeling + $withoutCategory).'.',
+            'link' => '/app/produtos?filtro=pendentes',
+            'metrics' => [
+                ['label' => 'ativos', 'value' => $activeProductsCount],
+                ['label' => 'prontos', 'value' => $readyProducts],
+                ['label' => 'sem tabela', 'value' => $withoutTable],
+                ['label' => 'erro de sync', 'value' => $syncErrors],
+            ],
+            'total_products' => $products->count(),
+            'active_products' => $activeProductsCount,
+            'ready_products' => $readyProducts,
+            'without_measurement_table' => $withoutTable,
+            'without_modeling' => $withoutModeling,
+            'without_category' => $withoutCategory,
+            'sync_errors' => $syncErrors,
+            'virtual_try_on_disabled' => $virtualTryOnDisabled,
+            'measurement_table_disabled' => $measurementTableDisabled,
+            'critical_products' => $criticalProducts,
+            'coverage_rate' => $coverageRate,
+            'measurement_tables_active' => MeasurementTable::query()
+                ->where('merchant_id', $merchantId)
+                ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
+                ->where('status', 'active')
+                ->whereHas('rows')
+                ->count(),
+            'product_test_ready' => Product::query()
+                ->where('merchant_id', $merchantId)
+                ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
+                ->where('status', 'active')
+                ->whereNotNull('measurement_table_id')
+                ->whereHas('variants', fn ($query) => $query->where('is_active', true))
+                ->count(),
+            'recommendations_total' => RecommendationLog::query()
+                ->where('merchant_id', $merchantId)
+                ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
+                ->count(),
+            'updated_at' => $products->max('updated_at')?->toISOString(),
+        ];
     }
 
-    private function measurementTablesCheck(int $merchantId, ?int $companyId): array
-    {
-        $count = MeasurementTable::query()
-            ->where('merchant_id', $merchantId)
-            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
-            ->where('status', 'active')
-            ->whereHas('rows')
-            ->count();
-
-        return $this->check(
-            key: 'measurement_tables',
-            label: 'Tabelas de medidas',
-            status: $count > 0 ? 'passed' : 'blocked',
-            detail: $count.' tabela(s) ativa(s) com linhas.',
-            action: $count > 0 ? 'Revisar tabelas antes de campanhas reais.' : 'Criar uma tabela ativa com tamanhos.'
-        );
-    }
-
-    private function productTestCheck(int $merchantId, ?int $companyId): array
-    {
-        $count = Product::query()
-            ->where('merchant_id', $merchantId)
-            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
-            ->whereNotNull('measurement_table_id')
-            ->whereHas('variants', fn ($query) => $query->where('is_active', true))
-            ->count();
-
-        return $this->check(
-            key: 'product_test',
-            label: 'Produto teste funcional',
-            status: $count > 0 ? 'passed' : 'blocked',
-            detail: $count.' produto(s) com tabela e variação ativa.',
-            action: $count > 0 ? 'Validar recomendação em /produto-teste após cada deploy.' : 'Vincular tabela e variações ao produto teste.'
-        );
-    }
-
-    private function widgetCheck(int $merchantId, ?int $companyId): array
+    private function widgetSnapshot(int $merchantId, ?int $companyId): array
     {
         $install = WidgetInstall::query()
             ->where('merchant_id', $merchantId)
             ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
-            ->where('is_active', true)
+            ->orderByRaw('merchant_company_id is null')
             ->first();
-        $domains = collect($install?->allowed_domains ?? [])->filter()->values();
 
+        $domains = collect($install?->allowed_domains ?? [])->filter()->values();
+        $placementStatus = data_get($install?->theme ?? [], 'placement.validation.status', 'untested');
+        $hasDraft = $install ? $this->widgetHasUnpublishedChanges($install) : false;
+        $status = ! $install || ! $install->is_active || $domains->isEmpty()
+            ? 'blocked'
+            : (in_array($placementStatus, ['failed'], true)
+                ? 'blocked'
+                : (in_array($placementStatus, ['warning', 'untested'], true) || $hasDraft ? 'warning' : 'passed'));
+
+        $placementLabel = match ($placementStatus) {
+            'passed' => 'seletor validado',
+            'warning' => 'seletor com alerta',
+            'failed' => 'seletor com falha',
+            default => 'seletor ainda não validado',
+        };
+
+        return [
+            'status' => $status,
+            'label' => 'Widget',
+            'summary' => ! $install
+                ? 'O widget ainda não foi configurado.'
+                : $domains->count().' domínio(s) liberado(s) e publicação '.($install->is_active ? 'ativa' : 'inativa').'.',
+            'detail' => ! $install
+                ? 'Abra a tela do widget para ativar, definir domínios e validar o seletor da página de produto.'
+                : 'Estado atual: '.$placementLabel.'. '.($hasDraft ? 'Existem mudanças em rascunho aguardando publicação.' : 'Sem mudanças pendentes em rascunho.'),
+            'link' => '/app/widget',
+            'metrics' => [
+                ['label' => 'domínios', 'value' => $domains->count()],
+                ['label' => 'publicado', 'value' => $install && $install->is_active ? 'sim' : 'não'],
+                ['label' => 'seletor', 'value' => $placementStatus],
+                ['label' => 'rascunho', 'value' => $hasDraft ? 'sim' : 'não'],
+            ],
+            'allowed_domains_count' => $domains->count(),
+            'is_active' => (bool) ($install?->is_active ?? false),
+            'placement_status' => $placementStatus,
+            'has_unpublished_changes' => $hasDraft,
+            'published_at' => ($install?->published_at ?: $install?->updated_at)?->toISOString(),
+        ];
+    }
+
+    private function syncSnapshot(int $merchantId, ?int $companyId): array
+    {
+        $latestEvent = IntegrationEvent::query()
+            ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
+            ->whereIn('event_type', ['dry_run_import', 'sync_products', 'xml_feed_sync'])
+            ->orderByDesc('occurred_at')
+            ->orderByDesc('id')
+            ->first();
+
+        $configuredIntegrations = PlatformConnection::query()
+            ->where('merchant_id', $merchantId)
+            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
+            ->whereIn('status', ['configured', 'connected'])
+            ->count();
+
+        $counters = $this->syncCounters($latestEvent);
+        $status = $configuredIntegrations === 0
+            ? 'warning'
+            : (! $latestEvent
+                ? 'warning'
+                : (($latestEvent->status === 'failed' || $counters['errors'] > 0 || $counters['warnings'] > 0) ? 'warning' : 'passed'));
+
+        $originLabel = match ($latestEvent?->event_type) {
+            'sync_products' => 'API BigShop',
+            'xml_feed_sync' => 'XML/feed',
+            'dry_run_import' => 'Prévia',
+            default => $latestEvent?->platform ? strtoupper((string) $latestEvent->platform) : null,
+        };
+
+        return [
+            'status' => $status,
+            'label' => 'Sincronização',
+            'summary' => $configuredIntegrations === 0
+                ? 'Nenhuma integração conectada até agora.'
+                : ($latestEvent
+                    ? 'Última execução em '.optional($latestEvent->occurred_at)->format('d/m/Y H:i').'.'
+                    : 'Ainda não existe histórico recente de sincronização.'),
+            'detail' => $latestEvent
+                ? $counters['errors'].' erro(s), '.$counters['warnings'].' alerta(s) e '.$counters['total'].' item(ns) processados.'
+                : 'Use a tela de sincronização para revisar origem, erros e reprocessamentos antes da publicação.',
+            'link' => '/app/sincronizacao',
+            'metrics' => [
+                ['label' => 'integrações', 'value' => $configuredIntegrations],
+                ['label' => 'origem', 'value' => $originLabel ?: 'sem histórico'],
+                ['label' => 'erros', 'value' => $counters['errors']],
+                ['label' => 'alertas', 'value' => $counters['warnings']],
+            ],
+            'configured_integrations' => $configuredIntegrations,
+            'origin_label' => $originLabel,
+            'last_run_at' => $latestEvent?->occurred_at?->toISOString(),
+            'errors' => $counters['errors'],
+            'warnings' => $counters['warnings'],
+            'total' => $counters['total'],
+            'issue_groups' => collect(data_get($latestEvent?->summary ?? [], 'issue_groups', []))
+                ->filter(fn ($group): bool => is_array($group))
+                ->take(3)
+                ->values()
+                ->all(),
+        ];
+    }
+
+    private function productsCheck(array $coverage): array
+    {
         return $this->check(
-            key: 'widget_domains',
-            label: 'Widget e domínios',
-            status: $install && $domains->isNotEmpty() ? 'passed' : 'blocked',
-            detail: $install ? $domains->count().' domínio(s) liberado(s).' : 'Widget inativo.',
-            action: $install && $domains->isNotEmpty() ? 'Testar snippet no domínio final antes do cutover.' : 'Ativar widget e cadastrar domínios liberados.'
+            key: 'products',
+            label: 'Produtos ativos',
+            status: $coverage['active_products'] > 0 ? 'passed' : 'blocked',
+            detail: $coverage['active_products'].' produto(s) ativo(s) no catálogo.',
+            action: $coverage['active_products'] > 0 ? 'Mantenha pelo menos um produto ativo com dados revisados.' : 'Cadastre e ative ao menos um produto antes de publicar.',
+            link: '/app/produtos',
+            group: 'catalogo'
         );
     }
 
-    private function recommendationSmokeCheck(int $merchantId, ?int $companyId): array
+    private function measurementTablesCheck(array $coverage): array
     {
-        $count = RecommendationLog::query()
-            ->where('merchant_id', $merchantId)
-            ->tap(fn ($query) => $this->scopeCompanyId($query, $companyId))
-            ->count();
+        return $this->check(
+            key: 'measurement_tables',
+            label: 'Tabelas de medidas',
+            status: $coverage['measurement_tables_active'] > 0 ? 'passed' : 'blocked',
+            detail: $coverage['measurement_tables_active'].' tabela(s) ativa(s) com linhas.',
+            action: $coverage['measurement_tables_active'] > 0 ? 'Revise as tabelas ligadas aos produtos antes de campanhas reais.' : 'Crie uma tabela ativa com linhas de medida antes de publicar.',
+            link: '/app/tabelas-de-medidas',
+            group: 'catalogo'
+        );
+    }
 
+    private function catalogCoverageCheck(array $coverage): array
+    {
+        return $this->check(
+            key: 'catalog_coverage',
+            label: 'Cobertura do catálogo',
+            status: $coverage['status'],
+            detail: $coverage['summary'],
+            action: $coverage['status'] === 'passed'
+                ? 'Continue monitorando a cobertura depois de cada importação ou revisão.'
+                : 'Abra os produtos pendentes e resolva tabela, modelagem, categoria e ativações individuais.',
+            link: $coverage['link'],
+            group: 'catalogo',
+            impact: $coverage['detail']
+        );
+    }
+
+    private function productDataQualityCheck(array $coverage): array
+    {
+        $status = $coverage['critical_products'] > 0
+            ? 'blocked'
+            : (($coverage['without_modeling'] + $coverage['without_category']) > 0 ? 'warning' : 'passed');
+
+        return $this->check(
+            key: 'product_data_quality',
+            label: 'Pendências críticas por produto',
+            status: $status,
+            detail: $coverage['critical_products'].' produto(s) com bloqueio e '.($coverage['without_modeling'] + $coverage['without_category']).' com revisão recomendada.',
+            action: $status === 'passed'
+                ? 'Os produtos ativos não têm bloqueios críticos no momento.'
+                : 'Corrija produtos sem tabela, com erro de sincronização ou com o provador/tabela desativados antes de publicar.',
+            link: '/app/produtos?filtro=pendentes',
+            group: 'catalogo',
+            impact: 'Sem correção, a publicação abre espaço para produtos sem recomendação ou com dados inconsistentes.'
+        );
+    }
+
+    private function productTestCheck(array $coverage): array
+    {
+        return $this->check(
+            key: 'product_test',
+            label: 'Produto piloto validável',
+            status: $coverage['product_test_ready'] > 0 ? 'passed' : 'blocked',
+            detail: $coverage['product_test_ready'].' produto(s) com tabela e variação ativa para teste.',
+            action: $coverage['product_test_ready'] > 0 ? 'Revalide o produto piloto depois de cada deploy final.' : 'Vincule tabela e mantenha ao menos uma variação ativa no produto piloto.',
+            link: '/produto-teste',
+            group: 'catalogo'
+        );
+    }
+
+    private function widgetPublicationCheck(array $widget): array
+    {
+        return $this->check(
+            key: 'widget_publication',
+            label: 'Publicação do widget',
+            status: $widget['status'],
+            detail: $widget['summary'],
+            action: $widget['status'] === 'passed'
+                ? 'Continue validando o seletor e os domínios sempre que a PDP mudar.'
+                : 'Ative o widget, revise domínios, publique o rascunho e valide o seletor da página do produto antes de liberar a loja.',
+            link: $widget['link'],
+            group: 'widget',
+            impact: $widget['detail']
+        );
+    }
+
+    private function recommendationSmokeCheck(int $recommendationsTotal): array
+    {
         return $this->check(
             key: 'recommendation_smoke',
             label: 'Smoke de recomendação',
-            status: $count > 0 ? 'passed' : 'warning',
-            detail: $count.' recomendação(oes) registrada(s).',
-            action: $count > 0 ? 'Repetir smoke no deploy final.' : 'Rodar uma recomendação real no produto teste.'
+            status: $recommendationsTotal > 0 ? 'passed' : 'warning',
+            detail: $recommendationsTotal.' recomendação(ões) registrada(s).',
+            action: $recommendationsTotal > 0 ? 'Repita o smoke no deploy final para confirmar a jornada completa.' : 'Execute uma recomendação real no produto piloto antes da publicação.',
+            link: '/app/assistente',
+            group: 'operacao'
+        );
+    }
+
+    private function syncHealthCheck(array $sync): array
+    {
+        return $this->check(
+            key: 'sync_health',
+            label: 'Histórico de sincronização',
+            status: $sync['status'],
+            detail: $sync['summary'],
+            action: $sync['status'] === 'passed'
+                ? 'Acompanhe erros e alertas sempre que houver nova importação.'
+                : 'Reveja a última sincronização, trate alertas e reprocessamentos antes da publicação.',
+            link: $sync['link'],
+            group: 'sincronizacao',
+            impact: $sync['detail']
         );
     }
 
@@ -172,7 +406,9 @@ class GoLiveReadinessController extends Controller
             label: 'Loja BigShop piloto',
             status: $configured ? 'passed' : 'warning',
             detail: $configured ? 'Conexão BigShop configurada.' : 'Aguardando loja, store_id e token x-api reais.',
-            action: $configured ? 'Executar probe e sync antes do piloto.' : 'Cadastrar credenciais reais da loja piloto.'
+            action: $configured ? 'Executar probe e sync antes do piloto real.' : 'Cadastrar credenciais reais da loja piloto quando a operação comercial liberar.',
+            link: '/app/integracoes',
+            group: 'sincronizacao'
         );
     }
 
@@ -186,8 +422,10 @@ class GoLiveReadinessController extends Controller
             key: 'checkout_provider',
             label: 'Checkout '.$provider->label(),
             status: $configured ? 'passed' : 'warning',
-            detail: $configured ? 'Operadora ativa com credenciais minimas configuradas.' : 'Credenciais da operadora ativa ainda nao estao completas em producao.',
-            action: $configured ? 'Executar compra real de baixo valor antes da campanha.' : 'Configurar Mercado Pago ou Pagar.me no ambiente e selecionar a operadora no painel SaaS.'
+            detail: $configured ? 'Operadora ativa com credenciais mínimas configuradas.' : 'Credenciais da operadora ativa ainda não estão completas em produção.',
+            action: $configured ? 'Executar compra real de baixo valor antes da campanha.' : 'Configurar Mercado Pago ou Pagar.me no ambiente e selecionar a operadora no painel SaaS.',
+            link: '/saas/checkout',
+            group: 'financeiro'
         );
     }
 
@@ -200,7 +438,9 @@ class GoLiveReadinessController extends Controller
             label: 'Transação real de pagamento',
             status: $paid ? 'passed' : 'warning',
             detail: $paid ? 'Existe checkout aprovado registrado.' : 'Nenhuma transação real aprovada registrada ainda.',
-            action: $paid ? 'Manter webhook e cron monitorados.' : 'Depois das chaves da operadora, executar uma compra Pix/cartao de baixo valor.'
+            action: $paid ? 'Manter webhook e cron monitorados.' : 'Depois das chaves da operadora, execute uma compra Pix ou cartão de baixo valor.',
+            link: '/saas/pedidos',
+            group: 'financeiro'
         );
     }
 
@@ -212,8 +452,10 @@ class GoLiveReadinessController extends Controller
             key: 'scheduler_cron',
             label: 'Cron e automações',
             status: $recent ? 'passed' : 'warning',
-            detail: $recent ? 'Log do scheduler atualizado recentemente.' : 'Não ha log recente do scheduler do Laravel.',
-            action: $recent ? 'Continuar acompanhando pagamentos e e-mails.' : 'Cadastrar no cPanel: php artisan schedule:run a cada minuto com log em storage/logs/cron-schedule.log.'
+            detail: $recent ? 'Log do scheduler atualizado recentemente.' : 'Não há log recente do scheduler do Laravel.',
+            action: $recent ? 'Continuar acompanhando pagamentos, e-mails e sincronizações.' : 'Cadastre no cPanel: php artisan schedule:run a cada minuto com log em storage/logs/cron-schedule.log.',
+            link: '/saas/emails',
+            group: 'operacao'
         );
     }
 
@@ -226,7 +468,9 @@ class GoLiveReadinessController extends Controller
             label: 'Secret do um clique',
             status: $configured ? 'passed' : 'warning',
             detail: $configured ? 'BIGSHOP_ACTIVATION_SECRET configurado.' : 'Secret ainda ausente no ambiente.',
-            action: $configured ? 'Validar payload assinado com a BigShop.' : 'Adicionar BIGSHOP_ACTIVATION_SECRET ao PRODUCTION_ENV.'
+            action: $configured ? 'Validar payload assinado com a BigShop.' : 'Adicionar BIGSHOP_ACTIVATION_SECRET ao PRODUCTION_ENV.',
+            link: '/app/integracoes',
+            group: 'seguranca'
         );
     }
 
@@ -239,7 +483,9 @@ class GoLiveReadinessController extends Controller
             label: 'OCR externo de IA',
             status: $externalKey ? 'passed' : 'warning',
             detail: $externalKey ? 'Provider externo configurável.' : 'Parser local ativo; OCR de imagem real pendente.',
-            action: $externalKey ? 'Validar custo e prompt antes de liberar OCR.' : 'Cadastrar OPENAI_API_KEY ou GEMINI_API_KEY quando OCR for necessário.'
+            action: $externalKey ? 'Validar custo e prompt antes de liberar OCR.' : 'Cadastrar OPENAI_API_KEY ou GEMINI_API_KEY quando OCR for necessário.',
+            link: '/app/assistente',
+            group: 'operacao'
         );
     }
 
@@ -250,7 +496,9 @@ class GoLiveReadinessController extends Controller
             label: 'Privacidade e termos',
             status: 'passed',
             detail: 'Páginas públicas /privacidade e /termos disponíveis.',
-            action: 'Revisar texto jurídico antes de campanhas pagas.'
+            action: 'Revisar o texto jurídico antes de campanhas pagas.',
+            link: '/privacidade',
+            group: 'seguranca'
         );
     }
 
@@ -261,7 +509,9 @@ class GoLiveReadinessController extends Controller
             label: 'Plano da raiz do domínio',
             status: 'passed',
             detail: 'Site público v2 publicado na raiz; backend permanece em /provadorvirtual_v2 para rollback.',
-            action: 'Validar raiz e subpasta em cada deploy.'
+            action: 'Validar raiz e subpasta em cada deploy.',
+            link: '/',
+            group: 'operacao'
         );
     }
 
@@ -278,7 +528,9 @@ class GoLiveReadinessController extends Controller
             label: 'Peso do widget',
             status: $passed ? 'passed' : 'warning',
             detail: "JS {$jsKb} KB, CSS {$cssKb} KB.",
-            action: $passed ? 'Validar em produto real com cache frio e 4G.' : 'Revisar peso do JS/CSS antes de piloto com trafego pago.'
+            action: $passed ? 'Validar em produto real com cache frio e 4G.' : 'Revisar o peso do JS e do CSS antes do piloto com tráfego pago.',
+            link: '/app/widget',
+            group: 'widget'
         );
     }
 
@@ -298,8 +550,10 @@ class GoLiveReadinessController extends Controller
             key: 'accessibility_mobile',
             label: 'Acessibilidade e mobile do widget',
             status: $passed ? 'passed' : 'warning',
-            detail: $passed ? 'Modal com roles ARIA e regra mobile revisada.' : 'Widget precisa revisar ARIA/mobile.',
-            action: 'Validar manualmente no produto teste em desktop, tablet e celular antes do piloto.'
+            detail: $passed ? 'Modal com roles ARIA e regra mobile revisada.' : 'Widget ainda precisa revisar ARIA ou mobile.',
+            action: 'Validar manualmente no produto piloto em desktop, tablet e celular antes da publicação.',
+            link: '/app/widget',
+            group: 'widget'
         );
     }
 
@@ -365,7 +619,7 @@ class GoLiveReadinessController extends Controller
                 'validation' => '.\\scripts\\validate-production.ps1',
             ],
             'pending_real_world_tests' => [
-                'Transação Mercado Pago Pix/cartao de baixo valor com webhook e cron.',
+                'Transação Mercado Pago Pix/cartão de baixo valor com webhook e cron.',
                 'Ativação BigShop um clique com payload assinado real.',
                 'Probe e sync em loja BigShop piloto com produto, grade e tabela.',
                 'Teste de widget em página real de cliente com cache frio e mobile.',
@@ -373,9 +627,199 @@ class GoLiveReadinessController extends Controller
         ];
     }
 
-    private function check(string $key, string $label, string $status, string $detail, string $action): array
+    private function publicationReport(?string $companyName, array $summary, Collection $checks, array $coverage, array $widget, array $sync, string $generatedAt): array
     {
-        return compact('key', 'label', 'status', 'detail', 'action');
+        $headline = match ($summary['status']) {
+            'ready' => 'A loja está pronta para publicar o provador.',
+            'ready_with_warnings' => 'A loja está pronta com avisos que merecem acompanhamento.',
+            default => 'A publicação ainda está bloqueada por itens críticos.',
+        };
+
+        $blockers = $checks->where('status', 'blocked')
+            ->map(fn (array $check): string => $check['label'].': '.$check['action'])
+            ->values()
+            ->all();
+        $warnings = $checks->where('status', 'warning')
+            ->map(fn (array $check): string => $check['label'].': '.$check['action'])
+            ->values()
+            ->all();
+        $recommendations = $checks->whereIn('status', ['blocked', 'warning'])
+            ->map(fn (array $check): array => [
+                'label' => $check['label'],
+                'description' => $check['action'],
+                'link' => $check['link'] ?? null,
+            ])
+            ->unique('label')
+            ->values()
+            ->all();
+        $storeLabel = $companyName ?: 'sua loja';
+        $summaryText = 'Catálogo com '.$coverage['ready_products'].' de '.$coverage['active_products'].' produto(s) ativo(s) prontos, widget em estado '.$this->statusBadgeLabel($widget['status']).' e sincronização em estado '.$this->statusBadgeLabel($sync['status']).'.';
+
+        $lines = [
+            'Relatório de publicação - '.$storeLabel,
+            'Gerado em: '.now()->format('d/m/Y H:i'),
+            'Status: '.$summary['status_label'],
+            '',
+            $headline,
+            $summaryText,
+        ];
+
+        if ($blockers !== []) {
+            $lines[] = '';
+            $lines[] = 'Bloqueios:';
+            foreach ($blockers as $blocker) {
+                $lines[] = '- '.$blocker;
+            }
+        }
+
+        if ($warnings !== []) {
+            $lines[] = '';
+            $lines[] = 'Avisos:';
+            foreach ($warnings as $warning) {
+                $lines[] = '- '.$warning;
+            }
+        }
+
+        if ($recommendations !== []) {
+            $lines[] = '';
+            $lines[] = 'Próximos passos:';
+            foreach ($recommendations as $recommendation) {
+                $line = '- '.$recommendation['label'].': '.$recommendation['description'];
+                if ($recommendation['link']) {
+                    $line .= ' ('.$recommendation['link'].')';
+                }
+
+                $lines[] = $line;
+            }
+        }
+
+        return [
+            'title' => 'Relatório de publicação',
+            'generated_at' => $generatedAt,
+            'status_label' => $summary['status_label'],
+            'headline' => $headline,
+            'summary' => $summaryText,
+            'blockers' => $blockers,
+            'warnings' => $warnings,
+            'recommendations' => $recommendations,
+            'text' => implode("\n", $lines),
+        ];
+    }
+
+    private function productIsReady(Product $product): bool
+    {
+        return $product->status === 'active'
+            && filled($product->measurement_table_id)
+            && filled($product->fit_profile)
+            && filled($product->category)
+            && ! $this->hasSyncError($product)
+            && $this->activationEnabled($product, 'virtual_try_on_enabled')
+            && $this->activationEnabled($product, 'measurement_table_enabled');
+    }
+
+    private function hasSyncError(Product $product): bool
+    {
+        $metadata = $product->metadata ?? [];
+
+        return filled(data_get($metadata, 'sync_error'))
+            || filled(data_get($metadata, 'last_sync_error'))
+            || filled(data_get($metadata, 'import_error'))
+            || data_get($metadata, 'sync.status') === 'error'
+            || data_get($metadata, 'last_sync.status') === 'error';
+    }
+
+    private function activationEnabled(Product $product, string $flag): bool
+    {
+        $metadata = $product->metadata ?? [];
+        $value = data_get($metadata, 'activation.'.$flag, true);
+
+        if ($value === null || $value === '') {
+            return true;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ?? (bool) $value;
+    }
+
+    private function syncCounters(?IntegrationEvent $event): array
+    {
+        $summary = $event?->summary ?? [];
+
+        return [
+            'total' => $this->summaryInt($summary, ['totals.total', 'summary.total', 'total', 'counters.total']),
+            'errors' => $this->summaryInt($summary, ['totals.errors', 'summary.errors', 'errors', 'error_count', 'counters.errors']),
+            'warnings' => $this->summaryInt($summary, ['totals.warnings', 'summary.warnings', 'warnings', 'warnings_count', 'counters.warnings']),
+        ];
+    }
+
+    private function summaryInt(array $summary, array $paths): int
+    {
+        foreach ($paths as $path) {
+            $value = data_get($summary, $path);
+
+            if (is_numeric($value)) {
+                return (int) $value;
+            }
+        }
+
+        return 0;
+    }
+
+    private function widgetHasUnpublishedChanges(WidgetInstall $install): bool
+    {
+        $live = $this->widgetState($install, false);
+        $draft = $this->widgetState($install, true);
+
+        return $live !== $draft;
+    }
+
+    private function widgetState(WidgetInstall $install, bool $draft): array
+    {
+        $liveTheme = $install->theme ?? [];
+
+        return [
+            'platform' => (string) ($draft ? ($install->draft_platform ?: $install->platform ?: 'custom') : ($install->platform ?: 'custom')),
+            'allowed_domains' => collect($draft ? ($install->draft_allowed_domains ?? $install->allowed_domains ?? []) : ($install->allowed_domains ?? []))
+                ->map(fn ($domain): string => (string) $domain)
+                ->values()
+                ->all(),
+            'theme' => collect($draft ? ($install->draft_theme ?? $liveTheme) : $liveTheme)
+                ->sortKeys()
+                ->all(),
+            'is_active' => (bool) ($draft ? ($install->draft_is_active ?? $install->is_active) : $install->is_active),
+        ];
+    }
+
+    private function check(
+        string $key,
+        string $label,
+        string $status,
+        string $detail,
+        string $action,
+        ?string $link = null,
+        string $group = 'operacao',
+        ?string $impact = null
+    ): array {
+        return compact('key', 'label', 'status', 'detail', 'action', 'link', 'group', 'impact');
+    }
+
+    private function summaryStatusLabel(string $status): string
+    {
+        return match ($status) {
+            'ready' => 'Pronto',
+            'ready_with_warnings' => 'Pronto com avisos',
+            default => 'Bloqueado',
+        };
+    }
+
+    private function statusBadgeLabel(string $status): string
+    {
+        return match ($status) {
+            'passed' => 'ok',
+            'warning' => 'atenção',
+            'ready' => 'pronto',
+            'ready_with_warnings' => 'pronto com avisos',
+            default => 'bloqueado',
+        };
     }
 
     private function scopeCompanyId($query, ?int $companyId)

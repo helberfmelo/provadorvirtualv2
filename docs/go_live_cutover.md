@@ -132,3 +132,12 @@ Sem chave externa, o assistente continua operando com parser local para texto/CS
 Roteiro completo em `docs/commercial_pilot_package.md`.
 
 Publicado em produção no run `26340033238`; `scripts/validate-production.ps1` retornou `PRODUCTION VALIDATION OK`.
+
+## Status Sprint 154
+
+`/app/go-live` evoluiu de checklist estático para uma central conectada de publicação:
+
+- cards de situação com bloqueios, avisos, itens aprovados e cobertura do catálogo;
+- blocos conectados de catálogo, widget e sincronização com links diretos para correção;
+- relatório pronto para compartilhar com o lojista, incluindo resumo, recomendações e pendências;
+- botão de revalidação para atualizar o diagnóstico sem sair da tela.

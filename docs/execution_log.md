@@ -1714,3 +1714,16 @@
 - Commit `52463bc` enviado para `main`; o run `26674078434` do GitHub Actions finalizou com sucesso, incluindo validação backend, build frontend, deploy remoto, deploy da raiz pública, master admin e smoke público.
 - A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, incluindo `/app/assistente`, `/app/widget`, `/app/analytics`, pedidos, devoluções, taxonomia, integrações, sincronização, widget JS/CSS, páginas públicas, SaaS, portal, APIs, CORS, login demo e go-live readiness. Resultado final: `PRODUCTION VALIDATION OK`.
 - A validação visual local rodou em `http://127.0.0.1:5177/app/assistente`, com backend local em `8002`, navegador headless e usuário demo. Desktop e mobile passaram com a revisão guiada, a explicação simples e a comparação com a tabela atual; as capturas ficaram em `.tmp/sprint153-assistente-*.png` e não devem ser versionadas.
+
+## 2026-05-30 - Sprint 154 Publicação e checklist conectado a dados reais
+
+- Relida a documentação obrigatória antes da sprint, seguindo `docs/README.md` e a lista completa de documentos mandatórios.
+- Usado o benchmark já registrado de Dashboard, Settings/Service e Settings/Data Sources da Sizebay como referência para maturidade operacional, cobertura, instalação validada e sinais de prontidão.
+- `GET /api/v1/go-live/readiness` foi ampliado para devolver resumo operacional mais rico, `connected_data` com catálogo/widget/sincronização e `report` pronto para compartilhar com o lojista.
+- `GoLiveReadinessController` passou a calcular cobertura real de catálogo, publicação do widget, estado de sincronização, bloqueios, avisos, recomendações e links diretos para resolução.
+- `/app/go-live` foi reconstruída como checklist conectado, com cards de situação, blocos de dados conectados, relatório para o lojista, agrupamento por área e botão de revalidação.
+- `frontend/src/services/api.ts` e `frontend/.env.example` passaram a usar `8002` como fallback/local default do backend, alinhando a documentação e a validação visual do portal.
+- `backend/config/cors.php` passou a incluir `api/v1/go-live*`, corrigindo o carregamento do painel local em `5177` durante a validação headless.
+- Validações locais passaram com `C:\\php\\php.exe -l` nos PHP alterados, suíte focada `GoLiveReadinessApiTest|WidgetInstallApiTest|IntegrationsApiTest`, PHPUnit completo (`132 tests`, `1571 assertions`), `C:\\php\\php.exe vendor\\bin\\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check` e varredura de segredos.
+- A varredura de segredos não encontrou credencial real versionada; os únicos achados foram strings legítimas de fixtures de teste (`sk_test_checkout`, `sk_test_sync`, `pk_test_checkout`).
+- A validação visual local rodou em `http://127.0.0.1:5177/app/go-live`, com backend local em `8002`, navegador headless e usuário demo. Desktop e mobile passaram com resumo, dados conectados, relatório e checklist agrupado; as capturas ficaram em `.tmp/sprint154-go-live-*.png` e não devem ser versionadas.

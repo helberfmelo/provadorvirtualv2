@@ -2947,7 +2947,15 @@ Critérios de aceite:
 - avisos explicam impacto;
 - checklist tem links diretos para resolver.
 
-Status: planejada.
+Status: implementada e validada localmente; aguardando publicação final desta sprint.
+
+Implementação desta sprint:
+
+- `/app/go-live` agora consome dados reais de catálogo, widget e sincronização para mostrar prontidão operacional sem depender de checklist estático;
+- `GET /api/v1/go-live/readiness` passou a devolver `connected_data`, resumo com bloqueios/avisos e um relatório de publicação pronto para compartilhar com o lojista;
+- a tela de publicação ganhou cards de situação, blocos conectados, recomendações, links diretos para correção e botão de revalidação;
+- o frontend local passou a apontar por padrão para o backend em `8002`, e o backend local passou a aceitar `api/v1/go-live*` no CORS para a validação do portal em `5177`;
+- validações locais já concluídas: `php -l`, suíte focada, PHPUnit completo, `pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile.
 
 ### Sprint 155 - Usuários, permissões e contexto de empresa
 
