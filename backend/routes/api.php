@@ -21,6 +21,7 @@ use App\Http\Controllers\Api\V1\MeasurementTemplateController;
 use App\Http\Controllers\Api\V1\MerchantCompanyProfileController;
 use App\Http\Controllers\Api\V1\MerchantOrderController;
 use App\Http\Controllers\Api\V1\MerchantOverviewController;
+use App\Http\Controllers\Api\V1\MerchantReturnController;
 use App\Http\Controllers\Api\V1\OperationalStatusController;
 use App\Http\Controllers\Api\V1\ProductController;
 use App\Http\Controllers\Api\V1\ProductVariantController;
@@ -167,6 +168,14 @@ Route::prefix('v1')->group(function (): void {
         Route::get('/orders/template', [MerchantOrderController::class, 'template'])
             ->middleware('portal.permission:merchant,analytics,view');
         Route::post('/orders/import', [MerchantOrderController::class, 'import'])
+            ->middleware('portal.permission:merchant,analytics,edit');
+        Route::get('/returns/overview', [MerchantReturnController::class, 'overview'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/returns', [MerchantReturnController::class, 'index'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::get('/returns/template', [MerchantReturnController::class, 'template'])
+            ->middleware('portal.permission:merchant,analytics,view');
+        Route::post('/returns/import', [MerchantReturnController::class, 'import'])
             ->middleware('portal.permission:merchant,analytics,edit');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])
             ->middleware('portal.permission:merchant,analytics,view');

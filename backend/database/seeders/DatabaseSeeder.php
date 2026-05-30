@@ -8,6 +8,7 @@ use App\Models\MeasurementTableRow;
 use App\Models\Merchant;
 use App\Models\MerchantCompany;
 use App\Models\MerchantOrder;
+use App\Models\MerchantReturn;
 use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\TransactionalEmail;
@@ -186,6 +187,7 @@ class DatabaseSeeder extends Seeder
             'price' => 219.90,
         ], ['38', '40', '42', '44', '46']);
         $this->seedMerchantOrders($merchant, $company);
+        $this->seedMerchantReturns($merchant, $company);
 
         WidgetInstall::query()->updateOrCreate(
             ['public_key' => 'pv_demo_luna'],
@@ -420,6 +422,89 @@ class DatabaseSeeder extends Seeder
                 'assisted_items_count' => $items->where('used_virtual_try_on', true)->count(),
                 'assisted_revenue_cents' => (int) $items->where('used_virtual_try_on', true)->sum('line_total_cents'),
                 'metadata' => ['source' => 'seed_demo_orders'],
+            ]);
+        }
+    }
+
+    private function seedMerchantReturns(Merchant $merchant, MerchantCompany $company): void
+    {
+        $seededReturns = [
+            [
+                'reference' => 'PV-RETURN-2026-001',
+                'order_reference' => 'PV-ORDER-2026-001',
+                'processed_at' => now()->subDay(),
+                'status' => 'returned',
+                'item' => [
+                    'sku' => 'PV-AURORA-MIDI-M',
+                    'product_name' => 'Vestido Midi Aurora',
+                    'ordered_size' => 'M',
+                    'ideal_size' => 'G',
+                    'returned_size' => 'M',
+                    'exchanged_to_size' => null,
+                    'return_reason' => 'size_too_small',
+                    'quantity' => 1,
+                    'refund_amount_cents' => 18990,
+                    'used_virtual_try_on' => true,
+                    'recommendation_confidence' => 96,
+                ],
+            ],
+            [
+                'reference' => 'PV-RETURN-2026-002',
+                'order_reference' => 'PV-ORDER-2026-002',
+                'processed_at' => now()->subHours(10),
+                'status' => 'exchange',
+                'item' => [
+                    'sku' => 'PV-ESSENCIAL-CAMISETA-M',
+                    'product_name' => 'Camiseta Essencial Marinho',
+                    'ordered_size' => 'M',
+                    'ideal_size' => 'P',
+                    'returned_size' => 'M',
+                    'exchanged_to_size' => 'P',
+                    'return_reason' => 'size_too_large',
+                    'quantity' => 1,
+                    'refund_amount_cents' => 7990,
+                    'used_virtual_try_on' => true,
+                    'recommendation_confidence' => 88,
+                ],
+            ],
+        ];
+
+        foreach ($seededReturns as $seededReturn) {
+            $return = MerchantReturn::query()->updateOrCreate(
+                [
+                    'merchant_id' => $merchant->id,
+                    'merchant_company_id' => $company->id,
+                    'return_reference_hash' => hash('sha256', $seededReturn['reference']),
+                ],
+                [
+                    'source' => 'import',
+                    'source_platform' => 'custom',
+                    'return_reference' => $seededReturn['reference'],
+                    'order_reference' => $seededReturn['order_reference'],
+                    'order_reference_hash' => hash('sha256', $seededReturn['order_reference']),
+                    'status' => $seededReturn['status'],
+                    'processed_at' => $seededReturn['processed_at'],
+                    'metadata' => ['source' => 'seed_demo_returns'],
+                ]
+            );
+
+            $return->items()->delete();
+            $return->items()->create([
+                ...$seededReturn['item'],
+                'ordered_at' => now()->subDays(2),
+                'status' => $seededReturn['status'],
+                'metadata' => ['source' => 'seed_demo_returns'],
+            ]);
+
+            $return->update([
+                'items_count' => 1,
+                'total_quantity' => (int) $seededReturn['item']['quantity'],
+                'refund_amount_cents' => (int) $seededReturn['item']['refund_amount_cents'],
+                'used_virtual_try_on' => (bool) $seededReturn['item']['used_virtual_try_on'],
+                'assisted_items_count' => $seededReturn['item']['used_virtual_try_on'] ? 1 : 0,
+                'assisted_refund_cents' => $seededReturn['item']['used_virtual_try_on']
+                    ? (int) $seededReturn['item']['refund_amount_cents']
+                    : 0,
             ]);
         }
     }

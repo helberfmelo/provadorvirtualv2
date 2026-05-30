@@ -112,6 +112,14 @@ const topics: HelpTopic[] = [
     primaryLabel: 'Abrir relatórios',
   },
   {
+    key: 'devolucoes',
+    title: 'Devoluções',
+    summary: 'Devoluções e trocas precisam de motivo normalizado, tamanho envolvido e vínculo com o uso do provador.',
+    steps: ['Baixe o modelo ou exporte o arquivo da plataforma.', 'Revise o mapeamento de colunas na prévia.', 'Importe só depois de corrigir linhas inválidas e motivos ausentes.'],
+    primaryTo: '/app/devolucoes',
+    primaryLabel: 'Abrir devoluções',
+  },
+  {
     key: 'usuarios',
     title: 'Usuários',
     summary: 'Permissões devem acompanhar a função real de cada pessoa na operação da loja.',

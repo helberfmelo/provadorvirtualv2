@@ -129,6 +129,7 @@ const companyNavSections = computed<NavSection[]>(() => [
     links: [
       { to: '/app/analytics', label: 'Relatórios', icon: 'fa-chart-line', show: auth.canView('analytics') },
       { to: '/app/pedidos', label: 'Pedidos', icon: 'fa-receipt', show: auth.canView('analytics') },
+      { to: '/app/devolucoes', label: 'Devoluções', icon: 'fa-arrow-rotate-left', show: auth.canView('analytics') },
       { to: '/app/assistente', label: 'Assistente IA', icon: 'fa-wand-magic-sparkles', show: auth.canView('ai_assistant') },
     ],
   },
@@ -279,6 +280,14 @@ const companyHelpItems: Array<ContextHelp & { prefix: string, exact?: boolean }>
     topic: 'pedidos',
     title: 'Pedidos',
     text: 'Cruze pedidos com uso do provador para medir conversão assistida e revisar tamanhos comprados.',
+    nextTo: '/app/devolucoes',
+    nextLabel: 'Abrir devoluções',
+  },
+  {
+    prefix: '/app/devolucoes',
+    topic: 'devolucoes',
+    title: 'Devoluções',
+    text: 'Normalize motivos, compare com uso do provador e revise sinais de tamanho antes de ajustar a operação.',
     nextTo: '/app/go-live',
     nextLabel: 'Ver publicação',
   },

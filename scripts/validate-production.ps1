@@ -106,6 +106,7 @@ Assert-Page "/saas/emails/configuracoes"
 Assert-Page "/app"
 Assert-Page "/app/analytics"
 Assert-Page "/app/pedidos"
+Assert-Page "/app/devolucoes"
 Assert-Page "/app/assistente"
 Assert-Page "/app/widget"
 Assert-Page "/app/produtos"
@@ -294,6 +295,35 @@ $ordersList = Invoke-RestMethod -Uri "$ApiBase/orders?period=30d&per_page=5" -He
 Assert-True ($null -ne $ordersList.data) "orders list sem data"
 Assert-True ($null -ne $ordersList.meta) "orders list sem paginacao"
 "API orders list OK"
+
+$returnsOverview = Invoke-RestMethod -Uri "$ApiBase/returns/overview?period=30d" -Headers $headers
+Assert-True ($null -ne $returnsOverview.data) "returns overview sem data"
+Assert-True ($null -ne $returnsOverview.data.summary) "returns overview sem resumo"
+Assert-True ($null -ne $returnsOverview.data.filter_options) "returns overview sem filtros"
+"API returns overview OK"
+
+$returnsList = Invoke-RestMethod -Uri "$ApiBase/returns?period=30d&per_page=5" -Headers $headers
+Assert-True ($null -ne $returnsList.data) "returns list sem data"
+Assert-True ($null -ne $returnsList.meta) "returns list sem paginacao"
+"API returns list OK"
+
+$returnsTemplate = Invoke-WebRequest -UseBasicParsing -Uri "$ApiBase/returns/template?format=csv" -Headers $headers
+$returnsTemplateContentType = Get-HeaderValue -Headers $returnsTemplate.Headers -Name "Content-Type"
+Assert-True ($returnsTemplate.StatusCode -eq 200) "returns template nao retornou 200"
+Assert-True ($returnsTemplateContentType -like "text/csv*") "returns template sem CSV"
+Assert-True ($returnsTemplate.Content.Contains("return_reference")) "returns template sem cabecalho esperado"
+"API returns template OK"
+
+$returnsPreviewBody = @{
+    format = "csv"
+    commit = $false
+    content = "return_reference;order_reference;ordered_at;processed_at;status;return_reason;sku;product_name;ordered_size;ideal_size;returned_size;quantity;refund_amount;source_platform`nRET-VAL-001;PV-ORDER-2026-001;2026-05-28 10:00:00;2026-05-29 11:00:00;returned;ficou pequeno;PV-AURORA-MIDI-M;Vestido Midi Aurora;M;G;M;1;189.90;custom"
+} | ConvertTo-Json -Depth 4
+
+$returnsPreview = Invoke-RestMethod -Method Post -Uri "$ApiBase/returns/import" -Headers $headers -ContentType "application/json" -Body $returnsPreviewBody
+Assert-True ($returnsPreview.summary.valid -ge 1) "returns preview sem linhas validas"
+Assert-True ($returnsPreview.columns.mapping.order_reference -eq "order_reference") "returns preview sem mapeamento sugerido"
+"API returns preview OK"
 
 $placementBody = @{
     platform = $widgetInstall.data.platform

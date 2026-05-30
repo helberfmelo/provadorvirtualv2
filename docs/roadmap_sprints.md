@@ -2856,7 +2856,7 @@ Critérios de aceite:
 - motivo de devolução fica normalizado;
 - dados alimentam indicadores sem expor informação pessoal desnecessária.
 
-Status: planejada.
+Status: implementada na Sprint 151. O portal ganhou `/app/devolucoes`, com filtros por período/status/motivo/origem/uso do Provador, visão geral de devoluções e trocas, produtos mais impactados e tabela operacional por ocorrência. A API passou a expor `GET /api/v1/returns/overview`, `GET /api/v1/returns`, `GET /api/v1/returns/template` e `POST /api/v1/returns/import`, usando `merchant_returns` e `merchant_return_items` para registrar protocolo, pedido, motivo normalizado, tamanhos comprado/ideal/devolvido/trocado, valor devolvido e vínculo com uso do Provador. A importação aceita CSV, XLSX e JSON exportado por API, traz assistente de mapeamento de colunas com sugestão automática, aponta linha/coluna com erro e reaproveita o pedido/recomendação existente para gravar sinais idempotentes de `return` ou `exchange` em `recommendation_learning_events`, alimentando relatórios e IA sem expor dados pessoais do consumidor. Validações locais passaram com `php -l`, suíte focada (`MerchantReturnsApiTest|MerchantOrdersApiTest|AnalyticsApiTest|RecommendationApiTest`), PHPUnit completo (`132 tests`, `1508 assertions`), `C:\php\php.exe vendor\bin\pint --dirty --test`, `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `5177` com backend local em `8002`.
 
 ### Sprint 152 - Aprendizado com pedidos, devoluções e feedback
 

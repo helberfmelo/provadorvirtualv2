@@ -8584,6 +8584,18 @@ td small {
   gap: 14px;
 }
 
+.returns-mapping-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 14px;
+}
+
+.returns-mapping-grid label small {
+  color: #9a3412;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
 .merchant-orders-table table {
   min-width: 1180px;
 }
@@ -9079,6 +9091,7 @@ td small {
   .product-activation-grid,
   .product-media-section,
   .measurement-summary-strip,
+  .returns-mapping-grid,
   .history-list article {
     grid-template-columns: 1fr;
   }

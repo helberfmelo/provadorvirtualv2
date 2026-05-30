@@ -18,6 +18,7 @@ import LoginView from '../views/LoginView.vue'
 import MeasurementTableFormView from '../views/MeasurementTableFormView.vue'
 import MeasurementTablesView from '../views/MeasurementTablesView.vue'
 import MerchantOrdersView from '../views/MerchantOrdersView.vue'
+import MerchantReturnsView from '../views/MerchantReturnsView.vue'
 import ProductFormView from '../views/ProductFormView.vue'
 import PrivacyView from '../views/PrivacyView.vue'
 import ProductsView from '../views/ProductsView.vue'
@@ -73,6 +74,7 @@ const router = createRouter({
     { path: '/app/assistente', component: AiAssistantView },
     { path: '/app/analytics', component: AnalyticsView },
     { path: '/app/pedidos', component: MerchantOrdersView },
+    { path: '/app/devolucoes', component: MerchantReturnsView },
     { path: '/app/go-live', component: GoLiveView },
     { path: '/app/ajuda', component: HelpView },
     { path: '/app/importacoes', component: ImportsView },
