@@ -3153,7 +3153,7 @@ Critérios de aceite:
 - nenhuma tela tem texto ou card desnecessário;
 - build, testes, smoke e validação de produção passam.
 
-Status: concluída localmente e pronta para publicação.
+Status: concluída e publicada em produção.
 
 Implementação desta sprint:
 
@@ -3164,7 +3164,8 @@ Implementação desta sprint:
 - `/app/integracoes` passou a mostrar modo leitura claro, além de estados mais orientados para carregamento, falha e empresa sem plataforma configurada;
 - `/app/sincronizacao` passou a orientar melhor comparação vazia, filtros sem resultado, ausência de seleção e execuções sem erro por produto;
 - criado `docs/portal_visual_checklist.md` como checklist visual Sizebay-plus para futuras telas;
-- validações locais concluídas: `npm --prefix frontend run build` e revisão visual headless desktop/mobile das telas polidas.
+- validações locais concluídas: `npm --prefix frontend run build` e revisão visual headless desktop/mobile das telas polidas;
+- publicada no commit `44d3513`, com run `26677917313` verde e `scripts/validate-production.ps1` retornando `PRODUCTION VALIDATION OK`.
 
 ### Sprint 160 - Migração Sizebay e importação assistida de clientes
 

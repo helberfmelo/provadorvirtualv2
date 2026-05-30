@@ -1806,3 +1806,5 @@
 - `/app/sincronizacao` ganhou estados orientados para comparação vazia, histórico filtrado sem resultados, detalhe sem execução selecionada e rodada sem erro por produto.
 - Criado `docs/portal_visual_checklist.md` e referenciado em `docs/portal_ui_guidelines.md` como checklist rápido de clareza, estados, permissão e responsividade para futuras telas.
 - Validações locais passaram com `npm --prefix frontend run build` e revisão visual headless em `http://127.0.0.1:5177/app/produtos`, `/app/integracoes`, `/app/sincronizacao` e `/app/usuarios`, incluindo cenário com filtro vazio em produtos e checagem mobile sem rolagem horizontal em `.tmp/sprint159-visual/`.
+- O fechamento publicado da sprint saiu no commit `44d3513`; o run `26677917313` do workflow `Deploy Production` terminou verde.
+- A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, cobrindo páginas públicas, SaaS, portal autenticado, widget, APIs operacionais, CORS, login demo e retornando `PRODUCTION VALIDATION OK`.
