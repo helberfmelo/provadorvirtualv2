@@ -1791,3 +1791,5 @@
 - Validações locais passaram com `npm --prefix frontend run build`, `git diff --check` e varredura de segredos.
 - A varredura de segredos não encontrou credencial real versionada nos arquivos alterados. `.tmp` permaneceu local-only.
 - A validação visual local rodou em `http://127.0.0.1:5177/app/ajuda`, com backend local em `8002`, navegador headless e usuário demo da empresa. Desktop e mobile passaram com busca, troca de artigo, botão `Suporte com contexto` e CTA relacionado; a barra de ajuda contextual em `http://127.0.0.1:5177/app/produtos` também apontou corretamente para o artigo de produtos. As capturas ficaram em `.tmp/sprint158-help-desktop.png` e `.tmp/sprint158-help-mobile.png` e não devem ser versionadas.
+- O fechamento publicado da sprint saiu no commit `b30ce84`; o run `26677519329` do workflow `Deploy Production` terminou verde.
+- A validação pós-deploy com `scripts/validate-production.ps1` passou integralmente, cobrindo páginas públicas, páginas SaaS, portal autenticado, widget JS/CSS, APIs operacionais, CORS, login demo, readiness e retornando `PRODUCTION VALIDATION OK`.

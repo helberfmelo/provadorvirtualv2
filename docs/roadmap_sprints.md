@@ -3110,7 +3110,7 @@ Critérios de aceite:
 - suporte recebe contexto sem o lojista precisar explicar tudo;
 - base não contém credenciais nem dados sensíveis.
 
-Status: concluída localmente e pronta para publicação.
+Status: concluída e publicada em produção.
 
 Implementação desta sprint:
 
@@ -3120,6 +3120,7 @@ Implementação desta sprint:
 - `App.vue` passou a usar a mesma base para a barra de ajuda contextual e para o link do manual, evitando listas duplicadas;
 - o link de suporte agora leva assunto, rota, empresa, código, plataforma e usuário, reduzindo explicação manual;
 - o menu do portal ganhou entrada explícita para `/app/ajuda`;
+- publicada no commit `b30ce84`, com run `26677519329` verde e `scripts/validate-production.ps1` retornando `PRODUCTION VALIDATION OK`.
 - validações locais já concluídas: `npm --prefix frontend run build`, `git diff --check`, varredura de segredos e revisão visual headless desktop/mobile em `/app/ajuda`, além da checagem da barra contextual em `/app/produtos`.
 
 ### Sprint 159 - Polimento final Sizebay-plus do portal
